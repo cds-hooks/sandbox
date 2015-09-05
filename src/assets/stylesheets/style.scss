@@ -2,14 +2,56 @@ $blue: #4A90E2;
 $red: #D0021B;
 $grey: #DCE0E0;
 $dark-grey: #565A5C;
+$light-grey: #f3f3f3;
 $white: #FFF;
 
 $font: "Helvetica Neue", "Helvetica", "Arial", "sans-serif";
 $font-head: "Avenir Next", Avenir, "Helvetica Neue", Helvetica, Arial, sans-serif;
 $monospace: Inconsolata, Menlo, Consolas, monospace !important;
 
-// DayPicker styles
+#top-bar {
+    background: $dark-grey;
+    color: $white;
+    font-size: 2em;
+    padding-left: 2em;
+}
 
+// DayPicker styles
+.chevron {
+    background: $light-grey;
+}
+
+.drug {
+    padding-right: 1em;
+    cursor: pointer;
+}
+
+table.drug-choice tr:hover{
+    background: $grey;
+}
+.cui {
+    font-family: monospace;
+}
+.OrderEntry {
+  display: inline-block;
+  width: 60%;
+}
+
+.FhirView {
+  display: inline-block;
+  width: 40%;
+  vertical-align: top;
+  margin-top: 2em;
+  font-size: 1rem;
+}
+
+.DateBox {
+  width: 20em;
+}
+.DateText{
+  width: 100%;
+  text-align: center;
+}
 .DayPicker {
   display: flex;
   flex-wrap: wrap;
