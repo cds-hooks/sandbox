@@ -35,7 +35,7 @@
     "webpack-dev-server": "*"
   },
   "scripts": {
-    "build": "webpack --config webpack.prod.config.js",
+    "build": "webpack -p --config webpack.prod.config.js",
     "dev": "webpack-dev-server --config webpack.dev.config.js --colors --content-base ./build",
     "test": "jest"
   },
