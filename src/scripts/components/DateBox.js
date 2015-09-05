@@ -13,12 +13,13 @@ const DateBox = React.createClass({
   },
 
   componentWillReceiveProps(nextProps){
+    var updates = {};
     if (nextProps.value != this.props.value) {
-      this.state.input = moment(nextProps.value).format("YYYY-MM-DD")
+      updates.input =  moment(nextProps.value).format("YYYY-MM-DD")
       if (this.refs.input.getDOMNode() !== document.activeElement) {
-        this.state.picking = false;
+        updates.picking= false;
       }
-      this.setState(this.state);
+      this.setState(updates);
     }
   },
 
@@ -71,8 +72,7 @@ const DateBox = React.createClass({
   stopPicking(e){
     console.log("Stop picking", e);
     if (this.state.valid || this.state.done) {
-      this.state.picking = false;
-      this.setState(this.state);
+      this.setState({picking: false});
     }
   },
 
@@ -85,10 +85,11 @@ const DateBox = React.createClass({
   },
 
   startPicking() {
-    this.state.done = false;
-    this.state.picking = true;
-    this.state.valid = false;
-    this.setState(this.state);
+    this.setState({
+      done: false,
+      picking: true,
+      valid: false
+    });
     if (this.refs.daypicker)
     this.refs.daypicker.showMonth(this.props.value);
   },
@@ -96,9 +97,10 @@ const DateBox = React.createClass({
   inputKey: function(e){
     e.persist();
      if (e.key === "Enter"){
-       this.state.done = true;
-       this.state.picking = !this.state.picking;
-       this.setState(this.state);
+       this.setState({
+        done: true,
+        picking: !this.state.picking
+       });
     }
   },
 
@@ -106,9 +108,10 @@ const DateBox = React.createClass({
   handleInputChange(e) {
 
     var { value } = e.target;
-    this.state.input = value;
-    this.state.picking = true;
-    this.setState(this.state);
+    this.setState({
+      input: value,
+      picking: true
+    });
 
     if (moment(value, "YYYY-MM-DD", true).isValid()) {
       var decision = moment(value, "YYYY-MM-DD").toDate();

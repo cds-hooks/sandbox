@@ -28,7 +28,7 @@ const App = React.createClass({
   getStateFromStores() {
     return {
       dates: DateStore.getDates(),
-      drug: DrugStore.getStatus()
+      drug: DrugStore.getState()
     }
   },
 

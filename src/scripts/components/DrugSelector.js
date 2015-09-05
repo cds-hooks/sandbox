@@ -8,8 +8,7 @@ const DrugSelector = React.createClass({
 
   componentWillReceiveProps(nextProps){
     if (nextProps.step != this.props.step) {
-      this.state.elt = 0;
-      this.setState(this.state);
+      this.setState({elt: 0});
     }
     if (nextProps.step === "done") {
       this.state.q = "";
@@ -25,16 +24,11 @@ const DrugSelector = React.createClass({
   },
 
   sendSearch: function(e){
-    this.state.q = e.target.value;
-    this.state.elt = 0;
-    this.setState(this.state);
-    if (this.state.q !== "") {
-
+    this.setState({q: e.target.value, elt: 0});
       AppDispatcher.dispatch({
         type: ActionTypes.SEARCH_DRUGS,
         q: e.target.value
       })
-    }
   },
 
   pickList: function(){
@@ -58,7 +52,7 @@ const DrugSelector = React.createClass({
       AppDispatcher.dispatch({
         type: ActionTypes.PREVIOUS_STEP
       });
-      if (this.props.step !== "ingredient") {
+      if (this.props.step !== 'ingredient'){ 
         e.preventDefault();
       }
     }
@@ -69,15 +63,13 @@ const DrugSelector = React.createClass({
     if (e.key === "ArrowDown"){
       e.preventDefault();
       if(this.state.elt < options.length-1) {
-        this.state.elt++;
-        this.setState(this.state);
+        this.setState({elt: this.state.elt + 1});
       }
     }
     if (e.key === "ArrowUp"){
       e.preventDefault();
       if(this.state.elt > 0) {
-        this.state.elt--;
-        this.setState(this.state);
+        this.setState({elt: this.state.elt - 1});
       }
     }
   },
@@ -95,7 +87,7 @@ const DrugSelector = React.createClass({
               </tr>)
     });
     var err = "";
-    if (this.state.q.length >2 && pickList.length === 0) {
+    if (this.state.q.length >1 && pickList.length === 0) {
       err = "No matches";
     }
     var done = "";

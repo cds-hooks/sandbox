@@ -2,8 +2,10 @@ var AppDispatcher = require('../dispatcher/AppDispatcher');
 var EventEmitter = require('events').EventEmitter;
 var assign = require('object-assign');
 var debounce = require('debounce');
-
+var Immutable = require('immutable');
 import rxnorm from '../rxnorm';
+import ActionTypes from '../actions/ActionTypes'
+
 var pills = Object.keys(rxnorm.pillToComponentSets).map(p=>{
   return {
     cui: p,
@@ -11,84 +13,31 @@ var pills = Object.keys(rxnorm.pillToComponentSets).map(p=>{
   }
 });
 
-console.log("Pills 4", pills.slice(0,5));
-
 var CHANGE_EVENT = 'change';
 
-import ActionTypes from '../actions/ActionTypes'
-var _currentID = null;
-var _threads = {};
+var explicitStepHistory = ["begin"]; // components, prescribable
 
-var examples = [
-  {
-    "str": "Hydrochlorothiazide 25 MG / Metoprolol Tartrate 50 MG Oral Tablet",
-    "form": "tablet",
-    "ingredients":[
-      ["metoprolol", "50mg"],
-      ["hydrochlorothiazide", "25mg"]
-    ]
-  },{
-    "str": "Metoprolol Tartrate 100 MG Oral Tablet",
-    "form": "tablet",
-    "ingredients": [
-      ["metoprolol", "100mg"]
-    ]
-  },{
-    "str": "Metoprolol Tartrate 50 MG Oral Tablet",
-    "form": "tablet",
-    "ingredients": [
-      ["metoprolol", "50mg"]
-    ]
-  },{
-    "str": "Hydrochlorothiazide 25 MG Oral Tablet",
-    "form": "tablet",
-    "ingredients": [
-      ["hydrochlorothiazide", "25mg"]
-    ]
+var state = Immutable.fromJS({
+  options: {
+    "ingredient": [],
+    "components": [],
+    "prescribable": []
   },
-];
+  decisions: {
+    "ingredient": null,
+    "components": null,
+    "prescribable": null
+  },
+  step: "begin"
+})
 
-var nextStep = {
-  "ingredient": "components",
-  "components": "prescribable",
-  "prescribable": "done"
-};
-
-var explicitStepHistory = ["ingredient"]; // components, prescribable
-var step = "begin"; // components, prescribable
-
-var options = {
-  "ingredient": [],
-  "components": [],
-  "prescribable": []
-}
-
-var decisions = {
-  "ingredient": null,
-  "components": null,
-  "prescribable": null
-}
-
-var currentHits = examples;
 var currentDrug = null;
 var currentForms = null;
 
 var DrugStore = assign({}, EventEmitter.prototype, {
-  getStatus: function(){
-    return {
-      step: step,
-      options: options,
-      decisions: decisions
-    };
+  getState: function(){
+    return state.toJS();
   },
-
-  getHits: function(){
-    return currentHits
-  },
-  getDrug: function(){
-    return currentDrug
-  },
-
 
   emitChange: function() {
     console.log("Emit change now")
@@ -120,10 +69,11 @@ var processSearch = debounce(function(action){
 
   process.nextTick(function() {
     console.log("parts", parts)
-    if(parts.length == 0) 
-      options.ingredient = [];
-    else 
-      options.ingredient = pills
+    var newIngredients;
+    if(parts.length == 0)
+      newIngredients = [];
+    else
+      newIngredients = pills
     .filter(e=>
             parts
             .map(p=>e.str.match(RegExp("(?:^|\\s)" + p, "i")))
@@ -132,10 +82,9 @@ var processSearch = debounce(function(action){
             .slice(0,30)
             .map(p=>{
               return { str: p.str.slice(0,-5), cui: p.cui};});
-
-              console.log("Hits on", parts, options.ingredient.length);
-              console.log("Performed  a serach", action, (new Date().getTime() - t));
-              DrugStore.emitChange();
+              console.log("Search done on", parts)
+    state = state.setIn(['options', 'ingredient'], newIngredients);
+    DrugStore.emitChange();
   });
 }, 50);
 
@@ -196,42 +145,60 @@ DrugStore.dispatchToken = AppDispatcher.register(function(action) {
   switch(action.type) {
 
     case ActionTypes.SEARCH_DRUGS:
-      step = "ingredient";
-    decisions.ingredient = decisions.components = decisions.prescribable = null;
+      state = state.merge({
+        'step': 'ingredient',
+        'decisions': {
+          'ingredient': null,
+          'components': null,
+          'prescribable': null
+        }
+      });
     processSearch(action);
     break;
 
     case ActionTypes.PREVIOUS_STEP:
-      step = explicitStepHistory.pop();
-      if (step === "begin")
-        options.ingredient = [];
+      var prevStep = explicitStepHistory.pop();
+      state = state.set('step',  prevStep || 'begin');
+      console.log("Transition back to", state.get('step'), explicitStepHistory);
+      if (state.get('step') === "begin")
+        state.setIn(['options', 'ingredient'], []);
       DrugStore.emitChange();
       break;
 
     case ActionTypes.PICK_DRUG:
-      console.log("Action", action)
     if (!action.implicitChoice){
       explicitStepHistory.push(action.subtype);
     }
     if(action.subtype === "ingredient"){
-      step = "components"
-      decisions.ingredient = action.decision;
-      options.components = makeComponents(decisions.ingredient);
+      state = state.mergeDeep({
+        'step': 'components',
+        'decisions': {'ingredient': action.decision}
+      });
+      state = state.setIn(['options', 'components'], makeComponents(action.decision));
     } else if (action.subtype == "components"){
-      step = "prescribable"
-      decisions.components = action.decision;
-      options.prescribable = makePrescribable(decisions.components);
+      state = state.mergeDeep({
+        'step': 'prescribable',
+        'decisions': {'components': action.decision},
+      });
+      state = state.setIn(['options', 'prescribable'], makePrescribable(action.decision));
     } else if (action.subtype == "prescribable"){
-      step = "done"
-      decisions.prescribable = action.decision;
+      state = state.mergeDeep({
+        'step': 'done',
+        'decisions': {'prescribable': action.decision}
+      });
     }
 
-    if (options[step] && options[step].length === 1) {
+    var step = state.get('step');
+    var options = state.getIn(['options', step]);
+    console.log("get ste", step, state.toJS(), options);
+    if (options && options.length == 1) {
       process.nextTick(function() {
+        console.log("impolict ips", typeof step, options);
+        var onlyChoice = options[0]
         AppDispatcher.dispatch({
           type: ActionTypes.PICK_DRUG,
           subtype: step,
-          decision: options[step][0],
+          decision: onlyChoice,
           implicitChoice: true
         })
       });
@@ -239,7 +206,6 @@ DrugStore.dispatchToken = AppDispatcher.register(function(action) {
       DrugStore.emitChange();
     }
 
-    console.log("Piced", options);
     break;
 
 

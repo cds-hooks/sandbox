@@ -6,6 +6,7 @@
   "dependencies": {
     "debounce": "^1.0.0",
     "flux": "^2.0.3",
+    "immutable": "^3.7.5",
     "moment": "^2.10.6",
     "object-assign": "^2.0.0",
     "react": "^0.13.3",
