@@ -31,20 +31,31 @@ const FhirView = React.createClass({
     var oldLines = this.lines(this.props);
     var newLines = this.lines(newProps);
     var additions = newLines
-      .filter(l=>oldLines.indexOf(l) === -1);
+    .filter(l=>oldLines.indexOf(l) === -1);
     console.log("Additions are", additions, oldLines, newLines);
     this.setState({additions: additions});
   },
 
+  componentDidUpdate(){
+    window.setTimeout(()=>{
+      Object.keys(this.refs).forEach(k=>{
+        var r = this.refs[k];
+        r.getDOMNode().className="line " + (r.props.addition? "fade-actual" :  "");
+      });
+    });
+  },
+
   render() {
     var additions = this.state ? this.state.additions : [];
-    var output = this.lines(this.props).map(l=>
-                  (<div
-                   className={additions.indexOf(l) === -1 ? "old-line" : "new-line"}>
-                   {l}
-                   </div>));
+    var output = this.lines(this.props).map((l,i)=>
+                                            (<div
+                                             ref={i}
+                                             addition={additions.indexOf(l) !== -1}
+                                             className="line">
+                                             {l}
+                                             </div>));
 
-    return (<pre className="FhirView">{ output }</pre>);
+                                             return (<pre className="FhirView">{ output }</pre>);
   },
 
 

@@ -9,9 +9,16 @@ $font: "Helvetica Neue", "Helvetica", "Arial", "sans-serif";
 $font-head: "Avenir Next", Avenir, "Helvetica Neue", Helvetica, Arial, sans-serif;
 $monospace: Inconsolata, Menlo, Consolas, monospace !important;
 
-.new-line {
-  background: $white;
+.line {
+  transition-property: background;
+  transition-duration: .4s;
 }
+.fade { }
+
+.fade-actual {
+  background: white;
+}
+
 
 #top-bar {
     background: $dark-grey;
