@@ -9,6 +9,10 @@ $font: "Helvetica Neue", "Helvetica", "Arial", "sans-serif";
 $font-head: "Avenir Next", Avenir, "Helvetica Neue", Helvetica, Arial, sans-serif;
 $monospace: Inconsolata, Menlo, Consolas, monospace !important;
 
+.new-line {
+  background: $white;
+}
+
 #top-bar {
     background: $dark-grey;
     color: $white;

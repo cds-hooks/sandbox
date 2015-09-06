@@ -18,6 +18,8 @@ var CHANGE_EVENT = 'change';
 var explicitStepHistory = ["begin"]; // components, prescribable
 
 var state = Immutable.fromJS({
+  elt: 0,
+  q: "",
   options: {
     "ingredient": [],
     "components": [],
@@ -31,16 +33,19 @@ var state = Immutable.fromJS({
   step: "begin"
 })
 
-var currentDrug = null;
-var currentForms = null;
-
 var DrugStore = assign({}, EventEmitter.prototype, {
+
   getState: function(){
     return state.toJS();
   },
 
+  getStateToPublish(){
+    return {
+      drug: state.getIn(['decisions', 'prescribable', 'cui'])
+    };
+  },
+
   emitChange: function() {
-    console.log("Emit change now")
     this.emit(CHANGE_EVENT);
   },
 
@@ -68,7 +73,6 @@ var processSearch = debounce(function(action){
   .filter(x=>x != "");
 
   process.nextTick(function() {
-    console.log("parts", parts)
     var newIngredients;
     if(parts.length == 0)
       newIngredients = [];
@@ -82,19 +86,17 @@ var processSearch = debounce(function(action){
             .slice(0,30)
             .map(p=>{
               return { str: p.str.slice(0,-5), cui: p.cui};});
-              console.log("Search done on", parts)
-    state = state.setIn(['options', 'ingredient'], newIngredients);
-    DrugStore.emitChange();
+              state = state.setIn(['options', 'ingredient'], newIngredients);
+              DrugStore.emitChange();
   });
 }, 50);
 
 function makeComponents(ingredient){
-  console.log("make compeonts form", ingredient)
   return rxnorm.pillToComponentSets[ingredient.cui]
   .map(function(set){
     return {
       str: set.map(cui => rxnorm.cuiToName[cui]).join(" / "),
-      cui: set
+        cui: set
     }
   }).sort(compareDrugNames);
 }
@@ -125,7 +127,6 @@ function compareArrays(a,b){
   return compareArrays(a.slice(1), b.slice(1));
 }
 function compareDrugNames(a, b){
-  console.log("Comare drug names", a, b);
   return compareArrays(toNums(a), toNums(b));
 }
 
@@ -144,28 +145,63 @@ DrugStore.dispatchToken = AppDispatcher.register(function(action) {
 
   switch(action.type) {
 
-    case ActionTypes.SEARCH_DRUGS:
+    case ActionTypes.NEW_HASH_STATE:
+      console.log("new hash state", action);
+    var hash = JSON.parse(window.location.hash.slice(1));
+    var drug = hash.drug ? {
+      cui: hash.drug,
+      str: rxnorm.cuiToName[hash.drug]
+    } : undefined;
+    if (drug){
       state = state.merge({
-        'step': 'ingredient',
+        'step': 'done',
         'decisions': {
-          'ingredient': null,
-          'components': null,
-          'prescribable': null
+          'prescribable': drug
         }
       });
+      console.log("LEaving satte", DrugStore.getState());
+      DrugStore.emitChange();
+    }
+    break;
+
+    case ActionTypes.SEARCH_DRUGS:
+      if (!action.q) return;
+    state = state.merge({
+      'step': 'ingredient',
+      'q': action.q,
+      'elt': 0,
+      'decisions': {
+        'ingredient': null,
+        'components': null,
+        'prescribable': null
+      }
+    });
+    DrugStore.emitChange();
     processSearch(action);
+    break;
+    case ActionTypes.MOVE_DRUG_CURSOR:
+      var elt = state.get('elt');
+    var step = state.get('step');
+    var options = state.getIn(['options', step]);
+    var numOptions = options.length || 0;
+
+    if (elt > 0 && action.direction==="up")
+      state = state.merge({elt: elt-1});
+    if (elt < numOptions - 1 && action.direction==="down")
+      state = state.merge({elt: elt+1});
+    DrugStore.emitChange();
     break;
 
     case ActionTypes.PREVIOUS_STEP:
       var prevStep = explicitStepHistory.pop();
-      state = state.set('step',  prevStep || 'begin');
-      console.log("Transition back to", state.get('step'), explicitStepHistory);
-      if (state.get('step') === "begin")
-        state.setIn(['options', 'ingredient'], []);
-      DrugStore.emitChange();
-      break;
+    state = state.set('step',  prevStep || 'begin');
+    if (state.get('step') === "begin")
+      state.setIn(['options', 'ingredient'], []);
+    DrugStore.emitChange();
+    break;
 
     case ActionTypes.PICK_DRUG:
+      state = state.set('elt', 0);
     if (!action.implicitChoice){
       explicitStepHistory.push(action.subtype);
     }
@@ -183,6 +219,8 @@ DrugStore.dispatchToken = AppDispatcher.register(function(action) {
       state = state.setIn(['options', 'prescribable'], makePrescribable(action.decision));
     } else if (action.subtype == "prescribable"){
       state = state.mergeDeep({
+        'q': "",
+        'elt': 0,
         'step': 'done',
         'decisions': {'prescribable': action.decision}
       });
@@ -190,10 +228,8 @@ DrugStore.dispatchToken = AppDispatcher.register(function(action) {
 
     var step = state.get('step');
     var options = state.getIn(['options', step]);
-    console.log("get ste", step, state.toJS(), options);
     if (options && options.length == 1) {
       process.nextTick(function() {
-        console.log("impolict ips", typeof step, options);
         var onlyChoice = options[0]
         AppDispatcher.dispatch({
           type: ActionTypes.PICK_DRUG,

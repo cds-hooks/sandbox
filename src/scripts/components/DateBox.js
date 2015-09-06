@@ -24,10 +24,8 @@ const DateBox = React.createClass({
   },
 
   render() {
-    console.log("render", this.props, this.state);
     var codeBlockStyle = { "fontFamily": "monospace", "backgroundColor": "#D0D0D0" };
     var selectedDay = moment(this.props.value).toDate();
-    console.log(selectedDay);
 
     var modifiers = {
 
@@ -70,7 +68,6 @@ const DateBox = React.createClass({
   },
 
   stopPicking(e){
-    console.log("Stop picking", e);
     if (this.state.valid || this.state.done) {
       this.setState({picking: false});
     }

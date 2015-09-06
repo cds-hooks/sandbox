@@ -3,32 +3,13 @@ import AppDispatcher from '../dispatcher/AppDispatcher';
 import ActionTypes from '../actions/ActionTypes'
 import DrugStore from '../stores/DrugStore'
 
-
 const DrugSelector = React.createClass({
 
-  componentWillReceiveProps(nextProps){
-    if (nextProps.step != this.props.step) {
-      this.setState({elt: 0});
-    }
-    if (nextProps.step === "done") {
-      this.state.q = "";
-    }
-
-  },
-
-  getInitialState() {
-    return {
-      elt: 0,
-      q: ""
-    };
-  },
-
   sendSearch: function(e){
-    this.setState({q: e.target.value, elt: 0});
-      AppDispatcher.dispatch({
-        type: ActionTypes.SEARCH_DRUGS,
-        q: e.target.value
-      })
+    AppDispatcher.dispatch({
+      type: ActionTypes.SEARCH_DRUGS,
+      q: e.target.value
+    })
   },
 
   pickList: function(){
@@ -38,7 +19,6 @@ const DrugSelector = React.createClass({
   },
 
   pick: function(subtype, decision){
-    console.log("pick",subtype, decision);
     AppDispatcher.dispatch({
       type: ActionTypes.PICK_DRUG,
       subtype: subtype,
@@ -57,37 +37,39 @@ const DrugSelector = React.createClass({
       }
     }
     if (e.key === "Enter" || e.key === "ArrowRight"){
-      this.pick(this.props.step, options[this.state.elt])
+      this.pick(this.props.step, options[this.props.elt])
       e.preventDefault();
     }
     if (e.key === "ArrowDown"){
       e.preventDefault();
-      if(this.state.elt < options.length-1) {
-        this.setState({elt: this.state.elt + 1});
-      }
+      AppDispatcher.dispatch({
+        type: ActionTypes.MOVE_DRUG_CURSOR,
+        direction: "down"
+      })
     }
     if (e.key === "ArrowUp"){
       e.preventDefault();
-      if(this.state.elt > 0) {
-        this.setState({elt: this.state.elt - 1});
-      }
+      AppDispatcher.dispatch({
+        type: ActionTypes.MOVE_DRUG_CURSOR,
+        direction: "up"
+      })
     }
   },
 
   render() {
-    var eltNum = this.state.elt;
+    var eltNum = this.props.elt;
     var pickList = this
     .pickList()
     .map((h, i)=>{
       var chevron = (i == eltNum)? "chevron" : "";
-      return (<tr className={chevron}
+      return (<tr className={chevron} key={i}
               onClick={e=>this.pick(this.props.step, h)} >
               <td className="drug">{h.str}</td>
               <td className="cui">{h.cui}</td>
               </tr>)
     });
     var err = "";
-    if (this.state.q.length >1 && pickList.length === 0) {
+    if (this.props.q.length >1 && pickList.length === 0) {
       err = "No matches";
     }
     var done = "";
@@ -102,7 +84,7 @@ const DrugSelector = React.createClass({
       ref="q"
       type="text"
       onKeyDown={this.inputKey}
-      value={this.state.q}
+      value={this.props.q}
       onChange={this.sendSearch}
       onFocus={this.sendSearch}
       />
@@ -115,7 +97,6 @@ const DrugSelector = React.createClass({
       </div>
     );
   }
-
 });
 
 module.exports = DrugSelector;

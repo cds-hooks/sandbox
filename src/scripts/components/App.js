@@ -1,15 +1,22 @@
+import AppDispatcher from '../dispatcher/AppDispatcher';
+import ActionTypes from '../actions/ActionTypes'
 import React from 'react';
 import DrugSelector from './DrugSelector';
 import DateBox from './DateBox';
 import FhirView from './FhirView';
 import DateStore from '../stores/DateStore';
 import DrugStore from '../stores/DrugStore';
+import HashStateStore from '../stores/HashStateStore';
+
 
 const App = React.createClass({
 
   componentDidMount: function() {
     DrugStore.addChangeListener(this._onChange);
     DateStore.addChangeListener(this._onChange);
+    AppDispatcher.dispatch({
+      type: ActionTypes.NEW_HASH_STATE
+    })
   },
 
   componentWillUnmount: function() {
@@ -19,9 +26,8 @@ const App = React.createClass({
 
   _onChange: function(){
     //TODO avoid mutation. Immutable.js?
-    console.log("Got a change");
     var next = this.getStateFromStores();
-    console.log("next state", next);
+    HashStateStore();
     this.setState(next);
   },
 

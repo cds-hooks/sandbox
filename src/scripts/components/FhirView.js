@@ -2,20 +2,18 @@ import React from 'react';
 import moment from 'moment';
 
 const FhirView = React.createClass({
-  render() {
+
+  lines(props){
     var resource = {
       "resourceType": "MedicationOrder"
     }
-
     resource.dateWritten = moment(new Date());
-    resource.startDate = moment(this.props.dates.start).format("YYYY-MM-DD");
-    resource.endDate = moment(this.props.dates.end).format("YYYY-MM-DD");
+    resource.startDate = moment(props.dates.start).format("YYYY-MM-DD");
+    resource.endDate = moment(props.dates.end).format("YYYY-MM-DD");
     resource.status = "draft";
     resource.patient = {"reference": "Patient/example"};
-    console.log("Drug state", this.props)
-    if (this.props.drug && this.props.drug.step === "done") {
-      console.log("Done!");
-      var med = this.props.drug.decisions.prescribable;
+    if (props.drug && props.drug.step === "done") {
+      var med = props.drug.decisions.prescribable;
       resource.medicationCodeableConcept = {
         "text": med.str,
         "coding": [{
@@ -25,9 +23,28 @@ const FhirView = React.createClass({
         }]
       };
     }
-    var value = JSON.stringify(resource, null, 2);
+    return JSON.stringify(resource, null, 2).split(/\n/);
+  },
 
-    return (<pre className="FhirView">{ value }</pre>);
+  componentWillReceiveProps(newProps){
+    console.log("Will receive props", newProps);
+    var oldLines = this.lines(this.props);
+    var newLines = this.lines(newProps);
+    var additions = newLines
+      .filter(l=>oldLines.indexOf(l) === -1);
+    console.log("Additions are", additions, oldLines, newLines);
+    this.setState({additions: additions});
+  },
+
+  render() {
+    var additions = this.state ? this.state.additions : [];
+    var output = this.lines(this.props).map(l=>
+                  (<div
+                   className={additions.indexOf(l) === -1 ? "old-line" : "new-line"}>
+                   {l}
+                   </div>));
+
+    return (<pre className="FhirView">{ output }</pre>);
   },
 
 
