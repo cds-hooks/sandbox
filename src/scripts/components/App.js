@@ -56,6 +56,7 @@ const App = React.createClass({
   },
 
   render() {
+    console.log("Render with", this.state);
     return (
       <div onClick={this.bodyClick}>
       <div className="OrderEntry">
