@@ -12,6 +12,18 @@ const DateBox = React.createClass({
     };
   },
 
+  componentDidMount(){
+    window.bodyClicks.on('click', (e)=>{
+      if (!this.getDOMNode().contains(e.target)){
+        AppDispatcher.dispatch({
+          type: ActionTypes.SELECT_DATE,
+          id: this.props.id,
+          decision: this.props.value
+        })
+      }
+    })
+  },
+
   componentWillReceiveProps(nextProps){
     var updates = {};
     if (nextProps.value != this.props.value) {
