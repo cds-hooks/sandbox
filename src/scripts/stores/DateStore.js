@@ -13,18 +13,19 @@ var _dates = Immutable.fromJS({ });
 var DateStore = assign({}, EventEmitter.prototype, {
   getStateToPublish(){
     return {
-      start: moment(_dates.get('start')).format("YYYY-MM-DD"),
-      end: moment(_dates.get('end')).format("YYYY-MM-DD")
+      start: moment(_dates.getIn(['start', 'value'])).format("YYYY-MM-DD"),
+      end: moment(_dates.getIn(['end', 'value'])).format("YYYY-MM-DD")
     }
   },
 
   getDates: function(){
-    console.log(_dates.toJS());
     return _dates.toJS();
   },
 
   setDate: function(id, date){
-    _dates = _dates.set(id, date || new Date());
+  var toMerge = {};
+  toMerge[id] = {value: date || new Date()};
+    _dates = _dates.mergeDeep(toMerge);
   },
 
   emitChange: function() {
@@ -44,9 +45,17 @@ var DateStore = assign({}, EventEmitter.prototype, {
 DateStore.dispatchToken = AppDispatcher.register(function(action) {
 
   switch(action.type) {
+    case ActionTypes.OFFER_DATES:
+      _dates = _dates.mapEntries(([k,v]) => [
+        k,
+        (k === action.id) ? v.set('picking', true) : v.set('picking', false)
+      ]);
+      DateStore.emitChange();
+      break;
 
     case ActionTypes.SELECT_DATE:
-      _dates = _dates.set(action.id, action.decision);
+      _dates = _dates.setIn([action.id, 'value'], action.decision);
+      _dates = _dates.setIn([action.id, 'picking'], false);
       DateStore.emitChange();
     break;
 

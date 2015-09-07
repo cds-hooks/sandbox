@@ -31,12 +31,20 @@ $monospace: Inconsolata, Menlo, Consolas, monospace !important;
 .chevron {
     background: $light-grey;
 }
+.Drug-Selector-holder {
+  position: relative;
+  width: 100%;
+  z-index: 2;
+}
 
 .drug {
     padding-right: 1em;
     cursor: pointer;
 }
-
+table.drug-choice {
+    background: white;
+    width: 100%;
+}
 table.drug-choice tr:hover{
     background: $grey;
 }
@@ -58,18 +66,26 @@ table.drug-choice tr:hover{
 
 .DateBox {
   width: 20em;
+  position: relative;
 }
 .DateText{
   width: 100%;
   text-align: center;
 }
 .DayPicker {
+  //position: absolute;
+  //left: 0em;
+  //top: 2em;
+  width: 100%;
+  z-index: 1;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  position: relative;
+  //position: relative;
   padding: 1rem 0;
   user-select: none;
+  background: white;
+  border: 1px solid $dark-grey;
 }
 
 .DayPicker-Month {

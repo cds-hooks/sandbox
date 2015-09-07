@@ -76,7 +76,7 @@ const DrugSelector = React.createClass({
     if (this.props.step === "done")
       done = (<h4>{this.props.decisions.prescribable.str}</h4>);
     return (
-      <div>
+      <div className="Drug-Selector">
       <h3>Medication</h3>
       <input
       autofocus={true}
@@ -90,9 +90,11 @@ const DrugSelector = React.createClass({
       />
       <h4>{this.props.ingredient && this.props.ingredient.str}</h4>
       {err}
+      <div className="Drug-Selector-holder">
       <table className="drug-choice">
       {pickList}
       </table>
+      </div>
       {done}
       </div>
     );

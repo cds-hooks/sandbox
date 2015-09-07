@@ -27,12 +27,10 @@ const FhirView = React.createClass({
   },
 
   componentWillReceiveProps(newProps){
-    console.log("Will receive props", newProps);
     var oldLines = this.lines(this.props);
     var newLines = this.lines(newProps);
     var additions = newLines
     .filter(l=>oldLines.indexOf(l) === -1);
-    console.log("Additions are", additions, oldLines, newLines);
     this.setState({additions: additions});
   },
 

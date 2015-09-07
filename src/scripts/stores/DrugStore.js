@@ -165,7 +165,6 @@ DrugStore.dispatchToken = AppDispatcher.register(function(action) {
     break;
 
     case ActionTypes.SEARCH_DRUGS:
-      if (!action.q) return;
     state = state.merge({
       'step': 'ingredient',
       'q': action.q,
@@ -176,6 +175,7 @@ DrugStore.dispatchToken = AppDispatcher.register(function(action) {
         'prescribable': null
       }
     });
+    console.log("Got a search action");
     DrugStore.emitChange();
     processSearch(action);
     break;

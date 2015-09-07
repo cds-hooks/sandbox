@@ -7,7 +7,17 @@ import FhirView from './FhirView';
 import DateStore from '../stores/DateStore';
 import DrugStore from '../stores/DrugStore';
 import HashStateStore from '../stores/HashStateStore';
+import {EventEmitter} from 'events';
 
+window.bodyClicks = new EventEmitter();
+function bodyClick(e) {
+  bodyClicks.emit('click', e);
+  AppDispatcher.dispatch({
+    type: ActionTypes.BODY_CLICK,
+    event: e
+  })
+};
+document.body.addEventListener("click", bodyClick);
 
 const App = React.createClass({
 
@@ -18,6 +28,7 @@ const App = React.createClass({
       type: ActionTypes.NEW_HASH_STATE
     })
   },
+
 
   componentWillUnmount: function() {
     DrugStore.removeChangeListener(this._onChange);
@@ -46,13 +57,13 @@ const App = React.createClass({
 
   render() {
     return (
-      <div>
+      <div onClick={this.bodyClick}>
       <div className="OrderEntry">
       <DrugSelector {...this.state.drug} />
       <h3>Start date</h3>
-      <DateBox id="start" value={this.state.dates.start}/>
+      <DateBox id="start" {...this.state.dates.start} />
       <h3>End date</h3>
-      <DateBox id="end" value={this.state.dates.end}/>
+      <DateBox id="end" {...this.state.dates.end} />
       </div>
       <FhirView {...this.state} />
       </div>
