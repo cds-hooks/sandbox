@@ -8,7 +8,9 @@ const FhirView = React.createClass({
       "resourceType": "MedicationOrder"
     }
     resource.dateWritten = moment(new Date());
+    if (props.dates.start.enabled)
     resource.startDate = moment(props.dates.start.value).format("YYYY-MM-DD");
+    if (props.dates.end.enabled)
     resource.endDate = moment(props.dates.end.value).format("YYYY-MM-DD");
     resource.status = "draft";
     resource.patient = {"reference": "Patient/example"};
@@ -32,7 +34,6 @@ const FhirView = React.createClass({
     var additions = newLines
     .filter(l=>oldLines.indexOf(l) === -1);
     this.setState({additions: additions});
-    console.log("Set additions", newProps);
   },
 
   componentDidUpdate(){
@@ -53,7 +54,6 @@ const FhirView = React.createClass({
                                              className="line">
                                              {l}
                                              </div>));
-    console.log("Render with", output);
 
     return (<pre className="FhirView">{ output }</pre>);
   },

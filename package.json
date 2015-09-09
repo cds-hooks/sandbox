@@ -11,7 +11,8 @@
     "object-assign": "^2.0.0",
     "react": "^0.13.3",
     "react-day-picker": "^1.0.5",
-    "react-tap-event-plugin": "^0.1.7"
+    "react-tap-event-plugin": "^0.1.7",
+    "striptags": "^2.0.3"
   },
   "devDependencies": {
     "babel-jest": "*",

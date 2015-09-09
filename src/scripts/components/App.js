@@ -4,12 +4,17 @@ import React from 'react';
 import DrugSelector from './DrugSelector';
 import DateBox from './DateBox';
 import FhirView from './FhirView';
+import HookEditor from './HookEditor';
 import DateStore from '../stores/DateStore';
 import DrugStore from '../stores/DrugStore';
+import HookStore from '../stores/HookStore';
 import HashStateStore from '../stores/HashStateStore';
 import {EventEmitter} from 'events';
+import moment from 'moment'
+
 
 window.bodyClicks = new EventEmitter();
+document.body.addEventListener("click", bodyClick);
 function bodyClick(e) {
   bodyClicks.emit('click', e);
   AppDispatcher.dispatch({
@@ -17,22 +22,22 @@ function bodyClick(e) {
     event: e
   })
 };
-document.body.addEventListener("click", bodyClick);
 
 const App = React.createClass({
 
   componentDidMount: function() {
     DrugStore.addChangeListener(this._onChange);
     DateStore.addChangeListener(this._onChange);
+    HookStore.addChangeListener(this._onChange);
     AppDispatcher.dispatch({
       type: ActionTypes.NEW_HASH_STATE
     })
   },
 
-
   componentWillUnmount: function() {
     DrugStore.removeChangeListener(this._onChange);
     DateStore.removeChangeListener(this._onChange);
+    HookStore.removeChangeListener(this._onChange);
   },
 
   _onChange: function(){
@@ -45,28 +50,40 @@ const App = React.createClass({
   getStateFromStores() {
     return {
       dates: DateStore.getDates(),
-      drug: DrugStore.getState()
+      drug: DrugStore.getState(),
+      hooks: HookStore.getState()
     }
   },
 
   getInitialState() {
-    DateStore.setDate("start");
-    DateStore.setDate("end");
+    DateStore.setDate("start", {
+      date: moment().toDate(),
+      enabled: true});
+    DateStore.setDate("end", {
+      date: moment().add(28, 'days').toDate(),
+      enabled: false});
     return this.getStateFromStores();
   },
 
   render() {
-    console.log("Render with", this.state);
     return (
-      <div onClick={this.bodyClick}>
-      <div className="OrderEntry">
-      <DrugSelector {...this.state.drug} />
-      <h3>Start date</h3>
-      <DateBox id="start" {...this.state.dates.start} />
-      <h3>End date</h3>
-      <DateBox id="end" {...this.state.dates.end} />
+      <div id="react-content">
+    <div id="top-bar">SMART CDS Hooks: EHR Demo</div>
+
+      <div id="main">
+        <div className="OrderEntry">
+        <DrugSelector {...this.state.drug} />
+        <DateBox id="start" display="Start date" {...this.state.dates.start} />
+        <DateBox id="end" display="End date" {...this.state.dates.end} />
+        </div>
+        <FhirView {...this.state} />
       </div>
-      <FhirView {...this.state} />
+      <HookEditor {...this.state.hooks} />
+    <div id="bottom-bar">
+      SMART Health IT —
+      About <a href="https://github.com/jmandel/cds-hooks/wiki">CDS Hooks</a> —
+      Source <a href="https://github.com/jmandel/cds-hooks-rx-app">on GitHub</a>
+    </div>
       </div>
     )
   }

@@ -146,7 +146,6 @@ DrugStore.dispatchToken = AppDispatcher.register(function(action) {
   switch(action.type) {
 
     case ActionTypes.NEW_HASH_STATE:
-      console.log("new hash state", action);
     var hash = JSON.parse(window.location.hash.slice(1));
     var drug = hash.drug ? {
       cui: hash.drug,
@@ -159,7 +158,6 @@ DrugStore.dispatchToken = AppDispatcher.register(function(action) {
           'prescribable': drug
         }
       });
-      console.log("LEaving satte", DrugStore.getState());
       DrugStore.emitChange();
     }
     break;
@@ -175,7 +173,6 @@ DrugStore.dispatchToken = AppDispatcher.register(function(action) {
         'prescribable': null
       }
     });
-    console.log("Got a search action");
     DrugStore.emitChange();
     processSearch(action);
     break;
@@ -196,13 +193,14 @@ DrugStore.dispatchToken = AppDispatcher.register(function(action) {
       var prevStep = explicitStepHistory.pop();
     state = state.set('step',  prevStep || 'begin');
     if (state.get('step') === "begin")
+      explicitStepHistory.push('begin');
       state.setIn(['options', 'ingredient'], []);
     DrugStore.emitChange();
     break;
 
     case ActionTypes.PICK_DRUG:
       state = state.set('elt', 0);
-    if (!action.implicitChoice){
+    if (!action.implicitChoice && action.subtype !== explicitStepHistory.slice(-1)[0]){
       explicitStepHistory.push(action.subtype);
     }
     if(action.subtype === "ingredient"){

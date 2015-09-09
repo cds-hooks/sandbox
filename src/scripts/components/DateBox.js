@@ -51,19 +51,35 @@ const DateBox = React.createClass({
       picker = null;
     }
 
-    return (<div className="DateBox">
-            <input
-            ref="input"
-            type="text"
-            className="DateText"
-            value={ this.state.input }
-            placeholder="YYYY-MM-DD"
-            onChange={ this.handleInputChange }
-            onFocus={ this.startPicking }
-            onKeyDown={this.startPicking} />
-            {picker}
-            </div>
-           );
+    var control = ( <div className="DateBox">
+       <input
+       ref="input"
+       type="text"
+       className="DateText form-control"
+       value={ this.state.input }
+       placeholder="YYYY-MM-DD"
+       onChange={ this.handleInputChange }
+       onFocus={ this.startPicking }
+       onMouseUp={ this.startPicking }
+       onKeyDown={this.startPicking} />
+       {picker}
+       </div> );
+
+    return (
+      
+  <div className="form-group">
+    <label>{this.props.display}</label>
+    <input type="checkbox" checked={this.props.enabled} onChange={this.toggleEnabled}/>
+    {this.props.enabled && control}
+  </div>);
+  },
+
+  toggleEnabled(){
+    AppDispatcher.dispatch({
+      type: ActionTypes.TOGGLE_DATE_ENABLED,
+      id: this.props.id,
+      enabled: !this.props.enabled
+    })
   },
 
   handleDayTouchTap(e, day, modifiers) {
@@ -85,12 +101,10 @@ const DateBox = React.createClass({
   },
 
   handleInputChange(e) {
-
     var { value } = e.target;
     this.setState({
       input: value,
     });
-
     if (moment(value, "YYYY-MM-DD", true).isValid()) {
       var decision = moment(value, "YYYY-MM-DD").toDate();
       if (value !== moment(this.props.value).format("YYYY-MM-DD")) {
@@ -101,7 +115,6 @@ const DateBox = React.createClass({
         })
       }
     }
-
   }
 
 });

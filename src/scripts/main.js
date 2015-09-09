@@ -8,4 +8,4 @@ require('!style!css!sass!../assets/stylesheets/style.scss');
 import App from './components/App.js';
 import React from 'react';
 
-React.render(<App josh="here"/>, document.getElementById('main'));
+React.render(<App/>, document.getElementById('react-wrapper'));

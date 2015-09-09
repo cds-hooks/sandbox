@@ -22,9 +22,9 @@ var DateStore = assign({}, EventEmitter.prototype, {
     return _dates.toJS();
   },
 
-  setDate: function(id, date){
+  setDate: function(id, {date, enabled}){
   var toMerge = {};
-  toMerge[id] = {value: date || new Date()};
+  toMerge[id] = {value: date || new Date(), enabled: !!enabled};
     _dates = _dates.mergeDeep(toMerge);
   },
 
@@ -58,6 +58,11 @@ DateStore.dispatchToken = AppDispatcher.register(function(action) {
       _dates = _dates.setIn([action.id, 'picking'], false);
       DateStore.emitChange();
     break;
+    case ActionTypes.TOGGLE_DATE_ENABLED:
+      _dates = _dates.setIn([action.id, 'enabled'], action.enabled);
+      DateStore.emitChange();
+    break;
+
 
 
     default:

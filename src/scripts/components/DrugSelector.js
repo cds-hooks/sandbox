@@ -74,11 +74,13 @@ const DrugSelector = React.createClass({
     }
     var done = "";
     if (this.props.step === "done")
-      done = (<h4>{this.props.decisions.prescribable.str}</h4>);
+      done = (<span className='selected-drug'>{this.props.decisions.prescribable.str}</span>);
     return (
       <div className="Drug-Selector">
-      <h3>Medication</h3>
+  <div className="form-group">
+    <label for="exampleInputEmail1">Medication</label>
       <input
+      className="form-control"
       autofocus={true}
       placeholder="search for a drug"
       ref="q"
@@ -86,16 +88,15 @@ const DrugSelector = React.createClass({
       onKeyDown={this.inputKey}
       value={this.props.q}
       onChange={this.sendSearch}
-      onFocus={this.sendSearch}
       />
-      <h4>{this.props.ingredient && this.props.ingredient.str}</h4>
-      {err}
+      <h5>{this.props.ingredient && this.props.ingredient.str || err}</h5>
       <div className="Drug-Selector-holder">
       <table className="drug-choice">
       {pickList}
       </table>
       </div>
       {done}
+  </div>
       </div>
     );
   }

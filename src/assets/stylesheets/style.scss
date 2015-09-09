@@ -9,6 +9,79 @@ $font: "Helvetica Neue", "Helvetica", "Arial", "sans-serif";
 $font-head: "Avenir Next", Avenir, "Helvetica Neue", Helvetica, Arial, sans-serif;
 $monospace: Inconsolata, Menlo, Consolas, monospace !important;
 
+html {
+    height: 100%;
+}
+
+body {
+    min-height: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+}
+
+.configure-hooks {
+width: 100%;
+}
+
+.save-hook {
+  float: right;
+  background: $white;
+  border: 1px solid $dark-grey;
+  font-weight: bold;
+}
+.save-hook:disabled {
+  color: $dark-grey;
+  font-weight: normal;
+}
+
+.edit-hook{
+    margin: 2em;
+}
+
+
+.edit-hook.new-hook .edit-hook-inner{
+    border: 2px dashed $dark-grey;
+}
+
+.edit-hook-inner {
+    background: white;
+    border: 2px solid $dark-grey;
+    padding: 2em;
+    display: block;
+    font-family: $monospace;
+    font-size: 1rem;
+    margin-top: .5em;
+}
+
+#react-content {
+    flex-grow: 1;
+    display: flex;
+    flex-flow: column nowrap;
+}
+
+#main {
+  flex-grow: 1;
+  display: flex;
+  flex-flow: row wrap;
+}
+
+.form-group {
+  margin: 1em;
+}
+
+input[type="checkbox"] {
+    vertical-align: text-bottom;
+    margin-left: .5em;
+}
+
+.selected-drug {
+    border: 1px solid $dark-grey;
+    padding: 0.3em;
+    border-radius: 10px;
+    background: $light-grey;
+    display: inline-block;
+}
+
 .line {
   transition-property: background;
   transition-duration: .4s;
@@ -25,7 +98,16 @@ $monospace: Inconsolata, Menlo, Consolas, monospace !important;
     color: $white;
     font-size: 2em;
     padding-left: 2em;
+    height: 1.5em;
 }
+#bottom-bar {
+    background: $dark-grey;
+    color: $white;
+    font-size: .75em;
+    padding-left: 2em;
+    margin-bottom: 0px;
+}
+
 
 // DayPicker styles
 .chevron {
@@ -34,6 +116,7 @@ $monospace: Inconsolata, Menlo, Consolas, monospace !important;
 .Drug-Selector-holder {
   position: relative;
   width: 100%;
+  padding-right: 1em;
   z-index: 2;
 }
 
@@ -52,25 +135,25 @@ table.drug-choice tr:hover{
     font-family: monospace;
 }
 .OrderEntry {
-  display: inline-block;
-  width: 60%;
+  flex-grow: 5;
+  flex-basis: 20em;
 }
 
 .FhirView {
-  display: inline-block;
-  width: 40%;
-  vertical-align: top;
-  margin-top: 2em;
+  margin: 2em;
   font-size: 1rem;
+  flex-basis: 22em;
+  flex-grow: 4;
 }
 
 .DateBox {
   width: 20em;
   position: relative;
 }
+
 .DateText{
-  width: 100%;
   text-align: center;
+  width: 10em;
 }
 .DayPicker {
   //position: absolute;
