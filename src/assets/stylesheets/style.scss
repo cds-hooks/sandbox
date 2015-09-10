@@ -19,6 +19,9 @@ body {
     flex-flow: column nowrap;
 }
 
+.hook-editor {
+  background: $dark-grey;
+}
 .configure-hooks {
 width: 100%;
 }

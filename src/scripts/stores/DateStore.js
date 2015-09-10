@@ -6,6 +6,11 @@ import moment from 'moment';
 import ActionTypes from '../actions/ActionTypes'
 import Immutable from 'immutable'
 
+var x = Immutable.fromJS({a: 1, b:{c:3}});
+var y = x.set('a',1 );
+
+console.log("x, y", Immutable.is(x, y), x===y);
+
 var CHANGE_EVENT = 'change';
 
 var _dates = Immutable.fromJS({ });

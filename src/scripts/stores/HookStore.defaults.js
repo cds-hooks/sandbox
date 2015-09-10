@@ -1,10 +1,10 @@
 export default {
     "pediatric-dosing": {
       "id": "pediatric-dosing",
-      "uri": "http://localhost:8081/pediatric-dosing",
+      "url": "http://localhost:8081/pediatric-dose-check",
       "name": "Pediatric Dosage Check",
       "intent": "evaluate-prescription",
-      "pre-fetch-template": {
+      "preFetchTemplate": {
         "resourceType": "Bundle",
         "type": "transaction",
         "entry": [{

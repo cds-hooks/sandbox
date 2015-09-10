@@ -97,7 +97,7 @@ const HookEditor = React.createClass({
                                             if (this.props.editing)
                                               current.push(<OneHook className="new-hook" hook={{id: "new"}}/>)
 
-                                            return (<div>{edit}{current}</div>);
+                                            return (<div className="hook-editor">{edit}{current}</div>);
   },
 
   startEditing() {

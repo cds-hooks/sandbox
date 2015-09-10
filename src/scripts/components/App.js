@@ -8,6 +8,7 @@ import HookEditor from './HookEditor';
 import DateStore from '../stores/DateStore';
 import DrugStore from '../stores/DrugStore';
 import HookStore from '../stores/HookStore';
+import DecisionStore from '../stores/DecisionStore';
 import HashStateStore from '../stores/HashStateStore';
 import {EventEmitter} from 'events';
 import moment from 'moment'
