@@ -6,7 +6,6 @@ import assign from 'object-assign'
 window.addEventListener('hashchange',hashListener);
 
 function hashListener(e){
-  console.log("duspatch it");
     AppDispatcher.dispatch({
       type: ActionTypes.NEW_HASH_STATE
     })
@@ -21,7 +20,6 @@ function publishStateFromStores(){
   );
   var newHash = `#${JSON.stringify(stateToPublish)}`;
   if (newHash != window.location.hash) {
-    console.log("expect publishing a difference:", newHash, window.location.hash);
     window.history.replaceState(undefined, undefined, newHash);
   }
 }

@@ -9,6 +9,7 @@ var server = restify.createServer({
 });
 
 server.use(restify.bodyParser());
+server.use(restify.CORS());
 
 services.forEach(function(service){
 

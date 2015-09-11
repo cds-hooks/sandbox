@@ -10,6 +10,7 @@
     "immutable": "^3.7.5",
     "json-loader": "^0.5.2",
     "moment": "^2.10.6",
+    "node-uuid": "^1.4.3",
     "object-assign": "^2.0.0",
     "react": "^0.13.3",
     "react-day-picker": "^1.0.5",

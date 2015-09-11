@@ -12,6 +12,7 @@ export default {
   "EDIT_HOOK": "EDIT_HOOK",
   "SAVE_HOOK": "SAVE_HOOK",
   "DELETE_HOOK": "DELETE_HOOK",
+  "LOADED": "LOADED"
 };
 
 

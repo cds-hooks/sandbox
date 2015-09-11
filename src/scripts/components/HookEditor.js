@@ -91,8 +91,8 @@ const HookEditor = React.createClass({
                 </button>);
 
                 var current = this.props.editing && Object
-                .keys(this.props.hooks).map(h => 
-                                            <OneHook hook={this.props.hooks[h]}/>) || [];
+                .keys(this.props.hooks.toList()).map(h => 
+                                            <OneHook hook={h.toJS()}/>) || [];
 
                                             if (this.props.editing)
                                               current.push(<OneHook className="new-hook" hook={{id: "new"}}/>)

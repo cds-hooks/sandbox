@@ -29,6 +29,7 @@ const App = React.createClass({
   componentDidMount: function() {
     DrugStore.addChangeListener(this._onChange);
     DateStore.addChangeListener(this._onChange);
+    DecisionStore.addChangeListener(this._onChange);
     HookStore.addChangeListener(this._onChange);
     AppDispatcher.dispatch({
       type: ActionTypes.NEW_HASH_STATE
@@ -37,6 +38,7 @@ const App = React.createClass({
 
   componentWillUnmount: function() {
     DrugStore.removeChangeListener(this._onChange);
+    DecisionStore.removeChangeListener(this._onChange);
     DateStore.removeChangeListener(this._onChange);
     HookStore.removeChangeListener(this._onChange);
   },
@@ -52,7 +54,8 @@ const App = React.createClass({
     return {
       dates: DateStore.getDates(),
       drug: DrugStore.getState(),
-      hooks: HookStore.getState()
+      hooks: HookStore.getState(),
+      decisions: DecisionStore.getState()
     }
   },
 
@@ -63,6 +66,7 @@ const App = React.createClass({
     DateStore.setDate("end", {
       date: moment().add(28, 'days').toDate(),
       enabled: false});
+    AppDispatcher.dispatch({ type: ActionTypes.LOADED })
     return this.getStateFromStores();
   },
 

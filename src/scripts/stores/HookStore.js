@@ -12,29 +12,29 @@ var state = Immutable.fromJS({
 });
 console.log("state", state)
 
-function saveHooks(state){
+function saveHooks(state) {
   window.localStorage["hooks"] = JSON.stringify(state.get('hooks'));
-};
+}
 
-function restoreHooks(){
-   try {
-     var hooks = JSON.parse(window.localStorage["hooks"]);
-     console.log("from storage");
-     return Immutable.fromJS(hooks);
-   } catch (e) {
-     console.log("from defulits", defaultHooks);
+function restoreHooks() {
+  try {
+    var hooks = JSON.parse(window.localStorage["hooks"]);
+    return Immutable.fromJS(hooks);
+  } catch (e) {
+    console.log("restore hooks from defulits", defaultHooks);
     return Immutable.fromJS(defaultHooks);
-   }
-};
+  }
+}
+;
 
-function resetHooks(){
+function resetHooks() {
   delete window.localStorage.hooks;
   state.set('hooks', restoreHooks());
-};
+}
 
 var HookStore = assign({}, EventEmitter.prototype, {
-  getState: function(){
-    return state.toJS();
+  getState: function() {
+    return state
   },
 
   emitChange: function() {
@@ -60,8 +60,8 @@ var HookStore = assign({}, EventEmitter.prototype, {
 
 HookStore.dispatchToken = AppDispatcher.register(function(action) {
 
-    console.log("hook aciton", action);
-  switch(action.type) {
+  console.log("hook aciton", action);
+  switch (action.type) {
 
     case ActionTypes.NEW_HOOK:
       state = state.set('editing', true)
@@ -80,7 +80,7 @@ HookStore.dispatchToken = AppDispatcher.register(function(action) {
       console.log("save", action)
       if (!action.discard) {
         state = state.setIn(['hooks', action.value.id], action.value);
-        if (action.id !== action.value.id){
+        if (action.id !== action.value.id) {
           state = state.deleteIn(['hooks', action.id]);
         }
       } else {
@@ -95,7 +95,7 @@ HookStore.dispatchToken = AppDispatcher.register(function(action) {
       break;
 
     default:
-      // do nothing
+  // do nothing
   }
 
 });
