@@ -79,7 +79,7 @@ HookStore.dispatchToken = AppDispatcher.register(function(action) {
     case ActionTypes.SAVE_HOOK:
       console.log("save", action)
       if (!action.discard) {
-        state = state.setIn(['hooks', action.value.id], action.value);
+        state = state.setIn(['hooks', action.value.id], Immutable.fromJS(action.value));
         if (action.id !== action.value.id) {
           state = state.deleteIn(['hooks', action.id]);
         }

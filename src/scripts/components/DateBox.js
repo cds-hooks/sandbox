@@ -67,7 +67,7 @@ const DateBox = React.createClass({
 
     return (
       
-  <div className="form-group">
+  <div className="col-md-4">
     <label>{this.props.display}</label>
     <input type="checkbox" checked={this.props.enabled} onChange={this.toggleEnabled}/>
     {this.props.enabled && control}

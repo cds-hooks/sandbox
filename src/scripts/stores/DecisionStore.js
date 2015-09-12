@@ -6,12 +6,26 @@ import DrugStore from './DrugStore'
 import HookStore from './HookStore'
 import moment from 'moment'
 import uuid from 'node-uuid'
+import { getIn, paramsToJson } from '../../../mock-cds-backend/utils.js'
 
 var AppDispatcher = require('../dispatcher/AppDispatcher')
 var EventEmitter = require('events').EventEmitter
 var assign = require('object-assign')
 var Immutable = require('immutable')
 
+var decisionSchema = {
+  'card': [{
+    'summary': 1,
+    'suggestion': [{
+      'label': 1,
+      'alternative': 1
+    }],
+    'link': [{
+      'label': 1,
+      'url': 1
+    }]
+  }]
+};
 
 var CHANGE_EVENT = 'change'
 var state = Immutable.fromJS({
@@ -49,9 +63,13 @@ function _hooksChanged() {
   if (Immutable.is(hooks, state.get('hooks'))) {
     return;
   }
-  state = state.set('hooks', hooks)
 
-  var hookFetches = hooks.toList().map(h => axios({
+  state = state.set('cards', Immutable.fromJS([]));
+  state = state.set('hooks', hooks)
+  console.log("so new hooks", hooks.toJS())
+  var hookFetches = hooks.valueSeq()
+  .filter(h=>h.get('preFetchTemplate'))
+  .map(h => axios({
       url: context.base,
       method: 'post',
       data: fillTemplate(h.get('preFetchTemplate'), context)
@@ -64,8 +82,10 @@ function _hooksChanged() {
         Immutable.fromJS({}))
   ))
 
-  state.get('preFetchData').then(results => console.log("Got prefetch!", results.toJS())
-  ).catch(err => console.log(err))
+  state.get('preFetchData').then(results => {
+    console.log("Got prefetch!", results.toJS())
+    callHooks(state)
+  }).catch(err => console.log(err))
 }
 
 function _rxChanged() {
@@ -76,10 +96,12 @@ function _rxChanged() {
 
   var resource = toFhir(props)
   if (!Immutable.is(resource, state.get('fhir'))) {
+    console.log("Changed to", state.get('fhir').toJS())
     state = state.set('fhir', resource)
+    state = state.set('cards', Immutable.List())
+    DecisionStore.emitChange()
+    callHooks(state)
   }
-  DecisionStore.emit(CHANGE_EVENT)
-  callHooks(state)
 }
 
 var launchService = {
@@ -107,23 +129,37 @@ function hookBody(h, fhir, preFetchData) {
   }
 }
 
-function callHooks(state) {
+function addCardsFrom(callCount, hookUrl, result) {
+  console.log("Result", hookUrl, result.data)
+  if (!result.data) {
+    return;
+  }
+  if (state.get('callCount') !== callCount){
+    return;
+  }
+  var cards = paramsToJson(result.data, decisionSchema)['card'];
+  console.log("Adding cards", cards)
+  var newCards = state.get('cards').push(...cards)
+  state = state.set('cards', newCards)
+  console.log("Extracted cards", cards)
+  DecisionStore.emitChange()
+}
+
+var callCount = 0;
+function callHooks(localState) {
+  var myCallCount = callCount++;
   console.log("Calling hooks...")
-  state.get('preFetchData').then((preFetchData) => {
-    console.log("Mak results", state.get('hooks').toList().map(h => h.get('url')).toJS())
-    var results = state.get('hooks').toList().map(h => axios({
+  state = state.set('cards', Immutable.fromJS([]));
+  state = state.set('callCount', myCallCount)
+  console.log("Calling # hooks", localState.get('hooks').count())
+  localState.get('preFetchData').then((preFetchData) => {
+    var results = localState.get('hooks').map((h, hookUrl) => axios({
         url: h.get('url'),
         method: 'post',
-        data: hookBody(h, state.get('fhir').toJS(), preFetchData[h.get('url')])
-      })
-    ).toJS()
-    console.log("Results are", results)
-
-    Promise.all(results).then(responses => {
-
-      console.log("Got all responses", responses)
-      DecisionStore.emit(CHANGE_EVENT)
-    })
+        data: hookBody(h, localState.get('fhir').toJS(), preFetchData[h.get('url')])
+      }))
+      .forEach((p, hookUrl) => p.then(result => addCardsFrom(myCallCount, hookUrl, result)))
+    console.log("WAIT", results)
   })
 }
 

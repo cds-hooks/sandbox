@@ -4,16 +4,19 @@ import ActionTypes from '../actions/ActionTypes';
 import striptags from 'striptags';
 
 const OneHook = React.createClass({
-  getInitialState(){
+  getInitialState() {
     return {};
   },
-  componentWillMount(){
+  componentWillMount() {
     this.componentWillReceiveProps(this.props);
   },
-  componentWillReceiveProps(newProps){
-    var newVal = JSON.stringify(newProps.hook, null,2);
+  componentWillReceiveProps(newProps) {
+    var newVal = JSON.stringify(newProps.hook, null, 2);
     if (newVal !== this.state.original) {
-      this.setState({original: newVal, current: newVal});
+      this.setState({
+        original: newVal,
+        current: newVal
+      });
       console.log("Reset original")
     }
   },
@@ -32,7 +35,7 @@ const OneHook = React.createClass({
     })
   },
 
-  getCurrent(){
+  getCurrent() {
     var val = this.refs.content.getDOMNode().innerHTML.replace(/\&nbsp;/g, " ");
     var stripped = striptags(val).replace(/&amp;/g, "&");
     var current;
@@ -44,60 +47,65 @@ const OneHook = React.createClass({
     return current;
   },
 
-  triggerUpdate(){
-    this.setState({current: this.getCurrent()});
+  triggerUpdate() {
+    this.setState({
+      current: this.getCurrent()
+    });
   },
 
   render() {
     console.log("Render hook", this.props.hook)
     var delButton = (this.props.hook.id === "new") ? null :
       <button
-    className='save-hook'
-    onClick={this.deleteHook}>
+      className='save-hook'
+      onClick={this.deleteHook}>
     delete
     </button>;
 
     var className = "edit-hook";
-    if (this.props.hook.id=="new") className += " new-hook";
+    if (this.props.hook.id == "new")
+      className += " new-hook";
 
     return (<div className={className}>
             <button className='save-hook'
-            disabled={this.state.original == this.state.current}
-            onClick={this.saveHook}>save</button>
+      disabled={this.state.original == this.state.current}
+      onClick={this.saveHook}>save</button>
             {delButton}
             <div contentEditable
-            className="edit-hook-inner"
-            ref='content'
-            onInput={this.triggerUpdate}
-            key={this.state.original}
-            dangerouslySetInnerHTML={{__html: this.state.original
-              .replace(/\n/g, "<br/>")
-              .replace(/ /g, "&nbsp;")
-            }} />
+      className="edit-hook-inner"
+      ref='content'
+      onInput={this.triggerUpdate}
+      key={this.state.original}
+      dangerouslySetInnerHTML={{
+        __html: this.state.original
+          .replace(/\n/g, "<br/>")
+          .replace(/ /g, "&nbsp;")
+      }} />
             </div>
-           );
+      );
   }
 });
 
 const HookEditor = React.createClass({
-  componentWillReceiveProps(nextProps){
-  },
+  componentWillReceiveProps(nextProps) {},
 
   render() {
-    var edit = (<button
-                className='btn btn-default configure-hooks'
-                onClick={this.startEditing}>
+    console.log("Render HookEditor", this.props)
+    var edit = (<a
+    className='configure-hooks'
+    onClick={this.startEditing}>
                 Configure Hooks
-                </button>);
+                </a>);
 
-                var current = this.props.editing && Object
-                .keys(this.props.hooks.toList()).map(h => 
-                                            <OneHook hook={h.toJS()}/>) || [];
+    var current = this.props.editing && this.props.hooks.map((h, hname) => <OneHook hook={h.toJS()}/>).valueSeq().toJS() || [];
+    console.log("urrent", current)
 
-                                            if (this.props.editing)
-                                              current.push(<OneHook className="new-hook" hook={{id: "new"}}/>)
+    if (this.props.editing)
+      current.push(<OneHook className="new-hook" hook={{
+        id: "new"
+      }}/>)
 
-                                            return (<div className="hook-editor">{edit}{current}</div>);
+    return (<div className="hook-editor">{edit}{current}</div>);
   },
 
   startEditing() {
@@ -105,10 +113,10 @@ const HookEditor = React.createClass({
       return AppDispatcher.dispatch({
         type: ActionTypes.NEW_HOOK
       })
-      return AppDispatcher.dispatch({
-        type: ActionTypes.SAVE_HOOK,
-        discard: true
-      })
+    return AppDispatcher.dispatch({
+      type: ActionTypes.SAVE_HOOK,
+      discard: true
+    })
 
 
   }

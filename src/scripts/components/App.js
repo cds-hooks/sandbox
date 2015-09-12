@@ -5,6 +5,7 @@ import DrugSelector from './DrugSelector';
 import DateBox from './DateBox';
 import FhirView from './FhirView';
 import HookEditor from './HookEditor';
+import Cards from './Cards';
 import DateStore from '../stores/DateStore';
 import DrugStore from '../stores/DrugStore';
 import HookStore from '../stores/HookStore';
@@ -64,8 +65,8 @@ const App = React.createClass({
       date: moment().toDate(),
       enabled: true});
     DateStore.setDate("end", {
-      date: moment().add(28, 'days').toDate(),
-      enabled: false});
+      date: moment().add(1, 'month').toDate(),
+      enabled: true});
     AppDispatcher.dispatch({ type: ActionTypes.LOADED })
     return this.getStateFromStores();
   },
@@ -73,21 +74,32 @@ const App = React.createClass({
   render() {
     return (
       <div id="react-content">
-    <div id="top-bar">SMART CDS Hooks: EHR Demo</div>
+        <div id="top-bar">CDS Hooks: Rx Demo
+        </div>
 
       <div id="main">
-        <div className="OrderEntry">
+        <div className="OrderEntry container">
+
+        <div className="row">
         <DrugSelector {...this.state.drug} />
+        </div>
+        <div className="row">
         <DateBox id="start" display="Start date" {...this.state.dates.start} />
         <DateBox id="end" display="End date" {...this.state.dates.end} />
+      </div>
+        <div className="decision-spacer"></div>
+      <Cards className="card-holder" decisions={this.state.decisions} />
         </div>
         <FhirView {...this.state} />
       </div>
-      <HookEditor {...this.state.hooks} />
     <div id="bottom-bar">
       SMART Health IT —
       About <a href="https://github.com/jmandel/cds-hooks/wiki">CDS Hooks</a> —
       Source <a href="https://github.com/jmandel/cds-hooks-rx-app">on GitHub</a>
+
+      <HookEditor
+        hooks={this.state.hooks.get('hooks')}
+        editing={this.state.hooks.get('editing')} />
     </div>
       </div>
     )

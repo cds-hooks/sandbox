@@ -1,4 +1,10 @@
 export default {
+  "cms-price-check": {
+      "id": "cms-price-check",
+      "url": "http://localhost:8081/cms-price-check",
+      "name": "CMS Price Check",
+      "intent": "evaluate-prescription"
+    },
     "pediatric-dosing": {
       "id": "pediatric-dosing",
       "url": "http://localhost:8081/pediatric-dose-check",

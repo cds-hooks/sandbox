@@ -76,8 +76,8 @@ const DrugSelector = React.createClass({
     if (this.props.step === "done")
       done = (<span className='selected-drug'>{this.props.decisions.prescribable.str}</span>);
     return (
-      <div className="Drug-Selector">
-  <div className="form-group">
+      <div className="Drug-Selector col-xs-12">
+  <div className="">
     <label for="exampleInputEmail1">Medication</label>
       <input
       className="form-control"

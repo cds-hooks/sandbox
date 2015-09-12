@@ -11,79 +11,70 @@ module.exports = function(indata, cb) {
 // recommending can, alternatively, return a single "decision" indicating a user-approved choice.
 
 function recommend(data) {
-  var lowerDose = getIn(data, 'content')[0]["resource"];
-  if (!lowerDose.medicationCodeableConcept){
+  var lowerPrice = getIn(data, 'content')[0]["resource"];
+  if (!lowerPrice.medicationCodeableConcept) {
     return {}
   }
 
-  return {
-    "resourceType": "Parameters",
-    "parameter": [
-      {
-        "name": "card",
-        "part": [{
-          "name": "summary",
-          "valueString": "JNC 8 guidelines may apply",
-        }, {
-          "name": "link",
-          "part": [{
-            "name": "label",
-            "valueString": "Tailor therapy with JNC Pro"
-          }, {
-            "name": "url",
-            "valueUri": "https://www.cms.gov/Newsroom/MediaReleaseDatabase/Fact-sheets/2015-Fact-sheets-items/2015-04-30.html"
-          }]
-        }]
-      },{
-        "name": "card",
-        "part": [{
-          "name": "summary",
-          "valueString": "Dose is high (>99.9th percentile)",
-        }, {
-          "name": "suggestion",
-          "part": [{
-            "name": "label",
-            "valueString": "5 mg daily"
-          }, {
-            "name": "alternative",
-            "resource": lowerDose
-          }]
-        }, {
-          "name": "suggestion",
-          "part": [{
-            "name": "label",
-            "valueString": "10 mg daily"
-          }, {
-            "name": "alternative",
-            "resource": lowerDose
-          }]
-        }, {
-          "name": "link",
-          "part": [{
-            "name": "label",
-            "valueString": "View prescribing trends"
-          }, {
-            "name": "url",
-            "valueUri": "https://www.cms.gov/Newsroom/MediaReleaseDatabase/Fact-sheets/2015-Fact-sheets-items/2015-04-30.html"
-          }]
-        }]
-      },{
-        "name": "card",
-        "part": [{
-          "name": "summary",
-          "valueString": "Generic lisinopril saves $35 copay",
-        }, {
-          "name": "suggestion",
-          "part": [{
-            "name": "label",
-            "valueString": "lisinopril"
-          }, {
-            "name": "alternative",
-            "resource": lowerDose
-          }]
-        }]
-      }, 
-    ]
+  var generic, brand;
+  var code = lowerPrice.medicationCodeableConcept.coding[0].code;
+  if (priceTable.brandToGeneric[code]) {
+    brand = code;
+    generic = priceTable.brandToGeneric[code];
+  } else {
+    generic = code;
   }
+
+  var prices = priceTable.ingredientsToPrices[priceTable.genericToIngredients[generic]];
+
+  if (!brand) {
+    if (prices.generic) {
+      return message("Cost: $" + Math.round(prices.generic.total));
+    }
+    else return empty();
+  }
+
+  if (prices.generic && prices.brand) {
+    lowerPrice.medicationCodeableConcept = {
+      "text": priceTable.cuiToName[generic],
+      "coding": [{
+        "code": generic,
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "display": priceTable.cuiToName[generic]
+      }]
+    };
+
+    return message("Cost: $" + Math.round(prices.brand.total)+". Save $" + Math.round(prices.brand.total - prices.generic.total) + " with generic " +  priceTable.cuiToName[generic], "change to generic", lowerPrice)
+  }
+
+  if (prices.brand) {
+    return message("Cost: $" + Math.round(prices.brand.total));
+  }
+}
+
+function message(summary, label, alternative) {
+  var ret = {
+    "resourceType": "Parameters",
+    "parameter": [{
+      "name": "card",
+      "part": [{
+        "name": "summary",
+        "valueString": summary,
+      }]
+    }]
+  };
+  if (label) {
+    ret.parameter[0].part.push({
+      "name": "suggestion",
+      "part": [{
+        "name": "label",
+        "valueString": label
+      }, {
+        "name": "alternative",
+        "resource": alternative
+      }]
+    });
+  }
+  return ret;
 }
 

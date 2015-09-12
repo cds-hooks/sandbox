@@ -1,7 +1,11 @@
 var restify = require('restify');
 var pediatric = require('./pediatric');
+var prices = require('./prices');
 
-var services = [pediatric];
+var services = {
+  'pediatric-dose-check': pediatric,
+  'cms-price-check': prices
+};
 
 var server = restify.createServer({
   name: 'mock-cds-backend',
@@ -11,9 +15,10 @@ var server = restify.createServer({
 server.use(restify.bodyParser());
 server.use(restify.CORS());
 
-services.forEach(function(service){
+Object.keys(services).forEach(function(name){
+  var service = services[name];
 
-  server.post('/pediatric-dose-check', function(req, res, next){
+  server.post('/' + name, function(req, res, next){
     service(req.body, function(err, cdsResult){
       res.json(cdsResult);
       if (err)

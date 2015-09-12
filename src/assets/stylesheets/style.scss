@@ -4,6 +4,10 @@ $grey: #DCE0E0;
 $dark-grey: #565A5C;
 $light-grey: #f3f3f3;
 $white: #FFF;
+$warning: #ec971f;
+$info: #31b0d5;
+$success: #449d44;
+$danger: #c9302c;
 
 $font: "Helvetica Neue", "Helvetica", "Arial", "sans-serif";
 $font-head: "Avenir Next", Avenir, "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -20,10 +24,11 @@ body {
 }
 
 .hook-editor {
-  background: $dark-grey;
+    display: inline;
 }
 .configure-hooks {
-width: 100%;
+    float: right;
+    cursor: pointer;
 }
 
 .save-hook {
@@ -31,9 +36,9 @@ width: 100%;
   background: $white;
   border: 1px solid $dark-grey;
   font-weight: bold;
+  color: $dark-grey;
 }
 .save-hook:disabled {
-  color: $dark-grey;
   font-weight: normal;
 }
 
@@ -42,17 +47,55 @@ width: 100%;
 }
 
 .edit-hook.new-hook .edit-hook-inner{
-    border: 2px dashed $dark-grey;
+    border: 2px dashed $white;
 }
 
 .edit-hook-inner {
-    background: white;
-    border: 2px solid $dark-grey;
+    border: 2px solid $white;
     padding: 2em;
     display: block;
     font-family: $monospace;
     font-size: 1rem;
     margin-top: .5em;
+}
+
+.decision-spacer {
+  flex-grow: 1;
+}
+
+.decision-card:hover {
+  background: #f6f6f6;
+}
+
+.decision-card {
+  border: 2px solid $light-grey;
+  border-radius: 5px;
+  margin: 1em;
+  margin-bottom: 1em;
+  margin-top: 1em;
+  padding: 1em;
+  padding: 20px 0;
+  padding-left: 20px;
+  border-left-width: 3px;
+  background: #fcfcfc;
+  border-left-color: $warning;
+}
+
+.decision-card button{
+  margin-top: .5em;
+  margin-bottom: .5em;
+  margin-right: .5em;
+}
+.decision-card .glyphicon {
+  margin-right: 0.4em;
+}
+
+.card-summary {
+  font-weight: bold;
+}
+
+.decision-card a {
+  display: block;
 }
 
 #react-content {
@@ -77,11 +120,15 @@ input[type="checkbox"] {
 }
 
 .selected-drug {
-    border: 1px solid $dark-grey;
+    //border: 1px solid $dark-grey;
     padding: 0.3em;
-    border-radius: 10px;
-    background: $light-grey;
-    display: inline-block;
+    //border-radius: 10px;
+    //background: $light-grey;
+    //display: inline-block;
+    font-style: italic;
+    margin-bottom: 1em;
+    display: block;
+    margin-top: -.6em;
 }
 
 .line {
@@ -96,10 +143,9 @@ input[type="checkbox"] {
 
 
 #top-bar {
-    background: $dark-grey;
-    color: $white;
     font-size: 2em;
-    padding-left: 2em;
+    padding-left: .4em;
+    padding-bottom: 1em;
     height: 1.5em;
 }
 #bottom-bar {
@@ -108,6 +154,10 @@ input[type="checkbox"] {
     font-size: .75em;
     padding-left: 2em;
     margin-bottom: 0px;
+}
+#bottom-bar a {
+ color: white;
+ font-weight: bold;
 }
 
 
@@ -139,13 +189,17 @@ table.drug-choice tr:hover{
 .OrderEntry {
   flex-grow: 5;
   flex-basis: 20em;
+  display: flex;
+  flex-flow: column nowrap;
 }
 
 .FhirView {
-  margin: 2em;
+  margin: 0em;
   font-size: 1rem;
   flex-basis: 22em;
   flex-grow: 4;
+  border-radius: 0px;
+  border: 0px;
 }
 
 .DateBox {
