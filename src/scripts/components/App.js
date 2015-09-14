@@ -2,14 +2,13 @@ import AppDispatcher from '../dispatcher/AppDispatcher';
 import ActionTypes from '../actions/ActionTypes'
 import React from 'react';
 import DrugSelector from './DrugSelector';
+import ProblemSelector from './ProblemSelector';
 import DateBox from './DateBox';
 import FhirView from './FhirView';
 import HookEditor from './HookEditor';
 import Cards from './Cards';
-import DateStore from '../stores/DateStore';
-import DrugStore from '../stores/DrugStore';
-import HookStore from '../stores/HookStore';
-import DecisionStore from '../stores/DecisionStore';
+import AppStore from '../stores/AppStore'
+import DateStore from '../stores/DateStore'
 import HashStateStore from '../stores/HashStateStore';
 import {EventEmitter} from 'events';
 import moment from 'moment'
@@ -28,36 +27,19 @@ function bodyClick(e) {
 const App = React.createClass({
 
   componentDidMount: function() {
-    DrugStore.addChangeListener(this._onChange);
-    DateStore.addChangeListener(this._onChange);
-    DecisionStore.addChangeListener(this._onChange);
-    HookStore.addChangeListener(this._onChange);
+    AppStore.addChangeListener(this._onChange);
     AppDispatcher.dispatch({
       type: ActionTypes.NEW_HASH_STATE
     })
   },
 
   componentWillUnmount: function() {
-    DrugStore.removeChangeListener(this._onChange);
-    DecisionStore.removeChangeListener(this._onChange);
-    DateStore.removeChangeListener(this._onChange);
-    HookStore.removeChangeListener(this._onChange);
+    AppStore.removeChangeListener(this._onChange);
   },
 
   _onChange: function(){
-    //TODO avoid mutation. Immutable.js?
-    var next = this.getStateFromStores();
     HashStateStore();
-    this.setState(next);
-  },
-
-  getStateFromStores() {
-    return {
-      dates: DateStore.getDates(),
-      drug: DrugStore.getState(),
-      hooks: HookStore.getState(),
-      decisions: DecisionStore.getState()
-    }
+    this.setState({all: AppStore.getState()});
   },
 
   getInitialState() {
@@ -68,7 +50,7 @@ const App = React.createClass({
       date: moment().add(1, 'month').toDate(),
       enabled: true});
     AppDispatcher.dispatch({ type: ActionTypes.LOADED })
-    return this.getStateFromStores();
+    return {all: AppStore.getState()}
   },
 
   render() {
@@ -79,16 +61,19 @@ const App = React.createClass({
 
       <div id="main">
         <div className="OrderEntry container">
-
+        <DrugSelector {...this.state.all.get('drug').toJS()} />
         <div className="row">
-        <DrugSelector {...this.state.drug} />
+        <ProblemSelector
+          conditions={this.state.all.getIn(['fhirServer', 'conditions'])} 
+          selection={this.state.all.getIn(['fhirServer', 'selection'])}
+        />
         </div>
         <div className="row">
-        <DateBox id="start" display="Start date" {...this.state.dates.start} />
-        <DateBox id="end" display="End date" {...this.state.dates.end} />
+        <DateBox id="start" display="Start date" {...this.state.all.get('dates').start} />
+        <DateBox id="end" display="End date" {...this.state.all.get('dates').end} />
       </div>
         <div className="decision-spacer"></div>
-      <Cards className="card-holder" decisions={this.state.decisions} />
+      <Cards className="card-holder" decisions={this.state.all.get('decisions')} />
         </div>
         <FhirView {...this.state} />
       </div>
@@ -98,8 +83,8 @@ const App = React.createClass({
       Source <a href="https://github.com/jmandel/cds-hooks-rx-app">on GitHub</a>
 
       <HookEditor
-        hooks={this.state.hooks.get('hooks')}
-        editing={this.state.hooks.get('editing')} />
+        hooks={this.state.all.getIn(['hooks', 'hooks'])}
+        editing={this.state.all.getIn(['hooks', 'editing'])} />
     </div>
       </div>
     )

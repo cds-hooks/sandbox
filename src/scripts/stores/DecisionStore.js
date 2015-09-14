@@ -1,6 +1,7 @@
 import axios from 'axios'
 import ActionTypes from '../actions/ActionTypes'
 import defaultHooks from './HookStore.defaults'
+import FhirServerStore from './FhirServerStore'
 import DateStore from './DateStore'
 import DrugStore from './DrugStore'
 import HookStore from './HookStore'
@@ -35,6 +36,7 @@ var state = Immutable.fromJS({
 })
 
 var preFetchData = Promise.resolve({})
+FhirServerStore.addChangeListener(_rxChanged)
 DrugStore.addChangeListener(_rxChanged)
 DateStore.addChangeListener(_rxChanged)
 HookStore.addChangeListener(_hooksChanged)
@@ -42,14 +44,11 @@ HookStore.addChangeListener(_hooksChanged)
 _hooksChanged()
 
 function getFhirContext() {
-  return {
-    "base": "http://localhost:9080/",
-    "Patient.id": "99912345"
-  }
+  var c = FhirServerStore.getState().get('context');
+  return c.set('Patient.id', c.get('patient')).toJS()
 }
 
 function fillTemplate(template, context) {
-  console.log("template", typeof template)
   var flat = JSON.stringify(template)
     .replace(/{{\s*Patient\.id\s*}}/g, context["Patient.id"])
   return JSON.parse(flat)
@@ -57,6 +56,7 @@ function fillTemplate(template, context) {
 
 function _hooksChanged() {
   var context = getFhirContext()
+  console.log("ooks with cont", context)
   var hooks = HookStore.getState().get('hooks')
   var hookNames = hooks.keySeq()
 
@@ -66,11 +66,12 @@ function _hooksChanged() {
 
   state = state.set('cards', Immutable.fromJS([]));
   state = state.set('hooks', hooks)
-  console.log("so new hooks", hooks.toJS())
-  var hookFetches = hooks.valueSeq()
-  .filter(h=>h.get('preFetchTemplate'))
+  
+  var hooksToFetch = hooks.valueSeq().filter(h=>h.get('preFetchTemplate'));
+
+  var hookFetches = hooksToFetch
   .map(h => axios({
-      url: context.base,
+      url: context.baseUrl,
       method: 'post',
       data: fillTemplate(h.get('preFetchTemplate'), context)
     })
@@ -78,12 +79,11 @@ function _hooksChanged() {
 
   state = state.set('preFetchData', Promise.all(hookFetches)
     .then(preFetchResults => preFetchResults.reduce(
-        (coll, r, i) => coll.set(hooks.getIn([hookNames.get(i), 'url']), r.data),
+        (coll, r, i) => coll.set(hooksToFetch.get(i).get('url'), r.data),
         Immutable.fromJS({}))
   ))
 
   state.get('preFetchData').then(results => {
-    console.log("Got prefetch!", results.toJS())
     callHooks(state)
   }).catch(err => console.log(err))
 }
@@ -91,15 +91,15 @@ function _hooksChanged() {
 function _rxChanged() {
   var props = {
     dates: DateStore.getDates(),
+    server: FhirServerStore.getState(),
     drug: DrugStore.getState()
   }
-
   var resource = toFhir(props)
   if (!Immutable.is(resource, state.get('fhir'))) {
-    console.log("Changed to", state.get('fhir').toJS())
     state = state.set('fhir', resource)
     state = state.set('cards', Immutable.List())
     DecisionStore.emitChange()
+    console.log("X CHANGE", resource.toJS())
     callHooks(state)
   }
 }
@@ -111,7 +111,7 @@ var launchService = {
 }
 
 function hookBody(h, fhir, preFetchData) {
-  return {
+  var ret =  {
     "resourceType": "Parameters",
     "parameter": [{
       "name": "launch",
@@ -127,10 +127,11 @@ function hookBody(h, fhir, preFetchData) {
       "resource": preFetchData
     }]
   }
+  console.log("body", ret)
+  return ret;
 }
-
+var cardKey = 0
 function addCardsFrom(callCount, hookUrl, result) {
-  console.log("Result", hookUrl, result.data)
   if (!result.data) {
     return;
   }
@@ -138,28 +139,30 @@ function addCardsFrom(callCount, hookUrl, result) {
     return;
   }
   var cards = paramsToJson(result.data, decisionSchema)['card'];
-  console.log("Adding cards", cards)
+  cards = Immutable.fromJS(cards).map((v, k) =>
+              v.set('key', cardKey++)
+              .set('suggestion', v.get('suggestion').map(s=>s.set("key", cardKey++)))
+              .set('link', v.get('link').map(s=>s.set("key", cardKey++)))
+              ).toJS()
   var newCards = state.get('cards').push(...cards)
   state = state.set('cards', newCards)
-  console.log("Extracted cards", cards)
   DecisionStore.emitChange()
 }
 
 var callCount = 0;
 function callHooks(localState) {
   var myCallCount = callCount++;
-  console.log("Calling hooks...")
   state = state.set('cards', Immutable.fromJS([]));
   state = state.set('callCount', myCallCount)
-  console.log("Calling # hooks", localState.get('hooks').count())
+  console.log("Call hooks",  localState.get('preFetchData'))
   localState.get('preFetchData').then((preFetchData) => {
+    console.log("Call hooksow tih", preFetchData)
     var results = localState.get('hooks').map((h, hookUrl) => axios({
         url: h.get('url'),
         method: 'post',
         data: hookBody(h, localState.get('fhir').toJS(), preFetchData[h.get('url')])
       }))
       .forEach((p, hookUrl) => p.then(result => addCardsFrom(myCallCount, hookUrl, result)))
-    console.log("WAIT", results)
   })
 }
 
@@ -175,8 +178,8 @@ function toFhir(props) {
   resource.patient = {
     "reference": "Patient/example"
   }
-  if (props.drug && props.drug.step === "done") {
-    var med = props.drug.decisions.prescribable
+  if (props.drug && props.drug.get('step') === "done") {
+    var med = props.drug.getIn(['decisions', 'prescribable']).toJS();
     resource.medicationCodeableConcept = {
       "text": med.str,
       "coding": [{
@@ -185,6 +188,34 @@ function toFhir(props) {
         "code": med.cui
       }]
     }
+  }
+
+  var freqs = {
+    'daily': 1,
+    'bid': 2,
+    'tid': 3,
+    'qid': 4
+  }
+
+  if (props.drug.get('sig')){
+    var sig = props.drug.get('sig').toJS();
+    resource.dosageInstruction = [{
+      doseQuantity: {
+        value: sig.number,
+        system: "http://unitsofmeasure.org",
+        code: "{pill}"
+      },
+      timing: [{
+        repeat: {
+          frequency: freqs[sig.frequency],
+          period: 1,
+          periodUnits: "d"
+        }
+      }]
+    }];
+  }
+  if (props.server.get('selectionAsFhir')){
+    resource.reasonCodeableConcept = props.server.get('selectionAsFhir')
   }
   return Immutable.fromJS(resource)
 }
@@ -222,7 +253,6 @@ DecisionStore.dispatchToken = AppDispatcher.register(function(action) {
 
     case ActionTypes.LOADED:
       _rxChanged()
-
       break
 
     default:

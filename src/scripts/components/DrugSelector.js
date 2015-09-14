@@ -76,9 +76,10 @@ const DrugSelector = React.createClass({
     if (this.props.step === "done")
       done = (<span className='selected-drug'>{this.props.decisions.prescribable.str}</span>);
     return (
+        <div className="row">
       <div className="Drug-Selector col-xs-12">
   <div className="">
-    <label for="exampleInputEmail1">Medication</label>
+    <label>Medication</label>
       <input
       className="form-control"
       autofocus={true}
@@ -98,7 +99,46 @@ const DrugSelector = React.createClass({
       {done}
   </div>
       </div>
+      <div className="timing-holder col-xs-12">
+        <label>Signature</label>
+        <form className="form-inline">
+          Take <input
+      className="form-control pill-count"
+      ref="sigNumber"
+      placeholder="e.g. "
+      type="number"
+      min="1" max="5"
+      value={this.props.sig.number}
+      onChange={this.sendSig}
+      /> pills by mouth 
+      <select value={this.props.sig.frequency}
+          ref="sigFrequency"
+          onChange={this.sendSig}
+          className="form-control sig-form">
+        <option value="daily">daily</option>
+        <option value="bid">twice daily</option>
+        <option value="tid">three times daily</option>
+        <option value="qid">four times daily</option>
+      </select>
+    </form>
+ 
+      </div>
+  </div>
     );
+  },
+
+  sendSig(){
+    console.log("take", this.refs.sigNumber.getDOMNode().value)
+    var sig = {
+      number: this.refs.sigNumber.getDOMNode().value,
+      frequency: this.refs.sigFrequency.getDOMNode().value
+    }
+    AppDispatcher.dispatch({
+      type: ActionTypes.NEW_SIG,
+      sig: sig
+    });
+
+
   }
 });
 

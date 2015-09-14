@@ -5,21 +5,25 @@ import striptags from 'striptags'
 
 const Cards = React.createClass({
   componentWillReceiveProps(nextProps) {},
+  takeSuggestion(suggestion){
+    AppDispatcher.dispatch({
+      type: ActionTypes.TAKE_SUGGESTION,
+      suggestion: suggestion
+    })
+  },
 
   render() {
     var cards = this.props.decisions.get('cards').map(c=>(
 
-      <div className="decision-card">
+      <div key={c.key} className="decision-card">
         <div className="card-summary">{c.summary}</div>
         {c.suggestion.map(l=>(
-          <button className="btn btn-success btn-xs">
-
+          <button key={l.key} onClick={e=>this.takeSuggestion(l)} className="btn btn-success btn-xs">
           <span className="glyphicon glyphicon-edit" aria-hidden="true"></span>
             {l.label}</button>
         ))}
         {c.link.map(l=>(
-          <a target="_blank" href={l.url}>
-            
+          <a key={l.key} target="_blank" href={l.url}>
           <span className="glyphicon glyphicon-link" aria-hidden="true"></span>
             {l.label}</a>
         ))}
@@ -28,7 +32,6 @@ const Cards = React.createClass({
     if (cards.count() == 0) {
       return null;
     }
-    console.log("Dealt", cards)
     return (<div>{cards}</div>)
   },
 

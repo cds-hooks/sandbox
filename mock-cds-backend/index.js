@@ -19,7 +19,9 @@ Object.keys(services).forEach(function(name){
   var service = services[name];
 
   server.post('/' + name, function(req, res, next){
+      console.log("handling", name)
     service(req.body, function(err, cdsResult){
+      console.log("service got", err, cdsResult)
       res.json(cdsResult);
       if (err)
         err = new restify.errors.InternalServerError('Request failed with ' + e);

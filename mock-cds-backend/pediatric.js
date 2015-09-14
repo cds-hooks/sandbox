@@ -14,7 +14,7 @@ function recommend(data) {
     return {}
   }
 
-  return {
+  var ret = {
     "resourceType": "Parameters",
     "parameter": [
       {
@@ -68,5 +68,7 @@ function recommend(data) {
       }
     ]
   }
+  console.log("Returning", ret)
+  return ret;
 }
 

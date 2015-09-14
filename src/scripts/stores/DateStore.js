@@ -5,12 +5,6 @@ var debounce = require('debounce');
 import moment from 'moment';
 import ActionTypes from '../actions/ActionTypes'
 import Immutable from 'immutable'
-
-var x = Immutable.fromJS({a: 1, b:{c:3}});
-var y = x.set('a',1 );
-
-console.log("x, y", Immutable.is(x, y), x===y);
-
 var CHANGE_EVENT = 'change';
 
 var _dates = Immutable.fromJS({ });
@@ -24,7 +18,7 @@ var DateStore = assign({}, EventEmitter.prototype, {
   },
 
   getDates: function(){
-    return _dates.toJS();
+    return _dates.toJS()
   },
 
   setDate: function(id, {date, enabled}){
@@ -50,6 +44,20 @@ var DateStore = assign({}, EventEmitter.prototype, {
 DateStore.dispatchToken = AppDispatcher.register(function(action) {
 
   switch(action.type) {
+
+    case ActionTypes.TAKE_SUGGESTION:
+      var original = _dates, alternative = action.suggestion.alternative
+      if (alternative.startDate) {
+        _dates = _dates.setIn(['start', 'value'], moment(alternative.startDate).toDate())
+      }
+      if (alternative.endDate) {
+        _dates = _dates.setIn(['end', 'value'], moment(alternative.endDate).toDate())
+      }
+      if (!Immutable.is(original, _dates)) {
+        DateStore.emitChange();
+      }
+      break;
+
     case ActionTypes.OFFER_DATES:
       _dates = _dates.mapEntries(([k,v]) => [
         k,

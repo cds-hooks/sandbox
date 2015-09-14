@@ -17,7 +17,6 @@ const OneHook = React.createClass({
         original: newVal,
         current: newVal
       });
-      console.log("Reset original")
     }
   },
   deleteHook() {
@@ -27,7 +26,6 @@ const OneHook = React.createClass({
     })
   },
   saveHook() {
-    console.log("SAving", this.props.hook.id);
     AppDispatcher.dispatch({
       type: ActionTypes.SAVE_HOOK,
       id: this.props.hook.id,
@@ -54,7 +52,6 @@ const OneHook = React.createClass({
   },
 
   render() {
-    console.log("Render hook", this.props.hook)
     var delButton = (this.props.hook.id === "new") ? null :
       <button
       className='save-hook'
@@ -90,7 +87,6 @@ const HookEditor = React.createClass({
   componentWillReceiveProps(nextProps) {},
 
   render() {
-    console.log("Render HookEditor", this.props)
     var edit = (<a
     className='configure-hooks'
     onClick={this.startEditing}>
@@ -98,7 +94,6 @@ const HookEditor = React.createClass({
                 </a>);
 
     var current = this.props.editing && this.props.hooks.map((h, hname) => <OneHook hook={h.toJS()}/>).valueSeq().toJS() || [];
-    console.log("urrent", current)
 
     if (this.props.editing)
       current.push(<OneHook className="new-hook" hook={{

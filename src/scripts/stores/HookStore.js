@@ -10,7 +10,6 @@ var state = Immutable.fromJS({
   editing: null,
   hooks: restoreHooks()
 });
-console.log("state", state)
 
 function saveHooks(state) {
   window.localStorage["hooks"] = JSON.stringify(state.get('hooks'));
@@ -21,7 +20,7 @@ function restoreHooks() {
     var hooks = JSON.parse(window.localStorage["hooks"]);
     return Immutable.fromJS(hooks);
   } catch (e) {
-    console.log("restore hooks from defulits", defaultHooks);
+    console.log("restore hooks from defaults", defaultHooks);
     return Immutable.fromJS(defaultHooks);
   }
 }
@@ -60,7 +59,6 @@ var HookStore = assign({}, EventEmitter.prototype, {
 
 HookStore.dispatchToken = AppDispatcher.register(function(action) {
 
-  console.log("hook aciton", action);
   switch (action.type) {
 
     case ActionTypes.NEW_HOOK:
@@ -77,7 +75,6 @@ HookStore.dispatchToken = AppDispatcher.register(function(action) {
 
 
     case ActionTypes.SAVE_HOOK:
-      console.log("save", action)
       if (!action.discard) {
         state = state.setIn(['hooks', action.value.id], Immutable.fromJS(action.value));
         if (action.id !== action.value.id) {

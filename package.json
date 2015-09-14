@@ -5,6 +5,7 @@
   "main": "build/bundle.js",
   "dependencies": {
     "axios": "^0.5.4",
+    "browser-request": "^0.3.3",
     "debounce": "^1.0.0",
     "flux": "^2.0.3",
     "immutable": "^3.7.5",

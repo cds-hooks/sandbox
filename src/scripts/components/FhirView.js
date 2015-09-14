@@ -12,11 +12,11 @@ const FhirView = React.createClass({
     }
   },
   shouldComponentUpdate(nextProps, nextState){
-    return nextProps.decisions.get('fhir') !== this.props.decisions.get('fhir')
+    return nextProps.all.get('decisions').get('fhir') !== this.props.all.get('decisions').get('fhir')
   },
   componentWillReceiveProps(newProps) {
-    var oldLines = format(this.props.decisions.get('fhir'))
-    var newLines = format(newProps.decisions.get('fhir'))
+    var oldLines = format(this.props.all.get('decisions').get('fhir'))
+    var newLines = format(newProps.all.get('decisions').get('fhir'))
     this.setState({
       additions: newLines.filter(l => oldLines.indexOf(l) === -1)
     });
@@ -26,17 +26,18 @@ const FhirView = React.createClass({
     window.setTimeout(() => {
       Object.keys(this.refs).forEach(k => {
         var r = this.refs[k];
-        r.getDOMNode().className = "line " + (r.props.addition ? "fade-actual" : "");
+        r.getDOMNode().className = "line " + (r.props.isAddition ? "fade-actual" : "");
       });
     });
   },
 
   render() {
     var additions = this.state.additions
-    var output = format(this.props.decisions.get('fhir')).map((l, i) => (
+    var output = format(this.props.all.getIn(['decisions', 'fhir'])).map((l, i) => (
     <div
+      key={i}
       ref={i}
-      addition={additions.indexOf(l) !== -1}
+      isAddition={additions.indexOf(l) !== -1}
       className="line"> {l}
     </div>));
 
