@@ -78,10 +78,27 @@ body {
   padding-left: 20px;
   border-left-width: 3px;
   background: #fcfcfc;
-  border-left-color: $warning;
 }
 
-.decision-card button{
+.decision-card.alert-success{
+    border-left-color: $success;
+}
+
+
+.decision-card.alert-info{
+    border-left-color: $info;
+}
+
+
+.decision-card.alert-warning{
+    border-left-color: $warning;
+}
+
+.decision-card.alert-danger{
+    border-left-color: $danger;
+}
+
+decision-card button{
   margin-top: .5em;
   margin-bottom: .5em;
   margin-right: .5em;
@@ -93,10 +110,26 @@ body {
 .card-summary {
   font-weight: bold;
 }
-
-.decision-card a {
-  display: block;
+.card-source {
+    font-size: .8em;
+    text-align: right;
+  font-style: italic;
+  float: right;
+  padding-right: 2em;
+  padding-left: 2em;
 }
+
+.card-helpful {
+font-style: normal;
+}
+
+div.card-helpful button.btn {
+    padding: 0px;
+    padding-left: 3px;
+    padding-right: 3px;
+    margin: 0px;
+}
+
 
 #react-content {
     flex-grow: 1;
@@ -139,6 +172,8 @@ input[type="checkbox"] {
 
 .fade-actual {
   background: white;
+  color: #4cae4c;
+  font-weight: bold;
 }
 
 

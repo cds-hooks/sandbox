@@ -110,7 +110,7 @@ const DrugSelector = React.createClass({
       min="1" max="5"
       value={this.props.sig.number}
       onChange={this.sendSig}
-      /> pills by mouth 
+    /> pill{this.props.sig.number > 1 ? "s":""} by mouth 
       <select value={this.props.sig.frequency}
           ref="sigFrequency"
           onChange={this.sendSig}

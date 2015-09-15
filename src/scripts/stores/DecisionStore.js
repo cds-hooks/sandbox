@@ -13,10 +13,13 @@ var AppDispatcher = require('../dispatcher/AppDispatcher')
 var EventEmitter = require('events').EventEmitter
 var assign = require('object-assign')
 var Immutable = require('immutable')
+var DELAY = 0; // no delay to apply hooks
 
 var decisionSchema = {
   'card': [{
     'summary': 1,
+    'source': 1,
+    'indicator': 1,
     'suggestion': [{
       'label': 1,
       'alternative': 1
@@ -53,10 +56,13 @@ function fillTemplate(template, context) {
     .replace(/{{\s*Patient\.id\s*}}/g, context["Patient.id"])
   return JSON.parse(flat)
 }
+function _externalAppReturned() {
+  console.log("Handling external return by re-running hooks")
+  callHooks(state)
+}
 
 function _hooksChanged() {
   var context = getFhirContext()
-  console.log("ooks with cont", context)
   var hooks = HookStore.getState().get('hooks')
   var hookNames = hooks.keySeq()
 
@@ -78,14 +84,11 @@ function _hooksChanged() {
   ).toJS()
 
   state = state.set('preFetchData', Promise.all(hookFetches)
-    .then(preFetchResults => preFetchResults.reduce(
+          .then(preFetchResults => preFetchResults.reduce(
         (coll, r, i) => coll.set(hooksToFetch.get(i).get('url'), r.data),
-        Immutable.fromJS({}))
-  ))
+          Immutable.fromJS({}))))
 
-  state.get('preFetchData').then(results => {
-    callHooks(state)
-  }).catch(err => console.log(err))
+  callHooks(state)
 }
 
 function _rxChanged() {
@@ -100,14 +103,21 @@ function _rxChanged() {
     state = state.set('cards', Immutable.List())
     DecisionStore.emitChange()
     console.log("X CHANGE", resource.toJS())
-    callHooks(state)
+    setTimeout(()=>callHooks(state), DELAY)
   }
 }
 
+var _sessionUuid = uuid.v4()
+
 var launchService = {
   createLaunch() {
-    return uuid.v4()
+    return _sessionUuid
   }
+}
+
+var _base = window.location.protocol + "//" + window.location.host + window.location.pathname;
+if (!_base.match(/.*\//)){
+   _base += "/";
 }
 
 function hookBody(h, fhir, preFetchData) {
@@ -116,6 +126,9 @@ function hookBody(h, fhir, preFetchData) {
     "parameter": [{
       "name": "launch",
       "valueString": launchService.createLaunch()
+    }, {
+      "name": "redirect",
+      "valueString": _base + "service-done.html"
     }, {
       "name": "intent",
       "valueString": "evaluate-prescription"
@@ -127,7 +140,6 @@ function hookBody(h, fhir, preFetchData) {
       "resource": preFetchData
     }]
   }
-  console.log("body", ret)
   return ret;
 }
 var cardKey = 0
@@ -154,13 +166,11 @@ function callHooks(localState) {
   var myCallCount = callCount++;
   state = state.set('cards', Immutable.fromJS([]));
   state = state.set('callCount', myCallCount)
-  console.log("Call hooks",  localState.get('preFetchData'))
   localState.get('preFetchData').then((preFetchData) => {
-    console.log("Call hooksow tih", preFetchData)
     var results = localState.get('hooks').map((h, hookUrl) => axios({
         url: h.get('url'),
         method: 'post',
-        data: hookBody(h, localState.get('fhir').toJS(), preFetchData[h.get('url')])
+        data: hookBody(h, localState.get('fhir').toJS(), preFetchData.get(h.get('url')))
       }))
       .forEach((p, hookUrl) => p.then(result => addCardsFrom(myCallCount, hookUrl, result)))
   })
@@ -250,6 +260,10 @@ var DecisionStore = assign({}, EventEmitter.prototype, {
 DecisionStore.dispatchToken = AppDispatcher.register(function(action) {
 
   switch (action.type) {
+
+    case ActionTypes.EXTERNAL_APP_RETURNED:
+       _externalAppReturned()
+      break
 
     case ActionTypes.LOADED:
       _rxChanged()

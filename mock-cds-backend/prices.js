@@ -3,8 +3,10 @@ var getIn = require('./utils').getIn
 var priceTable = require('./rxnorm-prices')
 
 
-module.exports = function(indata, cb) {
+module.exports = {
+  service: function(indata, cb) {
   cb(null, recommend(indata));
+  }
 }
 
 // recommending means returning a set of "card"s, each with a summary, set of suggestions and a set of links.
@@ -26,12 +28,15 @@ function recommend(data) {
   }
 
   var prices = priceTable.ingredientsToPrices[priceTable.genericToIngredients[generic]];
+  if (!prices) {
+    return {}
+  }
 
   if (!brand) {
     if (prices.generic) {
       return message("Cost: $" + Math.round(prices.generic.total));
     }
-    else return empty();
+    else return {}
   }
 
   if (prices.generic && prices.brand) {
@@ -43,8 +48,9 @@ function recommend(data) {
         "display": priceTable.cuiToName[generic]
       }]
     };
-
-    return message("Cost: $" + Math.round(prices.brand.total)+". Save $" + Math.round(prices.brand.total - prices.generic.total) + " with generic " +  priceTable.cuiToName[generic], "change to generic", lowerPrice)
+ //" " +  priceTable.cuiToName[generic]
+    return message("Cost: $" + Math.round(prices.brand.total)+". Save $" + Math.round(prices.brand.total - prices.generic.total) + " with a generic."
+                  , "change to generic", lowerPrice)
   }
 
   if (prices.brand) {
@@ -60,6 +66,12 @@ function message(summary, label, alternative) {
       "part": [{
         "name": "summary",
         "valueString": summary,
+      },{
+        "name": "source",
+        "valueString": "CMS Public Use Files",
+      },{
+        "name": "indicator",
+        "valueString": "info",
       }]
     }]
   };

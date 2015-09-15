@@ -38,7 +38,12 @@ function paramsToJson(ps, pattern){
     } else if (pattern[k] === 1){
       val = extractValue(val[0]);
     } else if (isArray(pattern[k])){
-      val = val.map(function(v){ return paramsToJson(v, pattern[k][0]);});
+      if (pattern[k].length === 1)
+        val = val.map(function(v){ return paramsToJson(v, pattern[k][0]);});
+      else if (pattern[k].length === 0) 
+        val = val.map(extractValue)
+      else 
+        throw "invalid patter " + pattern[k]
     } else if (typeof pattern[k] === 'object') {
       val = paramsToJson(val, pattern[k]);
     }
