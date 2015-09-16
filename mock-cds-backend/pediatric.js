@@ -47,7 +47,7 @@ function view(reason, sid, req, res, next){
     "redirect": _db[sid].redirect
   }
 
-  _db[sid].started = true
+  _db[sid].startedHarvoni = true
 
   var ret = fillTemplate(harvoniTemplate, context)
 
@@ -73,12 +73,12 @@ function assessJNC(inData, cards) {
   _db[launch].redirect = redirect
   _db[launch].inData = inData
 
-  if (!_db[launch].started){
+  if (!_db[launch].startedJNC){
     cards.parameter.push( {
       "name": "card",
       "part": [{
         "name": "summary",
-        "valueString": "JNC 8 guidelines may aply",
+        "valueString": "JNC 8 guidelines may apply",
       },{
         "name": "source",
         "valueString": "Joint National Committee",
@@ -116,7 +116,7 @@ function assessHarvoni(inData, cards) {
   _db[launch] = _db[launch] || {}
   _db[launch].redirect = redirect
   _db[launch].inData = inData
-  if (_db[launch].started){
+  if (_db[launch].startedHarvoni){
     cards.parameter.push( {
       "name": "card",
       "part": [{
@@ -147,7 +147,7 @@ function assessHarvoni(inData, cards) {
       "name": "card",
       "part": [{
         "name": "summary",
-        "valueString": "Harvoni require prior authorization",
+        "valueString": "Harvoni requires prior authorization",
       }, {
         "name": "source",
         "valueString": "CareMore PBM",
