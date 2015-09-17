@@ -106,10 +106,10 @@ function assessJNC(inData, response) {
       response.parameter.push({
         "name": "decision",
         "part": [{
-          "name": "remove",
+          "name": "delete",
           "valueString": "old-id" // TODO populate with temp id of the thing to replace
         }, {
-          "name": "add",
+          "name": "create",
           "resource": {
             "resourceType": "MedicationOrder",
             "startDate": "2015-09-17",

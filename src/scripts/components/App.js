@@ -61,13 +61,13 @@ const App = React.createClass({
 
       <div id="main">
         <div className="OrderEntry container">
-        <DrugSelector {...this.state.all.get('drug').toJS()} />
         <div className="row">
         <ProblemSelector
           conditions={this.state.all.getIn(['fhirServer', 'conditions'])} 
           selection={this.state.all.getIn(['fhirServer', 'selection'])}
         />
         </div>
+        <DrugSelector {...this.state.all.get('drug').toJS()} />
         <div className="row">
         <DateBox id="start" display="Start date" {...this.state.all.get('dates').start} />
         <DateBox id="end" display="End date" {...this.state.all.get('dates').end} />

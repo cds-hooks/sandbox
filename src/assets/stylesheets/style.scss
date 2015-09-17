@@ -212,8 +212,9 @@ input[type="checkbox"] {
   margin-bottom: 1em;
 }
 
-.pill-count {
-    max-width: 4em;
+.timing-holder input, .timing-holder select {
+    max-width: 5em;
+    display: inline;
 }
 
 .sig-form {

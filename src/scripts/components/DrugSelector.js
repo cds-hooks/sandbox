@@ -100,8 +100,6 @@ const DrugSelector = React.createClass({
   </div>
       </div>
       <div className="timing-holder col-xs-12">
-        <label>Signature</label>
-        <form className="form-inline">
           Take <input
       className="form-control pill-count"
       ref="sigNumber"
@@ -120,7 +118,6 @@ const DrugSelector = React.createClass({
         <option value="tid">three times daily</option>
         <option value="qid">four times daily</option>
       </select>
-    </form>
  
       </div>
   </div>

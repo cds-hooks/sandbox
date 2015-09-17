@@ -176,6 +176,7 @@ DrugStore.dispatchToken = AppDispatcher.register(function(action) {
           "str": alternative.medicationCodeableConcept.text,
           "cui": alternative.medicationCodeableConcept.coding[0].code
         }))
+        console.log("And set the med", alternative.medicationCodeableConcept.text)
       }
       if (!Immutable.is(original, state)) {
         DrugStore.emitChange();

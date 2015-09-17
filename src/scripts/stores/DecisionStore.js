@@ -16,6 +16,10 @@ var Immutable = require('immutable')
 var DELAY = 0; // no delay to apply hooks
 
 var decisionSchema = {
+  'decision': [{
+    'create': [],
+    'delete': []
+  }],
   'card': [{
     'summary': 1,
     'source': 1,
@@ -72,21 +76,21 @@ function _hooksChanged() {
 
   state = state.set('cards', Immutable.fromJS([]));
   state = state.set('hooks', hooks)
-  
-  var hooksToFetch = hooks.valueSeq().filter(h=>h.get('preFetchTemplate'));
+
+  var hooksToFetch = hooks.valueSeq().filter(h => h.get('preFetchTemplate'));
 
   var hookFetches = hooksToFetch
-  .map(h => axios({
-      url: context.baseUrl,
-      method: 'post',
-      data: fillTemplate(h.get('preFetchTemplate'), context)
-    })
+    .map(h => axios({
+        url: context.baseUrl,
+        method: 'post',
+        data: fillTemplate(h.get('preFetchTemplate'), context)
+      })
   ).toJS()
 
   state = state.set('preFetchData', Promise.all(hookFetches)
-          .then(preFetchResults => preFetchResults.reduce(
+    .then(preFetchResults => preFetchResults.reduce(
         (coll, r, i) => coll.set(hooksToFetch.get(i).get('url'), r.data),
-          Immutable.fromJS({}))))
+        Immutable.fromJS({}))))
 
   callHooks(state)
 }
@@ -103,7 +107,7 @@ function _rxChanged() {
     state = state.set('cards', Immutable.List())
     DecisionStore.emitChange()
     console.log("X CHANGE", resource.toJS())
-    setTimeout(()=>callHooks(state), DELAY)
+    setTimeout(() => callHooks(state), DELAY)
   }
 }
 
@@ -116,12 +120,12 @@ var launchService = {
 }
 
 var _base = window.location.protocol + "//" + window.location.host + window.location.pathname;
-if (!_base.match(/.*\//)){
-   _base += "/";
+if (!_base.match(/.*\//)) {
+  _base += "/";
 }
 
 function hookBody(h, fhir, preFetchData) {
-  var ret =  {
+  var ret = {
     "resourceType": "Parameters",
     "parameter": [{
       "name": "launch",
@@ -147,15 +151,24 @@ function addCardsFrom(callCount, hookUrl, result) {
   if (!result.data) {
     return;
   }
-  if (state.get('callCount') !== callCount){
+  if (state.get('callCount') !== callCount) {
     return;
   }
-  var cards = paramsToJson(result.data, decisionSchema)['card'];
-  cards = Immutable.fromJS(cards).map((v, k) =>
-              v.set('key', cardKey++)
-              .set('suggestion', v.get('suggestion').map(s=>s.set("key", cardKey++)))
-              .set('link', v.get('link').map(s=>s.set("key", cardKey++)))
-              ).toJS()
+  var result = paramsToJson(result.data, decisionSchema)
+  var decision = result.decision
+  if (decision && decision.length > 0) {
+    AppDispatcher.dispatch({
+      type: ActionTypes.TAKE_SUGGESTION,
+      suggestion: {
+        alternative: decision[0].create[0]
+      }
+    })
+  }
+  var cards = result.card || []
+  cards = Immutable.fromJS(cards).map((v, k) => v.set('key', cardKey++)
+      .set('suggestion', v.get('suggestion').map(s => s.set("key", cardKey++)))
+      .set('link', v.get('link').map(s => s.set("key", cardKey++)))
+  ).toJS()
   var newCards = state.get('cards').push(...cards)
   state = state.set('cards', newCards)
   DecisionStore.emitChange()
@@ -207,7 +220,7 @@ function toFhir(props) {
     'qid': 4
   }
 
-  if (props.drug.get('sig')){
+  if (props.drug.get('sig')) {
     var sig = props.drug.get('sig').toJS();
     resource.dosageInstruction = [{
       doseQuantity: {
@@ -224,7 +237,7 @@ function toFhir(props) {
       }]
     }];
   }
-  if (props.server.get('selectionAsFhir')){
+  if (props.server.get('selectionAsFhir')) {
     resource.reasonCodeableConcept = props.server.get('selectionAsFhir')
   }
   return Immutable.fromJS(resource)
@@ -262,7 +275,7 @@ DecisionStore.dispatchToken = AppDispatcher.register(function(action) {
   switch (action.type) {
 
     case ActionTypes.EXTERNAL_APP_RETURNED:
-       _externalAppReturned()
+      _externalAppReturned()
       break
 
     case ActionTypes.LOADED:
