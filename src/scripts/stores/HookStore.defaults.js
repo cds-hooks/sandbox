@@ -1,13 +1,19 @@
+var url = "http://hooks.smarthealthit.org:8081"
+
+if (window.location.href.match(/localhost/)){
+  url = "http://hooks.smarthealthit.org:8081"
+}
+
 export default {
   "cms-price-check": {
       "id": "cms-price-check",
-      "url": "http://localhost:8081/cms-price-check",
+      "url": url+"/cms-price-check",
       "name": "CMS Price Check",
       "intent": "evaluate-prescription"
     },
     "pediatric-dosing": {
       "id": "pediatric-dosing",
-      "url": "http://localhost:8081/pediatric-dose-check",
+      "url": url+"/pediatric-dose-check",
       "name": "Pediatric Dosage Check",
       "intent": "evaluate-prescription",
       "preFetchTemplate": {
