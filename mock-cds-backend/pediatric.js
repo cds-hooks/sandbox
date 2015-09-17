@@ -4,7 +4,11 @@ var paramsToJson = require('./utils').paramsToJson
 var context = require('./context')
 var fs = require('fs')
 
-var harvoniTemplate = fs.readFileSync(__dirname + '/static/harvoni.html', 'utf8')
+
+var templates = {
+  harvoni: fs.readFileSync(__dirname + '/static/harvoni.html', 'utf8'),
+  jnc8: fs.readFileSync(__dirname + '/static/jnc8.html', 'utf8')
+}
 
 function fillTemplate(template, context) {
   Object.keys(context).forEach(function(k){
@@ -47,9 +51,9 @@ function view(reason, sid, req, res, next){
     "redirect": _db[sid].redirect
   }
 
-  _db[sid].startedHarvoni = true
+  _db[sid]["started"+reason] = true
 
-  var ret = fillTemplate(harvoniTemplate, context)
+  var ret = fillTemplate(templates[reason], context)
 
   res.setHeader('Content-Type', 'text/html');
   res.writeHead(200);
@@ -57,7 +61,7 @@ function view(reason, sid, req, res, next){
   next();
 }
 
-function assessJNC(inData, cards) {
+function assessJNC(inData, response) {
   inData = paramsToJson(inData, callSchema);
   var med = inData.content[0];
   var launch = inData.launch;
@@ -73,8 +77,8 @@ function assessJNC(inData, cards) {
   _db[launch].redirect = redirect
   _db[launch].inData = inData
 
-  if (!_db[launch].startedJNC){
-    cards.parameter.push( {
+  if (!_db[launch]["startedjnc8"]){
+    response.parameter.push( {
       "name": "card",
       "part": [{
         "name": "summary",
@@ -96,6 +100,80 @@ function assessJNC(inData, cards) {
         }]
       }]
     })
+  } else {
+    if (!_db[launch].sentJnc8Decision) {
+      _db[launch].sentJnc8Decision = true;
+      response.parameter.push({
+        "name": "decision",
+        "part": [{
+          "name": "remove",
+          "valueString": "old-id" // TODO populate with temp id of the thing to replace
+        }, {
+          "name": "add",
+          "resource": {
+            "resourceType": "MedicationOrder",
+            "startDate": "2015-09-17",
+            "endDate": "2015-10-17",
+            "status": "draft",
+            "patient": {
+              "reference": "Patient/example"
+            },
+            "reasonCodeableConcept": med.reasonCodeableConcept,
+            "medicationCodeableConcept": {
+              "text": "Hydrochlorothiazide 12.5 MG Oral Capsule",
+              "coding": [
+                {
+                  "display": "Hydrochlorothiazide 12.5 MG Oral Capsule",
+                  "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+                  "code": "199903"
+                }
+              ]
+            },
+            "dosageInstruction": [
+              {
+                "doseQuantity": {
+                  "value": 1,
+                  "system": "http://unitsofmeasure.org",
+                  "code": "{pill}"
+                },
+                "timing": [
+                  {
+                    "repeat": {
+                      "frequency": 1,
+                      "period": 1,
+                      "periodUnits": "d"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }]
+      })
+    }
+     response.parameter.push({
+        "name": "card",
+        "part": [{
+          "name": "summary",
+          "valueString": "Managing with JNC Pro",
+        },{
+          "name": "source",
+          "valueString": "Joint National Committee",
+        },{
+          "name": "indicator",
+          "valueString": "info",
+        }, {
+          "name": "link",
+          "part": [{
+            "name": "label",
+            "valueString": "Tailor therapy"
+          }, {
+            "name": "url",
+            "valueString": context.url + "/service/pediatric-dose-check/jnc8/" + launch
+          }]
+        }]
+      });
+
   }
 }
 
@@ -116,7 +194,7 @@ function assessHarvoni(inData, cards) {
   _db[launch] = _db[launch] || {}
   _db[launch].redirect = redirect
   _db[launch].inData = inData
-  if (_db[launch].startedHarvoni){
+  if (_db[launch].startedharvoni){
     cards.parameter.push( {
       "name": "card",
       "part": [{
@@ -155,7 +233,7 @@ function assessHarvoni(inData, cards) {
         "name": "indicator",
         "valueString": "warning",
       },{
-         "name": "link",
+        "name": "link",
         "part": [{
           "name": "label",
           "valueString": "Begin prior auth process"
@@ -209,10 +287,6 @@ function assessDones() {
 }
 function recommend(data) {
   var lowerDose = getIn(data, 'content')[0]["resource"];
-  if (!lowerDose.medicationCodeableConcept){
-    return {}
-  }
-
   var ret = {
     "resourceType": "Parameters",
     "parameter": [

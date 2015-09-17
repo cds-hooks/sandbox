@@ -1,7 +1,7 @@
 var url = "http://hooks.smarthealthit.org:8081"
 
 if (window.location.href.match(/localhost/)){
-  url = "http://hooks.smarthealthit.org:8081"
+  url = "http://localhost:8081"
 }
 
 export default {
