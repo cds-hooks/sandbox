@@ -5,6 +5,7 @@ $dark-grey: #565A5C;
 $light-grey: #f3f3f3;
 $white: #FFF;
 $warning: #ec971f;
+$warning-text: #C57300;
 $info: #31b0d5;
 $success: #449d44;
 $danger: #c9302c;
@@ -67,14 +68,17 @@ body {
   background: #f6f6f6;
 }
 
+.card-top {
+    display: flex;
+  flex-direction: column;
+    flex-grow: 1
+}
+
 .decision-card {
   border: 2px solid $light-grey;
   border-radius: 5px;
-  margin-bottom: 1em;
-  margin-top: 1em;
+  display: flex;
   padding: 1em;
-  padding: 20px 0;
-  padding-left: 20px;
   border-left-width: 3px;
   background: #fcfcfc;
 }
@@ -89,6 +93,9 @@ body {
 }
 
 
+.alert-warning {
+    color: $warning-text !important;
+}
 .decision-card.alert-warning{
     border-left-color: $warning;
 }
@@ -108,18 +115,19 @@ decision-card button{
 
 .card-summary {
   font-weight: bold;
+  flex-grow: 1;
 }
 .card-source {
     font-size: .8em;
     text-align: right;
   font-style: italic;
-  float: right;
-  padding-right: 2em;
-  padding-left: 2em;
 }
 
 .card-helpful {
 font-style: normal;
+}
+.card-helpful button.btn{
+    vertical-align: initial;
 }
 
 div.card-helpful button.btn {
