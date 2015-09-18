@@ -172,6 +172,7 @@ DrugStore.dispatchToken = AppDispatcher.register(function(action) {
       var original = state,
         alternative = action.suggestion.alternative
       if (alternative.medicationCodeableConcept) {
+        state = state.set('step', 'done')
         state = state.setIn(['decisions', 'prescribable'], Immutable.fromJS({
           "str": alternative.medicationCodeableConcept.text,
           "cui": alternative.medicationCodeableConcept.coding[0].code
