@@ -67,9 +67,13 @@ const Cards = React.createClass({
 
       return ret
       })
-      if (cards.count() == 0) {
-        return null;
+      if (this.props.decisions.get('calling') && cards.count() == 0) {
+        return (<div>Loading cards...</div>)
       }
+      else if (cards.count() == 0) {
+        return (<div>No cards</div>)
+      }
+
       return (<div>{cards}</div>)
     },
 

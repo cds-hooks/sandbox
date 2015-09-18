@@ -43,13 +43,6 @@ var state = Immutable.fromJS({
 })
 
 var preFetchData = Promise.resolve({})
-FhirServerStore.addChangeListener(_rxChanged)
-DrugStore.addChangeListener(_rxChanged)
-DateStore.addChangeListener(_rxChanged)
-HookStore.addChangeListener(_hooksChanged)
-
-_hooksChanged()
-
 function getFhirContext() {
   var c = FhirServerStore.getState().get('context');
   return c.set('Patient.id', c.get('patient')).toJS()
@@ -154,6 +147,7 @@ function addCardsFrom(callCount, hookUrl, result) {
   if (state.get('callCount') !== callCount) {
     return;
   }
+  state = state.set('calling', false)
   var result = paramsToJson(result.data, decisionSchema)
   var decision = result.decision
   if (decision && decision.length > 0) {
@@ -179,6 +173,7 @@ function callHooks(localState) {
   var myCallCount = callCount++;
   state = state.set('cards', Immutable.fromJS([]));
   state = state.set('callCount', myCallCount)
+  state = state.set('calling', true)
   localState.get('preFetchData').then((preFetchData) => {
     var results = localState.get('hooks').map((h, hookUrl) => axios({
         url: h.get('url'),
@@ -187,15 +182,17 @@ function callHooks(localState) {
       }))
       .forEach((p, hookUrl) => p.then(result => addCardsFrom(myCallCount, hookUrl, result)))
   })
+  DecisionStore.emitChange()
 }
 
 function toFhir(props) {
   var resource = {
     "resourceType": "MedicationOrder"
   }
-  if (props.dates.start.enabled)
+  console.log("tofhir", props)
+  if (props.dates.start && props.dates.start.enabled)
     resource.startDate = moment(props.dates.start.value).format("YYYY-MM-DD")
-  if (props.dates.end.enabled)
+  if (props.dates.end && props.dates.end.enabled)
     resource.endDate = moment(props.dates.end.value).format("YYYY-MM-DD")
   resource.status = "draft"
   resource.patient = {
@@ -287,5 +284,12 @@ DecisionStore.dispatchToken = AppDispatcher.register(function(action) {
   }
 
 })
+FhirServerStore.addChangeListener(_rxChanged)
+DrugStore.addChangeListener(_rxChanged)
+DateStore.addChangeListener(_rxChanged)
+HookStore.addChangeListener(_hooksChanged)
+
+_hooksChanged()
+
 
 module.exports = DecisionStore
