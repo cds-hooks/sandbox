@@ -80,6 +80,7 @@ body {
   border: 2px solid $light-grey;
   border-radius: 5px;
   display: flex;
+  flex-flow: column wrap;
   padding: 1em;
   border-left-width: 3px;
   background: #fcfcfc;
@@ -87,6 +88,7 @@ body {
 
 .decision-card.alert-success{
     border-left-color: $success;
+    color: $success;
 }
 
 
@@ -115,13 +117,16 @@ decision-card button{
   margin-right: 0.4em;
 }
 
+.decision-card img{
+ max-width: 100%;
+}
+
 .card-summary {
   font-weight: bold;
   flex-grow: 1;
 }
 .card-source {
     font-size: .8em;
-    text-align: right;
   font-style: italic;
 }
 

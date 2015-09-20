@@ -82,7 +82,7 @@ function assessJNC(inData, response) {
       "name": "card",
       "part": [{
         "name": "summary",
-        "valueString": "JNC 8 guidelines may apply",
+        "valueString": "JNC 8 guidelines apply",
       },{
         "name": "source",
         "valueString": "Joint National Committee",
@@ -161,7 +161,7 @@ function assessJNC(inData, response) {
           "valueString": "Joint National Committee",
         },{
           "name": "indicator",
-          "valueString": "info",
+          "valueString": "success",
         }, {
           "name": "link",
           "part": [{
@@ -283,8 +283,63 @@ function assessDones() {
       }]
     }]
   }
-
 }
+
+function assessGenetics(inData, cards) {
+  inData = paramsToJson(inData, callSchema);
+  var med = inData.content[0];
+  if (! med.medicationCodeableConcept) return;
+  var drugName = med.medicationCodeableConcept.text;
+  console.log("Check allopurinol");
+  if (!drugName.match(/allopurinol/i)){
+    return;
+  }
+
+  console.log("match allopurinol");
+
+  var summary = 'Allopurinol contraindicated: life-threatening SCAR risk';
+  var detail = '\
+### Patient is `HLA-B*58:01` positive\n\
+\n\
+**Implication**: Significantly increased risk of allopurinol-induced SCAR\n\
+\n\
+**Absolute risk**: ~1.5%\n\
+\n\
+**Recommendations**: Allopurinol is contraindicated\n\
+\n\
+**Classification**:  Strong\n\
+\n\
+**Evidence**:\n\
+<img src="http://www.biomedcentral.com/content/figures/1471-2350-12-118-2-l.jpg" width="500px"/>';
+
+cards.parameter.push({
+      "name": "card",
+      "part": [{
+        "name": "summary",
+        "valueString": summary,
+      },{
+        "name": "source",
+        "valueString": "PharmGKB",
+      },{
+        "name": "indicator",
+        "valueString": "danger",
+      }, {
+        "name": "detail",
+        "valueString": detail
+      },{
+      "name": "link",
+      "part": [{
+        "name": "label",
+        "valueString": "View PharmGKB Guidelines"
+      }, {
+        "name": "url",
+        "valueUri": "https://www.pharmgkb.org/drug/PA448320#PA166105003"
+      }]
+    }]
+    });
+}
+
+
 function recommend(data) {
   var lowerDose = getIn(data, 'content')[0]["resource"];
   var ret = {
@@ -294,6 +349,7 @@ function recommend(data) {
   }
   assessHarvoni(data, ret)
   assessJNC(data, ret)
+  assessGenetics(data, ret)
   return ret;
 }
 

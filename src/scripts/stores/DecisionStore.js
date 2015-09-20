@@ -22,6 +22,7 @@ var decisionSchema = {
   }],
   'card': [{
     'summary': 1,
+    'detail': 0,
     'source': 1,
     'indicator': 1,
     'suggestion': [{

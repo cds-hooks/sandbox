@@ -18,6 +18,7 @@ server.use(restify.bodyParser());
 server.use(restify.CORS());
 
 server.on('uncaughtException', function (request, response, route, error) {
+  console.log("Err on", route, error)
   response.send(error)
 });
 
@@ -33,6 +34,7 @@ Object.keys(services).forEach(function(name){
         err = new restify.errors.InternalServerError('Request failed with ' + e);
         console.log("Err", err)
       }
+      console.log("now return", name)
       return next(err);
     });
   });

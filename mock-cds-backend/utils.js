@@ -33,7 +33,8 @@ function paramsToJson(ps, pattern){
   .reduce(function(coll, k){
     var val = getIn(ps, k);
     if (pattern[k] === 0){
-      val = val.length > 0 ? val[0] : null;
+      val = val && val.length > 0 ? val[0] : null;
+      if (val)
       val = extractValue(val);
     } else if (pattern[k] === 1){
       val = extractValue(val[0]);

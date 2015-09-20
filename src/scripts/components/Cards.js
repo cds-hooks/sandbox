@@ -1,4 +1,6 @@
 import React from 'react'
+import ReactMarkdown from 'react-markdown';
+
 import AppDispatcher from '../dispatcher/AppDispatcher'
 import ActionTypes from '../actions/ActionTypes'
 import striptags from 'striptags'
@@ -34,13 +36,20 @@ const Cards = React.createClass({
   },
 
   render() {
-    var cards = this.props.decisions.get('cards').sort((a, b) => indicators[a.source] - indicators[b.source]).map(c => {
+    var cards = this.props.decisions.get('cards')
+    .sort((b, a) => indicators[a.indicator] - indicators[b.indicator])
+    .map(c => {
 
       var classes = "decision-card alert alert-" + c.indicator;
       var ret = (
       <div key={c.key} className={classes}>
       <div className="card-top">
         <div className="card-summary">{c.summary}</div>
+      <div className="card-source">
+        Source: {c.source}
+      </div>
+
+        {c.detail && <ReactMarkdown softBreak="br" source={c.detail}/>}
         <div>
         {c.suggestion.map(l => (
       <button key={l.key} onClick={e => this.takeSuggestion(l)} className="btn btn-success btn-xs">
@@ -55,12 +64,6 @@ const Cards = React.createClass({
     </div>
 
     </div>
-      <div className="card-source">
-        <div className="card-helpful">
-          Card helpful? <button className="btn btn-xs">yes</button> <button className="btn btn-xs">no</button>
-        </div>
-        Source: {c.source}
-      </div>
 
           </div>
       )

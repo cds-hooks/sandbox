@@ -15,6 +15,7 @@
     "object-assign": "^2.0.0",
     "react": "^0.13.3",
     "react-day-picker": "^1.0.5",
+    "react-markdown": "^1.0.3",
     "react-tap-event-plugin": "^0.1.7",
     "request-promise": "^0.4.3",
     "striptags": "^2.0.3"
