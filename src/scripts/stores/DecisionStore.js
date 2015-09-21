@@ -27,7 +27,8 @@ var decisionSchema = {
     'indicator': 1,
     'suggestion': [{
       'label': 1,
-      'alternative': 1
+      'create': [],
+      'delete': []
     }],
     'link': [{
       'label': 1,
@@ -105,11 +106,15 @@ function _rxChanged() {
   }
 }
 
-var _sessionUuid = uuid.v4()
+var _sessionUuid = "25d2efb8-5499-48bf-9428-da8ed247ed00"
+var _activityUuid = uuid.v4()
 
-var launchService = {
-  createLaunch() {
-    return _sessionUuid
+var idService = {
+  createIds() {
+    return {
+      sessionId: _sessionUuid,
+      activityId: _activityUuid
+    }
   }
 }
 
@@ -119,22 +124,26 @@ if (!_base.match(/.*\//)) {
 }
 
 function hookBody(h, fhir, preFetchData) {
+  var ids = idService.createIds()
   var ret = {
     "resourceType": "Parameters",
     "parameter": [{
-      "name": "launch",
-      "valueString": launchService.createLaunch()
+      "name": "sessionId",
+      "valueString": ids.sessionId
+    },{
+      "name": "activityId",
+      "valueString": ids.activityId
     }, {
       "name": "redirect",
       "valueString": _base + "service-done.html"
     }, {
-      "name": "intent",
+      "name": "activity",
       "valueString": "evaluate-prescription"
     }, {
-      "name": "content",
+      "name": "context",
       "resource": fhir
     }, {
-      "name": "pre-fetch-data",
+      "name": "preFetchData",
       "resource": preFetchData
     }]
   }
@@ -155,7 +164,7 @@ function addCardsFrom(callCount, hookUrl, result) {
     AppDispatcher.dispatch({
       type: ActionTypes.TAKE_SUGGESTION,
       suggestion: {
-        alternative: decision[0].create[0]
+        create: decision[0].create
       }
     })
   }

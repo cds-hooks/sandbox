@@ -24,12 +24,14 @@ module.exports ={
   }, view:  view
 }
 
+// TODO incorporate types here
 var callSchema = {
-  launch: 1,
-  intent: 1,
-  content: [],
+  sessionId: 1,
+  activityId: 1,
+  activity: 1,
   redirect: 1,
-  "pre-fetch-data": 0
+  context: [],
+  preFetchData: 0
 };
 
 
@@ -39,8 +41,8 @@ var _db = {};
 // recommending can, alternatively, return a single "decision" indicating a user-approved choice.
 function view(reason, sid, req, res, next){
   var inData = _db[sid].inData;
-  var med = inData.content[0];
-  var patient = inData["pre-fetch-data"].entry.filter(function(e){
+  var med = inData.context[0];
+  var patient = inData.preFetchData.entry.filter(function(e){
     return e.resource.resourceType === "Patient"
   })[0].resource;
 
@@ -63,8 +65,8 @@ function view(reason, sid, req, res, next){
 
 function assessJNC(inData, response) {
   inData = paramsToJson(inData, callSchema);
-  var med = inData.content[0];
-  var launch = inData.launch;
+  var med = inData.context[0];
+  var activityId = inData.activityId;
   var redirect = inData.redirect;
   if (!med.reasonCodeableConcept) return;
   var reason = med.reasonCodeableConcept.text;
@@ -73,11 +75,11 @@ function assessJNC(inData, response) {
     return 
   }
 
-  _db[launch] = _db[launch] || {}
-  _db[launch].redirect = redirect
-  _db[launch].inData = inData
+  _db[activityId] = _db[activityId] || {}
+  _db[activityId].redirect = redirect
+  _db[activityId].inData = inData
 
-  if (!_db[launch]["startedjnc8"]){
+  if (!_db[activityId]["startedjnc8"]){
     response.parameter.push( {
       "name": "card",
       "part": [{
@@ -96,13 +98,13 @@ function assessJNC(inData, response) {
           "valueString": "Tailor therapy with JNC Pro"
         }, {
           "name": "url",
-          "valueString": context.url + "/service/pediatric-dose-check/jnc8/" + launch
+          "valueString": context.url + "/service/pediatric-dose-check/jnc8/" + activityId
         }]
       }]
     })
   } else {
-    if (!_db[launch].sentJnc8Decision) {
-      _db[launch].sentJnc8Decision = true;
+    if (!_db[activityId].sentJnc8Decision) {
+      _db[activityId].sentJnc8Decision = true;
       response.parameter.push({
         "name": "decision",
         "part": [{
@@ -169,7 +171,7 @@ function assessJNC(inData, response) {
             "valueString": "Tailor therapy"
           }, {
             "name": "url",
-            "valueString": context.url + "/service/pediatric-dose-check/jnc8/" + launch
+            "valueString": context.url + "/service/pediatric-dose-check/jnc8/" + activityId
           }]
         }]
       });
@@ -182,8 +184,8 @@ function assessJNC(inData, response) {
 
 function assessHarvoni(inData, cards) {
   inData = paramsToJson(inData, callSchema);
-  var med = inData.content[0];
-  var launch = inData.launch;
+  var med = inData.context[0];
+  var activityId = inData.activityId;
   var redirect = inData.redirect;
   if (! med.medicationCodeableConcept) return;
   var drugName = med.medicationCodeableConcept.text;
@@ -191,10 +193,10 @@ function assessHarvoni(inData, cards) {
     return 
   }
 
-  _db[launch] = _db[launch] || {}
-  _db[launch].redirect = redirect
-  _db[launch].inData = inData
-  if (_db[launch].startedharvoni){
+  _db[activityId] = _db[activityId] || {}
+  _db[activityId].redirect = redirect
+  _db[activityId].inData = inData
+  if (_db[activityId].startedharvoni){
     cards.parameter.push( {
       "name": "card",
       "part": [{
@@ -213,7 +215,7 @@ function assessHarvoni(inData, cards) {
           "valueString": "View status"
         }, {
           "name": "url",
-          "valueUri": context.url + "/service/pediatric-dose-check/harvoni/" + launch
+          "valueUri": context.url + "/service/pediatric-dose-check/harvoni/" + activityId
         }]
       }]
     })
@@ -239,7 +241,7 @@ function assessHarvoni(inData, cards) {
           "valueString": "Begin prior auth process"
         }, {
           "name": "url",
-          "valueUri": context.url + "/service/pediatric-dose-check/harvoni/" + launch
+          "valueUri": context.url + "/service/pediatric-dose-check/harvoni/" + activityId
         }]
       }]
     });
@@ -260,7 +262,7 @@ function assessDones() {
         "name": "label",
         "valueString": "5 mg daily"
       }, {
-        "name": "alternative",
+        "name": "create",
         "resource": lowerDose
       }]
     }, {
@@ -269,7 +271,7 @@ function assessDones() {
         "name": "label",
         "valueString": "10 mg daily"
       }, {
-        "name": "alternative",
+        "name": "create",
         "resource": lowerDose
       }]
     }, {
@@ -287,7 +289,7 @@ function assessDones() {
 
 function assessGenetics(inData, cards) {
   inData = paramsToJson(inData, callSchema);
-  var med = inData.content[0];
+  var med = inData.context[0];
   if (! med.medicationCodeableConcept) return;
   var drugName = med.medicationCodeableConcept.text;
   console.log("Check allopurinol");
@@ -341,7 +343,7 @@ cards.parameter.push({
 
 
 function recommend(data) {
-  var lowerDose = getIn(data, 'content')[0]["resource"];
+  var lowerDose = getIn(data, 'context')[0]["resource"];
   var ret = {
     "resourceType": "Parameters",
     "parameter": [

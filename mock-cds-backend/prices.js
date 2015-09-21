@@ -13,7 +13,7 @@ module.exports = {
 // recommending can, alternatively, return a single "decision" indicating a user-approved choice.
 
 function recommend(data) {
-  var lowerPrice = getIn(data, 'content')[0]["resource"];
+  var lowerPrice = getIn(data, 'context')[0]["resource"];
   if (!lowerPrice.medicationCodeableConcept) {
     return {}
   }
@@ -58,7 +58,7 @@ function recommend(data) {
   }
 }
 
-function message(summary, label, alternative) {
+function message(summary, label, toPropose) {
   var ret = {
     "resourceType": "Parameters",
     "parameter": [{
@@ -82,8 +82,8 @@ function message(summary, label, alternative) {
         "name": "label",
         "valueString": label
       }, {
-        "name": "alternative",
-        "resource": alternative
+        "name": "create",
+        "resource": toPropose
       }]
     });
   }

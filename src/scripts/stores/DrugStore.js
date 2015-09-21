@@ -170,14 +170,14 @@ DrugStore.dispatchToken = AppDispatcher.register(function(action) {
     case ActionTypes.TAKE_SUGGESTION:
       console.log("take drg suggestion", action)
       var original = state,
-        alternative = action.suggestion.alternative
-      if (alternative.medicationCodeableConcept) {
+        create = action.suggestion.create[0]
+      if (create.medicationCodeableConcept) {
         state = state.set('step', 'done')
         state = state.setIn(['decisions', 'prescribable'], Immutable.fromJS({
-          "str": alternative.medicationCodeableConcept.text,
-          "cui": alternative.medicationCodeableConcept.coding[0].code
+          "str": create.medicationCodeableConcept.text,
+          "cui": create.medicationCodeableConcept.coding[0].code
         }))
-        console.log("And set the med", alternative.medicationCodeableConcept.text)
+        console.log("And set the med", create.medicationCodeableConcept.text)
       }
       if (!Immutable.is(original, state)) {
         DrugStore.emitChange();

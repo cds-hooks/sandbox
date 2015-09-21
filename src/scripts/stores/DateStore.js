@@ -46,12 +46,12 @@ DateStore.dispatchToken = AppDispatcher.register(function(action) {
   switch(action.type) {
 
     case ActionTypes.TAKE_SUGGESTION:
-      var original = _dates, alternative = action.suggestion.alternative
-      if (alternative.startDate) {
-        _dates = _dates.setIn(['start', 'value'], moment(alternative.startDate).toDate())
+      var original = _dates, create = action.suggestion.create[0]
+      if (create.startDate) {
+        _dates = _dates.setIn(['start', 'value'], moment(create.startDate).toDate())
       }
-      if (alternative.endDate) {
-        _dates = _dates.setIn(['end', 'value'], moment(alternative.endDate).toDate())
+      if (create.endDate) {
+        _dates = _dates.setIn(['end', 'value'], moment(create.endDate).toDate())
       }
       if (!Immutable.is(original, _dates)) {
         DateStore.emitChange();
