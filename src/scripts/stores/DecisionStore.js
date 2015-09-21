@@ -16,21 +16,21 @@ var Immutable = require('immutable')
 var DELAY = 0; // no delay to apply hooks
 
 var decisionSchema = {
-  'decision': [{
-    'create': [],
-    'delete': []
+  'decision': [0, '*', {
+    'create': [0, '*', 'resource'],
+    'delete': [0, '*', 'string']
   }],
-  'card': [{
-    'summary': 1,
-    'detail': 0,
-    'source': 1,
-    'indicator': 1,
-    'suggestion': [{
-      'label': 1,
-      'create': [],
-      'delete': []
+  'card': [0, '*', {
+    'summary': [1, 1, 'string'],
+    'detail': [0, 1, 'string'],
+    'source': [1, 1, 'string'],
+    'indicator': [1, 1, 'string'],
+    'suggestion': [0, '*', {
+      'label': [1, 1, 'string'],
+      'create': [0, '*', 'resource'],
+      'delete': [0, '*', 'string']
     }],
-    'link': [{
+    'link': [0, '*', {
       'label': 1,
       'url': 1
     }]
@@ -130,7 +130,7 @@ function hookBody(h, fhir, preFetchData) {
     "parameter": [{
       "name": "sessionId",
       "valueString": ids.sessionId
-    },{
+    }, {
       "name": "activityId",
       "valueString": ids.activityId
     }, {
@@ -138,7 +138,7 @@ function hookBody(h, fhir, preFetchData) {
       "valueString": _base + "service-done.html"
     }, {
       "name": "activity",
-      "valueString": "evaluate-prescription"
+      "valueString": "medication-prescribe"
     }, {
       "name": "context",
       "resource": fhir

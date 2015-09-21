@@ -26,12 +26,12 @@ module.exports ={
 
 // TODO incorporate types here
 var callSchema = {
-  sessionId: 1,
-  activityId: 1,
-  activity: 1,
-  redirect: 1,
-  context: [],
-  preFetchData: 0
+  sessionId: [0,"*", "string"],
+  activityId:[0, "*", "string"],
+  activity:  [0, "*", "string"],
+  redirect:  [0, "*", "uri"],
+  context:   [0, "*", "resource"],
+  preFetchData: [0, 1, "resource"]
 };
 
 

@@ -10,19 +10,19 @@ function getIn(data, path) {
   }
 
   return (data.parameter || data.part)
-    .filter(function(p) {
-      return p.name === path[0];
-    })
-    .map(function(p) {
-      return getIn(p, path.slice(1));
-    })
+  .filter(function(p) {
+    return p.name === path[0];
+  })
+  .map(function(p) {
+    return getIn(p, path.slice(1));
+  })
 }
 
 //paramsToJS(someparams, {'card': [{'summary': 1, 'suggestion': [{"label": 1, "valueString":1}], 'link': ["label": 1, "valueUri": 1]}]})
 
 
 function extractValue(ps){
-    return ps['valueString'] || ps['valueUri'] || ps['resource'];
+  return ps['valueString'] || ps['valueUri'] || ps['resource'];
 }
 
 // Pattern is like
@@ -31,26 +31,74 @@ function extractValue(ps){
 function paramsToJson(ps, pattern){
   return Object.keys(pattern)
   .reduce(function(coll, k){
+
+    var minCardinality = pattern[k][0];
+    var maxCardinality = pattern[k][1];
+    var subPattern = pattern[k][2];
+    var isNested = (typeof subPattern === 'object');
     var val = getIn(ps, k);
-    if (pattern[k] === 0){
-      val = val && val.length > 0 ? val[0] : null;
-      if (val)
-      val = extractValue(val);
-    } else if (pattern[k] === 1){
-      val = extractValue(val[0]);
-    } else if (isArray(pattern[k])){
-      if (pattern[k].length === 1)
-        val = val.map(function(v){ return paramsToJson(v, pattern[k][0]);});
-      else if (pattern[k].length === 0) 
-        val = val.map(extractValue)
-      else 
-        throw "invalid patter " + pattern[k]
-    } else if (typeof pattern[k] === 'object') {
-      val = paramsToJson(val, pattern[k]);
+
+    if (!isNested){
+      val = val.map(extractValue);
+    } else {
+      val = val.map(function(v){ return paramsToJson(v, subPattern);});
     }
+
+    if (minCardinality === 1){
+      if (val.length < 1) {
+        throw "Min cardinality 1 but got no " + k;
+      }
+    }
+
+    if (maxCardinality === 1) {
+      val = val[0]
+    }
+
     coll[k] = val;
     return coll;
   }, {})
+}
+
+var test =  paramsToJson({
+  "parameter" : [
+    {
+      "name" : "sessionId",
+      "valueString" : "25d2efb8-5499-48bf-9428-da8ed247ed00"
+    },
+    {
+      "name" : "activityId",
+      "valueString" : "60abe606-ea4a-4cf1-a6ba-6ddf58183c11"
+    },
+    {
+      "valueString" : "http://localhost:8080/service-done.html",
+      "name" : "redirect"
+    },
+    {
+      "valueString" : "medication-prescribe",
+      "name" : "activity"
+    },
+    {
+      "resource" : {
+        "test": true
+      },
+      "name" : "context"
+    },
+    {
+      "name" : "preFetchData"
+    }
+  ],
+  "resourceType" : "Parameters"
+} , {
+  sessionId: [1, 1, "string"],
+  activityId:[1, 1, "string"],
+  activity:  [1, 1, "string"],
+  redirect:  [1, 1, "uri"],
+  context:   [0, "*", "resource"],
+  preFetchData: [0, 1, "resource"]
+});
+
+if (test.activity !== "medication-prescribe" || test.context[0].test !== true) {
+  throw "Parsing by schema failed."
 }
 
 module.exports.getIn = getIn;

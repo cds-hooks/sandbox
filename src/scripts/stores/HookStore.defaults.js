@@ -9,13 +9,13 @@ export default {
       "id": "cms-price-check",
       "url": url+"/cms-price-check",
       "name": "CMS Price Check",
-      "intent": "evaluate-prescription"
+      "activity": "medication-prescribe"
     },
     "pediatric-dosing": {
       "id": "pediatric-dosing",
       "url": url+"/pediatric-dose-check",
       "name": "Pediatric Dosage Check",
-      "intent": "evaluate-prescription",
+      "activity": "medication-prescribe",
       "preFetchTemplate": {
         "resourceType": "Bundle",
         "type": "transaction",
