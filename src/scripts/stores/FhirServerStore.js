@@ -70,6 +70,22 @@ var FhirServiceStore = assign({}, EventEmitter.prototype, {
     return state
   },
 
+  getStateToPublish() {
+    return {
+      reason: state.get('selection')
+    };
+  },
+  getSelectionAsFhir() {
+    if (!state.get('conditions')) return null;
+    if (!state.get('selection')) return null;
+    var match = state
+      .get('conditions')
+      .map(c=>c.resource.code)
+      .filter(c=> c.coding[0].code === state.get('selection'))
+    if (match.length > 0)
+      return match[0]
+  },
+
   emitChange: function() {
     this.emit(CHANGE_EVENT)
   },
@@ -94,12 +110,16 @@ FhirServiceStore.dispatchToken = AppDispatcher.register(function(action) {
 
   switch (action.type) {
     case ActionTypes.PICK_CONDITION:
-      var match = state.get('conditions').map(c=>c.resource.code).filter(c=> c.coding[0].code === action.selection)
       state= state.set('selection', action.selection)
-      state= state.set('selectionAsFhir', match[0] )
       FhirServiceStore.emitChange()
       break
-
+    case ActionTypes.NEW_HASH_STATE:
+      var hash = action.hash
+      var selection = hash.reason;
+      if (selection){
+        state = state.set('selection', selection)
+        FhirServiceStore.emitChange()
+      }
     default:
   }
 

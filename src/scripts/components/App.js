@@ -29,7 +29,8 @@ const App = React.createClass({
   componentDidMount: function() {
     AppStore.addChangeListener(this._onChange);
     AppDispatcher.dispatch({
-      type: ActionTypes.NEW_HASH_STATE
+      type: ActionTypes.NEW_HASH_STATE,
+      hash: JSON.parse(window.location.hash.slice(1))
     })
   },
 

@@ -151,7 +151,7 @@ DrugStore.dispatchToken = AppDispatcher.register(function(action) {
   switch (action.type) {
 
     case ActionTypes.NEW_HASH_STATE:
-      var hash = JSON.parse(window.location.hash.slice(1));
+      var hash = action.hash
       var drug = hash.drug ? {
         cui: hash.drug,
         str: rxnorm.cuiToName[hash.drug]

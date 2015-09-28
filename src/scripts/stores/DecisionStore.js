@@ -244,8 +244,9 @@ function toFhir(props) {
       }]
     }];
   }
-  if (props.server.get('selectionAsFhir')) {
-    resource.reasonCodeableConcept = props.server.get('selectionAsFhir')
+  var reason = FhirServerStore.getSelectionAsFhir()
+  if (reason) {
+    resource.reasonCodeableConcept = reason
   }
   return Immutable.fromJS(resource)
 }
