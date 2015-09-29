@@ -94,8 +94,10 @@ function _rxChanged() {
   var props = {
     dates: DateStore.getDates(),
     server: FhirServerStore.getState(),
-    drug: DrugStore.getState()
+    drug: DrugStore.getState(),
+    fhirServer:FhirServerStore.getState()
   }
+
   var resource = toFhir(props)
   if (!Immutable.is(resource, state.get('fhir'))) {
     state = state.set('fhir', resource)
@@ -206,10 +208,11 @@ function toFhir(props) {
     resource.endDate = moment(props.dates.end.value).format("YYYY-MM-DD")
   resource.status = "draft"
   resource.patient = {
-    "reference": "Patient/example"
+    "reference": "Patient/" + props.fhirServer.getIn(['context', 'patient'])
   }
   if (props.drug && props.drug.get('step') === "done") {
     var med = props.drug.getIn(['decisions', 'prescribable']).toJS();
+
     resource.medicationCodeableConcept = {
       "text": med.str,
       "coding": [{

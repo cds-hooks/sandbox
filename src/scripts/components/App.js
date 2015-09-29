@@ -81,7 +81,7 @@ const App = React.createClass({
     <div id="bottom-bar">
       SMART Health IT —
       About <a href="https://github.com/jmandel/cds-hooks/wiki">CDS Hooks</a> —
-      Source <a href="https://github.com/jmandel/cds-hooks-rx-app">on GitHub</a>
+      Rx Demo <a href="https://github.com/jmandel/cds-hooks-rx-app">source code</a>
 
       <HookEditor
         hooks={this.state.all.getIn(['hooks', 'hooks'])}
