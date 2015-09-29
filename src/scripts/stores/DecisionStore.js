@@ -95,7 +95,7 @@ function _rxChanged() {
     dates: DateStore.getDates(),
     server: FhirServerStore.getState(),
     drug: DrugStore.getState(),
-    fhirServer:FhirServerStore.getState()
+    fhirServer: FhirServerStore.getState()
   }
 
   var resource = toFhir(props)
@@ -211,6 +211,31 @@ function toFhir(props) {
     "reference": "Patient/" + props.fhirServer.getIn(['context', 'patient'])
   }
   if (props.drug && props.drug.get('step') === "done") {
+    var freqs = {
+      'daily': 1,
+      'bid': 2,
+      'tid': 3,
+      'qid': 4
+    }
+
+    if (props.drug.get('sig')) {
+      var sig = props.drug.get('sig').toJS();
+      resource.dosageInstruction = [{
+        doseQuantity: {
+          value: sig.number,
+          system: "http://unitsofmeasure.org",
+          code: "{pill}"
+        },
+        timing: [{
+          repeat: {
+            frequency: freqs[sig.frequency],
+            period: 1,
+            periodUnits: "d"
+          }
+        }]
+      }];
+    }
+
     var med = props.drug.getIn(['decisions', 'prescribable']).toJS();
 
     resource.medicationCodeableConcept = {
@@ -223,30 +248,6 @@ function toFhir(props) {
     }
   }
 
-  var freqs = {
-    'daily': 1,
-    'bid': 2,
-    'tid': 3,
-    'qid': 4
-  }
-
-  if (props.drug.get('sig')) {
-    var sig = props.drug.get('sig').toJS();
-    resource.dosageInstruction = [{
-      doseQuantity: {
-        value: sig.number,
-        system: "http://unitsofmeasure.org",
-        code: "{pill}"
-      },
-      timing: [{
-        repeat: {
-          frequency: freqs[sig.frequency],
-          period: 1,
-          periodUnits: "d"
-        }
-      }]
-    }];
-  }
   var reason = FhirServerStore.getSelectionAsFhir()
   if (reason) {
     resource.reasonCodeableConcept = reason
