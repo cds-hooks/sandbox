@@ -71,9 +71,11 @@ var FhirServiceStore = assign({}, EventEmitter.prototype, {
   },
 
   getStateToPublish() {
-    return {
-      reason: state.get('selection')
-    };
+    var ret = {}
+    if (state.get('selection')) {
+      ret.reason =  state.get('selection')
+    }
+    return ret
   },
   getSelectionAsFhir() {
     if (!state.get('conditions')) return null;
