@@ -269,6 +269,18 @@ table.drug-choice tr:hover{
   flex-flow: column nowrap;
 }
 
+#top-bar a {
+    cursor: pointer;
+}
+
+.PatientView .row {
+    margin-left: 2em;
+}
+
+.activity-on {
+  color: $dark-grey;
+}
+
 .FhirView {
   margin: 0em;
   font-size: 1rem;

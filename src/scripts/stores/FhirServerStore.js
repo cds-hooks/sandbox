@@ -47,6 +47,20 @@ function _fetchData() {
     }).catch(e => {
       console.log("Error fetching conditions", e)
   })
+  _client.read({
+    type: 'Patient',
+    id: state.getIn(['context', 'patient'])
+  }).then(b => {
+      var original = state;
+      state = state.set('patient', b.data)
+      console.log("Got patient", b.data)
+      if (!Immutable.is(original, state)) {
+        FhirServiceStore.emitChange()
+      }
+    }).catch(e => {
+      console.log("Error fetching patient", e)
+  })
+
 }
 
 
@@ -56,6 +70,7 @@ var state = Immutable.fromJS({
     conditions: []
   },
   "condition": [],
+  "patient": null,
   "selection": null
 })
 
@@ -131,7 +146,6 @@ import querystring from 'querystring'
 var qs = querystring.parse(window.location.search.slice(1))
 var fhirContext = {
   patient: qs.patientId || "1288992",
-
   baseUrl: qs.fhirServiceUrl || "http://hooks.smarthealthit.org:9080"
 }
 

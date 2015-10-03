@@ -3,6 +3,7 @@ import ActionTypes from '../actions/ActionTypes'
 import DateStore from './DateStore';
 import DrugStore from './DrugStore';
 import FhirServerStore from './FhirServerStore';
+import DecisionStore from './DecisionStore';
 import assign from 'object-assign'
 window.addEventListener('hashchange',hashListener);
 
@@ -18,10 +19,11 @@ function publishStateFromStores(){
   var stateToPublish = {};
   stateToPublish = assign(
     {},
-    //DateStore.getStateToPublish(),
+    DecisionStore.getStateToPublish(),
     DrugStore.getStateToPublish(),
     FhirServerStore.getStateToPublish()
   );
+
   var newHash = `#${JSON.stringify(stateToPublish)}`;
   if (newHash != window.location.hash) {
     window.history.replaceState(undefined, undefined, newHash);

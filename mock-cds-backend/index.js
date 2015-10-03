@@ -1,11 +1,13 @@
 var restify = require('restify');
 var pediatric = require('./pediatric');
 var prices = require('./prices');
+var patient = require('./patient');
 var context = require('./context');
 
 var services = {
   'pediatric-dose-check': pediatric,
-  'cms-price-check': prices
+  'cms-price-check': prices,
+  'pt-hello-world': patient
 };
 
 var server = restify.createServer({
@@ -40,9 +42,9 @@ Object.keys(services).forEach(function(name){
   });
 });
 
-server.get('/service/:serviceName/:reason/:sessionId', function(req, res, next){
-  console.log("Vew on", req.params.serviceName);
-  services[req.params.serviceName].view(req.params.reason, req.params.sessionId, req, res, next);
+server.get('/service/:serviceName/:reason/:activityInstance', function(req, res, next){
+  console.log("View on", req.params.serviceName);
+  services[req.params.serviceName].view(req.params.reason, req.params.activityInstance, req, res, next);
 })
 
 server.listen(process.env.PORT || 8081, function () {

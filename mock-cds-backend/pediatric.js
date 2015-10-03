@@ -26,9 +26,8 @@ module.exports ={
 
 // TODO incorporate types here
 var callSchema = {
-  sessionId: [0,"*", "string"],
-  activityId:[0, "*", "string"],
-  activity:  [0, "*", "string"],
+  activityInstance:[0, "*", "string"],
+  activity:  [0, "*", "coding"],
   redirect:  [0, "*", "uri"],
   context:   [0, "*", "resource"],
   preFetchData: [0, 1, "resource"]
@@ -66,7 +65,7 @@ function view(reason, sid, req, res, next){
 function assessJNC(inData, response) {
   inData = paramsToJson(inData, callSchema);
   var med = inData.context[0];
-  var activityId = inData.activityId;
+  var activityInstance = inData.activityInstance;
   var redirect = inData.redirect;
   if (!med.reasonCodeableConcept) return;
   var reason = med.reasonCodeableConcept.text;
@@ -75,11 +74,11 @@ function assessJNC(inData, response) {
     return 
   }
 
-  _db[activityId] = _db[activityId] || {}
-  _db[activityId].redirect = redirect
-  _db[activityId].inData = inData
+  _db[activityInstance] = _db[activityInstance] || {}
+  _db[activityInstance].redirect = redirect
+  _db[activityInstance].inData = inData
 
-  if (!_db[activityId]["startedjnc8"]){
+  if (!_db[activityInstance]["startedjnc8"]){
     response.parameter.push( {
       "name": "card",
       "part": [{
@@ -87,7 +86,10 @@ function assessJNC(inData, response) {
         "valueString": "JNC 8 guidelines apply",
       },{
         "name": "source",
-        "valueString": "Joint National Committee",
+        "part": [{
+          "name": "label",
+          "valueString": "Joint National Commission",
+        }]
       },{
         "name": "indicator",
         "valueString": "info",
@@ -98,13 +100,13 @@ function assessJNC(inData, response) {
           "valueString": "Tailor therapy with JNC Pro"
         }, {
           "name": "url",
-          "valueString": context.url + "/service/pediatric-dose-check/jnc8/" + activityId
+          "valueString": context.url + "/service/pediatric-dose-check/jnc8/" + activityInstance
         }]
       }]
     })
   } else {
-    if (!_db[activityId].sentJnc8Decision) {
-      _db[activityId].sentJnc8Decision = true;
+    if (!_db[activityInstance].sentJnc8Decision) {
+      _db[activityInstance].sentJnc8Decision = true;
       response.parameter.push({
         "name": "decision",
         "part": [{
@@ -159,8 +161,11 @@ function assessJNC(inData, response) {
           "name": "summary",
           "valueString": "Managing with JNC Pro",
         },{
-          "name": "source",
-          "valueString": "Joint National Committee",
+        "name": "source",
+        "part": [{
+          "name": "label",
+          "valueString": "Joint National Commission",
+        }]
         },{
           "name": "indicator",
           "valueString": "success",
@@ -171,7 +176,7 @@ function assessJNC(inData, response) {
             "valueString": "Tailor therapy"
           }, {
             "name": "url",
-            "valueString": context.url + "/service/pediatric-dose-check/jnc8/" + activityId
+            "valueString": context.url + "/service/pediatric-dose-check/jnc8/" + activityInstance
           }]
         }]
       });
@@ -185,7 +190,7 @@ function assessJNC(inData, response) {
 function assessHarvoni(inData, cards) {
   inData = paramsToJson(inData, callSchema);
   var med = inData.context[0];
-  var activityId = inData.activityId;
+  var activityInstance = inData.activityInstance;
   var redirect = inData.redirect;
   if (! med.medicationCodeableConcept) return;
   var drugName = med.medicationCodeableConcept.text;
@@ -193,10 +198,10 @@ function assessHarvoni(inData, cards) {
     return 
   }
 
-  _db[activityId] = _db[activityId] || {}
-  _db[activityId].redirect = redirect
-  _db[activityId].inData = inData
-  if (_db[activityId].startedharvoni){
+  _db[activityInstance] = _db[activityInstance] || {}
+  _db[activityInstance].redirect = redirect
+  _db[activityInstance].inData = inData
+  if (_db[activityInstance].startedharvoni){
     cards.parameter.push( {
       "name": "card",
       "part": [{
@@ -204,8 +209,11 @@ function assessHarvoni(inData, cards) {
         "valueString": "Prior authorization in process",
       },{
         "name": "source",
-        "valueString": "CareMore PBM",
-      },{
+        "part": [{
+          "name": "label",
+          "valueString": "CareMore PBM",
+        }]
+        },{
         "name": "indicator",
         "valueString": "success",
       }, {
@@ -215,7 +223,7 @@ function assessHarvoni(inData, cards) {
           "valueString": "View status"
         }, {
           "name": "url",
-          "valueUri": context.url + "/service/pediatric-dose-check/harvoni/" + activityId
+          "valueUri": context.url + "/service/pediatric-dose-check/harvoni/" + activityInstance
         }]
       }]
     })
@@ -228,10 +236,13 @@ function assessHarvoni(inData, cards) {
       "part": [{
         "name": "summary",
         "valueString": "Harvoni requires prior authorization",
-      }, {
-        "name": "source",
-        "valueString": "CareMore PBM",
       },{
+        "name": "source",
+        "part": [{
+          "name": "label",
+          "valueString": "CareMore PBM",
+        }]
+        } ,{
         "name": "indicator",
         "valueString": "warning",
       },{
@@ -241,7 +252,7 @@ function assessHarvoni(inData, cards) {
           "valueString": "Begin prior auth process"
         }, {
           "name": "url",
-          "valueUri": context.url + "/service/pediatric-dose-check/harvoni/" + activityId
+          "valueUri": context.url + "/service/pediatric-dose-check/harvoni/" + activityInstance
         }]
       }]
     });
@@ -321,7 +332,10 @@ cards.parameter.push({
         "valueString": summary,
       },{
         "name": "source",
-        "valueString": "PharmGKB",
+        "part": [{
+          "name": "label",
+          "valueString": "PharmGKB",
+        }]
       },{
         "name": "indicator",
         "valueString": "danger",

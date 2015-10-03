@@ -60,5 +60,4 @@ function _changed() {
   AppStore.emitChange()
 }
 
-
 module.exports = AppStore

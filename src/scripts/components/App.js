@@ -1,12 +1,9 @@
 import AppDispatcher from '../dispatcher/AppDispatcher';
 import ActionTypes from '../actions/ActionTypes'
 import React from 'react';
-import DrugSelector from './DrugSelector';
-import ProblemSelector from './ProblemSelector';
-import DateBox from './DateBox';
-import FhirView from './FhirView';
+import RxActivity from './RxActivity';
+import PatientViewActivity from './PatientViewActivity';
 import HookEditor from './HookEditor';
-import Cards from './Cards';
 import AppStore from '../stores/AppStore'
 import DateStore from '../stores/DateStore'
 import HashStateStore from '../stores/HashStateStore';
@@ -39,6 +36,7 @@ const App = React.createClass({
   },
 
   _onChange: function(){
+    console.log("Canged so new hash")
     HashStateStore();
     this.setState({all: AppStore.getState()});
   },
@@ -54,30 +52,35 @@ const App = React.createClass({
     return {all: AppStore.getState()}
   },
 
+  setActivity(code){
+    AppDispatcher.dispatch({
+      type: ActionTypes.SET_ACTIVITY,
+      activity: code
+    })
+  },
+
   render() {
+    var activity = (this.state.all.getIn(['decisions', 'activity']))
+    var rxClass = activity === "medication-prescribe" ? "activity-on" : "activity-off"
+    var ptClass = activity === "patient-view" ? "activity-on" : "activity-off"
+
     return (
       <div id="react-content">
-        <div id="top-bar">CDS Hooks: Rx Demo
+        <div id="top-bar">
+          <span>CDS Hooks Demo: </span>
+          <a className={rxClass} onClick={e=>this.setActivity("medication-prescribe")}>Rx</a>
+          <span> | </span>
+          <a className={ptClass} onClick={e=>this.setActivity("patient-view")}>Pt</a>
         </div>
+        {
+          activity === 'medication-prescribe' &&
+            <RxActivity all={this.state.all}/>
+        }
+        {
+          activity === 'patient-view' &&
+            <PatientViewActivity all={this.state.all}/>
+        }
 
-      <div id="main">
-        <div className="OrderEntry container">
-        <div className="row">
-        <ProblemSelector
-          conditions={this.state.all.getIn(['fhirServer', 'conditions'])} 
-          selection={this.state.all.getIn(['fhirServer', 'selection'])}
-        />
-        </div>
-        <DrugSelector {...this.state.all.get('drug').toJS()} />
-        <div className="row">
-        <DateBox id="start" display="Start date" {...this.state.all.get('dates').start} />
-        <DateBox id="end" display="End date" {...this.state.all.get('dates').end} />
-      </div>
-        <div className="decision-spacer"></div>
-      <Cards className="card-holder" decisions={this.state.all.get('decisions')} />
-        </div>
-        <FhirView {...this.state} />
-      </div>
     <div id="bottom-bar">
       SMART Health IT —
       About <a href="https://github.com/jmandel/cds-hooks/wiki">CDS Hooks</a> —

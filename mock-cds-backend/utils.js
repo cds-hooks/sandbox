@@ -22,7 +22,10 @@ function getIn(data, path) {
 
 
 function extractValue(ps){
-  return ps['valueString'] || ps['valueUri'] || ps['resource'];
+  var props = ["valueString", "valueUri", "valueId", "valueCode", "valueCoding", "valueInteger", "resource"]
+  for (var i=0; i<props.length; i++){
+    if (ps[props[i]]) return ps[props[i]]
+  }
 }
 
 // Pattern is like
@@ -62,11 +65,7 @@ function paramsToJson(ps, pattern){
 var test =  paramsToJson({
   "parameter" : [
     {
-      "name" : "sessionId",
-      "valueString" : "25d2efb8-5499-48bf-9428-da8ed247ed00"
-    },
-    {
-      "name" : "activityId",
+      "name" : "activityInstance",
       "valueString" : "60abe606-ea4a-4cf1-a6ba-6ddf58183c11"
     },
     {
@@ -89,8 +88,7 @@ var test =  paramsToJson({
   ],
   "resourceType" : "Parameters"
 } , {
-  sessionId: [1, 1, "string"],
-  activityId:[1, 1, "string"],
+  activityInstance:[1, 1, "string"],
   activity:  [1, 1, "string"],
   redirect:  [1, 1, "uri"],
   context:   [0, "*", "resource"],

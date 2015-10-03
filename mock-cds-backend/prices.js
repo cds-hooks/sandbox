@@ -68,7 +68,10 @@ function message(summary, label, toPropose) {
         "valueString": summary,
       },{
         "name": "source",
-        "valueString": "CMS Public Use Files",
+        "part": [{
+          "name": "label",
+          "valueString": "CMS Public Use Files",
+        }]
       },{
         "name": "indicator",
         "valueString": "info",

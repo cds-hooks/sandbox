@@ -12,8 +12,7 @@ const DateBox = React.createClass({
     };
   },
 
-  componentDidMount(){
-    window.bodyClicks.on('click', (e)=>{
+  bodyClick(e) {
       if (!this.getDOMNode().contains(e.target)){
         AppDispatcher.dispatch({
           type: ActionTypes.SELECT_DATE,
@@ -21,7 +20,14 @@ const DateBox = React.createClass({
           decision: this.props.value
         })
       }
-    })
+  },
+
+  componentDidMount(){
+    window.bodyClicks.on('click', this.bodyClick)
+  },
+
+  componentWillUnmount(){
+    window.bodyClicks.removeListener('click', this.bodyClick)
   },
 
   componentWillReceiveProps(nextProps){

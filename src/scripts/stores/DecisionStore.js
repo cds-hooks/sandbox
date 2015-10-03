@@ -1,9 +1,9 @@
 import axios from 'axios'
 import ActionTypes from '../actions/ActionTypes'
 import defaultHooks from './HookStore.defaults'
+import MedicationPrescribeStore from './MedicationPrescribeStore'
+import PatientViewStore from './PatientViewStore'
 import FhirServerStore from './FhirServerStore'
-import DateStore from './DateStore'
-import DrugStore from './DrugStore'
 import HookStore from './HookStore'
 import moment from 'moment'
 import uuid from 'node-uuid'
@@ -15,32 +15,35 @@ var assign = require('object-assign')
 var Immutable = require('immutable')
 var DELAY = 0; // no delay to apply hooks
 
+HookStore.addChangeListener(_hooksChanged)
+
 var decisionSchema = {
   'decision': [0, '*', {
     'create': [0, '*', 'resource'],
-    'delete': [0, '*', 'string']
+    'delete': [0, '*', 'id']
   }],
   'card': [0, '*', {
     'summary': [1, 1, 'string'],
+    'source': [1, 1, {
+      'label': [1, 1, 'string'],
+      'url': [0, 1, 'uri']
+    }],
     'detail': [0, 1, 'string'],
-    'source': [1, 1, 'string'],
-    'indicator': [1, 1, 'string'],
+    'indicator': [1, 1, 'code'],
     'suggestion': [0, '*', {
       'label': [1, 1, 'string'],
       'create': [0, '*', 'resource'],
-      'delete': [0, '*', 'string']
+      'delete': [0, '*', 'id']
     }],
     'link': [0, '*', {
-      'label': 1,
-      'url': 1
+      'label': [1, 1, 'string'],
+      'url': [1, 1, 'uri']
     }]
   }]
 };
 
 var CHANGE_EVENT = 'change'
 var state = Immutable.fromJS({
-  fhir: {},
-  additions: [],
   cards: []
 })
 
@@ -82,40 +85,32 @@ function _hooksChanged() {
       })
   ).toJS()
 
-  state = state.set('preFetchData', Promise.all(hookFetches)
-    .then(preFetchResults => preFetchResults.reduce(
-        (coll, r, i) => coll.set(hooksToFetch.get(i).get('url'), r.data),
-        Immutable.fromJS({}))))
 
+  state = state.set('preFetchData', Promise.all(hookFetches)
+          .then(preFetchResults => {
+            console.log("reducing prefetch", preFetchResults)
+          return preFetchResults.reduce(
+        (coll, r, i) => coll.set(hooksToFetch.get(i).get('url'), r.data),
+        Immutable.fromJS({}))
+
+          }))
+
+  console.log("Pending prefetc")
   callHooks(state)
 }
 
-function _rxChanged() {
-  var props = {
-    dates: DateStore.getDates(),
-    server: FhirServerStore.getState(),
-    drug: DrugStore.getState(),
-    fhirServer: FhirServerStore.getState()
-  }
 
-  var resource = toFhir(props)
-  if (!Immutable.is(resource, state.get('fhir'))) {
-    state = state.set('fhir', resource)
-    state = state.set('cards', Immutable.List())
-    DecisionStore.emitChange()
-    console.log("X CHANGE", resource.toJS())
-    setTimeout(() => callHooks(state), DELAY)
-  }
-}
-
-var _sessionUuid = "25d2efb8-5499-48bf-9428-da8ed247ed00"
+// 
+// ActivityGenerators call:
+// DecisionStore.setActivityState({'activity': 'medication-prescribe', 'fhir', {resource})
+// which proparges to the DecisionStore state.
+// and calls the hooks, filtered on activity match.
 var _activityUuid = uuid.v4()
 
 var idService = {
   createIds() {
     return {
-      sessionId: _sessionUuid,
-      activityId: _activityUuid
+      activityInstance: _activityUuid
     }
   }
 }
@@ -130,27 +125,39 @@ function hookBody(h, fhir, preFetchData) {
   var ret = {
     "resourceType": "Parameters",
     "parameter": [{
-      "name": "sessionId",
-      "valueString": ids.sessionId
+      "name": "activity",
+      "valueCoding": {
+        "system": "http://cds-hooks.smarthealthit.org/activity",
+        "code": "medication-prescribe"
+      }
     }, {
-      "name": "activityId",
-      "valueString": ids.activityId
+      "name": "activityInstance",
+      "valueString": ids.activityInstance
+    }, {
+      "name": "fhirServer",
+      "valueUri": FhirServerStore.getState().getIn(['context', 'baseUrl'])
     }, {
       "name": "redirect",
       "valueString": _base + "service-done.html"
     }, {
-      "name": "activity",
-      "valueString": "medication-prescribe"
+      "name": "user",
+      "valueString": "Practitioner/example"
     }, {
-      "name": "context",
-      "resource": fhir
+      "name": "patient",
+      "valueId": FhirServerStore.getState().getIn(['context', 'patient'])
     }, {
       "name": "preFetchData",
       "resource": preFetchData
     }]
   }
+  if (fhir)
+  ret.parameter.push({
+      "name": "context",
+      "resource": fhir
+  });
   return ret;
 }
+
 var cardKey = 0
 function addCardsFrom(callCount, hookUrl, result) {
   if (!result.data) {
@@ -159,6 +166,7 @@ function addCardsFrom(callCount, hookUrl, result) {
   if (state.get('callCount') !== callCount) {
     return;
   }
+
   state = state.set('calling', false)
   var result = paramsToJson(result.data, decisionSchema)
   var decision = result.decision
@@ -170,6 +178,7 @@ function addCardsFrom(callCount, hookUrl, result) {
       }
     })
   }
+
   var cards = result.card || []
   cards = Immutable.fromJS(cards).map((v, k) => v.set('key', cardKey++)
       .set('suggestion', v.get('suggestion').map(s => s.set("key", cardKey++)))
@@ -177,6 +186,7 @@ function addCardsFrom(callCount, hookUrl, result) {
   ).toJS()
   var newCards = state.get('cards').push(...cards)
   state = state.set('cards', newCards)
+
   DecisionStore.emitChange()
 }
 
@@ -186,79 +196,66 @@ function callHooks(localState) {
   state = state.set('cards', Immutable.fromJS([]));
   state = state.set('callCount', myCallCount)
   state = state.set('calling', true)
+
+  var applicableServices = localState
+    .get('hooks')
+    .filter((h, hookUrl) => h.get('activity') === localState.get('activity'))
+
+    if (applicableServices.count() == 0) {
+      console.log("no applicable services")
+      state = state.set('calling', false)
+    }
+    else {
+      console.log("call applicable services", applicableServices.count())
+    }
+
+
   localState.get('preFetchData').then((preFetchData) => {
-    var results = localState.get('hooks').map((h, hookUrl) => axios({
+
+    var results =  applicableServices.map((h, hookUrl) => axios({
         url: h.get('url'),
         method: 'post',
-        data: hookBody(h, localState.get('fhir').toJS(), preFetchData.get(h.get('url')))
+        data: hookBody(
+          h,
+          localState.get('fhir') && localState.get('fhir').toJS(),
+          preFetchData.get(h.get('url')))
       }))
       .forEach((p, hookUrl) => p.then(result => addCardsFrom(myCallCount, hookUrl, result)))
   })
   DecisionStore.emitChange()
 }
 
-function toFhir(props) {
-  var resource = {
-    "resourceType": "MedicationOrder"
-  }
-  console.log("tofhir", props)
-  if (props.dates.start && props.dates.start.enabled)
-    resource.startDate = moment(props.dates.start.value).format("YYYY-MM-DD")
-  if (props.dates.end && props.dates.end.enabled)
-    resource.endDate = moment(props.dates.end.value).format("YYYY-MM-DD")
-  resource.status = "draft"
-  resource.patient = {
-    "reference": "Patient/" + props.fhirServer.getIn(['context', 'patient'])
-  }
-  if (props.drug && props.drug.get('step') === "done") {
-    var freqs = {
-      'daily': 1,
-      'bid': 2,
-      'tid': 3,
-      'qid': 4
-    }
-
-    if (props.drug.get('sig')) {
-      var sig = props.drug.get('sig').toJS();
-      resource.dosageInstruction = [{
-        doseQuantity: {
-          value: sig.number,
-          system: "http://unitsofmeasure.org",
-          code: "{pill}"
-        },
-        timing: [{
-          repeat: {
-            frequency: freqs[sig.frequency],
-            period: 1,
-            periodUnits: "d"
-          }
-        }]
-      }];
-    }
-
-    var med = props.drug.getIn(['decisions', 'prescribable']).toJS();
-
-    resource.medicationCodeableConcept = {
-      "text": med.str,
-      "coding": [{
-        "display": med.str,
-        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
-        "code": med.cui
-      }]
-    }
-  }
-
-  var reason = FhirServerStore.getSelectionAsFhir()
-  if (reason) {
-    resource.reasonCodeableConcept = reason
-  }
-  return Immutable.fromJS(resource)
-}
-
 
 var DecisionStore = assign({}, EventEmitter.prototype, {
+
   getState: function() {
     return state
+  },
+
+  setActivity: function(activity) {
+    console.log("Set activity", activity)
+    state = state.merge(_stores[activity].getState())
+    state.get('activityStore').processChange()
+    DecisionStore.emitChange()
+  },
+
+  setActivityState: function(activity, resource) {
+    if (activity !== state.get('activity')) {
+      return;
+    }
+
+    if (!Immutable.is(resource, state.get('fhir'))) {
+      console.log("Changed fhir state from", state.get('fhir').toJSON(), resource && resource.toJSON())
+      state = state.set('fhir', resource)
+      state = state.set('cards', Immutable.List())
+      setTimeout(() => callHooks(state), DELAY)
+    }
+  },
+
+  getStateToPublish: function() {
+    return {
+      activity: state.get("activity")
+    }
   },
 
   emitChange: function() {
@@ -291,7 +288,15 @@ DecisionStore.dispatchToken = AppDispatcher.register(function(action) {
       break
 
     case ActionTypes.LOADED:
-      _rxChanged()
+      break
+
+    case ActionTypes.SET_ACTIVITY:
+        DecisionStore.setActivity(action.activity)
+      break
+
+    case ActionTypes.NEW_HASH_STATE:
+      var hash = action.hash
+      DecisionStore.setActivity(hash.activity  || 'medication-prescribe')
       break
 
     default:
@@ -299,12 +304,11 @@ DecisionStore.dispatchToken = AppDispatcher.register(function(action) {
   }
 
 })
-FhirServerStore.addChangeListener(_rxChanged)
-DrugStore.addChangeListener(_rxChanged)
-DateStore.addChangeListener(_rxChanged)
-HookStore.addChangeListener(_hooksChanged)
 
+var _stores = {
+  'medication-prescribe': MedicationPrescribeStore.register(DecisionStore),
+  'patient-view': PatientViewStore.register(DecisionStore)
+};
 _hooksChanged()
-
 
 module.exports = DecisionStore
