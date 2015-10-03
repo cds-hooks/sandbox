@@ -21,14 +21,17 @@ function bodyClick(e) {
   })
 };
 
+console.log("dispatching")
+AppDispatcher.dispatch({
+  type: ActionTypes.NEW_HASH_STATE,
+  hash: window.location.hash.slice(1) ? JSON.parse(window.location.hash.slice(1)) : {}
+})
+console.log("DIspatched")
+
 const App = React.createClass({
 
   componentDidMount: function() {
     AppStore.addChangeListener(this._onChange);
-    AppDispatcher.dispatch({
-      type: ActionTypes.NEW_HASH_STATE,
-      hash: JSON.parse(window.location.hash.slice(1))
-    })
   },
 
   componentWillUnmount: function() {
@@ -36,7 +39,6 @@ const App = React.createClass({
   },
 
   _onChange: function(){
-    console.log("Canged so new hash")
     HashStateStore();
     this.setState({all: AppStore.getState()});
   },
@@ -45,11 +47,11 @@ const App = React.createClass({
     DateStore.setDate("start", {
       date: moment().toDate(),
       enabled: true});
-    DateStore.setDate("end", {
-      date: moment().add(1, 'month').toDate(),
-      enabled: true});
-    AppDispatcher.dispatch({ type: ActionTypes.LOADED })
-    return {all: AppStore.getState()}
+      DateStore.setDate("end", {
+        date: moment().add(1, 'month').toDate(),
+        enabled: true});
+        AppDispatcher.dispatch({ type: ActionTypes.LOADED })
+        return {all: AppStore.getState()}
   },
 
   setActivity(code){
@@ -75,22 +77,22 @@ const App = React.createClass({
         {
           activity === 'medication-prescribe' &&
             <RxActivity all={this.state.all}/>
-        }
-        {
-          activity === 'patient-view' &&
-            <PatientViewActivity all={this.state.all}/>
-        }
+            }
+            {
+              activity === 'patient-view' &&
+                <PatientViewActivity all={this.state.all}/>
+                }
 
-    <div id="bottom-bar">
-      SMART Health IT —
-      About <a href="https://github.com/jmandel/cds-hooks/wiki">CDS Hooks</a> —
-      Rx Demo <a href="https://github.com/jmandel/cds-hooks-rx-app">source code</a>
+                <div id="bottom-bar">
+                  SMART Health IT —
+                  About <a href="https://github.com/jmandel/cds-hooks/wiki">CDS Hooks</a> —
+                  Rx Demo <a href="https://github.com/jmandel/cds-hooks-rx-app">source code</a>
 
-      <HookEditor
-        hooks={this.state.all.getIn(['hooks', 'hooks'])}
-        editing={this.state.all.getIn(['hooks', 'editing'])} />
-    </div>
-      </div>
+                  <HookEditor
+                    hooks={this.state.all.getIn(['hooks', 'hooks'])}
+                    editing={this.state.all.getIn(['hooks', 'editing'])} />
+                </div>
+              </div>
     )
   }
 });

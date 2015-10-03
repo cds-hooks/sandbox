@@ -87,13 +87,12 @@ function _hooksChanged() {
 
 
   state = state.set('preFetchData', Promise.all(hookFetches)
-          .then(preFetchResults => {
-            console.log("reducing prefetch", preFetchResults)
-          return preFetchResults.reduce(
+    .then(preFetchResults => preFetchResults.reduce(
         (coll, r, i) => coll.set(hooksToFetch.get(i).get('url'), r.data),
         Immutable.fromJS({}))
 
-          }))
+
+  ))
 
   console.log("Pending prefetc")
   callHooks(state)
@@ -151,10 +150,10 @@ function hookBody(h, fhir, preFetchData) {
     }]
   }
   if (fhir)
-  ret.parameter.push({
+    ret.parameter.push({
       "name": "context",
       "resource": fhir
-  });
+    });
   return ret;
 }
 
@@ -201,18 +200,17 @@ function callHooks(localState) {
     .get('hooks')
     .filter((h, hookUrl) => h.get('activity') === localState.get('activity'))
 
-    if (applicableServices.count() == 0) {
-      console.log("no applicable services")
-      state = state.set('calling', false)
-    }
-    else {
-      console.log("call applicable services", applicableServices.count())
-    }
+  if (applicableServices.count() == 0) {
+    console.log("no applicable services")
+    state = state.set('calling', false)
+  } else {
+    console.log("call applicable services", applicableServices.count())
+  }
 
 
   localState.get('preFetchData').then((preFetchData) => {
 
-    var results =  applicableServices.map((h, hookUrl) => axios({
+    var results = applicableServices.map((h, hookUrl) => axios({
         url: h.get('url'),
         method: 'post',
         data: hookBody(
@@ -236,6 +234,7 @@ var DecisionStore = assign({}, EventEmitter.prototype, {
     console.log("Set activity", activity)
     state = state.merge(_stores[activity].getState())
     state.get('activityStore').processChange()
+    console.log("PC", state.get('activityStore').processChange)
     DecisionStore.emitChange()
   },
 
@@ -245,7 +244,6 @@ var DecisionStore = assign({}, EventEmitter.prototype, {
     }
 
     if (!Immutable.is(resource, state.get('fhir'))) {
-      console.log("Changed fhir state from", state.get('fhir').toJSON(), resource && resource.toJSON())
       state = state.set('fhir', resource)
       state = state.set('cards', Immutable.List())
       setTimeout(() => callHooks(state), DELAY)
@@ -291,12 +289,12 @@ DecisionStore.dispatchToken = AppDispatcher.register(function(action) {
       break
 
     case ActionTypes.SET_ACTIVITY:
-        DecisionStore.setActivity(action.activity)
+      DecisionStore.setActivity(action.activity)
       break
 
     case ActionTypes.NEW_HASH_STATE:
       var hash = action.hash
-      DecisionStore.setActivity(hash.activity  || 'medication-prescribe')
+      DecisionStore.setActivity(hash.activity || 'medication-prescribe')
       break
 
     default:

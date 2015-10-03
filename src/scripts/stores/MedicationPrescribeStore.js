@@ -120,10 +120,10 @@ var MedicationPrescribeStore = assign({}, EventEmitter.prototype, {
 
 })
 
-var state = Immutable.fromJS({
+var state = Immutable.Map({
   'activity': 'medication-prescribe',
-  'fhir': {}
-}).set('activityStore', MedicationPrescribeStore)
-console.log("my internal state", state.get('activityStore'), MedicationPrescribeStore)
+  'fhir': {},
+  'activityStore': MedicationPrescribeStore
+})
 
 module.exports = MedicationPrescribeStore
