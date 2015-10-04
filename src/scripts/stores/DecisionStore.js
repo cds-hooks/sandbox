@@ -184,6 +184,7 @@ function addCardsFrom(callCount, hookUrl, result) {
       .set('suggestion', v.get('suggestion').map(s => s.set("key", cardKey++)))
       .set('link', v.get('link').map(s => s.set("key", cardKey++)))
   ).toJS()
+  console.log("Added as", cards)
   var newCards = state.get('cards').push(...cards)
   state = state.set('cards', newCards)
 
