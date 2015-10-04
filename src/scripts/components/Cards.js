@@ -38,6 +38,7 @@ const Cards = React.createClass({
   render() {
     var cards = this.props.decisions.get('cards')
     .sort((b, a) => indicators[a.indicator] - indicators[b.indicator])
+    .filter(c=>c.summary)
     .map(c => {
 
       var classes = "decision-card alert alert-" + c.indicator;
@@ -46,7 +47,7 @@ const Cards = React.createClass({
       <div className="card-top">
         <div className="card-summary">{c.summary}</div>
       <div className="card-source">
-        Source: {c.source.label}
+        {c.source.label && "Source" + c.source.label}
       </div>
 
         {c.detail && <ReactMarkdown softBreak="br" source={c.detail}/>}
