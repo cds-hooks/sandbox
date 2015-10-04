@@ -168,6 +168,7 @@ function addCardsFrom(callCount, hookUrl, result) {
 
   state = state.set('calling', false)
   var result = paramsToJson(result.data, decisionSchema)
+  console.log("3 addCardsFrom", result)
   var decision = result.decision
   if (decision && decision.length > 0) {
     AppDispatcher.dispatch({

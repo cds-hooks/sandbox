@@ -49,7 +49,7 @@ function paramsToJson(ps, pattern){
 
     if (minCardinality === 1){
       if (val.length < 1) {
-        throw "Min cardinality 1 but got no " + k;
+        console.log( "Min cardinality 1 but got no " + k);
       }
     }
 
