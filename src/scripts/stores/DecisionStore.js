@@ -127,7 +127,7 @@ function hookBody(h, fhir, preFetchData) {
       "name": "activity",
       "valueCoding": {
         "system": "http://cds-hooks.smarthealthit.org/activity",
-        "code": "medication-prescribe"
+        "code": state.get('activity')
       }
     }, {
       "name": "activityInstance",
