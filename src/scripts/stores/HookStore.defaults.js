@@ -6,7 +6,7 @@ if (window.location.href.match(/localhost/)) {
 
 export default {
   "pt-healthintersections": {
-    "id": "pt-hello-world",
+    "id": "pt-healthintersections",
     "url": "http://fhir-dev.healthintersections.com.au/open/$cds-hook",
     "name": "Patient Hello World",
     "activity": "patient-view",
