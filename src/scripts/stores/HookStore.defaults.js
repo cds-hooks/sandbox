@@ -5,6 +5,22 @@ if (window.location.href.match(/localhost/)) {
 }
 
 export default {
+  "pt-healthintersections": {
+    "id": "pt-hello-world",
+    "url": "http://fhir-dev.healthintersections.com.au/open/$cds-hook",
+    "name": "Patient Hello World",
+    "activity": "patient-view",
+    "preFetchTemplate": {
+      "resourceType": "Bundle",
+      "type": "transaction",
+      "entry": [{
+        "request": {
+          "method": "GET",
+          "url": "Patient/{{Patient.id}}"
+        }
+      }]
+    }
+  },
   "pt-hello-world": {
     "id": "pt-hello-world",
     "url": url + "/pt-hello-world",

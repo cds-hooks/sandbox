@@ -9,7 +9,7 @@ function getIn(data, path) {
     return data;
   }
 
-  return (data.parameter || data.part)
+  return (data.parameter || data.part || [])
   .filter(function(p) {
     return p.name === path[0];
   })
