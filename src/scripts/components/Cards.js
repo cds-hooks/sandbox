@@ -47,7 +47,7 @@ const Cards = React.createClass({
       <div className="card-top">
         <div className="card-summary">{c.summary}</div>
       <div className="card-source">
-        {c.source.label && "Source" + c.source.label}
+        {c.source.label && "Source: " + c.source.label}
       </div>
 
         {c.detail && <ReactMarkdown softBreak="br" source={c.detail}/>}
