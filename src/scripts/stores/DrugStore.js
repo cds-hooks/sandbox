@@ -77,6 +77,7 @@ var processSearch = debounce(function(action) {
     .filter(x => x != "");
 
   process.nextTick(function() {
+    var t0 = new Date().getTime()
     var newIngredients;
     if (parts.length == 0)
       newIngredients = [];
@@ -94,6 +95,8 @@ var processSearch = debounce(function(action) {
           };
         });
     state = state.setIn(['options', 'ingredient'], newIngredients);
+    var t1 = new Date().getTime()
+    console.log("Search", (t1-t0), "ms")
     DrugStore.emitChange();
   });
 }, 50);

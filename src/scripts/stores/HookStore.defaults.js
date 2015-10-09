@@ -5,6 +5,36 @@ if (window.location.href.match(/localhost/)) {
 }
 
 export default {
+  "bmi-cds-hook": {
+    "id": "bmi-cds-hook",
+    "url": "https://o33vjt5ak2.execute-api.us-east-1.amazonaws.com/prod/bmi-cds-hook",
+    "name": "Patient BMI",
+    "activity": "patient-view",
+    "preFetchTemplate": {
+      "resourceType": "Bundle",
+      "type": "transaction",
+      "entry": [
+        {
+          "request": {
+            "method": "GET",
+            "url": "Patient/{{Patient.id}}"
+          }
+        },
+        {
+          "request": {
+            "method": "GET",
+            "url": "Observation?patient={{Patient.id}}&code=8302-2&_sort:desc=date&_count=1"
+          }
+        },
+        {
+          "request": {
+            "method": "GET",
+            "url": "Observation?patient={{Patient.id}}&code=3141-9&_sort:desc=date&_count=1"
+          }
+        }
+      ]
+    }
+  }
   "pt-healthintersections": {
     "id": "pt-healthintersections",
     "url": "http://fhir-dev.healthintersections.com.au/open/$cds-hook",

@@ -40,8 +40,11 @@ const FhirView = React.createClass({
       isAddition={additions.indexOf(l) !== -1}
       className="line"> {l}
     </div>));
-
-    return (<pre className="FhirView">{ output }</pre>);
+    if (this.props.all.getIn(['decisions', 'fhir'])){
+      return (<pre className="FhirView">{ output }</pre>);
+    } else {
+      return (<pre className="FhirView"><div className="line">(No CDS Hook <i>context resources</i> required.)</div></pre>)
+    }
   }
 
 
