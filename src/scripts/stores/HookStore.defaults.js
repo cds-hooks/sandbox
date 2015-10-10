@@ -34,7 +34,7 @@ export default {
         }
       ]
     }
-  }
+  },
   "pt-healthintersections": {
     "id": "pt-healthintersections",
     "url": "http://fhir-dev.healthintersections.com.au/open/$cds-hook",
