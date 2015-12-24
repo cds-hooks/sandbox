@@ -1,6 +1,9 @@
 var webpack = require('webpack');
 
 module.exports = {
+  node: {
+    fs: "empty"
+  },
   entry: {
     app: [
       "./src/scripts/main.js"
@@ -20,23 +23,17 @@ module.exports = {
     loaders: [
       {
         test: /\.json?$/,
-        loader: "json",
-        exclude: /node_modules/
+        loader: "json"
       },
       {
         test: /\.jsx?$/,
-        loader: "babel",
+        loader: "babel?presets[]=react,presets[]=es2015",
         exclude: /node_modules/
       },
 
       {
         test: /\.sass$/,
         loader: "style!css!sass?indentedSyntax=true&outputStyle=expanded"
-      },
-
-      {
-        test: /bootstrap\/js\//,
-        loader: 'imports?jQuery=jquery'
       },
 
       {

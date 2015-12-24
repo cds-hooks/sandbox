@@ -24,11 +24,10 @@ module.exports = {
     loaders: [
       {
         test: /\.json?$/,
-        loader: "json",
-        exclude: /node_modules/
+        loader: "json"
       },{
         test: /\.jsx?$/,
-        loader: "react-hot!babel",
+        loader: "babel?presets[]=react,presets[]=es2015",
         exclude: /node_modules/
       },
 
@@ -36,12 +35,6 @@ module.exports = {
         test: /\.(sass|scss)$/,
         loader: "style!css!sass?indentedSyntax=true&outputStyle=expanded"
       },
-
-      {
-        test: /bootstrap\/js\//,
-        loader: 'imports?jQuery=jquery'
-      },
-
       {
         test: /\.(ttf|eot|svg)$/,
         loader: 'file-loader'

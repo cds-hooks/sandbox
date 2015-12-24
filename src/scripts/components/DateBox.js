@@ -3,7 +3,7 @@ import DayPicker from 'react-day-picker';
 import AppDispatcher from '../dispatcher/AppDispatcher';
 import ActionTypes from '../actions/ActionTypes';
 import moment from 'moment';
-var { isPastDay, isSameDay } = require("../../../node_modules/react-day-picker/lib/Utils.js");
+var { isPastDay, isSameDay } =  DayPicker.DateUtils;
 
 const DateBox = React.createClass({
   getInitialState() {
@@ -51,7 +51,7 @@ const DateBox = React.createClass({
     initialMonth={ this.props.value }
     numberOfMonths={ 1 }
     modifiers={ modifiers }
-    onDayTouchTap={ this.handleDayTouchTap } />;
+    onDayClick={ this.handleDayTouchTap } />;
 
     if (!this.props.picking) {
       picker = null;

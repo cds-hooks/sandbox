@@ -1,5 +1,3 @@
-require('bootstrap-webpack');
-require('react-tap-event-plugin')();
 require('!style!css!sass!../assets/stylesheets/style.scss');
 
 // TODO: Require assets here.
