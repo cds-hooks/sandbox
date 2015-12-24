@@ -140,15 +140,13 @@ function assessJNC(inData, response) {
                   "system": "http://unitsofmeasure.org",
                   "code": "{pill}"
                 },
-                "timing": [
-                  {
+                "timing": {
                     "repeat": {
                       "frequency": 1,
                       "period": 1,
                       "periodUnits": "d"
                     }
                   }
-                ]
               }
             ]
           }

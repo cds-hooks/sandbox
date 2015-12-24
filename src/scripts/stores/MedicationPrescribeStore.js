@@ -55,13 +55,13 @@ function toFhir(props) {
           system: "http://unitsofmeasure.org",
           code: "{pill}"
         },
-        timing: [{
+        timing: {
           repeat: {
             frequency: freqs[sig.frequency],
             period: 1,
             periodUnits: "d"
           }
-        }]
+        }
       }];
     }
 
