@@ -5,6 +5,24 @@ if (window.location.href.match(/localhost/)) {
 }
 
 export default {
+  "drug-interaction-cds-hook": {
+    "id": "drug-interaction-cds-hook",
+    "url": "https://d1fwjs99ve.execute-api.us-east-1.amazonaws.com/prod/drug-interaction-cds-hook",
+    "name": "Drug-Drug Interaction",
+    "activity": "medication-prescribe",
+    "preFetchTemplate": {
+      "resourceType": "Bundle",
+      "type": "transaction",
+      "entry": [
+        {
+          "request": {
+            "method": "GET",
+            "url": "MedicationOrder?patient={{Patient.id}}&status=active"
+          }
+        }
+      ]
+    }
+  },
   "bmi-cds-hook": {
     "id": "bmi-cds-hook",
     "url": "https://o33vjt5ak2.execute-api.us-east-1.amazonaws.com/prod/bmi-cds-hook",
@@ -103,5 +121,3 @@ export default {
     }
   }
 }
-
-
