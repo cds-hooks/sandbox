@@ -1,0 +1,10 @@
+frontend:
+  build: .
+  ports:
+   - "8080:8080"
+  command: run-frontend
+backend:
+  build: .
+  ports:
+   - "8081:8081"
+  command: run-backend

@@ -1,0 +1,15 @@
+frontend:
+  build: .
+  ports:
+   - "8080:8080"
+  volumes:
+   - .:/app
+  command: npm run-script dev
+
+backend:
+  build: .
+  ports:
+   - "8081:8081"
+  volumes:
+  - .:/app
+  command: sh -c "cd /app/mock-cds-backend && nodemon index.js"
