@@ -4,7 +4,7 @@ Live demo at http://hooks.fhir.me/
 
 # Develop it
 
-### Dependencies (docker)
+### Dev environment with docker
 
 1. Install latest (1.9+) `docker-engine` (see
 https://docs.docker.com/engine/installation/ubuntulinux/)
@@ -22,7 +22,7 @@ sudo apt-get install docker-engine pip
 sudo pip install docker-compose
 ```
 
-### Local dev environment
+#### Local dev environment
 
 ```
 git clone https://github.com/jmandel/cds-hooks-rx-app
@@ -39,7 +39,39 @@ Configuration:
    you can pass a query variable to the HTML page, as in
    http://localhost:8080?fhirServiceUrl=http://my-fhir-server
 
-### In production
+
+### Dev environment sans docker
+
+The simpler story if you're just looking to do local dev is something like:
+
+
+### Setup
+
+Install `nodejs` 5.3+ and `npm` 3.3+ and then:
+```
+npm install -g nodemon
+git clone https://github.com/jmandel/cds-hooks-rx-app
+cd cds-hooks-rx-app
+npm install
+cd mock-cds-backend
+npm install
+```
+
+### Run it
+
+Frontend
+```
+cd cds-hooks-rx-app 
+npm run-script dev
+```
+
+CDS service
+```
+cd cds-hooks-rx-app/mock-cds-backend
+nodemon index.js
+```
+
+# In production
 
 No current support is provided for hosting a production copy of this demo, but briefly:
 
@@ -48,4 +80,3 @@ No current support is provided for hosting a production copy of this demo, but b
 
  * TODO: provide a way to configure the frontend server to talk to a different
    "mock services" server (current values are hard-coded)
-
