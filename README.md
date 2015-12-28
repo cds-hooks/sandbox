@@ -37,7 +37,7 @@ Configuration:
 
  * To talk to a FHIR server other than http://hooks.smarthealthit.org:9080,
    you can pass a query variable to the HTML page, as in
-   http://localhost:8080?fhirServiceUrl=http://my-fhir-server
+   `http://localhost:8080?fhirServiceUrl=http://my-fhir-server`
 
 
 ### Dev environment sans docker
