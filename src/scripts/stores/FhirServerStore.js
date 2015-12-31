@@ -146,7 +146,7 @@ import querystring from 'querystring'
 var qs = querystring.parse(window.location.search.slice(1))
 var fhirContext = {
   patient: qs.patientId || "1288992",
-  baseUrl: qs.fhirServiceUrl || "http://hooks.smarthealthit.org:9080"
+  baseUrl: qs.fhirServiceUrl || runtime.FHIR_URL
 }
 
 FhirServiceStore.setContext(fhirContext)

@@ -18,4 +18,6 @@ RUN mv docker/scripts/* /bin && \
     mv /tmp/ui/node_modules /app && \
     mv /tmp/service/node_modules /app/mock-cds-backend
 
-CMD ["ls", "-l"]
+RUN npm install -g http-server
+
+CMD run-frontend

@@ -1,15 +1,35 @@
+mysql:
+  image: "mysql:latest"
+  environment:
+    MYSQL_ROOT_PASSWORD: "password"
+    MYSQL_DATABASE: "fhir_ut"
+  ports:
+   - 3306
+
+api:
+    build: ./api-server
+  ports:
+   - "9002:8080"
+  links:
+    - "mysql:mysql"
+
 frontend:
   build: .
   ports:
-   - "8080:8080"
-  volumes:
-   - .:/app
-  command: npm run-script dev
+   - "9000:8080"
+#  volumes:
+#   - .:/app
+  environment:
+    CDS_HOOKS_URL: $CDS_HOOKS_URL
+    FHIR_URL: $FHIR_URL
+  # command: npm run-script dev
 
 backend:
   build: .
   ports:
-   - "8081:8081"
-  volumes:
-  - .:/app
+   - "9001:8081"
+#  volumes:
+#  - .:/app
+  environment:
+    URL: $CDS_HOOKS_URL
   command: sh -c "cd /app/mock-cds-backend && nodemon index.js"

@@ -1,8 +1,4 @@
-var url = "http://hooks.smarthealthit.org:8081"
-
-if (window.location.href.match(/localhost/)) {
-  url = "http://localhost:8081"
-}
+var url = runtime.CDS_HOOKS_URL
 
 export default {
   "drug-interaction-cds-hook": {
@@ -41,13 +37,13 @@ export default {
         {
           "request": {
             "method": "GET",
-            "url": "Observation?patient={{Patient.id}}&code=8302-2&_sort:desc=date&_count=1"
+            "url": "Observation?patient={{Patient.id}}&code=8302-2&_count=1"
           }
         },
         {
           "request": {
             "method": "GET",
-            "url": "Observation?patient={{Patient.id}}&code=3141-9&_sort:desc=date&_count=1"
+            "url": "Observation?patient={{Patient.id}}&code=3141-9&_count=1"
           }
         }
       ]
@@ -103,7 +99,7 @@ export default {
         "request": {
           "method": "GET",
           // Most recent height observation
-          "url": "Observation?patient={{Patient.id}}&code=8302-2&_sort:desc=date&_count=1"
+          "url": "Observation?patient={{Patient.id}}&code=8302-2&_count=1"
         }
       }, {
         "request": {

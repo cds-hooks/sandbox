@@ -39,6 +39,14 @@ Configuration:
    you can pass a query variable to the HTML page, as in
    `http://localhost:8080?fhirServiceUrl=http://my-fhir-server`
 
+Bring up the whole stack including API server, assuming you're on a host called `morel`:
+
+```
+CDS_HOOKS_URL="http://morel:9001" \
+FHIR_URL="http://morel:9002/data" \
+docker-compose -f docker-compose-dev.yml up
+```
+
 
 ### Dev environment sans docker
 

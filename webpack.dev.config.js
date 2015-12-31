@@ -15,7 +15,11 @@ module.exports = {
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
-    new webpack.NoErrorsPlugin()
+    new webpack.NoErrorsPlugin(),
+    new webpack.DefinePlugin({
+      "runtime.CDS_HOOKS_URL": JSON.stringify(process.env.CDS_HOOKS_URL || "http://localhost:8081"),
+      "runtime.FHIR_URL": JSON.stringify(process.env.FHIR_URL || "http://hooks.smarthealthit.org:9080")
+    })
   ],
   resolve: {
     modulesDirectories: ['node_modules'],

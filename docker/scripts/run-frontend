@@ -1,3 +1,4 @@
 #!/bin/bash
 cd /app
-npm run-script dev
+npm run-script build
+http-server -p 8080 build/
