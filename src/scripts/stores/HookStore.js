@@ -11,9 +11,13 @@ var state = Immutable.fromJS({
   hooks: restoreHooks()
 });
 
-function saveHooks(state) {
+function saveHooks() {
   window.localStorage["hooks"] = JSON.stringify(state.get('hooks'));
+  console.log("Hooks saved. To reset, run resetHooks()")
 }
+
+window.saveHooks = saveHooks
+window.resetHooks = resetHooks
 
 function restoreHooks() {
   try {
