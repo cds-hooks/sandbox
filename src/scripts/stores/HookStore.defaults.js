@@ -133,5 +133,35 @@ export default {
         }
       ]
     }
+  },
+  "WK-med-prescribe": {
+    "id": "WK-med-prescribe",
+    "url": "http://wkhfhir.azurewebsites.net/api/$cds-hook",
+    "name": "WK Medication Prescribe",
+    "activity": "medication-prescribe"
+  },
+  "pds-patient": {
+    "id": "pds-patient",
+    "url": "https://staging.rxcheck.com/pds/patient",
+    "name": "Prescription Decision Support - Patient",
+    "activity": "patient-view",
+    "preFetchTemplate": {
+      "resourceType": "Bundle",
+      "type": "transaction",
+      "entry": [
+        {
+          "request": {
+            "method": "GET",
+            "url": "Patient/{{Patient.id}}"
+          }
+        },
+        {
+          "request": {
+            "method": "GET",
+            "url": "MedicationOrder?patient={{Patient.id}}&status=active"
+          }
+        }
+      ]
+    }
   }
 }
