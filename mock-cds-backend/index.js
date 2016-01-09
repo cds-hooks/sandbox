@@ -32,7 +32,7 @@ server.use(function(req, res, next){
 server.use(restify.CORS());
 server.on('uncaughtException', function (request, response, route, error) {
   console.log("Err on", route, error)
-  response.send(error)
+  response.end(error.toString())
 });
 
 Object.keys(services).forEach(function(name){
