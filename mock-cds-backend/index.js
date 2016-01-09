@@ -17,8 +17,20 @@ var server = restify.createServer({
 
 
 server.use(restify.bodyParser());
-server.use(restify.CORS());
+server.use(function(req, res, next){
+  if (req._contentType.match('json\\+fhir')){
+    req.body = JSON.parse(req.body.toString())
+    res.fhirJson = function(data){
+      res.setHeader('Content-Type', 'application/json+fhir');
+      res.writeHead(200);
+      res.end(JSON.stringify(data))
+    }
+    next()
+  }
 
+})
+
+server.use(restify.CORS());
 server.on('uncaughtException', function (request, response, route, error) {
   console.log("Err on", route, error)
   response.send(error)
@@ -30,14 +42,14 @@ Object.keys(services).forEach(function(name){
   console.log("Configure", name)
   server.get('/' + name + '/metadata', function(req, res, next){
     console.log("Get metadata")
-    res.json(service.metadata)
+    res.fhirJson(service.metadata)
   });
 
   server.post(new RegExp("\\/" + name + "\\/\\$cds-hook"), function(req, res, next){
     console.log("Do CDS", name)
     service.service(req.body, function(err, cdsResult){
       console.log("service got", err, cdsResult)
-      res.json(cdsResult);
+      res.fhirJson(cdsResult);
       if (err){
         err = new restify.errors.InternalServerError('Request failed with ' + e);
         console.log("Err", err)

@@ -55,7 +55,7 @@ function getFhirContext() {
 
 function fillTemplate(template, context) {
   var flat = JSON.stringify(template)
-    .replace(/{{\s*Patient\.id\s*}}/g, context["Patient.id"])
+  .replace(/{{\s*Patient\.id\s*}}/g, context["Patient.id"])
   return JSON.parse(flat)
 }
 function _externalAppReturned() {
@@ -78,24 +78,24 @@ function _hooksChanged() {
   var hooksToFetch = hooks.valueSeq().filter(h => h.get('preFetchTemplate'));
 
   var hookFetches = hooksToFetch
-    .map(h => axios({
-        url: context.baseUrl,
-        method: 'post',
-        data: fillTemplate(h.get('preFetchTemplate'), context)
-      })
-  ).toJS()
+  .map(h => axios({
+    url: context.baseUrl,
+    method: 'post',
+    data: fillTemplate(h.get('preFetchTemplate'), context)
+  })
+      ).toJS()
 
 
-  state = state.set('preFetchData', Promise.all(hookFetches)
-    .then(preFetchResults => preFetchResults.reduce(
-        (coll, r, i) => coll.set(hooksToFetch.get(i).get('url'), r.data),
-        Immutable.fromJS({}))
+      state = state.set('preFetchData', Promise.all(hookFetches)
+                        .then(preFetchResults => preFetchResults.reduce(
+                          (coll, r, i) => coll.set(hooksToFetch.get(i).get('url'), r.data),
+                            Immutable.fromJS({}))
 
 
-  ))
+                             ))
 
-  console.log("Pending prefetc")
-  callHooks(state)
+                             console.log("Pending prefetc")
+                             callHooks(state)
 }
 
 
@@ -154,7 +154,7 @@ function hookBody(h, fhir, preFetchData) {
       "name": "context",
       "resource": fhir
     });
-  return ret;
+    return ret;
 }
 
 var cardKey = 0
@@ -181,14 +181,14 @@ function addCardsFrom(callCount, hookUrl, result) {
 
   var cards = result.card || []
   cards = Immutable.fromJS(cards).map((v, k) => v.set('key', cardKey++)
-      .set('suggestion', v.get('suggestion').map(s => s.set("key", cardKey++)))
-      .set('link', v.get('link').map(s => s.set("key", cardKey++)))
-  ).toJS()
-  console.log("Added as", cards)
-  var newCards = state.get('cards').push(...cards)
-  state = state.set('cards', newCards)
+                                      .set('suggestion', v.get('suggestion').map(s => s.set("key", cardKey++)))
+                                      .set('link', v.get('link').map(s => s.set("key", cardKey++)))
+                                     ).toJS()
+                                     console.log("Added as", cards)
+                                     var newCards = state.get('cards').push(...cards)
+                                     state = state.set('cards', newCards)
 
-  DecisionStore.emitChange()
+                                     DecisionStore.emitChange()
 }
 
 var callCount = 0;
@@ -199,8 +199,8 @@ function callHooks(localState) {
   state = state.set('calling', true)
 
   var applicableServices = localState
-    .get('hooks')
-    .filter((h, hookUrl) => h.get('activity') === localState.get('activity'))
+  .get('hooks')
+  .filter((h, hookUrl) => h.get('activity') === localState.get('activity'))
 
   if (applicableServices.count() == 0) {
     console.log("no applicable services")
@@ -213,14 +213,17 @@ function callHooks(localState) {
   localState.get('preFetchData').then((preFetchData) => {
 
     var results = applicableServices.map((h, hookUrl) => axios({
-        url: h.get('url'),
-        method: 'post',
-        data: hookBody(
-          h,
-          localState.get('fhir') && localState.get('fhir').toJS(),
-          preFetchData.get(h.get('url')))
-      }))
-      .forEach((p, hookUrl) => p.then(result => addCardsFrom(myCallCount, hookUrl, result)))
+      url: h.get('url'),
+      method: 'post',
+      data: hookBody(
+        h,
+        localState.get('fhir') && localState.get('fhir').toJS(),
+        preFetchData.get(h.get('url'))),
+        headers: {
+          'Content-Type': 'application/json+fhir'
+        }
+    }))
+    .forEach((p, hookUrl) => p.then(result => addCardsFrom(myCallCount, hookUrl, result)))
   })
   DecisionStore.emitChange()
 }
@@ -283,24 +286,24 @@ DecisionStore.dispatchToken = AppDispatcher.register(function(action) {
 
   switch (action.type) {
 
-    case ActionTypes.EXTERNAL_APP_RETURNED:
-      _externalAppReturned()
-      break
+      case ActionTypes.EXTERNAL_APP_RETURNED:
+          _externalAppReturned()
+          break
 
-    case ActionTypes.LOADED:
-      break
+      case ActionTypes.LOADED:
+          break
 
-    case ActionTypes.SET_ACTIVITY:
-      DecisionStore.setActivity(action.activity)
-      break
+      case ActionTypes.SET_ACTIVITY:
+          DecisionStore.setActivity(action.activity)
+          break
 
-    case ActionTypes.NEW_HASH_STATE:
-      var hash = action.hash
-      DecisionStore.setActivity(hash.activity || 'medication-prescribe')
-      break
+      case ActionTypes.NEW_HASH_STATE:
+          var hash = action.hash
+          DecisionStore.setActivity(hash.activity || 'medication-prescribe')
+          break
 
-    default:
-  // do nothing
+      default:
+          // do nothing
   }
 
 })
