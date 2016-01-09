@@ -169,5 +169,11 @@ export default {
     "url": "http://cds.medapptech.com/$cds-hook",
     "name": "Pill Images",
     "activity": "medication-prescribe"
+  },
+  "premier-pt-view": {
+    "id": "premier-pt-view",
+    "url": "http://premiercdsapp.elasticbeanstalk.com/fhir/$cds-hook",
+    "name": "Premier CDS",
+    "activity": "patient-view"
   }
 }
