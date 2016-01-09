@@ -25,9 +25,8 @@ server.use(function(req, res, next){
       res.writeHead(200);
       res.end(JSON.stringify(data))
     }
-    next()
   }
-
+  next()
 })
 
 server.use(restify.CORS());
