@@ -18,13 +18,13 @@ var server = restify.createServer({
 
 server.use(restify.bodyParser());
 server.use(function(req, res, next){
-  if (req._contentType.match('json\\+fhir')){
+  if (req.method !== 'GET' && req._contentType.match('json\\+fhir')){
     req.body = JSON.parse(req.body.toString())
-    res.fhirJson = function(data){
-      res.setHeader('Content-Type', 'application/json+fhir');
-      res.writeHead(200);
-      res.end(JSON.stringify(data))
-    }
+  }
+  res.fhirJson = function(data){
+    res.setHeader('Content-Type', 'application/json+fhir');
+    res.writeHead(200);
+    res.end(JSON.stringify(data))
   }
   next()
 })
