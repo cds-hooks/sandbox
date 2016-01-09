@@ -111,7 +111,7 @@ function assessJNC(inData, response) {
         }]
       },{
         "name": "indicator",
-        "valueString": "info",
+        "valueCode": "info",
       }, {
         "name": "link",
         "part": [{
@@ -185,7 +185,7 @@ function assessJNC(inData, response) {
         }]
       },{
         "name": "indicator",
-        "valueString": "success",
+        "valueCode": "success",
       }, {
         "name": "link",
         "part": [{
@@ -232,7 +232,7 @@ function assessHarvoni(inData, cards) {
         }]
       },{
         "name": "indicator",
-        "valueString": "success",
+        "valueCode": "success",
       }, {
         "name": "link",
         "part": [{
@@ -261,7 +261,7 @@ function assessHarvoni(inData, cards) {
         }]
       } ,{
         "name": "indicator",
-        "valueString": "warning",
+        "valueCode": "warning",
       },{
         "name": "link",
         "part": [{
@@ -355,7 +355,7 @@ function assessGenetics(inData, cards) {
       }]
     },{
       "name": "indicator",
-      "valueString": "danger",
+      "valueCode": "danger",
     }, {
       "name": "detail",
       "valueString": detail

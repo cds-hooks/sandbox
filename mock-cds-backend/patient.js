@@ -55,7 +55,7 @@ function recommend(data) {
           }]
         }, {
           "name": "indicator",
-          "valueString": "success",
+          "valueCode": "success",
         }]
       }
     ]

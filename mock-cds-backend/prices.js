@@ -90,7 +90,7 @@ function message(summary, label, toPropose) {
         }]
       },{
         "name": "indicator",
-        "valueString": "info",
+        "valueCode": "info",
       }]
     }]
   };
