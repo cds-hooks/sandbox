@@ -1,12 +1,28 @@
 var isArray = require('util').isArray
 var getIn = require('./utils').getIn
 var priceTable = require('./rxnorm-prices')
+var metadata = require('./utils').metadata
 
 
 module.exports = {
   service: function(indata, cb) {
   cb(null, recommend(indata));
-  }
+  },
+  metadata: metadata([
+      {
+        "url" : "name",
+        "valueString" : "Check prices for a prescription in-progress"
+      },
+      {
+        "url" : "activity",
+        "valueCoding" : {
+          "code" : "medication-prescribe",
+          "display" : "Provide information about a prescription in-progress",
+          "system" : "http://cds-hooks.smarthealthit.org/activity"
+        }
+      }
+    ])
+
 }
 
 // recommending means returning a set of "card"s, each with a summary, set of suggestions and a set of links.

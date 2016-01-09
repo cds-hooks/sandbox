@@ -3,12 +3,36 @@ var getIn = require('./utils').getIn
 var paramsToJson = require('./utils').paramsToJson
 var context = require('./context')
 var fs = require('fs')
+var metadata = require('./utils').metadata
 
 module.exports = {
   service: function(indata, cb) {
     cb(null, recommend(indata));
   },
-  view: null
+  view: null,
+  metadata: metadata([
+    {
+      "url" : "name",
+      "valueString" : "Display a greeting for a patient"
+    },
+    {
+      "url" : "activity",
+      "valueCoding" : {
+        "code" : "patient-view",
+        "display" : "Provide information about a Patient",
+        "system" : "http://cds-hooks.smarthealthit.org/activity"
+      }
+    },
+
+    {
+      "url" : "preFetchRequired",
+      "valueString" : "Patient/{{Patient.id}}"
+    }
+
+  ])
+
+
+
 }
 
 

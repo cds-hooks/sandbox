@@ -67,7 +67,7 @@ export default {
   },
   "pt-hello-world": {
     "id": "pt-hello-world",
-    "url": url + "/pt-hello-world",
+    "url": url + "/pt-hello-world/$cds-hook",
     "name": "Patient Hello World",
     "activity": "patient-view",
     "preFetchTemplate": {
@@ -83,13 +83,13 @@ export default {
   },
   "cms-price-check": {
     "id": "cms-price-check",
-    "url": url + "/cms-price-check",
+    "url": url + "/cms-price-check/$cds-hook",
     "name": "CMS Price Check",
     "activity": "medication-prescribe"
   },
   "pediatric-dosing": {
     "id": "pediatric-dosing",
-    "url": url + "/pediatric-dose-check",
+    "url": url + "/pediatric-dose-check/$cds-hook",
     "name": "Pediatric Dosage Check",
     "activity": "medication-prescribe",
     "preFetchTemplate": {

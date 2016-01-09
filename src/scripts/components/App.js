@@ -6,6 +6,7 @@ import PatientViewActivity from './PatientViewActivity';
 import HookEditor from './HookEditor';
 import AppStore from '../stores/AppStore'
 import DateStore from '../stores/DateStore'
+import FhirServerStore from '../stores/FhirServerStore'
 import HashStateStore from '../stores/HashStateStore';
 import {EventEmitter} from 'events';
 import moment from 'moment'
@@ -51,7 +52,8 @@ const App = React.createClass({
         date: moment().add(1, 'month').toDate(),
         enabled: true});
         AppDispatcher.dispatch({ type: ActionTypes.LOADED })
-        return {all: AppStore.getState()}
+        return {all: AppStore.getState(), 
+        settingContext: false}
   },
 
   setActivity(code){
@@ -59,6 +61,12 @@ const App = React.createClass({
       type: ActionTypes.SET_ACTIVITY,
       activity: code
     })
+  },
+
+  changePatient(){
+    var pid = this.state.all.getIn(["fhirServer", "context", "patient"])
+    pid = window.prompt("Patient ID", pid)
+    FhirServerStore.setContext({patient: pid})
   },
 
   render() {
@@ -73,6 +81,7 @@ const App = React.createClass({
           <a className={rxClass} onClick={e=>this.setActivity("medication-prescribe")}>Rx</a>
           <span> | </span>
           <a className={ptClass} onClick={e=>this.setActivity("patient-view")}>Pt</a>
+          &nbsp; <a className="change-patient" onClick={this.changePatient}>Change Patient</a>
         </div>
         {
           activity === 'medication-prescribe' &&

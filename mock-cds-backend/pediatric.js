@@ -1,6 +1,7 @@
 var isArray = require('util').isArray
 var getIn = require('./utils').getIn
 var paramsToJson = require('./utils').paramsToJson
+var metadata = require('./utils').metadata
 var context = require('./context')
 var fs = require('fs')
 
@@ -21,7 +22,25 @@ function fillTemplate(template, context) {
 module.exports ={
   service: function(indata, cb) {
     cb(null, recommend(indata));
-  }, view:  view
+  }, view:  view,
+  metadata: metadata([
+      {
+        "url" : "name",
+        "valueString" : "Random grab-bag of mock services"
+      },
+      {
+        "url" : "activity",
+        "valueCoding" : {
+          "code" : "medication-prescribe",
+          "display" : "Provide information about a prescription in-progress",
+          "system" : "http://cds-hooks.smarthealthit.org/activity"
+        }
+      },
+      {
+        "url" : "preFetchOptional",
+        "valueString" : "Patient/{{Patient.id}}"
+      }
+    ])
 }
 
 // TODO incorporate types here
@@ -141,43 +160,43 @@ function assessJNC(inData, response) {
                   "code": "{pill}"
                 },
                 "timing": {
-                    "repeat": {
-                      "frequency": 1,
-                      "period": 1,
-                      "periodUnits": "d"
-                    }
+                  "repeat": {
+                    "frequency": 1,
+                    "period": 1,
+                    "periodUnits": "d"
                   }
+                }
               }
             ]
           }
         }]
       })
     }
-     response.parameter.push({
-        "name": "card",
-        "part": [{
-          "name": "summary",
-          "valueString": "Managing with JNC Pro",
-        },{
+    response.parameter.push({
+      "name": "card",
+      "part": [{
+        "name": "summary",
+        "valueString": "Managing with JNC Pro",
+      },{
         "name": "source",
         "part": [{
           "name": "label",
           "valueString": "Joint National Commission",
         }]
-        },{
-          "name": "indicator",
-          "valueString": "success",
+      },{
+        "name": "indicator",
+        "valueString": "success",
+      }, {
+        "name": "link",
+        "part": [{
+          "name": "label",
+          "valueString": "Tailor therapy"
         }, {
-          "name": "link",
-          "part": [{
-            "name": "label",
-            "valueString": "Tailor therapy"
-          }, {
-            "name": "url",
-            "valueString": context.url + "/service/pediatric-dose-check/jnc8/" + activityInstance
-          }]
+          "name": "url",
+          "valueString": context.url + "/service/pediatric-dose-check/jnc8/" + activityInstance
         }]
-      });
+      }]
+    });
 
   }
 }
@@ -211,7 +230,7 @@ function assessHarvoni(inData, cards) {
           "name": "label",
           "valueString": "CareMore PBM",
         }]
-        },{
+      },{
         "name": "indicator",
         "valueString": "success",
       }, {
@@ -240,7 +259,7 @@ function assessHarvoni(inData, cards) {
           "name": "label",
           "valueString": "CareMore PBM",
         }]
-        } ,{
+      } ,{
         "name": "indicator",
         "valueString": "warning",
       },{
@@ -310,37 +329,37 @@ function assessGenetics(inData, cards) {
 
   var summary = 'Allopurinol contraindicated: life-threatening SCAR risk';
   var detail = '\
-### Patient is `HLA-B*58:01` positive\n\
-\n\
-**Implication**: Significantly increased risk of allopurinol-induced SCAR\n\
-\n\
-**Absolute risk**: ~1.5%\n\
-\n\
-**Recommendations**: Allopurinol is contraindicated\n\
-\n\
-**Classification**:  Strong\n\
-\n\
-**Evidence**:\n\
-<img src="http://www.biomedcentral.com/content/figures/1471-2350-12-118-2-l.jpg" width="500px"/>';
+  ### Patient is `HLA-B*58:01` positive\n\
+  \n\
+  **Implication**: Significantly increased risk of allopurinol-induced SCAR\n\
+  \n\
+  **Absolute risk**: ~1.5%\n\
+  \n\
+  **Recommendations**: Allopurinol is contraindicated\n\
+  \n\
+  **Classification**:  Strong\n\
+  \n\
+  **Evidence**:\n\
+  <img src="http://www.biomedcentral.com/content/figures/1471-2350-12-118-2-l.jpg" width="500px"/>';
 
-cards.parameter.push({
-      "name": "card",
+  cards.parameter.push({
+    "name": "card",
+    "part": [{
+      "name": "summary",
+      "valueString": summary,
+    },{
+      "name": "source",
       "part": [{
-        "name": "summary",
-        "valueString": summary,
-      },{
-        "name": "source",
-        "part": [{
-          "name": "label",
-          "valueString": "PharmGKB",
-        }]
-      },{
-        "name": "indicator",
-        "valueString": "danger",
-      }, {
-        "name": "detail",
-        "valueString": detail
-      },{
+        "name": "label",
+        "valueString": "PharmGKB",
+      }]
+    },{
+      "name": "indicator",
+      "valueString": "danger",
+    }, {
+      "name": "detail",
+      "valueString": detail
+    },{
       "name": "link",
       "part": [{
         "name": "label",
@@ -350,7 +369,7 @@ cards.parameter.push({
         "valueUri": "https://www.pharmgkb.org/drug/PA448320#PA166105003"
       }]
     }]
-    });
+  });
 }
 
 

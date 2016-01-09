@@ -77,8 +77,8 @@ var state = Immutable.fromJS({
 
 var FhirServiceStore = assign({}, EventEmitter.prototype, {
   setContext: function(fhirContext) {
-    state = state.set('context', Immutable.fromJS(fhirContext))
-    _client = fhirClient(fhirContext)
+    state = state.set('context', state.get('context').merge(fhirContext))
+    _client = fhirClient(state.get('context').toJS())
     _fetchData()
   },
   getState: function() {

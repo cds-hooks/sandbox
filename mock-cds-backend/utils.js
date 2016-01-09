@@ -99,5 +99,46 @@ if (test.activity !== "medication-prescribe" || test.context[0].test !== true) {
   throw "Parsing by schema failed."
 }
 
+function metadata(deets){
+
+
+return {
+   "version" : "1.0.2-7406-1.0.26",
+   "acceptUnknown" : "both",
+   "description" : "Mock CDS Services",
+   "rest" : [
+      {
+         "extension" : [
+            {
+               "url" : "http://fhir-registry.smarthealthit.org/StructureDefinition/cds-activity",
+               "extension" : deets
+            }
+         ],
+         "mode" : "server",
+         "transactionMode" : "both",
+         "operation" : [
+            {
+               "definition" : {
+                  "reference" : "OperationDefinition/fso-cds-hook"
+               },
+               "name" : "cds-hook"
+            }
+         ]
+      }
+   ],
+   "resourceType" : "Conformance",
+   "status" : "active",
+   "date" : "2016-01-09T15:39:51Z",
+   "fhirVersion" : "1.0.2-7406",
+   "format" : [
+      "application/xml+fhir",
+      "application/json+fhir"
+   ],
+   "id" : "FhirServer",
+   "name" : "SMART FHIR Server Conformance Statement"
+};
+}
+
+module.exports.metadata = metadata;
 module.exports.getIn = getIn;
 module.exports.paramsToJson = paramsToJson;

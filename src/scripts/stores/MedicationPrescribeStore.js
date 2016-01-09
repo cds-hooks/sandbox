@@ -32,9 +32,9 @@ function toFhir(props) {
     "resourceType": "MedicationOrder"
   }
   if (props.dates.start && props.dates.start.enabled)
-    resource.startDate = moment(props.dates.start.value).format("YYYY-MM-DD")
+    resource.dateWritten = moment(props.dates.start.value).format("YYYY-MM-DD")
   if (props.dates.end && props.dates.end.enabled)
-    resource.endDate = moment(props.dates.end.value).format("YYYY-MM-DD")
+    resource.dateEnded = moment(props.dates.end.value).format("YYYY-MM-DD")
   resource.status = "draft"
   resource.patient = {
     "reference": "Patient/" + props.fhirServer.getIn(['context', 'patient'])

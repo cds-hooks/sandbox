@@ -25,11 +25,17 @@ server.on('uncaughtException', function (request, response, route, error) {
 });
 
 Object.keys(services).forEach(function(name){
-  var service = services[name].service;
+  var service = services[name];
 
-  server.post('/' + name, function(req, res, next){
-      console.log("handling", name)
-    service(req.body, function(err, cdsResult){
+  console.log("Configure", name)
+  server.get('/' + name + '/metadata', function(req, res, next){
+    console.log("Get metadata")
+    res.json(service.metadata)
+  });
+
+  server.post(new RegExp("\\/" + name + "\\/\\$cds-hook"), function(req, res, next){
+    console.log("Do CDS", name)
+    service.service(req.body, function(err, cdsResult){
       console.log("service got", err, cdsResult)
       res.json(cdsResult);
       if (err){
