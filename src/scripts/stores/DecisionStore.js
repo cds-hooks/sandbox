@@ -16,6 +16,7 @@ var Immutable = require('immutable')
 var DELAY = 0; // no delay to apply hooks
 
 HookStore.addChangeListener(_hooksChanged)
+FhirServerStore.addChangeListener(_hooksChanged)
 
 var decisionSchema = {
   'decision': [0, '*', {
@@ -67,10 +68,6 @@ function _hooksChanged() {
   var context = getFhirContext()
   var hooks = HookStore.getState().get('hooks')
   var hookNames = hooks.keySeq()
-
-  if (Immutable.is(hooks, state.get('hooks'))) {
-    return;
-  }
 
   state = state.set('cards', Immutable.fromJS([]));
   state = state.set('hooks', hooks)
