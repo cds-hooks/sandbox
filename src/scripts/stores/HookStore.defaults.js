@@ -115,5 +115,23 @@ export default {
         }
       }]
     }
+  },
+  "WK-patient-view": {
+    "id": "WK-patient-view",
+    "url": "http://wkhfhir.azurewebsites.net/api/$cds-hook",
+    "name": "WK Patient View",
+    "activity": "patient-view",
+    "preFetchTemplate": {
+      "resourceType": "Bundle",
+      "type": "transaction",
+      "entry": [
+        {
+          "request": {
+            "method": "GET",
+            "url": "Patient/{{Patient.id}}"
+          }
+        }
+      ]
+    }
   }
 }
