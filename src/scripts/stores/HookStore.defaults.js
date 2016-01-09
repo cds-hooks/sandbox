@@ -163,5 +163,11 @@ export default {
         }
       ]
     }
+  },
+  "medapptech-pill-images": {
+    "id": "medapptech-pill-images",
+    "url": "http://cds.medapptech.com/$cds-hook",
+    "name": "Pill Images",
+    "activity": "medication-prescribe"
   }
 }
