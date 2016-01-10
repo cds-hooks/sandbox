@@ -211,5 +211,41 @@ export default {
         }
       ]
     }
+  },
+  "mo-glif-cds-hook-rx-prescribe": {
+    "id": "mo-glif-cds-hook-rx-prescribe",
+    "url": "https://fhir-cthon-11-demo-direct.test.medical-objects.com.au/rest/fhir/$cds-hook",
+    "name": "MO GLIF CDS Hook for medication-prescribe",
+    "activity": "medication-prescribe",
+    "preFetchTemplate": {
+      "resourceType": "Bundle",
+      "type": "transaction",
+      "entry": [
+        {
+          "request": {
+            "method": "GET",
+            "url": "Patient/{{Patient.id}}"
+          }
+        },
+        {
+          "request": {
+            "method": "GET",
+            "url": "Observation?patient={{Patient.id}}&_sort:desc=date"
+          }
+        },
+        {
+          "request": {
+            "method": "GET",
+            "url": "DiagnosticReport?patient={{Patient.id}}"
+          }
+        },
+        {
+          "request": {
+            "method": "GET",
+            "url": "MedicationOrder?patient={{Patient.id}}"
+          }
+        }
+      ]
+    }
   }
 }

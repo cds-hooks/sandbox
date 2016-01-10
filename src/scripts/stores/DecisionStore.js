@@ -45,6 +45,7 @@ var decisionSchema = {
 
 var CHANGE_EVENT = 'change'
 var state = Immutable.fromJS({
+  calling: false,
   cards: []
 })
 
@@ -66,6 +67,7 @@ function _externalAppReturned() {
 
 function _hooksChanged() {
   var context = getFhirContext()
+  console.log("Eval hooks changed in context", context)
   var hooks = HookStore.getState().get('hooks')
   var hookNames = hooks.keySeq()
 
