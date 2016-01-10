@@ -193,5 +193,23 @@ export default {
         }
       ]
     }
+  },
+  "pt-eligibility-benefits": {
+    "id": "pt-eligibility-benefits",
+    "url": "http://52.70.147.29/eligibility-benefits/$cds-hook",
+    "name": "Patient Eligibility",
+    "activity": "patient-view",
+    "preFetchTemplate": {
+      "resourceType": "Bundle",
+      "type": "transaction",
+      "entry": [
+        {
+          "request": {
+            "method": "GET",
+            "url": "Patient/{{Patient.id}}"
+          }
+        }
+      ]
+    }
   }
 }
