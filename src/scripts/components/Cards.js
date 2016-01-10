@@ -37,6 +37,15 @@ const Cards = React.createClass({
 
   render() {
     console.log(this.props.decisions.get('cards').toJSON())
+
+    function source(s) {
+      if (!s || !s.label) return
+
+      return <div className="card-source">
+        Source: <a href={s.url || "#"}> {s.label}</a>
+        </div>
+    }
+
     var cards = this.props.decisions.get('cards')
     .sort((b, a) => indicators[a.indicator] - indicators[b.indicator])
     .filter(c=>c.summary)
@@ -47,10 +56,7 @@ const Cards = React.createClass({
       <div key={c.key} className={classes}>
       <div className="card-top">
         <div className="card-summary">{c.summary}</div>
-      <div className="card-source">
-        {c.source && c.source.label && "Source: " + c.source.label}
-      </div>
-
+        {source(c.source)}
         {c.detail && <ReactMarkdown softBreak="br" source={c.detail}/>}
         <div>
         {c.suggestion.map(l => (
