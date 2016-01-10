@@ -175,5 +175,23 @@ export default {
     "url": "http://premiercdsapp.elasticbeanstalk.com/fhir/$cds-hook",
     "name": "Premier CDS",
     "activity": "patient-view"
+  },
+  "medication-prescribe": {
+    "id": "pds-prescribe",
+    "url": "https://staging.rxcheck.com/pds/prescribe",
+    "name": "Prescription Decision Support - Prescribe",
+    "activity": "medication-prescribe",
+    "preFetchTemplate": {
+      "resourceType": "Bundle",
+      "type": "transaction",
+      "entry": [
+        {
+          "request": {
+            "method": "GET",
+            "url": "MedicationOrder?patient={{Patient.id}}&status=active"
+          }
+        }
+      ]
+    }
   }
 }
