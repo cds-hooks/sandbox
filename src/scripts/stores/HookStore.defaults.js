@@ -176,7 +176,7 @@ export default {
     "name": "Premier CDS",
     "activity": "patient-view"
   },
-  "medication-prescribe": {
+  "pds-prescribe": {
     "id": "pds-prescribe",
     "url": "https://staging.rxcheck.com/pds/prescribe",
     "name": "Prescription Decision Support - Prescribe",
