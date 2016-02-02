@@ -71,18 +71,22 @@ const App = React.createClass({
 
   render() {
     var activity = (this.state.all.getIn(['decisions', 'activity']))
-    var rxClass = activity === "medication-prescribe" ? "activity-on" : "activity-off"
-    var ptClass = activity === "patient-view" ? "activity-on" : "activity-off"
+    var rxClass = activity === "medication-prescribe" ? "nav-button activity-on" : "nav-button activity-off"
+    var ptClass = activity === "patient-view" ? "nav-button activity-on" : "nav-button activity-off"
 
     return (
       <div id="react-content">
-        <div id="top-bar">
-          <span>CDS Hooks Demo: </span>
-          <a className={rxClass} onClick={e=>this.setActivity("medication-prescribe")}>Rx</a>
-          <span> | </span>
-          <a className={ptClass} onClick={e=>this.setActivity("patient-view")}>Pt</a>
-          &nbsp; <a className="change-patient" onClick={this.changePatient}>Change Patient</a>
+        <div id="top-bar" className="app-header">
+          <span className="header-brand"><i className="glyphicon glyphicon-flash"></i> <span className="brand-cds">CDS Hooks</span> Demo</span>
+          <div className="header-nav">
+            <a className={rxClass} onClick={e=>this.setActivity("medication-prescribe")}>Rx View</a>
+            <a className={ptClass} onClick={e=>this.setActivity("patient-view")}>Patient View</a>
+            <a className="nav-button change-patient" onClick={this.changePatient}>Change Patient</a>
+          </div>
         </div>
+
+        <HookEditor hooks={this.state.all.getIn(['hooks', 'hooks'])} editing={this.state.all.getIn(['hooks', 'editing'])} />
+        
         {
           activity === 'medication-prescribe' &&
             <RxActivity all={this.state.all}/>
@@ -92,14 +96,12 @@ const App = React.createClass({
                 <PatientViewActivity all={this.state.all}/>
                 }
 
-                <div id="bottom-bar">
+                <div id="bottom-bar" className="app-footer">
                   SMART Health IT —
                   About <a href="https://github.com/jmandel/cds-hooks/wiki">CDS Hooks</a> —
                   Rx Demo <a href="https://github.com/jmandel/cds-hooks-rx-app">source code</a>
 
-                  <HookEditor
-                    hooks={this.state.all.getIn(['hooks', 'hooks'])}
-                    editing={this.state.all.getIn(['hooks', 'editing'])} />
+                  
                 </div>
               </div>
     )

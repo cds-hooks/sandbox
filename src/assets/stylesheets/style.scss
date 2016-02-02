@@ -1,308 +1,499 @@
-$blue: #4A90E2;
-$red: #D0021B;
-$grey: #DCE0E0;
-$dark-grey: #565A5C;
-$light-grey: #f3f3f3;
-$light-light-grey: #f9f9f9;
-$white: #FFF;
-$warning: #ec971f;
-$warning-text: #C57300;
+/* Variables */
+$color-primary: #384E77;
+$color-secondary: #18314F;
+$color-tertiary: #8BBEB2;
+
+$color-highlight: #E6F9AF;
+$color-dark: #0D0630;
+
+$aqua: #3be0af;
+$blue: #08c;
+$green: #690;
+$orange: #f60;
+$purple: #b8b1f8;
+$red: #c00;
+
+$grey: #999;
+$dark-grey: #333;
+$light-grey: #ddd;
+$light-light-grey: #f5f5f5;
+$white: #fff;
+$warning: #f00;
+$warning-text: #f00;
 $info: #31b0d5;
-$success: #449d44;
-$danger: #c9302c;
+$success: #9c0;
+$danger: #c00;
 
-$font: "Helvetica Neue", "Helvetica", "Arial", "sans-serif";
-$font-head: "Avenir Next", Avenir, "Helvetica Neue", Helvetica, Arial, sans-serif;
-$monospace: Inconsolata, Menlo, Consolas, monospace !important;
+$font-roboto: 'Roboto', sans-serif;
+$font-roboto-condensed: 'Roboto Condensed', sans-serif;
+$font-monospace: Inconsolata, Menlo, Consolas, monospace !important;
 
-html {
-    height: 100%;
+$trans-black-25: rgba(0, 0, 0, .25);
+$trans-black-50: rgba(0, 0, 0, .5);
+$trans-black-75: rgba(0, 0, 0, .75);
+$trans-white-25: rgba(255, 255, 255, .25);
+$trans-white-50: rgba(255, 255, 255, .5);
+$trans-white-75: rgba(255, 255, 255, .75);
+
+/* ---------- Mixins ---------- */
+@mixin border-radius($radius) {
+    -webkit-border-radius: $radius;
+    -moz-border-radius: $radius;
+    -ms-border-radius: $radius;
+    -o-border-radius: $radius;
+    border-radius: $radius;
+}
+@mixin transition($transition-property, $transition-time, $method) {
+    -webkit-transition: $transition-property $transition-time $method;
+    -moz-transition: $transition-property $transition-time $method;
+    -ms-transition: $transition-property $transition-time $method;
+    -o-transition: $transition-property $transition-time $method;
+    transition: $transition-property $transition-time $method;
+}
+@mixin opacity($value) {
+    opacity: $value;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=" $value * 100 ")";
+    filter: alpha(opacity= $value * 100 );
+    zoom: 1;
 }
 
+/* ---------- Reset ---------- */
+html,body, div, span, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  font-size: 100%;
+  vertical-align: baseline;
+  text-align: left;
+  background: transparent;
+}
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {display: block;}
+
+/* Global Tags
+====================================================================================== */
 body {
-    min-height: 100%;
-    display: flex;
-    flex-flow: column nowrap;
+    font-family: $font-roboto;
+    color: #333;
 }
 
-.hook-editor {
-    display: inline;
+h1, h2, h3, h4, h5, h6 {
+  font-family: $font-roboto-condensed;
+  font-weight: 700;
+  margin: 0 0 10px;
 }
-.configure-hooks {
-    float: right;
-    cursor: pointer;
+h1 {
+  font-size: 3em;
 }
-
-.change-patient {
-  font-size: 0.5em;
+h2 {
+  font-size: 2.4em;
 }
-
-.save-hook {
-  float: right;
-  background: $white;
-  border: 1px solid $dark-grey;
-  font-weight: bold;
-  color: $dark-grey;
+h3 {
+  font-size: 2em;
 }
-.save-hook:disabled {
-  font-weight: normal;
+h4 {
+  font-size: 1.6em;
 }
-
-.edit-hook{
-    margin: 2em;
+h5 {
+  font-size: 1.4em;
 }
-
-.edit-hook.new-hook .edit-hook-inner{
-    border: 2px dashed $white;
+h6 {
+  font-size: 1.2em;
+}
+p {
+  font-size: 1em;
+  margin: 0 0 20px;
+  color: #888;
 }
 
-.edit-hook-inner {
-    border: 2px solid $white;
-    padding: 2em;
-    display: block;
-    font-family: $monospace;
-    font-size: 1rem;
-    margin-top: .5em;
+a {
+  color: #09c;
+  &:hover {
+    color: #06c;
+  }
 }
 
-.decision-spacer {
-  //flex-grow: 1;
-  height: 2em;
+pre {
+  padding: 30px;
+  background: $color-dark;
+  color: #fff;
+  font-size: .85em;
+  border-radius: 0;
 }
 
-.decision-card:hover {
-  background: #f6f6f6;
+.btn {
+  border: none;
+  &.btn-wired {
+    background: none;
+    color: #09c;
+    border: 1px solid #09c;
+    &:hover {
+      background: #09c;
+      color: #fff;
+      border: 1px solid #09c;
+    }
+  }
 }
 
-.card-top {
-    display: flex;
-  flex-direction: column;
-    flex-grow: 1
+/* Structure
+====================================================================================== */
+.app-header {
+    position: fixed;
+    width: 100%;
+    height: 60px;
+    padding: 15px 30px;
+    background: $color-primary;
+    color: #fff;
+    font-family: $font-roboto-condensed;
+    z-index: 100;
+    .header-brand {
+      display: inline-block;
+      font-size: 1.5em;
+      font-weight: 300;
+      line-height: 1.2;
+      .brand-cds {
+        font-weight: 700;
+        color: $aqua;
+      }
+      i {
+        color: $aqua;
+      }
+    }
+    .header-nav {
+      display: inline-block;
+      vertical-align: top;
+      margin: -2px 0 0 50px;
+      .nav-button {
+        display: inline-block;
+        padding: 5px 15px;
+        color: #fff;
+        border: 1px solid $trans-white-50;
+        &:first-child {
+          -webkit-border-top-left-radius: 4px;
+          -webkit-border-bottom-left-radius: 4px;
+          -moz-border-radius-topleft: 4px;
+          -moz-border-radius-bottomleft: 4px;
+          border-top-left-radius: 4px;
+          border-bottom-left-radius: 4px;
+        }
+        &:last-child {
+          -webkit-border-top-right-radius: 4px;
+          -webkit-border-bottom-right-radius: 4px;
+          -moz-border-radius-topright: 4px;
+          -moz-border-radius-bottomright: 4px;
+          border-top-right-radius: 4px;
+          border-bottom-right-radius: 4px;
+        }
+        &.change-patient {
+          background: $color-secondary;
+          border-left: none;
+        }
+        &:hover {
+          background: $trans-white-25;
+          text-decoration: none;
+        }
+        &.activity-on {
+          background: #fff;
+          color: $color-primary;
+        }
+      }
+    }
+    a {
+      cursor: pointer;
+    }
 }
 
+.app-main {
+  display: table;
+  width: 100%;
+  height: 100vh;
+  padding: 60px 0;
+}
+
+.view-title {
+  padding: 0 0 10px;
+  margin: 0 0 10px;
+  font-size: 1.5em;
+  letter-spacing: -0.025em;
+  color: $color-primary;
+  border-bottom: 2px solid #eee;
+}
+
+.app-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    padding: 20px 30px;
+    background: $dark-grey;
+    color: $white;
+    font-size: .85em;
+    z-index: 10;
+    a {
+     color: white;
+     font-weight: bold;
+    }
+}
+
+/* Components
+====================================================================================== */
+.order-entry {
+  display: table-cell;
+  width: 55%;
+  padding: 30px;
+}
+
+.fhir-view {
+  display: table-cell;
+  .line {
+    transition-property: background;
+    transition-duration: .4s;
+  }
+  .fade-actual {
+    background: $color-highlight;
+    color: lighten($color-dark, 10%);
+    font-weight: bold;
+  }
+}
+
+/* cards */
 .decision-card {
-  border: 2px solid $light-grey;
-  border-radius: 5px;
-  display: flex;
-  flex-flow: column wrap;
-  padding: 1em;
-  border-left-width: 3px;
+  padding: 15px;
   background: #fcfcfc;
+  border: 2px solid $light-grey;
+  border-radius: 4px;
+  border-left-width: 3px;
+  ul {
+    font-size: .85em;
+    margin: 0 0 20px 20px;
+    color: #888;
+  }
+  img {
+    display: block;
+    width: 100px;
+    margin: 0 0 5px;
+  }
+  .glyphicon {
+    margin-right: 5px;
+  }
+  .card-top {
+    position: relative;
+  }
+  .card-summary {
+    font-family: $font-roboto-condensed;
+    margin: 0 0 5px;
+  }
+  .card-source {
+    font-size: .85em;
+    font-style: italic;
+    margin: 0 0 5px;
+  }
+  &.alert-success {
+    border-left-color: $green;
+    .card-summary {
+      color: $green;
+    }
+  }
+  &.alert-info {
+    border-left-color: $color-primary;
+    .card-summary {
+      color: $color-primary;
+    }
+  }
+  &.alert-warning {
+    border-left-color: $orange;
+    .card-summary {
+      color: $orange;
+    }
+  }
+  &.alert-danger {
+    border-left-color: $red;
+    .card-summary {
+      color: $red;
+    }
+  }
+  &:hover {
+    background: #f6f6f6;
+  }
 }
 
-.decision-card.alert-success{
-    border-left-color: $success;
-    color: $success;
-}
-
-
-.decision-card.alert-info{
-    border-left-color: $info;
-}
-
-
-.alert-warning {
-    color: $warning-text !important;
-}
-.decision-card.alert-warning{
-    border-left-color: $warning;
-}
-
-.decision-card.alert-danger{
-    border-left-color: $danger;
-}
-
-decision-card button{
-  margin-top: .5em;
-  margin-bottom: .5em;
-  margin-right: .5em;
-}
-.decision-card .glyphicon {
-  margin-right: 0.4em;
-}
-
-.decision-card img{
- max-width: 100%;
-}
-
-.card-summary {
-  font-weight: bold;
-  flex-grow: 1;
-}
-.card-source {
-    font-size: .8em;
-  font-style: italic;
-}
-
-.card-helpful {
-font-style: normal;
-}
-.card-helpful button.btn{
-    vertical-align: initial;
-}
-
-div.card-helpful button.btn {
-    padding: 0px;
-    padding-left: 3px;
-    padding-right: 3px;
-    margin: 0px;
-}
-
-
-#react-content {
-    flex-grow: 1;
-    display: flex;
-    flex-flow: column nowrap;
-}
-
-#main {
-  flex-grow: 1;
-  display: flex;
-  flex-flow: row wrap;
-}
-
-.form-group {
-  margin: 1em;
-}
-
-input[type="checkbox"] {
-    vertical-align: text-bottom;
-    margin-left: .5em;
-}
-
-.selected-drug {
-    //border: 1px solid $dark-grey;
-    padding: 0.3em;
-    //border-radius: 10px;
-    //background: $light-grey;
-    //display: inline-block;
+.medication-container {
+  .selected-drug {
+    padding: 10px;
     font-style: italic;
     margin-bottom: 1em;
     display: block;
     margin-top: -.6em;
+  }
 }
 
-.line {
-  transition-property: background;
-  transition-duration: .4s;
-}
-.fade { }
-
-.fade-actual {
-  background: white;
-  color: #4cae4c;
-  font-weight: bold;
+/* dates */
+.date-container {
+  margin: 0 0 15px;
+  input[type="checkbox"] {
+    vertical-align: top;
+    margin: 4px 0 0 5px;
+  }
 }
 
-
-#top-bar {
-    font-size: 2em;
-    padding-left: .4em;
-    padding-bottom: 1em;
-    height: 1.5em;
-}
-#bottom-bar {
-    background: $dark-grey;
-    color: $white;
-    font-size: .75em;
-    padding-left: 2em;
-    margin-bottom: 0px;
-}
-#bottom-bar a {
- color: white;
- font-weight: bold;
-}
-
-
-// DayPicker styles
-.chevron {
-    background: $light-grey;
-}
-
-.timing-holder {
-  margin-bottom: 1em;
+/* timing */
+.timing-container {
+  padding: 10px;
+  border: 1px solid $light-grey;
+  label {
+    margin-right: 5px;
+  }
+  input,
+  select {
+    margin-right: 30px;
+  }
+  .pill-count {
+    display: inline-block;
+    width: 50px;
+    height: auto;
+    padding: 5px;
+  }
+  .sig-form {
+    display: inline-block;
+    width: 100px;
+    height: 30px;
+    padding: 5px;
+  }
 }
 
-.timing-holder input, .timing-holder select {
-    max-width: 11em;
-    display: inline;
-}
-.timing-holder input{
-    max-width: 4em;
-}
-
-
-.sig-form {
-margin-left: .5em;
-}
-
-.problem-holder {
-  padding-left: 15px;
-  padding-right: 15px;
-  margin-bottom: 2em;
-}
-
-.Drug-Selector-holder {
-  position: relative;
-  width: 100%;
-  padding-right: 1em;
-  z-index: 2;
-  background: $light-grey;
-}
-
-.drug {
-    padding-right: 1em;
-    font-size: 1.2em;
+/* hooks */
+.hook-editor {
+  position: fixed;
+  top: 14px;
+  right: 30px;
+  z-index: 1001;
+  .configure-hooks {
+    display: inline-block;
+    padding: 5px 15px;
+    font-family: $font-roboto-condensed;
+    background: $aqua;
+    color: $color-dark;
+    border-radius: 4px;
     cursor: pointer;
+    &:hover {
+      background: darken($aqua, 20%);
+      text-decoration: none;
+    }
+    i {
+      margin-right: 3px;
+    }
+  }
+  &.editor-open {
+    top: 60px;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 30px;
+    margin: 0 0 60px;
+    background: $trans-black-75;
+    overflow: auto;
+    .configure-hooks {
+      float: right;
+      margin: 0 0 20px;
+    }
+  }
 }
-table.drug-choice {
-    background: white;
-    background: $light-light-grey;
+.edit-hook {
+  position: relative;
+  margin: 0 0 20px;
+  clear: both;
+  .edit-hook-inner {
+    padding: 30px;
+    font-family: $font-monospace;
+    font-size: .85em;
+    color: #fff;
+    border: 2px solid $white;
+  }
+  &.new-hook {
+    .edit-hook-inner {
+      border: 2px dashed $white;
+    }
+  }
+  .save-hook {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    &:disabled {
+      font-weight: normal;
+    }
+  }
+  .delete-hook {
+    position: absolute;
+    top: 10px;
+    right: 65px;
+  }
+}
+
+/* Forms
+====================================================================================== */
+label {
+  font-family: $font-roboto-condensed;
+}
+.input-container {
+  margin: 0 0 15px;
+}
+input[type="text"],
+input[type="email"],
+input[type="phone"],
+input[type="password"],
+input[type="url"],
+input[type="tel"],
+input[type="number"],
+select,
+textarea,
+.form-control {
+    display: block;
     width: 100%;
+    padding: 10px;
+    height: 42px;
+    background: #eee;
+    color: #333;
+    border: none;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    @include border-radius(0);
 }
-table.drug-choice tr:hover{
-    background: $grey;
-}
-.cui {
-    font-family: monospace;
-}
-.OrderEntry {
-  flex-grow: 5;
-  flex-basis: 20em;
-  display: flex;
-  flex-flow: column nowrap;
+textarea {
+    height: 120px;
 }
 
-#top-bar a {
+/* Tables
+====================================================================================== */
+table.drug-choice {
+  background: white;
+  background: $light-light-grey;
+  width: 100%;
+  padding: 10px;
+  margin: 0 0 20px;
+  tr:hover{
+    background: $color-highlight;
+    color: $color-primary;
     cursor: pointer;
+  }
+  td {
+    padding: 5px;
+  }
+  .chevron {
+    background: $light-grey;
+  }
 }
 
-.PatientView .row {
-    margin-left: 2em;
-}
-
-.activity-on {
-  color: $dark-grey;
-}
-
-.FhirView {
-  margin: 0em;
-  font-size: 1rem;
-  flex-basis: 22em;
-  flex-grow: 4;
-  border-radius: 0px;
-  border: 0px;
-}
-
-.DateBox {
-  width: 20em;
-  position: relative;
-}
-
-.DateText{
-  text-align: center;
-  width: 10em;
-}
+/* Plugins
+====================================================================================== */
+/* ----- DayPicker Plugin ----- */
 .DayPicker {
   //position: absolute;
   //left: 0em;
@@ -327,78 +518,76 @@ table.drug-choice tr:hover{
   margin: 0 1rem;
 }
 
-  .DayPicker-NavBar {
-    position: absolute;
-    left: 0;
-    right: 0;
-    padding: 0 .5rem;
+.DayPicker-NavBar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  padding: 0 .5rem;
+}
+
+.DayPicker-NavButton {
+  position: absolute;
+  width: 1.5rem;
+  height: 1.5rem;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  cursor: pointer;
+}
+
+.DayPicker-NavButton--prev {
+  left: 1rem;
+  background-image: url("../prev.svg");
+}
+
+.DayPicker-NavButton--next {
+  right: 1rem;
+  background-image: url("../next.svg");
+}
+
+
+.DayPicker-Caption {
+  display: table-caption;
+  height: 3.5rem;
+  text-align: center;
+}
+
+.DayPicker-Weekdays {
+  display: table-header-group;
+  > div {
+    display: table-row;
   }
+}
 
-  .DayPicker-NavButton {
-    position: absolute;
-    width: 1.5rem;
-    height: 1.5rem;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    cursor: pointer;
-  }
+.DayPicker-Weekday {
+  display: table-cell;
+  padding: .5rem;
+  font-size: .875em;
+  text-align: center;
+}
 
-    .DayPicker-NavButton--prev {
-      left: 1rem;
-      background-image: url("../prev.svg");
-    }
+.DayPicker-Body {
+  display: table-row-group;
+}
 
-    .DayPicker-NavButton--next {
-      right: 1rem;
-      background-image: url("../next.svg");
-    }
+.DayPicker-Week {
+  display: table-row;
+}
 
+.DayPicker-Day {
+  display: table-cell;
+  padding: .5rem;
+  border: 1px solid lighten($grey, 5);
+  text-align: center;
+  cursor: pointer;
+  vertical-align: middle;
+}
 
-  .DayPicker-Caption {
-    display: table-caption;
-    height: 3.5rem;
-    text-align: center;
-  }
-
-  .DayPicker-Weekdays {
-    display: table-header-group;
-    > div {
-      display: table-row;
-    }
-  }
-
-    .DayPicker-Weekday {
-      display: table-cell;
-      padding: .5rem;
-      font-size: .875em;
-      text-align: center;
-    }
-
-  .DayPicker-Body {
-    display: table-row-group;
-  }
-
-    .DayPicker-Week {
-      display: table-row;
-    }
-
-      .DayPicker-Day {
-        display: table-cell;
-        padding: .5rem;
-        border: 1px solid lighten($grey, 5);
-        text-align: center;
-        cursor: pointer;
-        vertical-align: middle;
-      }
-
-  .DayPicker--interactionDisabled .DayPicker-Day {
-    cursor: default;
-  }
-
+.DayPicker--interactionDisabled .DayPicker-Day {
+  cursor: default;
+}
 
 // Modifiers
-
 .DayPicker-Day--today {
   color: $red;
   font-weight: 500;
@@ -426,7 +615,79 @@ table.drug-choice tr:hover{
 }
 
 // Locales
-
 .DayPicker--ar {
   direction: rtl;
 }
+
+
+@media (max-width: 767px) {
+
+  .app-header {
+    position: static;
+    height: auto;
+    padding: 15px;
+    .header-brand {
+      display: block;
+      width: 300px;
+      margin: 0 auto 10px;
+      text-align: center;
+    }
+    .header-nav {
+      display: block;
+      margin: 0;
+      text-align: center;
+    }
+  }
+
+  .app-main {
+    height: auto;
+    padding: 0 0 60px;
+  }
+
+  .app-footer {
+    height: auto; 
+  }
+
+  .order-entry {
+    display: block;
+    width: 100%;
+    margin: 0 0 20px;
+    vertical-align: top;
+  }
+
+  .fhir-view {
+    display: block;
+    width: 100%;
+  }
+
+  .hook-editor {
+    position: static;
+    margin: 0 0 15px;
+    .configure-hooks {
+      display: block;
+      width: 100%;
+      padding: 10px 0;
+      text-align: center;
+      border-radius: 0;
+    }
+}
+
+
+}
+
+@media (max-width: 500px) {
+
+  .app-main {
+    padding: 0 0 80px;
+  }
+
+  .order-entry {
+    padding: 15px;
+  }
+
+  .fhir-view {
+    padding: 15px;
+  }
+
+}
+

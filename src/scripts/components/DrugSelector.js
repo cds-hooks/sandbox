@@ -76,51 +76,30 @@ const DrugSelector = React.createClass({
     if (this.props.step === "done")
       done = (<span className='selected-drug'>{this.props.decisions.prescribable.str}</span>);
     return (
-        <div className="row">
-      <div className="Drug-Selector col-xs-12">
-  <div className="">
-    <label>Medication</label>
-      <input
-      className="form-control"
-      autofocus={true}
-      placeholder="search for a drug"
-      ref="q"
-      type="text"
-      onKeyDown={this.inputKey}
-      value={this.props.q}
-      onChange={this.sendSearch}
-      />
-      <h5>{this.props.ingredient && this.props.ingredient.str || err}</h5>
-      <div className="Drug-Selector-holder">
-      <table className="drug-choice">
-      {pickList}
-      </table>
+      <div>
+        <div className="medication-container">
+          <label>Medication:</label>
+          <input className="form-control" autofocus={true} placeholder="Search for a drug..." ref="q" type="text" onKeyDown={this.inputKey} value={this.props.q} onChange={this.sendSearch} />
+          <h5>{this.props.ingredient && this.props.ingredient.str || err}</h5>
+          <div className="Drug-Selector-holder">
+            <table className="drug-choice">
+              {pickList}
+            </table>
+          </div>
+          {done}
+        </div>
+        <div className="timing-container">
+          <label className="inline-label">Take</label>
+          <input className="form-control pill-count" ref="sigNumber" placeholder="e.g." type="number" min="1" max="5" value={this.props.sig.number} onChange={this.sendSig} />
+          <label className="inline-label">pill {this.props.sig.number > 1 ? "s":""} by mouth</label>
+          <select value={this.props.sig.frequency} ref="sigFrequency" onChange={this.sendSig} className="form-control sig-form">
+            <option value="daily">daily</option>
+            <option value="bid">twice daily</option>
+            <option value="tid">three times daily</option>
+            <option value="qid">four times daily</option>
+          </select>
+        </div>
       </div>
-      {done}
-  </div>
-      </div>
-      <div className="timing-holder col-xs-12">
-          Take <input
-      className="form-control pill-count"
-      ref="sigNumber"
-      placeholder="e.g. "
-      type="number"
-      min="1" max="5"
-      value={this.props.sig.number}
-      onChange={this.sendSig}
-    /> pill{this.props.sig.number > 1 ? "s":""} by mouth 
-      <select value={this.props.sig.frequency}
-          ref="sigFrequency"
-          onChange={this.sendSig}
-          className="form-control sig-form">
-        <option value="daily">daily</option>
-        <option value="bid">twice daily</option>
-        <option value="tid">three times daily</option>
-        <option value="qid">four times daily</option>
-      </select>
- 
-      </div>
-  </div>
     );
   },
 

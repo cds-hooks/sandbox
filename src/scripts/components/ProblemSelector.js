@@ -32,8 +32,8 @@ const ProblemSelector = React.createClass({
   render() {
     var problems = this.pickList(this.props)
     return (
-      <div className="problem-holder col-xs-12">
-        <label> Treating </label>
+      <div className="treatment-container">
+        <label>Treating:</label>
         <select  value={this.props.selection} className="form-control"
           onChange={e => this.pick(e)}>
           <option value="">Choose a problem</option>

@@ -55,12 +55,12 @@ const Cards = React.createClass({
       var ret = (
       <div key={c.key} className={classes}>
       <div className="card-top">
-        <div className="card-summary">{c.summary}</div>
+        <h5 className="card-summary">{c.summary}</h5>
         {source(c.source)}
         {c.detail && <ReactMarkdown softBreak="br" source={c.detail}/>}
         <div>
         {c.suggestion.map(l => (
-      <button key={l.key} onClick={e => this.takeSuggestion(l)} className="btn btn-success btn-xs">
+      <button key={l.key} onClick={e => this.takeSuggestion(l)} className="btn btn-wired btn-sm">
             <span className="glyphicon glyphicon-edit" aria-hidden="true"></span>
             {l.label}</button>
       ))}

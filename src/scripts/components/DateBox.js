@@ -72,12 +72,11 @@ const DateBox = React.createClass({
        </div> );
 
     return (
-      
-  <div className="col-md-4">
-    <label>{this.props.display}</label>
-    <input type="checkbox" checked={this.props.enabled} onChange={this.toggleEnabled}/>
-    {this.props.enabled && control}
-  </div>);
+      <div className="date-container">
+        <label>{this.props.display}</label>
+        <input type="checkbox" checked={this.props.enabled} onChange={this.toggleEnabled}/>
+        {this.props.enabled && control}
+      </div>);
   },
 
   toggleEnabled(){
