@@ -77,6 +77,11 @@ HookStore.dispatchToken = AppDispatcher.register(function(action) {
       HookStore.emitChange();
       break;
 
+    case ActionTypes.TOGGLE_ENABLED:
+      var current = state.getIn(['hooks', action.id, 'enabled'])
+      state = state.setIn(['hooks', action.id, 'enabled'], !current)
+      HookStore.emitChange();
+      break;
 
     case ActionTypes.SAVE_HOOK:
       if (!action.discard) {

@@ -15,11 +15,18 @@ const OneHook = React.createClass({
     if (newVal !== this.state.original) {
       this.setState({
         original: newVal,
-        current: newVal
+        current: newVal,
+        enabled: newProps.hook.enabled
       });
     }
   },
-  deleteHook() {
+  toggleHook() {
+    AppDispatcher.dispatch({
+      type: ActionTypes.TOGGLE_ENABLED,
+      id: this.props.hook.id
+    })
+  },
+   deleteHook() {
     AppDispatcher.dispatch({
       type: ActionTypes.DELETE_HOOK,
       id: this.props.hook.id
@@ -52,6 +59,8 @@ const OneHook = React.createClass({
   },
 
   render() {
+    var toggleButton = (this.props.hook.id === "new") ? null :
+      <input type='checkbox' className='toggle-hook' onClick={this.toggleHook} checked={this.state && this.state.enabled}></input>;
     var delButton = (this.props.hook.id === "new") ? null :
       <button className='delete-hook btn btn-danger btn-sm' onClick={this.deleteHook}>Delete</button>;
 
@@ -61,6 +70,7 @@ const OneHook = React.createClass({
 
     return (
       <div className={className}>
+        {toggleButton}
         <button className='save-hook btn btn-success btn-sm' disabled={this.state.original == this.state.current} onClick={this.saveHook}>Save</button>
         {delButton}
         <div contentEditable
@@ -90,7 +100,8 @@ const HookEditor = React.createClass({
 
     if (this.props.editing)
       current.push(<OneHook className="new-hook" hook={{
-        id: "new"
+        id: "new",
+        enabled: "true"
       }}/>)
 
     return (<div id="hook-container" className="hook-editor">{edit}{current}</div>);

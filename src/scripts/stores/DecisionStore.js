@@ -68,8 +68,12 @@ function _externalAppReturned() {
 function _hooksChanged() {
   var context = getFhirContext()
   console.log("Eval hooks changed in context", context)
-  var hooks = HookStore.getState().get('hooks')
+  var hooks = HookStore.getState().get('hooks').filter((v,k) => 
+    HookStore.getState().getIn(['hooks', k, 'enabled'])
+  )
+
   var hookNames = hooks.keySeq()
+  console.log("HN", hookNames.count());
 
   state = state.set('cards', Immutable.fromJS([]));
   state = state.set('hooks', hooks)
