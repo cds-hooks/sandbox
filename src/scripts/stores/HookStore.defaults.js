@@ -264,7 +264,7 @@ export default {
   },
   "meducation-view": {
     "id": "meducation-view",
-    "enabled": "false",
+    "enabled": false,
     "url": "http://hooks.meducation.com",
     "name": "Meducation View",
     "activity": "medication-prescribe",
