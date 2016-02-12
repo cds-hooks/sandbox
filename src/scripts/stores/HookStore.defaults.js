@@ -261,5 +261,24 @@ export default {
         }
       ]
     }
+  },
+  "meducation-view": {
+    "id": "meducation-view",
+    "enabled": "false",
+    "url": "http://hooks.meducation.com",
+    "name": "Meducation View",
+    "activity": "medication-prescribe",
+    "preFetchTemplate": {
+      "resourceType": "Bundle",
+      "type": "transaction",
+      "entry": [
+        {
+          "request": {
+            "method": "GET",
+            "url": "MedicationOrder?patient={{Patient.id}}&status=active"
+          }
+        }
+      ]
+    }
   }
 }
