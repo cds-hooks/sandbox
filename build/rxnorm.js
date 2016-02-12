@@ -1,4 +1,4 @@
-var db = {
+var rxnorm = {
   "cuiToName": {
     "616568": "calcium phosphate 112 MG / Melatonin 3 MG Oral Tablet", 
     "199390": "Etodolac 500 MG Oral Tablet", 
@@ -90651,4 +90651,3 @@ var db = {
     ]
   }
 };
-export default db;

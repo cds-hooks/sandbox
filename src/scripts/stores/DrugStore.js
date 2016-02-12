@@ -3,7 +3,6 @@ var EventEmitter = require('events').EventEmitter;
 var assign = require('object-assign');
 var debounce = require('debounce');
 var Immutable = require('immutable');
-import rxnorm from '../rxnorm';
 import ActionTypes from '../actions/ActionTypes'
 
 var pills = Object.keys(rxnorm.pillToComponentSets).map(p => {
