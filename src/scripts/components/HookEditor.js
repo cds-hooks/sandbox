@@ -59,8 +59,9 @@ const OneHook = React.createClass({
   },
 
   render() {
-    var toggleButton = (this.props.hook.id === "new") ? null :
-      <input type='checkbox' className='toggle-hook' onClick={this.toggleHook} checked={this.state && this.state.enabled}></input>;
+    var toggleButton = (this.props.hook.id === "new") ? null : <button className='btn btn-warning btn-sm toggle-hook' onClick={this.toggleHook}>Enabled?
+        <span className={"glyphicon " + (this.state && this.state.enabled ? "glyphicon-check" : "glyphicon-unchecked")} aria-hidden="true"></span>
+      </button>
     var delButton = (this.props.hook.id === "new") ? null :
       <button className='delete-hook btn btn-danger btn-sm' onClick={this.deleteHook}>Delete</button>;
 
