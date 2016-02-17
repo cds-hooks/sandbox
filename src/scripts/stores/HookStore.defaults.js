@@ -280,5 +280,24 @@ export default {
         }
       ]
     }
+  },
+  "bilirubin-patient-view": {
+    "id": "bilirubin-cdshooksadapter-patient-view-cds-hook",
+    "enabled": false,
+    "url": "https://sandbox.hspconsortium.org/hspc-bilirubin-cdshooksadapter/patient-view/$cds-hook",
+    "name": "Bilirubin Patient View CDS Hooks Patient",
+    "activity": "patient-view",
+    "preFetchTemplate": {
+      "resourceType": "Bundle",
+      "type": "transaction",
+      "entry": [
+        {
+          "request": {
+            "method": "GET",
+            "url": "Patient/{{Patient.id}}"
+          }
+        }
+      ]
+    }
   }
 }
