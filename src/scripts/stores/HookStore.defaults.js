@@ -282,7 +282,7 @@ export default {
     }
   },
   "bilirubin-patient-view": {
-    "id": "bilirubin-cdshooksadapter-patient-view-cds-hook",
+    "id": "bilirubin-patient-view",
     "enabled": false,
     "url": "https://sandbox.hspconsortium.org/hspc-bilirubin-cdshooksadapter/patient-view/$cds-hook",
     "name": "Bilirubin Patient View CDS Hooks Patient",
