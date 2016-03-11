@@ -7,8 +7,12 @@ RUN curl http://central.maven.org/maven2/org/eclipse/jetty/jetty-runner/9.3.6.v2
 
 WORKDIR /hspc-build
 COPY hspc.sh /hspc-build/hspc.sh
-COPY patches /hspc-build/patches
 RUN ./hspc.sh
+RUN mvn install -f reference-impl/pom.xml
+
+COPY hspc-config.sh /hspc-build/hspc-config.sh
+COPY patches /hspc-build/patches
+RUN ./hspc-config.sh
 
 WORKDIR /hspc
 RUN  find /hspc-build -name *.war -print0  | xargs -I{} -0 cp -v {} /hspc
