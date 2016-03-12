@@ -39,7 +39,6 @@ const OneHook = React.createClass({
       value: JSON.parse(this.state.current)
     })
   },
-
   getCurrent() {
     var val = this.refs.content.getDOMNode().innerHTML.replace(/\&nbsp;/g, " ");
     var stripped = striptags(val).replace(/&amp;/g, "&");
@@ -93,9 +92,14 @@ const HookEditor = React.createClass({
   componentWillReceiveProps(nextProps) {},
 
   render() {
+
     var edit = (
       <a className='configure-hooks' onClick={this.startEditing}><i className="glyphicon glyphicon-cog"></i> Configure Hooks</a>
-    );
+    )
+
+    var add = (
+      <a className='configure-hooks' onClick={this.addHook}><i className="glyphicon glyphicon-plus"></i>Quick Add</a>
+    )
 
     var current = this.props.editing && this.props.hooks.map((h, hname) => <OneHook hook={h.toJS()}/>).valueSeq().toJS() || [];
 
@@ -105,7 +109,14 @@ const HookEditor = React.createClass({
         enabled: "true"
       }}/>)
 
-    return (<div id="hook-container" className="hook-editor">{edit}{current}</div>);
+    return (<div id="hook-container" className="hook-editor">{edit}{add}{current}</div>);
+  },
+  addHook(){
+    var url = prompt("Hook URL (ends in '/$cds-hook')");
+    AppDispatcher.dispatch({
+      type: ActionTypes.QUICK_ADD_HOOK,
+      url: url
+    })
   },
 
   startEditing() {

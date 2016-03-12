@@ -19,7 +19,7 @@ var server = restify.createServer({
 server.use(restify.bodyParser());
 server.use(function(req, res, next){
   if (req.method !== 'GET' && req._contentType.match('json\\+fhir')){
-    req.body = JSON.parse(req.body.toString())
+    req.body = req.body ? JSON.parse(req.body.toString()) : {}
   }
   res.fhirJson = function(data){
     res.setHeader('Content-Type', 'application/json+fhir');
@@ -44,7 +44,7 @@ Object.keys(services).forEach(function(name){
     res.fhirJson(service.metadata)
   });
 
-  server.post(new RegExp("\\/" + name + "\\/\\$cds-hook"), function(req, res, next){
+  server.post(new RegExp("\\/" + name + "\\/\\$cds-hook$"), function(req, res, next){
     console.log("Do CDS", name)
     service.service(req.body, function(err, cdsResult){
       console.log("service got", err, cdsResult)
@@ -56,6 +56,14 @@ Object.keys(services).forEach(function(name){
       console.log("now return", name)
       return next(err);
     });
+  });
+
+  server.get(new RegExp("\\/" + name + "\\/\\$cds-hook-metadata"), function(req, res, next){
+    res.fhirJson(service.hookMetadata);
+  });
+
+  server.post(new RegExp("\\/" + name + "\\/\\$cds-hook-metadata"), function(req, res, next){
+    res.fhirJson(service.hookMetadata);
   });
 });
 

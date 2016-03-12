@@ -28,6 +28,47 @@ function extractValue(ps){
   }
 }
 
+
+function jsonToParams(js, pattern, depth){
+  depth = depth || 0;
+  var ret = [];
+  Object.keys(js).forEach(function(k){
+    var vals = js[k];
+    if (!isArray(vals)) vals = [vals];
+
+    if (!pattern[k]){
+      console.log("Not a valid key in parmas", k, js, pattern);
+    }
+
+    var kPattern = pattern[k];
+    var isNested = (typeof kPattern[2] === "object");
+    if (!isNested) {
+      var vType = "value" + kPattern[2].slice(0,1).toUpperCase() +kPattern[2].slice(1)
+      ret = ret.concat(vals.map(function(v){
+        var oneParam = {};
+        oneParam.name = k;
+        oneParam[vType] = v;
+        return oneParam;
+      }))
+    } else {
+      ret = ret.concat(vals.map(function(v){
+        var oneParam = {};
+        oneParam.name = k;
+        oneParam.part = jsonToParams(v, kPattern[2], depth+1);
+        return oneParam;
+      }))
+    }
+  });
+  if (depth === 0){
+    return {
+      "resourceType": "Parameters",
+      "parameter": ret
+    }
+  } else {
+    return ret
+  }
+}
+
 // Pattern is like
 //
 // {'card': [{'summary': 1, 'suggestion': [{'label': 1, 'alternative': 1}], 'link': [{'label': 1}]}]}
@@ -99,6 +140,30 @@ if (test.activity !== "medication-prescribe" || test.context[0].test !== true) {
   throw "Parsing by schema failed."
 }
 
+var rtest =  jsonToParams({
+  name: ["simple service", "and other"],
+  description: "described",
+  link: [{
+    label: "click me",
+    url: "here"
+  },{
+    label: "click me too",
+    url: "also here"
+  }]
+} , {
+  name:[1, 1, "string"],
+  description:  [1, 1, "string"],
+  link: [1,1,{
+    label: [1,1,"string"],
+    url: [1,1,"uri"]
+  }]
+});
+
+if (rtest.parameter.length !== 5){
+  throw "Generating by schema failed."
+}
+
+
 function metadata(deets){
 
 
@@ -142,3 +207,14 @@ return {
 module.exports.metadata = metadata;
 module.exports.getIn = getIn;
 module.exports.paramsToJson = paramsToJson;
+module.exports.jsonToParams = jsonToParams;
+module.exports.schema = {
+  metadata: {
+    name: [1,1,"string"],
+    description: [1,1,"string"],
+    activity: [1,1,"coding"],
+    preFetchTemplate: [1,"*","string"]
+  }
+}
+
+

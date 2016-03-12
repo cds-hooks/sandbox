@@ -2,8 +2,10 @@ var AppDispatcher = require('../dispatcher/AppDispatcher');
 var EventEmitter = require('events').EventEmitter;
 var assign = require('object-assign');
 var Immutable = require('immutable');
+import axios from 'axios'
 import ActionTypes from '../actions/ActionTypes'
 import defaultHooks from './HookStore.defaults'
+import { schema, paramsToJson } from '../../../mock-cds-backend/utils.js'
 
 var CHANGE_EVENT = 'change';
 var state = Immutable.fromJS({
@@ -64,6 +66,38 @@ var HookStore = assign({}, EventEmitter.prototype, {
 HookStore.dispatchToken = AppDispatcher.register(function(action) {
 
   switch (action.type) {
+
+    case ActionTypes.QUICK_ADD_HOOK:
+      axios({
+        url: action.url + "-metadata",
+        method: 'get',
+      }).then(function(result){
+        var hook = paramsToJson(result.data, schema.metadata)
+        var generated = {
+          id: action.url,
+          enabled: true,
+          url: action.url,
+          activity: hook.activity.code,
+          preFetchTemplate: hook.preFetchTemplate ? {
+            resourceType: "Bundle",
+            type: "transaction",
+            entry: hook.preFetchTemplate.map(u => ({
+              request: {
+                method: "GET",
+                url: u
+              }
+            }))
+          } : undefined
+        }
+
+        AppDispatcher.dispatch({
+          type: ActionTypes.SAVE_HOOK,
+          id: action.url,
+          value: generated
+        })
+
+      })
+      break;
 
     case ActionTypes.NEW_HOOK:
       state = state.set('editing', true)

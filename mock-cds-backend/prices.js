@@ -1,13 +1,24 @@
 var isArray = require('util').isArray
 var getIn = require('./utils').getIn
 var priceTable = require('./rxnorm-prices')
+var utils = require('./utils')
 var metadata = require('./utils').metadata
+var jsonToParams = require('./utils').jsonToParams
 
 
 module.exports = {
   service: function(indata, cb) {
   cb(null, recommend(indata));
   },
+  hookMetadata: jsonToParams({
+    name: "CMS Pricing Service",
+    description: "Estimate the price of a prescription based on historical pharmacy dispensing data",
+    activity:{
+      "system": "http://cds-hooks.smarthealthit.org/activity",
+      "code": "medication-prescribe"
+    },
+    preFetchTemplate: ["Patient/{{Patient.id}}"]
+  }, utils.schema.metadata),
   metadata: metadata([
       {
         "url" : "name",
