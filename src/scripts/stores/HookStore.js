@@ -73,12 +73,13 @@ HookStore.dispatchToken = AppDispatcher.register(function(action) {
         method: 'get',
       }).then(function(result){
         var hook = paramsToJson(result.data, schema.metadata)
+        console.log("HOOK", hook)
         var generated = {
           id: action.url,
           enabled: true,
           url: action.url,
           activity: hook.activity.code,
-          preFetchTemplate: hook.preFetchTemplate ? {
+          preFetchTemplate: hook.preFetchTemplate  && hook.preFetchTemplate.length > 0 ? {
             resourceType: "Bundle",
             type: "transaction",
             entry: hook.preFetchTemplate.map(u => ({
