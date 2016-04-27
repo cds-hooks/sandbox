@@ -31,10 +31,13 @@ function toFhir(props) {
   var resource = {
     "resourceType": "MedicationOrder"
   }
+  resource.dateWritten = moment().format("YYYY-MM-DD")
+  var startDate, endDate;
   if (props.dates.start && props.dates.start.enabled)
-    resource.dateWritten = moment(props.dates.start.value).format("YYYY-MM-DD")
+    startDate= moment(props.dates.start.value).format("YYYY-MM-DD")
   if (props.dates.end && props.dates.end.enabled)
-    resource.dateEnded = moment(props.dates.end.value).format("YYYY-MM-DD")
+    endDate = moment(props.dates.end.value).format("YYYY-MM-DD")
+
   resource.status = "draft"
   resource.patient = {
     "reference": "Patient/" + props.fhirServer.getIn(['context', 'patient'])
@@ -63,6 +66,12 @@ function toFhir(props) {
           }
         }
       }];
+      if (startDate || endDate){
+        resource.dosageInstruction[0].timing.repeat.boundsPeriod = {
+            start: startDate,
+            end: endDate
+        }
+      }
     }
 
     var med = props.drug.getIn(['decisions', 'prescribable']).toJS();
