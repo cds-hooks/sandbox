@@ -1,6 +1,6 @@
 # Try it out
 
-Live demo at http://hooks.fhir.me/
+Live demo at http://hooks2.smarthealthit.org
 
 # Develop it
 
@@ -88,3 +88,5 @@ No current support is provided for hosting a production copy of this demo, but b
 
  * TODO: provide a way to configure the frontend server to talk to a different
    "mock services" server (current values are hard-coded)
+
+
