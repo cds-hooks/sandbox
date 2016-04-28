@@ -1,10 +1,10 @@
-var url = runtime.CDS_HOOKS_URL
+var url = runtime.CDS_HOOKS_URL + "/cds-services/"
 
 export default {
-  "cms-price-check": {
+  [url + "cms-price-check"]: {
     "enabled": true,
-    "id": url + "/cds-services/cms-price-check",
-    "url": url + "/cds-services/cms-price-check",
+    "id": url + "cms-price-check",
+    "url": url + "cms-price-check",
     "name": "CMS Price Check",
     "hook": "medication-prescribe"
   }
