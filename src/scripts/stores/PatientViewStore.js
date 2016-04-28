@@ -53,9 +53,9 @@ var PatientViewStore = assign({}, EventEmitter.prototype, {
 })
 
 var state = Immutable.Map({
-  'activity': 'patient-view',
+  'hook': 'patient-view',
   'fhir': {},
-  'activityStore': PatientViewStore
+  'hookStore': PatientViewStore
 })
 
 module.exports = PatientViewStore

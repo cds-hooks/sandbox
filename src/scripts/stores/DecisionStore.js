@@ -18,31 +18,6 @@ var DELAY = 0; // no delay to apply hooks
 HookStore.addChangeListener(_hooksChanged)
 FhirServerStore.addChangeListener(_hooksChanged)
 
-var decisionSchema = {
-  'decision': [0, '*', {
-    'create': [0, '*', 'resource'],
-    'delete': [0, '*', 'id']
-  }],
-  'card': [0, '*', {
-    'summary': [1, 1, 'string'],
-    'source': [1, 1, {
-      'label': [1, 1, 'string'],
-      'url': [0, 1, 'uri']
-    }],
-    'detail': [0, 1, 'string'],
-    'indicator': [1, 1, 'code'],
-    'suggestion': [0, '*', {
-      'label': [1, 1, 'string'],
-      'create': [0, '*', 'resource'],
-      'delete': [0, '*', 'id']
-    }],
-    'link': [0, '*', {
-      'label': [1, 1, 'string'],
-      'url': [1, 1, 'uri']
-    }]
-  }]
-};
-
 var CHANGE_EVENT = 'change'
 var state = Immutable.fromJS({
   calling: false,
@@ -102,17 +77,12 @@ function _hooksChanged() {
 }
 
 
-// 
-// ActivityGenerators call:
-// DecisionStore.setActivityState({'activity': 'medication-prescribe', 'fhir', {resource})
-// which proparges to the DecisionStore state.
-// and calls the hooks, filtered on activity match.
-var _activityUuid = uuid.v4()
+var _hookUuid = uuid.v4()
 
 var idService = {
   createIds() {
     return {
-      activityInstance: _activityUuid
+      hookInstance: _hookUuid
     }
   }
 }
@@ -125,39 +95,21 @@ if (!_base.match(/.*\//)) {
 function hookBody(h, fhir, preFetchData) {
   var ids = idService.createIds()
   var ret = {
-    "resourceType": "Parameters",
-    "parameter": [{
-      "name": "activity",
-      "valueCoding": {
-        "system": "http://cds-hooks.smarthealthit.org/activity",
-        "code": state.get('activity')
-      }
-    }, {
-      "name": "activityInstance",
-      "valueString": ids.activityInstance
-    }, {
-      "name": "fhirServer",
-      "valueUri": FhirServerStore.getState().getIn(['context', 'baseUrl'])
-    }, {
-      "name": "redirect",
-      "valueString": _base + "service-done.html"
-    }, {
-      "name": "user",
-      "valueString": "Practitioner/example"
-    }, {
-      "name": "patient",
-      "valueId": FhirServerStore.getState().getIn(['context', 'patient'])
-    }, {
-      "name": "preFetchData",
-      "resource": preFetchData
-    }]
+    hook: {
+        "system": "http://cds-hooks.smarthealthit.org/hook",
+        "code": state.get('hook')
+    },
+    hookInstance: ids.hookInstance,
+    fhirServer: FhirServerStore.getState().getIn(['context', 'baseUrl']),
+    redirect: _base + "service-done.html",
+    user: "Practitioner/example",
+    patient: FhirServerStore.getState().getIn(['context', 'patient']),
+    preFetchData: preFetchData,
+    context: []
   }
   if (fhir)
-    ret.parameter.push({
-      "name": "context",
-      "resource": fhir
-    });
-    return ret;
+    ret.context.push(fhir);
+  return ret;
 }
 
 var cardKey = 0
@@ -170,22 +122,23 @@ function addCardsFrom(callCount, hookUrl, result) {
   }
 
   state = state.set('calling', false)
-  var result = paramsToJson(result.data, decisionSchema)
+  var result = result.data
   console.log("3 addCardsFrom", result)
-  var decision = result.decision
-  if (decision && decision.length > 0) {
+  var decisions = result.decisions
+  if (decisions && decisions.length > 0) {
     AppDispatcher.dispatch({
       type: ActionTypes.TAKE_SUGGESTION,
       suggestion: {
-        create: decision[0].create
+        create: decisions[0].create
       }
     })
   }
 
-  var cards = result.card || []
+  var cards = result.cards || []
+  console.log("Got cards", cards);
   cards = Immutable.fromJS(cards).map((v, k) => v.set('key', cardKey++)
-                                      .set('suggestion', v.get('suggestion').map(s => s.set("key", cardKey++)))
-                                      .set('link', v.get('link').map(s => s.set("key", cardKey++)))
+                                      .set('suggestions', v.get('suggestions', []).map(s => s.set("key", cardKey++)))
+                                      .set('links', v.get('links', []).map(s => s.set("key", cardKey++)))
                                      ).toJS()
                                      console.log("Added as", cards)
                                      var newCards = state.get('cards').push(...cards)
@@ -203,7 +156,7 @@ function callHooks(localState) {
 
   var applicableServices = localState
   .get('hooks')
-  .filter((h, hookUrl) => h.get('activity') === localState.get('activity'))
+  .filter((h, hookUrl) => h.get('hook') === localState.get('hook'))
 
   if (applicableServices.count() == 0) {
     console.log("no applicable services")
@@ -238,16 +191,16 @@ var DecisionStore = assign({}, EventEmitter.prototype, {
     return state
   },
 
-  setActivity: function(activity) {
-    console.log("Set activity", activity)
-    state = state.merge(_stores[activity].getState())
-    state.get('activityStore').processChange()
-    console.log("PC", state.get('activityStore').processChange)
+  setActivity: function(hook) {
+    console.log("Set hook", hook)
+    state = state.merge(_stores[hook].getState())
+    state.get('hookStore').processChange()
+    console.log("PC", state.get('hookStore').processChange)
     DecisionStore.emitChange()
   },
 
-  setActivityState: function(activity, resource) {
-    if (activity !== state.get('activity')) {
+  setActivityState: function(hook, resource) {
+    if (hook !== state.get('hook')) {
       return;
     }
 
@@ -260,7 +213,7 @@ var DecisionStore = assign({}, EventEmitter.prototype, {
 
   getStateToPublish: function() {
     return {
-      activity: state.get("activity")
+      hook: state.get("hook")
     }
   },
 
@@ -297,12 +250,12 @@ DecisionStore.dispatchToken = AppDispatcher.register(function(action) {
           break
 
       case ActionTypes.SET_ACTIVITY:
-          DecisionStore.setActivity(action.activity)
+          DecisionStore.setActivity(action.hook)
           break
 
       case ActionTypes.NEW_HASH_STATE:
           var hash = action.hash
-          DecisionStore.setActivity(hash.activity || 'medication-prescribe')
+          DecisionStore.setActivity(hash.hook || 'medication-prescribe')
           break
 
       default:

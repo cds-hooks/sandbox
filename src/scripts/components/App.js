@@ -59,7 +59,7 @@ const App = React.createClass({
   setActivity(code){
     AppDispatcher.dispatch({
       type: ActionTypes.SET_ACTIVITY,
-      activity: code
+      hook: code
     })
   },
 
@@ -70,9 +70,9 @@ const App = React.createClass({
   },
 
   render() {
-    var activity = (this.state.all.getIn(['decisions', 'activity']))
-    var rxClass = activity === "medication-prescribe" ? "nav-button activity-on" : "nav-button activity-off"
-    var ptClass = activity === "patient-view" ? "nav-button activity-on" : "nav-button activity-off"
+    var hook = (this.state.all.getIn(['decisions', 'hook']))
+    var rxClass = hook === "medication-prescribe" ? "nav-button activity-on" : "nav-button activity-off"
+    var ptClass = hook === "patient-view" ? "nav-button activity-on" : "nav-button activity-off"
 
     return (
       <div id="react-content">
@@ -88,11 +88,11 @@ const App = React.createClass({
         <HookEditor hooks={this.state.all.getIn(['hooks', 'hooks'])} editing={this.state.all.getIn(['hooks', 'editing'])} />
         
         {
-          activity === 'medication-prescribe' &&
+          hook === 'medication-prescribe' &&
             <RxActivity all={this.state.all}/>
             }
             {
-              activity === 'patient-view' &&
+              hook === 'patient-view' &&
                 <PatientViewActivity all={this.state.all}/>
                 }
 

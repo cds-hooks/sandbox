@@ -112,7 +112,7 @@ const HookEditor = React.createClass({
     return (<div id="hook-container" className="hook-editor">{edit}{add}{current}</div>);
   },
   addHook(){
-    var url = prompt("Hook URL (ends in '/$cds-hook')");
+    var url = prompt("CDS Service Provider URL");
     AppDispatcher.dispatch({
       type: ActionTypes.QUICK_ADD_HOOK,
       url: url

@@ -10,56 +10,30 @@ module.exports = {
     cb(null, recommend(indata));
   },
   view: null,
-  metadata: metadata([
-    {
-      "url" : "name",
-      "valueString" : "Display a greeting for a patient"
+  description: {
+    id: "patient-hello-world",
+    name: "Patient hello world",
+    description: "Greet patient by name",
+    hook:{
+      "system": "http://cds-hooks.smarthealthit.org/activity",
+      "code": "patient-view"
     },
-    {
-      "url" : "activity",
-      "valueCoding" : {
-        "code" : "patient-view",
-        "display" : "Provide information about a Patient",
-        "system" : "http://cds-hooks.smarthealthit.org/activity"
-      }
-    },
-
-    {
-      "url" : "preFetchRequired",
-      "valueString" : "Patient/{{Patient.id}}"
-    }
-
-  ])
-
-
-
+    preFetch: ["Patient/{{Patient.id}}"]
+  }
 }
 
 
 function recommend(data) {
   var patient = getIn(data, 'preFetchData')[0].resource.entry[0].resource;
   var name = patient.name[0].given[0];
-  var ret = {
-    "resourceType": "Parameters",
-    "parameter": [
-      {
-        "name": "card",
-        "part": [{
-          "name": "summary",
-          "valueString": "Hello " + name + "!"
-        }, {
-          "name": "source",
-          "part": [{
-            "name": "label",
-            "valueString": "Patient Greeting Service",
-          }]
-        }, {
-          "name": "indicator",
-          "valueCode": "success",
-        }]
-      }
-    ]
+  return {
+    cards: [{
+      summary: "Hello " + name + "!",
+      source: {
+        label: "Patient greeting service"
+      },
+      indicator: "success"
+    }]
   }
-  return ret;
 }
 

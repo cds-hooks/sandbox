@@ -35,16 +35,20 @@ server.on('uncaughtException', function (request, response, route, error) {
   response.end(error.toString())
 });
 
+var metas = Object.keys(services).map(function(name){
+  return services[name].description
+});
+
+server.get('.well-known/cds-services', function(req, res, next){
+  return res.fhirJson({
+    services: metas
+  })
+
+})
+
 Object.keys(services).forEach(function(name){
   var service = services[name];
-
-  console.log("Configure", name)
-  server.get('/' + name + '/metadata', function(req, res, next){
-    console.log("Get metadata")
-    res.fhirJson(service.metadata)
-  });
-
-  server.post(new RegExp("\\/" + name + "\\/\\$cds-hook$"), function(req, res, next){
+  server.post("/cds-services/"+name, function(req, res, next){
     console.log("Do CDS", name)
     service.service(req.body, function(err, cdsResult){
       console.log("service got", err, cdsResult)
@@ -58,18 +62,11 @@ Object.keys(services).forEach(function(name){
     });
   });
 
-  server.get(new RegExp("\\/" + name + "\\/\\$cds-hook-metadata"), function(req, res, next){
-    res.fhirJson(service.hookMetadata);
-  });
-
-  server.post(new RegExp("\\/" + name + "\\/\\$cds-hook-metadata"), function(req, res, next){
-    res.fhirJson(service.hookMetadata);
-  });
 });
 
-server.get('/service/:serviceName/:reason/:activityInstance', function(req, res, next){
+server.get('/service/:serviceName/:reason/:hookInstance', function(req, res, next){
   console.log("View on", req.params.serviceName);
-  services[req.params.serviceName].view(req.params.reason, req.params.activityInstance, req, res, next);
+  services[req.params.serviceName].view(req.params.reason, req.params.hookInstance, req, res, next);
 })
 
 server.listen(process.env.PORT || 8081, function () {
