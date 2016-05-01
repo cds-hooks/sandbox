@@ -22,11 +22,7 @@ module.exports ={
     cb(null, recommend(indata));
   }, view:  view,
   description: {
-    hook: {
-      "code" : "medication-prescribe",
-      "display" : "Provide information about a prescription in-progress",
-      "system" : "http://cds-hooks.smarthealthit.org/activity"
-    },
+    hook: "medication-prescribe",
     name: "Random grab-bag of mock services",
     description: "Generate a bunch of cards for various reasons",
     id: "pediatric-dose-check",

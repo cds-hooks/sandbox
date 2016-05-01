@@ -21,11 +21,6 @@ server.use(function(req, res, next){
   if (req.method !== 'GET' && req._contentType.match('json\\+fhir')){
     req.body = req.body ? JSON.parse(req.body.toString()) : {}
   }
-  res.fhirJson = function(data){
-    res.setHeader('Content-Type', 'application/json+fhir');
-    res.writeHead(200);
-    res.end(JSON.stringify(data))
-  }
   next()
 })
 
@@ -40,7 +35,7 @@ var metas = Object.keys(services).map(function(name){
 });
 
 server.get('.well-known/cds-services', function(req, res, next){
-  return res.fhirJson({
+  return res.json({
     services: metas
   })
 
@@ -52,7 +47,7 @@ Object.keys(services).forEach(function(name){
     console.log("Do CDS", name)
     service.service(req.body, function(err, cdsResult){
       console.log("service got", err, cdsResult)
-      res.fhirJson(cdsResult);
+      res.json(cdsResult);
       if (err){
         err = new restify.errors.InternalServerError('Request failed with ' + e);
         console.log("Err", err)
