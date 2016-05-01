@@ -26,9 +26,9 @@ module.exports ={
     name: "Random grab-bag of mock services",
     description: "Generate a bunch of cards for various reasons",
     id: "pediatric-dose-check",
-    prefetch: [
-      "Patient/{{Patient.id}}"
-    ]
+    prefetch:{
+      patient: "Patient/{{Patient.id}}"
+    }
   }
 }
 
@@ -38,10 +38,7 @@ var _db = {};
 function view(reason, sid, req, res, next){
   var inData = _db[sid].inData;
   var med = inData.context[0];
-  var patient = inData.prefetchData.entry.filter(function(e){
-    return e.resource.resourceType === "Patient"
-  })[0].resource;
-
+  var patient = inData.prefetch.patient.resource;
 
   var context = {
     "Patient.name": patient.name[0].given.join(" ") + " " + patient.name[0].family.join(" "),

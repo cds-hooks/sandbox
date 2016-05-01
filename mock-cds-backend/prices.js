@@ -13,8 +13,7 @@ module.exports = {
     name: "CMS Pricing Service",
     id: "cms-price-check",
     description: "Estimate the price of a prescription based on historical pharmacy dispensing data",
-    hook: "medication-prescribe",
-    prefetch: ["Patient/{{Patient.id}}"]
+    hook: "medication-prescribe"
   }
 }
 

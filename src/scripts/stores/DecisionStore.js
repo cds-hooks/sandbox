@@ -110,12 +110,6 @@ if (!_base.match(/.*\//)) {
 
 function hookBody(h, fhir, prefetch) {
   var ids = idService.createIds()
-  console.log("based on", prefetch.toJS());
-  console.log("My pref", h.get('prefetch', Immutable.Map()).toJS());
-  console.log("My expanded",
-     h.get('prefetch', Immutable.Map())
-               .map(v => prefetch.get(v)).toJS())
- 
   var ret = {
     hook: h.get('hook'),
     hookInstance: ids.hookInstance,
