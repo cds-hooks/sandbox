@@ -84,7 +84,7 @@ HookStore.dispatchToken = AppDispatcher.register(function(action) {
           url: action.url + "/cds-services/"+ service.id,
           enabled: true,
           hook: service.hook,
-          prefetch: service.prefetch
+          prefetch: service.prefetch || {}
         }))
 
         generated.forEach(h => {
