@@ -22,6 +22,7 @@ window.saveHooks = saveHooks
 window.resetHooks = resetHooks
 
 function restoreHooks() {
+  console.log("REstoring", defaultHooks)
   try {
     var hooks = JSON.parse(window.localStorage["cdsServices"]);
     return Immutable.fromJS(hooks);
@@ -33,8 +34,8 @@ function restoreHooks() {
 ;
 
 function resetHooks() {
-  delete window.localStorage.hooks;
-  state.set('hooks', restoreHooks());
+  delete window.localStorage.cdsServices;
+  state = state.set('hooks', restoreHooks());
 }
 
 var HookStore = assign({}, EventEmitter.prototype, {
@@ -67,7 +68,10 @@ var HookStore = assign({}, EventEmitter.prototype, {
 HookStore.dispatchToken = AppDispatcher.register(function(action) {
 
   switch (action.type) {
-
+    case ActionTypes.RESET_HOOKS:
+        resetHooks()
+        HookStore.emitChange()
+        break
     case ActionTypes.QUICK_ADD_HOOK:
       axios({
         url: action.url + "/.well-known/cds-services",
@@ -79,17 +83,8 @@ HookStore.dispatchToken = AppDispatcher.register(function(action) {
           id: action.url + "/cds-services/" + service.id,
           url: action.url + "/cds-services/"+ service.id,
           enabled: true,
-          hook: service.hook.code,
-          preFetchTemplate: service.preFetch && service.preFetch.length > 0 ? {
-            resourceType: "Bundle",
-            type: "transaction",
-            entry: service.preFetch.map(u => ({
-              request: {
-                method: "GET",
-                url: u
-              }
-            }))
-          } : undefined
+          hook: service.hook,
+          prefetch: service.prefetch
         }))
 
         generated.forEach(h => {

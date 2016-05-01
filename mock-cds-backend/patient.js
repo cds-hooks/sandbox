@@ -14,17 +14,15 @@ module.exports = {
     id: "patient-hello-world",
     name: "Patient hello world",
     description: "Greet patient by name",
-    hook:{
-      "system": "http://cds-hooks.smarthealthit.org/activity",
-      "code": "patient-view"
-    },
-    preFetch: ["Patient/{{Patient.id}}"]
+    hook: "patient-view",
+    prefetch: {
+      patientToGreet: "Patient/{{Patient.id}}"
+    }
   }
 }
 
-
 function recommend(data) {
-  var patient = getIn(data, 'preFetchData')[0].resource.entry[0].resource;
+  var patient = data.prefetch.patientToGreet.resource;
   var name = patient.name[0].given[0];
   return {
     cards: [{

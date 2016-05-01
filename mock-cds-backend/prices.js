@@ -17,7 +17,7 @@ module.exports = {
       "system": "http://cds-hooks.smarthealthit.org/activity",
       "code": "medication-prescribe"
     },
-    preFetch: ["Patient/{{Patient.id}}"]
+    prefetch: ["Patient/{{Patient.id}}"]
   }
 }
 

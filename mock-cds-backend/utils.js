@@ -124,7 +124,7 @@ var test =  paramsToJson({
       "name" : "context"
     },
     {
-      "name" : "preFetchData"
+      "name" : "prefetchData"
     }
   ],
   "resourceType" : "Parameters"
@@ -133,7 +133,7 @@ var test =  paramsToJson({
   activity:  [1, 1, "string"],
   redirect:  [1, 1, "uri"],
   context:   [0, "*", "resource"],
-  preFetchData: [0, 1, "resource"]
+  prefetchData: [0, 1, "resource"]
 });
 
 if (test.activity !== "medication-prescribe" || test.context[0].test !== true) {
@@ -213,7 +213,7 @@ module.exports.schema = {
     name: [1,1,"string"],
     description: [1,1,"string"],
     activity: [1,1,"coding"],
-    preFetchTemplate: [1,"*","string"]
+    prefetchTemplate: [1,"*","string"]
   }
 }
 

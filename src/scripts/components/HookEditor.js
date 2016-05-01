@@ -97,20 +97,33 @@ const HookEditor = React.createClass({
       <a className='configure-hooks' onClick={this.startEditing}><i className="glyphicon glyphicon-cog"></i> Configure Hooks</a>
     )
 
+    var reset = (
+      <a className='configure-hooks' onClick={this.resetHooks}><i className="glyphicon glyphicon-leaf"></i>Reset</a>
+    )
+
     var add = (
       <a className='configure-hooks' onClick={this.addHook}><i className="glyphicon glyphicon-plus"></i>Quick Add</a>
     )
 
-    var current = this.props.editing && this.props.hooks.map((h, hname) => <OneHook hook={h.toJS()}/>).valueSeq().toJS() || [];
+    var current = this.props.editing && this.props.hooks.map((h, hname) => <OneHook key={h.get('id')} hook={h.toJS()}/>).valueSeq().toJS() || [];
 
     if (this.props.editing)
-      current.push(<OneHook className="new-hook" hook={{
+      current.push(<OneHook key="new" className="new-hook" hook={{
         id: "new",
         enabled: "true"
       }}/>)
 
-    return (<div id="hook-container" className="hook-editor">{edit}{add}{current}</div>);
+      return (<div id="hook-container" className="hook-editor">
+        <span className="hook-buttons"> {add}{reset}{edit}</span>
+        {current}
+      </div>);
   },
+   resetHooks(){
+    AppDispatcher.dispatch({
+      type: ActionTypes.RESET_HOOKS
+    })
+  },
+
   addHook(){
     var url = prompt("CDS Service Provider URL");
     AppDispatcher.dispatch({
@@ -119,7 +132,7 @@ const HookEditor = React.createClass({
     })
   },
 
-  startEditing() {
+ startEditing() {
     if (!this.props.editing) {
       document.getElementById("hook-container").classList.add("editor-open");
       return AppDispatcher.dispatch({

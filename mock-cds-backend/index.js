@@ -7,7 +7,7 @@ var context = require('./context');
 var services = {
   'pediatric-dose-check': pediatric,
   'cms-price-check': prices,
-  'pt-hello-world': patient
+  'patient-hello-world': patient
 };
 
 var server = restify.createServer({

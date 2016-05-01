@@ -16,7 +16,7 @@ var Immutable = require('immutable')
 var CHANGE_EVENT = 'change'
 var state = Immutable.fromJS({ })
 
-var preFetchData = Promise.resolve({})
+var prefetchData = Promise.resolve({})
 DrugStore.addChangeListener(_changed)
 DateStore.addChangeListener(_changed)
 HookStore.addChangeListener(_changed)

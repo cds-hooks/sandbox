@@ -24,7 +24,6 @@ var state = Immutable.fromJS({
   cards: []
 })
 
-var preFetchData = Promise.resolve({})
 function getFhirContext() {
   var c = FhirServerStore.getState().get('context');
   return c.set('Patient.id', c.get('patient')).toJS()
@@ -42,38 +41,55 @@ function _externalAppReturned() {
 
 function _hooksChanged() {
   var context = getFhirContext()
-  console.log("Eval hooks changed in context", context)
-  var hooks = HookStore.getState().get('hooks').filter((v,k) => 
-    HookStore.getState().getIn(['hooks', k, 'enabled'])
-  )
+  var hooks = HookStore.getState().get('hooks').filter((v,k) => v.get('enabled'))
+  var patient = FhirServerStore.getState().getIn(['context', 'patient']);
+
+  var samePatient = patient === state.get('patient')
+  var sameHooks = hooks.equals(state.get('hooks'))
+
+  if (samePatient && sameHooks) {
+    return;
+  }
 
   var hookNames = hooks.keySeq()
+  console.log("Eval hooks changed in context", context)
   console.log("HN", hookNames.count());
 
   state = state.set('cards', Immutable.fromJS([]));
   state = state.set('hooks', hooks)
+  state = state.set('patient', patient)
 
-  var hooksToFetch = hooks.valueSeq().filter(h => h.get('preFetchTemplate'));
+  var response = (url, r) => [
+    url,
+    {
+      resource: r.data,
+      response: {
+        status: r.status + " " + r.statusText
+      }
+    }
+  ]
 
-  var hookFetches = hooksToFetch
-  .map(h => axios({
-    url: context.baseUrl,
-    method: 'post',
-    data: fillTemplate(h.get('preFetchTemplate'), context)
-  })
-      ).toJS()
+  var prefetch = hooks
+    .reduce((coll, v)=> coll.union(
+      v.get('prefetch', Immutable.Map())
+       .valueSeq()),
+      Immutable.Set())
+    .map(url => [
+      url,
+      axios({
+        url: context.baseUrl + '/' + fillTemplate(url, context),
+        method: 'get'
+      })
+    ])
+    .map(([url, p]) => p
+         .then(r => response(url, r))
+         .catch(r => response(url, r)))
 
+  state = state.set('prefetch', Promise
+    .all(prefetch)
+    .then(Immutable.Map))
 
-      state = state.set('preFetchData', Promise.all(hookFetches)
-                        .then(preFetchResults => preFetchResults.reduce(
-                          (coll, r, i) => coll.set(hooksToFetch.get(i).get('url'), r.data),
-                            Immutable.fromJS({}))
-
-
-                             ))
-
-                             console.log("Pending prefetc")
-                             callHooks(state)
+  callHooks(state);
 }
 
 
@@ -92,19 +108,23 @@ if (!_base.match(/.*\//)) {
   _base += "/";
 }
 
-function hookBody(h, fhir, preFetchData) {
+function hookBody(h, fhir, prefetch) {
   var ids = idService.createIds()
+  console.log("based on", prefetch.toJS());
+  console.log("My pref", h.get('prefetch', Immutable.Map()).toJS());
+  console.log("My expanded",
+     h.get('prefetch', Immutable.Map())
+               .map(v => prefetch.get(v)).toJS())
+ 
   var ret = {
-    hook: {
-        "system": "http://cds-hooks.smarthealthit.org/hook",
-        "code": state.get('hook')
-    },
+    hook: h.get('hook'),
     hookInstance: ids.hookInstance,
     fhirServer: FhirServerStore.getState().getIn(['context', 'baseUrl']),
     redirect: _base + "service-done.html",
     user: "Practitioner/example",
-    patient: FhirServerStore.getState().getIn(['context', 'patient']),
-    preFetchData: preFetchData,
+    patient: state.get('patient'),
+    prefetch: h.get('prefetch', Immutable.Map())
+               .map(v => prefetch.get(v)),
     context: []
   }
   if (fhir)
@@ -166,15 +186,13 @@ function callHooks(localState) {
   }
 
 
-  localState.get('preFetchData').then((preFetchData) => {
-
+  localState.get('prefetch').then((prefetch) => {
     var results = applicableServices.map((h, hookUrl) => axios({
       url: h.get('url'),
       method: 'post',
-      data: hookBody(
-        h,
-        localState.get('fhir') && localState.get('fhir').toJS(),
-        preFetchData.get(h.get('url'))),
+      data: hookBody(h,
+                     localState.get('fhir') && localState.get('fhir').toJS(),
+                     prefetch),
         headers: {
           'Content-Type': 'application/json+fhir'
         }
