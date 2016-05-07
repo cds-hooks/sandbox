@@ -15,7 +15,6 @@ var server = restify.createServer({
   version: '0.0.1'
 });
 
-
 server.use(restify.bodyParser());
 server.use(function(req, res, next){
   if (req.method !== 'GET' && req._contentType.match('json\\+fhir')){
@@ -38,11 +37,13 @@ server.get('.well-known/cds-services', function(req, res, next){
   return res.json({
     services: metas
   })
-
 })
 
 Object.keys(services).forEach(function(name){
   var service = services[name];
+  server.post("/cds-services/"+name+"/analytics/:uuid", function(req, res, next){
+    return res.json({thanks: true});
+  });
   server.post("/cds-services/"+name, function(req, res, next){
     console.log("Do CDS", name)
     service.service(req.body, function(err, cdsResult){

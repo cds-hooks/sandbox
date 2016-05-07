@@ -24,6 +24,7 @@ var indicators = {
 const Cards = React.createClass({
   componentWillReceiveProps(nextProps) {},
   takeSuggestion(suggestion) {
+    console.log("TAke", suggestion);
     AppDispatcher.dispatch({
       type: ActionTypes.TAKE_SUGGESTION,
       suggestion: suggestion

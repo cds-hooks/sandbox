@@ -150,10 +150,14 @@ function addCardsFrom(callCount, hookUrl, result) {
 
   var cards = result.cards || []
   console.log("Got cards", cards);
-  cards = Immutable.fromJS(cards).map((v, k) => v.set('key', cardKey++)
-                                      .set('suggestions', v.get('suggestions', []).map(s => s.set("key", cardKey++)))
-                                      .set('links', v.get('links', []).map(s => s.set("key", cardKey++)))
-                                     ).toJS()
+  cards = Immutable.fromJS(cards)
+                   .map((v, k) => v.set('key', cardKey++)
+                                   .set('suggestions', v.get('suggestions', []).map(s => s
+                                       .set("key", cardKey++)
+                                       .set("suggestionUrl", hookUrl + "/analytics/" + s.get("uuid"))))
+                                   .set('links', v.get('links', []).map(s => s
+                                       .set("key", cardKey++))
+                                    )).toJS()
                                      console.log("Added as", cards)
                                      var newCards = state.get('cards').push(...cards)
                                      state = state.set('cards', newCards)
@@ -256,6 +260,15 @@ DecisionStore.dispatchToken = AppDispatcher.register(function(action) {
 
       case ActionTypes.EXTERNAL_APP_RETURNED:
           _externalAppReturned()
+          break
+
+      case ActionTypes.TAKE_SUGGESTION:
+          if (action.suggestion.uuid){
+            axios({
+              url: action.suggestion.suggestionUrl,
+              method: 'post'
+            })
+          }
           break
 
       case ActionTypes.LOADED:

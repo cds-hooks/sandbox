@@ -76,6 +76,7 @@ function message(summary, label, toPropose) {
       indicator: "info",
       suggestions: label ? [{
         label: label,
+        uuid: "123",
         create: [toPropose]
       }] : []
     }]
