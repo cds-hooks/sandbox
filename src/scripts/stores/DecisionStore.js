@@ -192,7 +192,7 @@ function callHooks(localState) {
                      localState.get('fhir') && localState.get('fhir').toJS(),
                      prefetch),
         headers: {
-          'Content-Type': 'application/json+fhir'
+          'Content-Type': 'application/json'
         }
     }))
     .forEach((p, hookUrl) => p.then(result => addCardsFrom(myCallCount, hookUrl, result)))
