@@ -74,7 +74,7 @@ HookStore.dispatchToken = AppDispatcher.register(function(action) {
         break
     case ActionTypes.QUICK_ADD_HOOK:
       axios({
-        url: action.url + "/.well-known/cds-services",
+        url: action.url + "/cds-services",
         method: 'get',
       }).then(function(result){
         var services = result.data.services;

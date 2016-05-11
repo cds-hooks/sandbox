@@ -33,7 +33,7 @@ var metas = Object.keys(services).map(function(name){
   return services[name].description
 });
 
-server.get('.well-known/cds-services', function(req, res, next){
+server.get('cds-services', function(req, res, next){
   return res.json({
     services: metas
   })
