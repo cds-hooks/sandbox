@@ -66,7 +66,7 @@ const Cards = React.createClass({
             {l.label}</button>
       ))}
           {c.links.map(l => (
-      <a key={l.key} onClick={e => this.launchService(e, l.url)} target="_blank" href={l.url}>
+      <a key={l.key} className="source-link" onClick={e => this.launchService(e, l.url)} target="_blank" href={l.url}>
               <span className="glyphicon glyphicon-link" aria-hidden="true"></span>
               {l.label}</a>
       ))}
