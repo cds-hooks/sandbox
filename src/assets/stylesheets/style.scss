@@ -122,7 +122,6 @@ a {
 
 pre {
   padding: 30px;
-  background: $color-dark;
   color: #fff;
   font-size: .85em;
   border-radius: 0;
@@ -141,6 +140,8 @@ pre {
     }
   }
 }
+
+.hidden { display:none; }
 
 /* Structure
 ====================================================================================== */
@@ -247,12 +248,14 @@ pre {
 ====================================================================================== */
 .order-entry {
   display: table-cell;
-  width: 55%;
   padding: 30px;
 }
 
 .fhir-view {
   display: table-cell;
+  position: static;
+  background: $color-dark;
+  height: 100%;
   .line {
     transition-property: background;
     transition-duration: .4s;
@@ -262,6 +265,27 @@ pre {
     color: lighten($color-dark, 10%);
     font-weight: bold;
   }
+  .configure-fhir-view {
+    position: absolute;
+    top: 60px;
+    right: 10px;
+    margin-top: 10px;
+    background: $blue;
+    border-radius: 4px;
+    color: #0d0630;
+    cursor: pointer;
+    display: inline-block;
+    font-family: "Roboto Condensed",sans-serif;
+    padding: 5px;
+    &:hover {
+      background: darken($blue, 20%);
+      text-decoration: none;
+    }
+  }
+}
+
+.fhir-view-visible {
+  width: 45%;
 }
 
 /* cards */
@@ -655,7 +679,7 @@ table.drug-choice {
   }
 
   .app-footer {
-    height: auto; 
+    height: auto;
   }
 
   .order-entry {
@@ -668,6 +692,10 @@ table.drug-choice {
   .fhir-view {
     display: block;
     width: 100%;
+    .configure-fhir-view {
+      position: static;
+      margin-left: 10px;
+    }
   }
 
   .hook-editor {
@@ -697,7 +725,10 @@ table.drug-choice {
 
   .fhir-view {
     padding: 15px;
+    .configure-fhir-view {
+      position: static;
+      margin-left: 10px;
+    }
   }
 
 }
-
