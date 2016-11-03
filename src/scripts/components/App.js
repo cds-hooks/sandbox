@@ -52,7 +52,7 @@ const App = React.createClass({
         date: moment().add(1, 'month').toDate(),
         enabled: true});
         AppDispatcher.dispatch({ type: ActionTypes.LOADED })
-        return {all: AppStore.getState(), 
+        return {all: AppStore.getState(),
         settingContext: false}
   },
 
@@ -66,7 +66,7 @@ const App = React.createClass({
   changePatient(){
     var pid = this.state.all.getIn(["fhirServer", "context", "patient"])
     pid = window.prompt("Patient ID", pid)
-    FhirServerStore.setContext({patient: pid})
+    if (pid) FhirServerStore.setContext({patient: pid})
   },
 
   render() {
@@ -86,7 +86,7 @@ const App = React.createClass({
         </div>
 
         <HookEditor hooks={this.state.all.getIn(['hooks', 'hooks'])} editing={this.state.all.getIn(['hooks', 'editing'])} />
-        
+
         {
           hook === 'medication-prescribe' &&
             <RxActivity all={this.state.all}/>
@@ -101,7 +101,7 @@ const App = React.createClass({
                   About <a href="https://github.com/jmandel/cds-hooks/wiki">CDS Hooks</a> —
                   Rx Demo <a href="https://github.com/jmandel/cds-hooks-rx-app">source code</a>
 
-                  
+
                 </div>
               </div>
     )
