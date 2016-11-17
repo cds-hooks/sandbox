@@ -1,6 +1,6 @@
 # Try it out
 
-Live demo at http://hooks2.smarthealthit.org
+Live demo at http://demo.cds-hooks.org
 
 # Develop it
 
