@@ -2,9 +2,15 @@ frontend:
   build: .
   ports:
    - "8080:8080"
+  environment:
+    HTTP_PORT_FRONTEND: 8080
+    FHIR_URL: https://fhir-open-api-dstu2.smarthealthit.org
+    CDS_HOOKS_URL: http://localhost:8081
   command: run-frontend
 backend:
   build: .
   ports:
    - "8081:8081"
+  environment:
+    HTTP_PORT_BACKEND: 8081
   command: run-backend
