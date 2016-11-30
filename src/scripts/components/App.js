@@ -98,8 +98,8 @@ const App = React.createClass({
 
                 <div id="bottom-bar" className="app-footer">
                   SMART Health IT —
-                  About <a href="https://github.com/jmandel/cds-hooks/wiki">CDS Hooks</a> —
-                  Rx Demo <a href="https://github.com/jmandel/cds-hooks-rx-app">source code</a>
+                  About <a href="http://cds-hooks.org">CDS Hooks</a> —
+                  Rx Demo <a href="https://github.com/cds-hooks/cds-hooks-rx-app">source code</a>
 
 
                 </div>
