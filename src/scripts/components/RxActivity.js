@@ -42,7 +42,7 @@ const RxActivity = React.createClass({
         </div>
 
         <div className="decision-spacer"></div>
-        <Cards className="card-holder" decisions={this.props.all.get('decisions')} />
+        <Cards className="card-holder" decisions={this.props.all.get('decisions')} context={this.props.all.getIn(['fhirServer', 'context'])} />
       </div>
       <FhirView {...this.props} />
     </div>
