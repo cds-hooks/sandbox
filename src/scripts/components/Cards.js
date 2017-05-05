@@ -57,6 +57,7 @@ const Cards = React.createClass({
       if (c.links) c.links.map(l => {
         if ("smart" === l.type) {
           if (l.url.indexOf("?") < 0) l.url += "?"
+          else l.url += "&"
           l.url += "fhirServiceUrl=" + this.props.context.get('baseUrl')
           l.url += "&patientId=" + this.props.context.get('patient')
         }
