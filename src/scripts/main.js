@@ -1,4 +1,4 @@
-require('!style!css!sass!../assets/stylesheets/style.scss');
+require('!style-loader!css-loader!sass-loader!../assets/stylesheets/style.scss');
 
 // TODO: Require assets here.
 // require('../assets/images/product.png');

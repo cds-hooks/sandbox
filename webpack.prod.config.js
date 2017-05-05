@@ -1,4 +1,5 @@
 var webpack = require('webpack');
+var path = require('path');
 
 module.exports = {
   node: {
@@ -10,7 +11,7 @@ module.exports = {
     ]
   },
   output: {
-    path: "./build",
+    path: path.join(__dirname, "build"),
     filename: "bundle.js"
   },
   plugins: [
@@ -27,17 +28,17 @@ module.exports = {
     loaders: [
       {
         test: /\.json?$/,
-        loader: "json"
+        loader: "json-loader"
       },
       {
         test: /\.jsx?$/,
-        loader: "babel?presets[]=react,presets[]=es2015",
+        loader: "babel-loader?presets[]=react,presets[]=es2015",
         exclude: /node_modules/
       },
 
       {
         test: /\.sass$/,
-        loader: "style!css!sass?indentedSyntax=true&outputStyle=expanded"
+        loader: "style-loader!css!sass?indentedSyntax=true&outputStyle=expanded"
       },
 
       {
@@ -57,7 +58,7 @@ module.exports = {
 
       {
         test: /\.html$/,
-        loader: "file?name=[path][name].[ext]&context=./src"
+        loader: "file-loader?name=[path][name].[ext]&context=./src"
       }
     ]
   }
