@@ -14,16 +14,17 @@ var state = Immutable.fromJS({
 });
 
 function saveHooks() {
-  window.localStorage["hooks"] = JSON.stringify(state.get('hooks'));
-  console.log("Hooks saved. To reset, run resetHooks()")
+  window.localStorage["cdsServices"] = JSON.stringify(state.get('hooks'));
+  console.log("cdsServices saved. To reset, run resetHooks()")
 }
 
 window.saveHooks = saveHooks
 window.resetHooks = resetHooks
 
 function restoreHooks() {
+  console.log("REstoring", defaultHooks)
   try {
-    var hooks = JSON.parse(window.localStorage["hooks"]);
+    var hooks = JSON.parse(window.localStorage["cdsServices"]);
     return Immutable.fromJS(hooks);
   } catch (e) {
     console.log("restore hooks from defaults", defaultHooks);
@@ -33,8 +34,8 @@ function restoreHooks() {
 ;
 
 function resetHooks() {
-  delete window.localStorage.hooks;
-  state.set('hooks', restoreHooks());
+  delete window.localStorage.cdsServices;
+  state = state.set('hooks', restoreHooks());
 }
 
 var HookStore = assign({}, EventEmitter.prototype, {
@@ -43,6 +44,7 @@ var HookStore = assign({}, EventEmitter.prototype, {
   },
 
   emitChange: function() {
+    saveHooks()
     this.emit(CHANGE_EVENT);
   },
 
@@ -66,35 +68,31 @@ var HookStore = assign({}, EventEmitter.prototype, {
 HookStore.dispatchToken = AppDispatcher.register(function(action) {
 
   switch (action.type) {
-
+    case ActionTypes.RESET_HOOKS:
+        resetHooks()
+        HookStore.emitChange()
+        break
     case ActionTypes.QUICK_ADD_HOOK:
       axios({
-        url: action.url + "-metadata",
+        url: action.url + "/cds-services",
         method: 'get',
       }).then(function(result){
-        var hook = paramsToJson(result.data, schema.metadata)
-        console.log("HOOK", hook)
-        var generated = {
-          id: action.url,
+        var services = result.data.services;
+        console.log("HOOK", services)
+        var generated = services.map(service => ({
+          id: action.url + "/cds-services/" + service.id,
+          url: action.url + "/cds-services/"+ service.id,
           enabled: true,
-          url: action.url,
-          activity: hook.activity.code,
-          preFetchTemplate: hook.preFetchTemplate  && hook.preFetchTemplate.length > 0 ? {
-            resourceType: "Bundle",
-            type: "transaction",
-            entry: hook.preFetchTemplate.map(u => ({
-              request: {
-                method: "GET",
-                url: u
-              }
-            }))
-          } : undefined
-        }
+          hook: service.hook,
+          prefetch: service.prefetch || {}
+        }))
 
-        AppDispatcher.dispatch({
-          type: ActionTypes.SAVE_HOOK,
-          id: action.url,
-          value: generated
+        generated.forEach(h => {
+          AppDispatcher.dispatch({
+            type: ActionTypes.SAVE_HOOK,
+            id: h.url,
+            value: h
+          })
         })
 
       })

@@ -8,7 +8,8 @@ const FhirView = React.createClass({
 
   getInitialState(){
     return {
-      additions: []
+      additions: [],
+      shouldHide: false
     }
   },
   shouldComponentUpdate(nextProps, nextState){
@@ -42,15 +43,23 @@ const FhirView = React.createClass({
     </div>));
     if (this.props.all.getIn(['decisions', 'fhir'])){
       return (
-        <pre className="fhir-view">
-          { output }
-        </pre>
+        <div className={this.state.shouldHide ? 'fhir-view' : 'fhir-view fhir-view-visible'}>
+          <a className="configure-fhir-view" onClick={this.clickShowHide}>Context</a>
+          <pre className={this.state.shouldHide ? 'hidden' : ''}>{output}</pre>
+
+        </div>
       );
     } else {
-      return (<pre className="fhir-view"><div className="line">(No CDS Hook <i>context resources</i> required.)</div></pre>)
+      return (<div className="fhir-view fhir-view-visible"><pre className="fhir-text"><div className="line">(No CDS Hook <i>context resources</i> required.)</div></pre></div>)
     }
-  }
+  },
 
+  clickShowHide(){
+    var state = this.state
+    state.shouldHide = !state.shouldHide
+    this.setState(state)
+    this.forceUpdate()
+  }
 
 });
 

@@ -1,3 +1,4 @@
-#!/bin/bash
-cd /app/mock-cds-backend
-nodemon index.js
+#!/bin/sh
+
+export PORT=$HTTP_PORT_BACKEND
+cd mock-cds-backend && npm run dev

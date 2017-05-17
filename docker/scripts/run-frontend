@@ -1,4 +1,3 @@
-#!/bin/bash
-cd /app
-npm run-script build
-http-server -p 8080 build/
+#!/bin/sh
+npm run build
+http-server build -p $HTTP_PORT_FRONTEND -a 0.0.0.0

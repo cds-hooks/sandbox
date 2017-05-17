@@ -7,7 +7,7 @@ var context = require('./context');
 var services = {
   'pediatric-dose-check': pediatric,
   'cms-price-check': prices,
-  'pt-hello-world': patient
+  'patient-hello-world': patient
 };
 
 var server = restify.createServer({
@@ -15,16 +15,10 @@ var server = restify.createServer({
   version: '0.0.1'
 });
 
-
 server.use(restify.bodyParser());
 server.use(function(req, res, next){
   if (req.method !== 'GET' && req._contentType.match('json\\+fhir')){
     req.body = req.body ? JSON.parse(req.body.toString()) : {}
-  }
-  res.fhirJson = function(data){
-    res.setHeader('Content-Type', 'application/json+fhir');
-    res.writeHead(200);
-    res.end(JSON.stringify(data))
   }
   next()
 })
@@ -35,20 +29,26 @@ server.on('uncaughtException', function (request, response, route, error) {
   response.end(error.toString())
 });
 
+var metas = Object.keys(services).map(function(name){
+  return services[name].description
+});
+
+server.get('cds-services', function(req, res, next){
+  return res.json({
+    services: metas
+  })
+})
+
 Object.keys(services).forEach(function(name){
   var service = services[name];
-
-  console.log("Configure", name)
-  server.get('/' + name + '/metadata', function(req, res, next){
-    console.log("Get metadata")
-    res.fhirJson(service.metadata)
+  server.post("/cds-services/"+name+"/analytics/:uuid", function(req, res, next){
+    return res.json({thanks: true});
   });
-
-  server.post(new RegExp("\\/" + name + "\\/\\$cds-hook$"), function(req, res, next){
+  server.post("/cds-services/"+name, function(req, res, next){
     console.log("Do CDS", name)
     service.service(req.body, function(err, cdsResult){
       console.log("service got", err, cdsResult)
-      res.fhirJson(cdsResult);
+      res.json(cdsResult);
       if (err){
         err = new restify.errors.InternalServerError('Request failed with ' + e);
         console.log("Err", err)
@@ -58,18 +58,11 @@ Object.keys(services).forEach(function(name){
     });
   });
 
-  server.get(new RegExp("\\/" + name + "\\/\\$cds-hook-metadata"), function(req, res, next){
-    res.fhirJson(service.hookMetadata);
-  });
-
-  server.post(new RegExp("\\/" + name + "\\/\\$cds-hook-metadata"), function(req, res, next){
-    res.fhirJson(service.hookMetadata);
-  });
 });
 
-server.get('/service/:serviceName/:reason/:activityInstance', function(req, res, next){
+server.get('/service/:serviceName/:reason/:hookInstance', function(req, res, next){
   console.log("View on", req.params.serviceName);
-  services[req.params.serviceName].view(req.params.reason, req.params.activityInstance, req, res, next);
+  services[req.params.serviceName].view(req.params.reason, req.params.hookInstance, req, res, next);
 })
 
 server.listen(process.env.PORT || 8081, function () {

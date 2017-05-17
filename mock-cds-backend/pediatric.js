@@ -1,6 +1,4 @@
 var isArray = require('util').isArray
-var getIn = require('./utils').getIn
-var paramsToJson = require('./utils').paramsToJson
 var metadata = require('./utils').metadata
 var context = require('./context')
 var fs = require('fs')
@@ -23,36 +21,16 @@ module.exports ={
   service: function(indata, cb) {
     cb(null, recommend(indata));
   }, view:  view,
-  metadata: metadata([
-      {
-        "url" : "name",
-        "valueString" : "Random grab-bag of mock services"
-      },
-      {
-        "url" : "activity",
-        "valueCoding" : {
-          "code" : "medication-prescribe",
-          "display" : "Provide information about a prescription in-progress",
-          "system" : "http://cds-hooks.smarthealthit.org/activity"
-        }
-      },
-      {
-        "url" : "preFetchOptional",
-        "valueString" : "Patient/{{Patient.id}}"
-      }
-    ])
+  description: {
+    hook: "medication-prescribe",
+    name: "Random grab-bag of mock services",
+    description: "Generate a bunch of cards for various reasons",
+    id: "pediatric-dose-check",
+    prefetch:{
+      patient: "Patient/{{Patient.id}}"
+    }
+  }
 }
-
-// TODO incorporate types here
-var callSchema = {
-  activityInstance:[0, "*", "string"],
-  activity:  [0, "*", "coding"],
-  redirect:  [0, "*", "uri"],
-  context:   [0, "*", "resource"],
-  preFetchData: [0, 1, "resource"]
-};
-
-
 
 var _db = {};
 // recommending means returning a set of "card"s, each with a summary, set of suggestions and a set of links.
@@ -60,10 +38,7 @@ var _db = {};
 function view(reason, sid, req, res, next){
   var inData = _db[sid].inData;
   var med = inData.context[0];
-  var patient = inData.preFetchData.entry.filter(function(e){
-    return e.resource.resourceType === "Patient"
-  })[0].resource;
-
+  var patient = inData.prefetch.patient.resource;
 
   var context = {
     "Patient.name": patient.name[0].given.join(" ") + " " + patient.name[0].family.join(" "),
@@ -82,122 +57,84 @@ function view(reason, sid, req, res, next){
 }
 
 function assessJNC(inData, response) {
-  inData = paramsToJson(inData, callSchema);
   var med = inData.context[0];
-  var activityInstance = inData.activityInstance;
+  var hookInstance = inData.hookInstance;
   var redirect = inData.redirect;
   if (!med.reasonCodeableConcept) return;
   var reason = med.reasonCodeableConcept.text;
 
   if (!reason.match(/hypertension|blood pressure|HTN/i)){
-    return 
+    return
   }
 
-  _db[activityInstance] = _db[activityInstance] || {}
-  _db[activityInstance].redirect = redirect
-  _db[activityInstance].inData = inData
+  _db[hookInstance] = _db[hookInstance] || {}
+  _db[hookInstance].redirect = redirect
+  _db[hookInstance].inData = inData
 
-  if (!_db[activityInstance]["startedjnc8"]){
-    response.parameter.push( {
-      "name": "card",
-      "part": [{
-        "name": "summary",
-        "valueString": "JNC 8 guidelines apply",
-      },{
-        "name": "source",
-        "part": [{
-          "name": "label",
-          "valueString": "Joint National Commission",
-        }]
-      },{
-        "name": "indicator",
-        "valueCode": "info",
-      }, {
-        "name": "link",
-        "part": [{
-          "name": "label",
-          "valueString": "Tailor therapy with JNC Pro"
-        }, {
-          "name": "url",
-          "valueString": context.url + "/service/pediatric-dose-check/jnc8/" + activityInstance
-        }]
+  if (!_db[hookInstance]["startedjnc8"]){
+    response.cards.push( {
+      summary: "JNC 8 guidelines apply",
+      source: "Joint National Commission",
+      indicator: "info",
+      links: [{
+        label: "Tailor therapy with JNC Pro",
+        url: context.url + "/service/pediatric-dose-check/jnc8/" + hookInstance
       }]
     })
   } else {
-    if (!_db[activityInstance].sentJnc8Decision) {
-      _db[activityInstance].sentJnc8Decision = true;
-      response.parameter.push({
-        "name": "decision",
-        "part": [{
-          "name": "delete",
-          "valueString": "old-id" // TODO populate with temp id of the thing to replace
-        }, {
-          "name": "create",
-          "resource": {
-            "resourceType": "MedicationOrder",
-            "startDate": "2015-09-17",
-            "endDate": "2015-10-17",
-            "status": "draft",
-            "patient": {
-              "reference": "Patient/example"
-            },
-            "reasonCodeableConcept": med.reasonCodeableConcept,
-            "medicationCodeableConcept": {
-              "text": "Hydrochlorothiazide 12.5 MG Oral Capsule",
-              "coding": [
-                {
-                  "display": "Hydrochlorothiazide 12.5 MG Oral Capsule",
-                  "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
-                  "code": "199903"
-                }
-              ]
-            },
-            "dosageInstruction": [
+    if (!_db[hookInstance].sentJnc8Decision) {
+      _db[hookInstance].sentJnc8Decision = true;
+      response.decisions.push({
+        "delete": "old-id",
+        "create": [{
+          "resourceType": "MedicationOrder",
+          "startDate": "2015-09-17",
+          "endDate": "2015-10-17",
+          "status": "draft",
+          "patient": {
+            "reference": "Patient/example"
+          },
+          "reasonCodeableConcept": med.reasonCodeableConcept,
+          "medicationCodeableConcept": {
+            "text": "Hydrochlorothiazide 12.5 MG Oral Capsule",
+            "coding": [
               {
-                "doseQuantity": {
-                  "value": 1,
-                  "system": "http://unitsofmeasure.org",
-                  "code": "{pill}"
-                },
-                "timing": {
-                  "repeat": {
-                    "frequency": 1,
-                    "period": 1,
-                    "periodUnits": "d"
-                  }
-                }
+                "display": "Hydrochlorothiazide 12.5 MG Oral Capsule",
+                "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+                "code": "199903"
               }
             ]
-          }
+          },
+          "dosageInstruction": [
+            {
+              "doseQuantity": {
+                "value": 1,
+                "system": "http://unitsofmeasure.org",
+                "code": "{pill}"
+              },
+              "timing": {
+                "repeat": {
+                  "frequency": 1,
+                  "period": 1,
+                  "periodUnits": "d"
+                }
+              }
+            }
+          ]
         }]
-      })
+      });
+      response.cards.push({
+        summary: "Managing with JNC Pro",
+        source: {
+          label: "Joint National Commission"
+        },
+        indicator: "success",
+        links: [{
+          label: "Tailor therapy",
+          url: context.url + "/service/pediatric-dose-check/jnc8/" + hookInstance
+        }]
+      });
     }
-    response.parameter.push({
-      "name": "card",
-      "part": [{
-        "name": "summary",
-        "valueString": "Managing with JNC Pro",
-      },{
-        "name": "source",
-        "part": [{
-          "name": "label",
-          "valueString": "Joint National Commission",
-        }]
-      },{
-        "name": "indicator",
-        "valueCode": "success",
-      }, {
-        "name": "link",
-        "part": [{
-          "name": "label",
-          "valueString": "Tailor therapy"
-        }, {
-          "name": "url",
-          "valueString": context.url + "/service/pediatric-dose-check/jnc8/" + activityInstance
-        }]
-      }]
-    });
-
   }
 }
 
@@ -205,9 +142,8 @@ function assessJNC(inData, response) {
 
 
 function assessHarvoni(inData, cards) {
-  inData = paramsToJson(inData, callSchema);
   var med = inData.context[0];
-  var activityInstance = inData.activityInstance;
+  var hookInstance = inData.hookInstance;
   var redirect = inData.redirect;
   if (! med.medicationCodeableConcept) return;
   var drugName = med.medicationCodeableConcept.text;
@@ -215,108 +151,37 @@ function assessHarvoni(inData, cards) {
     return 
   }
 
-  _db[activityInstance] = _db[activityInstance] || {}
-  _db[activityInstance].redirect = redirect
-  _db[activityInstance].inData = inData
-  if (_db[activityInstance].startedharvoni){
-    cards.parameter.push( {
-      "name": "card",
-      "part": [{
-        "name": "summary",
-        "valueString": "Prior authorization in process",
-      },{
-        "name": "source",
-        "part": [{
-          "name": "label",
-          "valueString": "CareMore PBM",
-        }]
-      },{
-        "name": "indicator",
-        "valueCode": "success",
-      }, {
-        "name": "link",
-        "part": [{
-          "name": "label",
-          "valueString": "View status"
-        }, {
-          "name": "url",
-          "valueUri": context.url + "/service/pediatric-dose-check/harvoni/" + activityInstance
-        }]
+  _db[hookInstance] = _db[hookInstance] || {}
+  _db[hookInstance].redirect = redirect
+  _db[hookInstance].inData = inData
+  if (_db[hookInstance].startedharvoni){
+    cards.cards.push( {
+      summary: "Prior authorization in process",
+      source: {
+        label: "CareMore PBM",
+      },
+      indicator: "success",
+      links: [{
+        label: "View status",
+        url: context.url + "/service/pediatric-dose-check/harvoni/" + hookInstance
       }]
     })
   } else {
-
-
-
-    cards.parameter.push({
-      "name": "card",
-      "part": [{
-        "name": "summary",
-        "valueString": "Harvoni requires prior authorization",
-      },{
-        "name": "source",
-        "part": [{
-          "name": "label",
-          "valueString": "CareMore PBM",
-        }]
-      } ,{
-        "name": "indicator",
-        "valueCode": "warning",
-      },{
-        "name": "link",
-        "part": [{
-          "name": "label",
-          "valueString": "Begin prior auth process"
-        }, {
-          "name": "url",
-          "valueUri": context.url + "/service/pediatric-dose-check/harvoni/" + activityInstance
-        }]
+    cards.cards.push({
+      summary: "Harvoni requires prior authorization",
+      source: {
+        label: "CareMore PBM",
+      },
+      indicator: "warning",
+      links: [{
+        label: "Begin prior auth process",
+        url: context.url + "/service/pediatric-dose-check/harvoni/" + hookInstance
       }]
     });
-
-  }
-
-}
-
-function assessDones() {
-  return {
-    "name": "card",
-    "part": [{
-      "name": "summary",
-      "valueString": "Dose is high (>99.9th percentile)",
-    }, {
-      "name": "suggestion",
-      "part": [{
-        "name": "label",
-        "valueString": "5 mg daily"
-      }, {
-        "name": "create",
-        "resource": lowerDose
-      }]
-    }, {
-      "name": "suggestion",
-      "part": [{
-        "name": "label",
-        "valueString": "10 mg daily"
-      }, {
-        "name": "create",
-        "resource": lowerDose
-      }]
-    }, {
-      "name": "link",
-      "part": [{
-        "name": "label",
-        "valueString": "View prescribing trends"
-      }, {
-        "name": "url",
-        "valueUri": "https://www.cms.gov/Newsroom/MediaReleaseDatabase/Fact-sheets/2015-Fact-sheets-items/2015-04-30.html"
-      }]
-    }]
   }
 }
 
 function assessGenetics(inData, cards) {
-  inData = paramsToJson(inData, callSchema);
   var med = inData.context[0];
   if (! med.medicationCodeableConcept) return;
   var drugName = med.medicationCodeableConcept.text;
@@ -342,47 +207,28 @@ function assessGenetics(inData, cards) {
   **Evidence**:\n\
   <img src="http://www.biomedcentral.com/content/figures/1471-2350-12-118-2-l.jpg" width="500px"/>';
 
-  cards.parameter.push({
-    "name": "card",
-    "part": [{
-      "name": "summary",
-      "valueString": summary,
-    },{
-      "name": "source",
-      "part": [{
-        "name": "label",
-        "valueString": "PharmGKB",
-      }]
-    },{
-      "name": "indicator",
-      "valueCode": "danger",
-    }, {
-      "name": "detail",
-      "valueString": detail
-    },{
-      "name": "link",
-      "part": [{
-        "name": "label",
-        "valueString": "View PharmGKB Guidelines"
-      }, {
-        "name": "url",
-        "valueUri": "https://www.pharmgkb.org/drug/PA448320#PA166105003"
-      }]
+  cards.cards.push({
+    summary: summary,
+    source: {
+      label: "PharmGKB",
+    },
+    indicator: "danger",
+    detail: detail,
+    links: [{
+      label: "View PharmGKB Guidelines",
+      url: "https://www.pharmgkb.org/drug/PA448320#PA166105003"
     }]
   });
 }
 
-
 function recommend(data) {
-  var lowerDose = getIn(data, 'context')[0]["resource"];
+  var lowerDose = data.context[0]
   var ret = {
-    "resourceType": "Parameters",
-    "parameter": [
-    ]
+    cards: [],
+    decisions: []
   }
   assessHarvoni(data, ret)
   assessJNC(data, ret)
   assessGenetics(data, ret)
   return ret;
 }
-

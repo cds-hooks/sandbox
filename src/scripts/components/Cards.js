@@ -24,6 +24,7 @@ var indicators = {
 const Cards = React.createClass({
   componentWillReceiveProps(nextProps) {},
   takeSuggestion(suggestion) {
+    console.log("TAke", suggestion);
     AppDispatcher.dispatch({
       type: ActionTypes.TAKE_SUGGESTION,
       suggestion: suggestion
@@ -59,13 +60,13 @@ const Cards = React.createClass({
         {source(c.source)}
         {c.detail && <ReactMarkdown softBreak="br" source={c.detail}/>}
         <div>
-        {c.suggestion.map(l => (
+        {c.suggestions.map(l => (
       <button key={l.key} onClick={e => this.takeSuggestion(l)} className="btn btn-wired btn-sm">
             <span className="glyphicon glyphicon-edit" aria-hidden="true"></span>
             {l.label}</button>
       ))}
-          {c.link.map(l => (
-      <a key={l.key} onClick={e => this.launchService(e, l.url)} target="_blank" href={l.url}>
+          {c.links.map(l => (
+      <a key={l.key} className="source-link" onClick={e => this.launchService(e, l.url)} target="_blank" href={l.url}>
               <span className="glyphicon glyphicon-link" aria-hidden="true"></span>
               {l.label}</a>
       ))}

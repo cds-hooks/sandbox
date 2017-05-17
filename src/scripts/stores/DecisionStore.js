@@ -18,38 +18,12 @@ var DELAY = 0; // no delay to apply hooks
 HookStore.addChangeListener(_hooksChanged)
 FhirServerStore.addChangeListener(_hooksChanged)
 
-var decisionSchema = {
-  'decision': [0, '*', {
-    'create': [0, '*', 'resource'],
-    'delete': [0, '*', 'id']
-  }],
-  'card': [0, '*', {
-    'summary': [1, 1, 'string'],
-    'source': [1, 1, {
-      'label': [1, 1, 'string'],
-      'url': [0, 1, 'uri']
-    }],
-    'detail': [0, 1, 'string'],
-    'indicator': [1, 1, 'code'],
-    'suggestion': [0, '*', {
-      'label': [1, 1, 'string'],
-      'create': [0, '*', 'resource'],
-      'delete': [0, '*', 'id']
-    }],
-    'link': [0, '*', {
-      'label': [1, 1, 'string'],
-      'url': [1, 1, 'uri']
-    }]
-  }]
-};
-
 var CHANGE_EVENT = 'change'
 var state = Immutable.fromJS({
   calling: false,
   cards: []
 })
 
-var preFetchData = Promise.resolve({})
 function getFhirContext() {
   var c = FhirServerStore.getState().get('context');
   return c.set('Patient.id', c.get('patient')).toJS()
@@ -67,52 +41,64 @@ function _externalAppReturned() {
 
 function _hooksChanged() {
   var context = getFhirContext()
-  console.log("Eval hooks changed in context", context)
-  var hooks = HookStore.getState().get('hooks').filter((v,k) => 
-    HookStore.getState().getIn(['hooks', k, 'enabled'])
-  )
+  var hooks = HookStore.getState().get('hooks').filter((v,k) => v.get('enabled'))
+  var patient = FhirServerStore.getState().getIn(['context', 'patient']);
+
+  var samePatient = patient === state.get('patient')
+  var sameHooks = hooks.equals(state.get('hooks'))
+
+  if (samePatient && sameHooks) {
+    return;
+  }
 
   var hookNames = hooks.keySeq()
+  console.log("Eval hooks changed in context", context)
   console.log("HN", hookNames.count());
 
   state = state.set('cards', Immutable.fromJS([]));
   state = state.set('hooks', hooks)
+  state = state.set('patient', patient)
 
-  var hooksToFetch = hooks.valueSeq().filter(h => h.get('preFetchTemplate'));
+  var response = (url, r) => [
+    url,
+    {
+      resource: r.data,
+      response: {
+        status: r.status + " " + r.statusText
+      }
+    }
+  ]
 
-  var hookFetches = hooksToFetch
-  .map(h => axios({
-    url: context.baseUrl,
-    method: 'post',
-    data: fillTemplate(h.get('preFetchTemplate'), context)
-  })
-      ).toJS()
+  var prefetch = hooks
+    .reduce((coll, v)=> coll.union(
+      v.get('prefetch', Immutable.Map())
+       .valueSeq()),
+      Immutable.Set())
+    .map(url => [
+      url,
+      axios({
+        url: context.baseUrl + '/' + fillTemplate(url, context),
+        method: 'get'
+      })
+    ])
+    .map(([url, p]) => p
+         .then(r => response(url, r))
+         .catch(r => response(url, r)))
 
+  state = state.set('prefetch', Promise
+    .all(prefetch)
+    .then(Immutable.Map))
 
-      state = state.set('preFetchData', Promise.all(hookFetches)
-                        .then(preFetchResults => preFetchResults.reduce(
-                          (coll, r, i) => coll.set(hooksToFetch.get(i).get('url'), r.data),
-                            Immutable.fromJS({}))
-
-
-                             ))
-
-                             console.log("Pending prefetc")
-                             callHooks(state)
+  callHooks(state);
 }
 
 
-// 
-// ActivityGenerators call:
-// DecisionStore.setActivityState({'activity': 'medication-prescribe', 'fhir', {resource})
-// which proparges to the DecisionStore state.
-// and calls the hooks, filtered on activity match.
-var _activityUuid = uuid.v4()
+var _hookUuid = uuid.v4()
 
 var idService = {
   createIds() {
     return {
-      activityInstance: _activityUuid
+      hookInstance: _hookUuid
     }
   }
 }
@@ -122,42 +108,22 @@ if (!_base.match(/.*\//)) {
   _base += "/";
 }
 
-function hookBody(h, fhir, preFetchData) {
+function hookBody(h, fhir, prefetch) {
   var ids = idService.createIds()
   var ret = {
-    "resourceType": "Parameters",
-    "parameter": [{
-      "name": "activity",
-      "valueCoding": {
-        "system": "http://cds-hooks.smarthealthit.org/activity",
-        "code": state.get('activity')
-      }
-    }, {
-      "name": "activityInstance",
-      "valueString": ids.activityInstance
-    }, {
-      "name": "fhirServer",
-      "valueUri": FhirServerStore.getState().getIn(['context', 'baseUrl'])
-    }, {
-      "name": "redirect",
-      "valueString": _base + "service-done.html"
-    }, {
-      "name": "user",
-      "valueString": "Practitioner/example"
-    }, {
-      "name": "patient",
-      "valueId": FhirServerStore.getState().getIn(['context', 'patient'])
-    }, {
-      "name": "preFetchData",
-      "resource": preFetchData
-    }]
+    hook: h.get('hook'),
+    hookInstance: ids.hookInstance,
+    fhirServer: FhirServerStore.getState().getIn(['context', 'baseUrl']),
+    redirect: _base + "service-done.html",
+    user: "Practitioner/example",
+    patient: state.get('patient'),
+    prefetch: h.get('prefetch', Immutable.Map())
+               .map(v => prefetch.get(v)),
+    context: []
   }
   if (fhir)
-    ret.parameter.push({
-      "name": "context",
-      "resource": fhir
-    });
-    return ret;
+    ret.context.push(fhir);
+  return ret;
 }
 
 var cardKey = 0
@@ -170,23 +136,28 @@ function addCardsFrom(callCount, hookUrl, result) {
   }
 
   state = state.set('calling', false)
-  var result = paramsToJson(result.data, decisionSchema)
+  var result = result.data
   console.log("3 addCardsFrom", result)
-  var decision = result.decision
-  if (decision && decision.length > 0) {
+  var decisions = result.decisions
+  if (decisions && decisions.length > 0) {
     AppDispatcher.dispatch({
       type: ActionTypes.TAKE_SUGGESTION,
       suggestion: {
-        create: decision[0].create
+        create: decisions[0].create
       }
     })
   }
 
-  var cards = result.card || []
-  cards = Immutable.fromJS(cards).map((v, k) => v.set('key', cardKey++)
-                                      .set('suggestion', v.get('suggestion').map(s => s.set("key", cardKey++)))
-                                      .set('link', v.get('link').map(s => s.set("key", cardKey++)))
-                                     ).toJS()
+  var cards = result.cards || []
+  console.log("Got cards", cards);
+  cards = Immutable.fromJS(cards)
+                   .map((v, k) => v.set('key', cardKey++)
+                                   .set('suggestions', v.get('suggestions', []).map(s => s
+                                       .set("key", cardKey++)
+                                       .set("suggestionUrl", hookUrl + "/analytics/" + s.get("uuid"))))
+                                   .set('links', v.get('links', []).map(s => s
+                                       .set("key", cardKey++))
+                                    )).toJS()
                                      console.log("Added as", cards)
                                      var newCards = state.get('cards').push(...cards)
                                      state = state.set('cards', newCards)
@@ -203,7 +174,7 @@ function callHooks(localState) {
 
   var applicableServices = localState
   .get('hooks')
-  .filter((h, hookUrl) => h.get('activity') === localState.get('activity'))
+  .filter((h, hookUrl) => h.get('hook') === localState.get('hook'))
 
   if (applicableServices.count() == 0) {
     console.log("no applicable services")
@@ -213,17 +184,15 @@ function callHooks(localState) {
   }
 
 
-  localState.get('preFetchData').then((preFetchData) => {
-
+  localState.get('prefetch').then((prefetch) => {
     var results = applicableServices.map((h, hookUrl) => axios({
       url: h.get('url'),
       method: 'post',
-      data: hookBody(
-        h,
-        localState.get('fhir') && localState.get('fhir').toJS(),
-        preFetchData.get(h.get('url'))),
+      data: hookBody(h,
+                     localState.get('fhir') && localState.get('fhir').toJS(),
+                     prefetch),
         headers: {
-          'Content-Type': 'application/json+fhir'
+          'Content-Type': 'application/json'
         }
     }))
     .forEach((p, hookUrl) => p.then(result => addCardsFrom(myCallCount, hookUrl, result)))
@@ -238,16 +207,16 @@ var DecisionStore = assign({}, EventEmitter.prototype, {
     return state
   },
 
-  setActivity: function(activity) {
-    console.log("Set activity", activity)
-    state = state.merge(_stores[activity].getState())
-    state.get('activityStore').processChange()
-    console.log("PC", state.get('activityStore').processChange)
+  setActivity: function(hook) {
+    console.log("Set hook", hook)
+    state = state.merge(_stores[hook].getState())
+    state.get('hookStore').processChange()
+    console.log("PC", state.get('hookStore').processChange)
     DecisionStore.emitChange()
   },
 
-  setActivityState: function(activity, resource) {
-    if (activity !== state.get('activity')) {
+  setActivityState: function(hook, resource) {
+    if (hook !== state.get('hook')) {
       return;
     }
 
@@ -260,7 +229,7 @@ var DecisionStore = assign({}, EventEmitter.prototype, {
 
   getStateToPublish: function() {
     return {
-      activity: state.get("activity")
+      hook: state.get("hook")
     }
   },
 
@@ -293,16 +262,25 @@ DecisionStore.dispatchToken = AppDispatcher.register(function(action) {
           _externalAppReturned()
           break
 
+      case ActionTypes.TAKE_SUGGESTION:
+          if (action.suggestion.uuid){
+            axios({
+              url: action.suggestion.suggestionUrl,
+              method: 'post'
+            })
+          }
+          break
+
       case ActionTypes.LOADED:
           break
 
       case ActionTypes.SET_ACTIVITY:
-          DecisionStore.setActivity(action.activity)
+          DecisionStore.setActivity(action.hook)
           break
 
       case ActionTypes.NEW_HASH_STATE:
           var hash = action.hash
-          DecisionStore.setActivity(hash.activity || 'medication-prescribe')
+          DecisionStore.setActivity(hash.hook || 'medication-prescribe')
           break
 
       default:
