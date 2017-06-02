@@ -280,7 +280,7 @@ DecisionStore.dispatchToken = AppDispatcher.register(function(action) {
 
       case ActionTypes.NEW_HASH_STATE:
           var hash = action.hash
-          DecisionStore.setActivity(hash.hook || 'medication-prescribe')
+          DecisionStore.setActivity(hash.hook || 'patient-view')
           break
 
       default:

@@ -79,8 +79,8 @@ const App = React.createClass({
         <div id="top-bar" className="app-header">
           <span className="header-brand"><i className="glyphicon glyphicon-flash"></i> <span className="brand-cds">CDS Hooks</span> Sandbox</span>
           <div className="header-nav">
-            <a className={rxClass} onClick={e=>this.setActivity("medication-prescribe")}>Rx View</a>
             <a className={ptClass} onClick={e=>this.setActivity("patient-view")}>Patient View</a>
+            <a className={rxClass} onClick={e=>this.setActivity("medication-prescribe")}>Rx View</a>
             <a className="nav-button change-patient" onClick={this.changePatient}>Change Patient</a>
           </div>
         </div>
@@ -88,22 +88,18 @@ const App = React.createClass({
         <HookEditor hooks={this.state.all.getIn(['hooks', 'hooks'])} editing={this.state.all.getIn(['hooks', 'editing'])} />
 
         {
-          hook === 'medication-prescribe' &&
-            <RxActivity all={this.state.all}/>
-            }
-            {
-              hook === 'patient-view' &&
-                <PatientViewActivity all={this.state.all}/>
-                }
+          hook === 'medication-prescribe' && <RxActivity all={this.state.all}/>
+        }
+        {
+          hook === 'patient-view' && <PatientViewActivity all={this.state.all}/>
+        }
 
-                <div id="bottom-bar" className="app-footer">
-                  SMART Health IT —
-                  About <a href="http://cds-hooks.org">CDS Hooks</a> —
-                  Sandbox <a href="https://github.com/cds-hooks/sandbox">source code</a>
-
-
-                </div>
-              </div>
+        <div id="bottom-bar" className="app-footer">
+          SMART Health IT —
+          About <a href="http://cds-hooks.org">CDS Hooks</a> —
+          Sandbox <a href="https://github.com/cds-hooks/sandbox">source code</a>
+        </div>
+      </div>
     )
   }
 });
