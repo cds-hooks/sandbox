@@ -246,6 +246,10 @@ pre {
 
 /* Components
 ====================================================================================== */
+.remove-display {
+  display: none;
+}
+
 .order-entry {
   display: table-cell;
   padding: 30px;

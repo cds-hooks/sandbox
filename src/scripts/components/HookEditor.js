@@ -2,6 +2,7 @@ import React from 'react';
 import AppDispatcher from '../dispatcher/AppDispatcher';
 import ActionTypes from '../actions/ActionTypes';
 import striptags from 'striptags';
+import {Modal, Button, Alert} from 'react-bootstrap';
 
 const OneHook = React.createClass({
   getInitialState() {
@@ -89,8 +90,37 @@ const OneHook = React.createClass({
 });
 
 const HookEditor = React.createClass({
+  getInitialState() {
+    return {
+      showModal: false,
+      showUrlBannerError: false,
+      discoveryEndpoint: '',
+      isNewInputWindow: true,
+    };
+  },
   componentWillReceiveProps(nextProps) {},
+  showModal() {
+    this.setState({showModal: true});
+  },
+  hideModal() {
+    this.setState({showModal: false});
+    this.setState({isNewInputWindow: true});
+  },
+  handleChange(event) {
+    this.setState({discoveryEndpoint: event.target.value.toString().trim() });
+  },
+  isValidDiscoveryEndpoint() {
+    var url = this.state.discoveryEndpoint;
+    var endpoint = "/cds-services";
+    if (url.length < endpoint.length) return false;
 
+    // Check if the url ends with the '/cds-services' endpoint
+    return url.lastIndexOf(endpoint) === (url.length - endpoint.length);
+  },
+  hideAlert() {
+    if (this.state.isNewInputWindow) return 'remove-display';
+    return this.state.showUrlBannerError ? '' : 'remove-display';
+  },
   render() {
 
     var edit = (
@@ -102,7 +132,7 @@ const HookEditor = React.createClass({
     );
 
     var add = (
-      <a className='configure-hooks' onClick={this.addHook}><i className="glyphicon glyphicon-plus"></i>Quick Add</a>
+      <a className='configure-hooks' onClick={this.showModal}><i className="glyphicon glyphicon-plus"></i>Add CDS Service</a>
     );
 
     var current = this.props.editing && this.props.hooks.map((h, hname) => <OneHook key={h.get('id')} hook={h.toJS()}/>).valueSeq().toJS() || [];
@@ -115,6 +145,32 @@ const HookEditor = React.createClass({
 
       return (<div id="hook-container" className="hook-editor">
         <span className="hook-buttons"> {add}{reset}{edit}</span>
+        <Modal show={this.state.showModal} onHide={this.hideModal}>
+          <Modal.Header closeButton>
+            <Modal.Title>Add CDS Service</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Alert bsStyle="danger" className={this.hideAlert()}>
+              <i className="glyphicon glyphicon-exclamation-sign" /> <strong>Invalid endpoint: </strong>URL must end at <i>/cds-services</i>
+            </Alert>
+            <div className="input-container">
+              <label>Discovery Endpoint URL:</label>
+              <input className="form-control"
+                     autofocus={true}
+                     placeholder={"https://example-service.com/cds-services"}
+                     type="text"
+                     onChange={this.handleChange}
+              />
+            </div>
+            <div>
+              <i>Note: See <a href='http://cds-hooks.org/#discovery'>documentation</a> for more details regarding the Discovery endpoint.</i>
+            </div>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button bsStyle="primary" onClick={this.addHook}>Save</Button>
+            <Button onClick={this.hideModal}>Close</Button>
+          </Modal.Footer>
+        </Modal>
         {current}
       </div>);
   },
@@ -125,11 +181,18 @@ const HookEditor = React.createClass({
   },
 
   addHook(){
-    var url = prompt("CDS Service Provider URL");
-    AppDispatcher.dispatch({
-      type: ActionTypes.QUICK_ADD_HOOK,
-      url: url
-    })
+    this.setState({isNewInputWindow: false});
+    if (this.isValidDiscoveryEndpoint()) {
+      this.hideModal();
+      this.setState({showUrlBannerError: false});
+      AppDispatcher.dispatch({
+        type: ActionTypes.QUICK_ADD_HOOK,
+        url: this.state.discoveryEndpoint
+      });
+      this.setState({discoveryEndpoint: ''});
+    } else {
+      this.setState({showUrlBannerError: true});
+    }
   },
 
  startEditing() {

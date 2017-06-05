@@ -5,5 +5,6 @@ require('!style!css!sass!../assets/stylesheets/style.scss');
 
 import App from './components/App.js';
 import React from 'react';
+import ReactDOM from 'react-dom';
 
-React.render(<App/>, document.getElementById('react-wrapper'));
+ReactDOM.render(<App/>, document.getElementById('react-wrapper'));
