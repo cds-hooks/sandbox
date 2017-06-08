@@ -77,7 +77,7 @@ const App = React.createClass({
     return (
       <div id="react-content">
         <div id="top-bar" className="app-header">
-          <span className="header-brand"><i className="glyphicon glyphicon-flash"></i> <span className="brand-cds">CDS Hooks</span> Demo</span>
+          <span className="header-brand"><i className="glyphicon glyphicon-flash"></i> <span className="brand-cds">CDS Hooks</span> Sandbox</span>
           <div className="header-nav">
             <a className={rxClass} onClick={e=>this.setActivity("medication-prescribe")}>Rx View</a>
             <a className={ptClass} onClick={e=>this.setActivity("patient-view")}>Patient View</a>
@@ -99,7 +99,7 @@ const App = React.createClass({
                 <div id="bottom-bar" className="app-footer">
                   SMART Health IT —
                   About <a href="http://cds-hooks.org">CDS Hooks</a> —
-                  Rx Demo <a href="https://github.com/cds-hooks/cds-hooks-rx-app">source code</a>
+                  Sandbox <a href="https://github.com/cds-hooks/sandbox">source code</a>
 
 
                 </div>

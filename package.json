@@ -1,5 +1,5 @@
 {
-  "name": "rx",
+  "name": "cds-hooks-sandbox",
   "version": "0.0.0",
   "description": "A React/Flux app generate by RF, powered with Babel",
   "main": "build/bundle.js",
@@ -40,8 +40,8 @@
     "sass-loader": "*",
     "style-loader": "*",
     "url-loader": "*",
-    "webpack": "*",
-    "webpack-dev-server": "*"
+    "webpack": "^1.13.3",
+    "webpack-dev-server": "^1.16.2"
   },
   "scripts": {
     "build": "webpack -p --config webpack.prod.config.js",

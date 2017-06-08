@@ -1,6 +1,6 @@
 # Try it out
 
-Live demo at http://demo.cds-hooks.org
+Live demo at http://cds-hooks.org/sandbox
 
 # Develop it
 

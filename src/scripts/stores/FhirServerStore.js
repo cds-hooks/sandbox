@@ -145,7 +145,7 @@ FhirServiceStore.dispatchToken = AppDispatcher.register(function(action) {
 import querystring from 'querystring'
 var qs = querystring.parse(window.location.search.slice(1))
 var fhirContext = {
-  patient: qs.patientId || "1288992",
+  patient: qs.patientId || "SMART-1288992",
   baseUrl: qs.fhirServiceUrl || runtime.FHIR_URL
 }
 
