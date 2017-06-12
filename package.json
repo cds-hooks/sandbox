@@ -20,6 +20,7 @@
     "react-dom": "^0.14.9",
     "react-markdown": "^1.0.3",
     "request-promise": "^0.4.3",
+    "restify": "^4.3.0",
     "striptags": "^2.0.3"
   },
   "devDependencies": {
@@ -38,6 +39,7 @@
     "jest-cli": "*",
     "jquery": "*",
     "node-sass": "*",
+    "nodemon": "^1.11.0",
     "react-bootstrap": "^0.31.0",
     "react-hot-loader": "*",
     "react-tools": "*",
@@ -49,7 +51,8 @@
   },
   "scripts": {
     "build": "webpack -p --config webpack.prod.config.js",
-    "dev": "webpack-dev-server --host 0.0.0.0 --config webpack.dev.config.js --colors --content-base ./build",
+    "dev-frontend": "webpack-dev-server --host 0.0.0.0 --config webpack.dev.config.js --colors --content-base ./build",
+    "dev-services": "nodemon mock-cds-backend/index.js",
     "test": "jest"
   },
   "author": "",
