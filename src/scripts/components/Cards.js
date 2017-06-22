@@ -37,8 +37,6 @@ const Cards = React.createClass({
   },
 
   render() {
-    console.log(this.props.decisions.get('cards').toJSON())
-
     function source(s) {
       if (!s || !s.label) return
 

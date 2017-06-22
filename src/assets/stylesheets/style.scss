@@ -703,6 +703,18 @@ table.drug-choice {
   direction: rtl;
 }
 
+.patient-modal-divider {
+  width: 100%;
+  text-align: center;
+  border-bottom: 2px solid #ddd;
+  line-height: 0.1em;
+  margin: 40px 0 30px;
+
+  span {
+    background: #ffffff;
+    padding: 0 5px;
+  }
+}
 
 @media (max-width: 767px) {
 

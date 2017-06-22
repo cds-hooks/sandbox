@@ -63,6 +63,19 @@ function _fetchData() {
 
 }
 
+function _checkValidPatient(patientID, dfd) {
+  _client.read({
+    type: 'Patient',
+    id: patientID
+  }).then(response => {
+    return dfd.resolve(response.status);
+  }).catch(response => {
+    console.log("Error fetching patient", response);
+    return dfd.resolve(response.status);
+  })
+  return dfd.promise();
+}
+
 
 var state = Immutable.fromJS({
   "context": {
@@ -101,6 +114,9 @@ var FhirServiceStore = assign({}, EventEmitter.prototype, {
       .filter(c=> c.coding[0].code === state.get('selection'))
     if (match.length > 0)
       return match[0]
+  },
+  checkPatientResponse(patientID, dfd) {
+   return _checkValidPatient(patientID, dfd)
   },
 
   emitChange: function() {
