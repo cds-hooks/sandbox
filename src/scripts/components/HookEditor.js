@@ -94,16 +94,16 @@ const HookEditor = React.createClass({
   render() {
 
     var edit = (
-      <a className='configure-hooks' onClick={this.startEditing}><i className="glyphicon glyphicon-cog"></i> Configure Hooks</a>
-    )
+      <a className='configure-hooks' onClick={this.startEditing}><i className="glyphicon glyphicon-cog"></i> Configure CDS Services</a>
+    );
 
     var reset = (
       <a className='configure-hooks' onClick={this.resetHooks}><i className="glyphicon glyphicon-leaf"></i>Reset</a>
-    )
+    );
 
     var add = (
       <a className='configure-hooks' onClick={this.addHook}><i className="glyphicon glyphicon-plus"></i>Quick Add</a>
-    )
+    );
 
     var current = this.props.editing && this.props.hooks.map((h, hname) => <OneHook key={h.get('id')} hook={h.toJS()}/>).valueSeq().toJS() || [];
 
@@ -140,7 +140,7 @@ const HookEditor = React.createClass({
       })
     } else {
       document.getElementById("hook-container").classList.remove("editor-open");
-    }  
+    }
     return AppDispatcher.dispatch({
       type: ActionTypes.SAVE_HOOK,
       discard: true
