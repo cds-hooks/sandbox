@@ -74,26 +74,27 @@ HookStore.dispatchToken = AppDispatcher.register(function(action) {
         break
     case ActionTypes.QUICK_ADD_HOOK:
       axios({
-        url: action.url + "/cds-services",
+        url: action.url,
         method: 'get',
       }).then(function(result){
-        var services = result.data.services;
-        console.log("HOOK", services)
-        var generated = services.map(service => ({
-          id: action.url + "/cds-services/" + service.id,
-          url: action.url + "/cds-services/"+ service.id,
-          enabled: true,
-          hook: service.hook,
-          prefetch: service.prefetch || {}
-        }))
+        if (result && result.hasOwnProperty('data') && result.data.hasOwnProperty('services')) {
+          var services = result.data.services;
+          var generated = services.map(service => ({
+            id: action.url + "/" + service.id,
+            url: action.url + "/"+ service.id,
+            enabled: true,
+            hook: service.hook,
+            prefetch: service.prefetch || {}
+          }));
 
-        generated.forEach(h => {
-          AppDispatcher.dispatch({
-            type: ActionTypes.SAVE_HOOK,
-            id: h.url,
-            value: h
-          })
-        })
+          generated.forEach(h => {
+            AppDispatcher.dispatch({
+              type: ActionTypes.SAVE_HOOK,
+              id: h.url,
+              value: h
+            })
+          });
+        }
 
       })
       break;

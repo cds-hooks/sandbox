@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import DayPicker from 'react-day-picker';
 import AppDispatcher from '../dispatcher/AppDispatcher';
 import ActionTypes from '../actions/ActionTypes';
@@ -13,7 +14,7 @@ const DateBox = React.createClass({
   },
 
   bodyClick(e) {
-      if (!this.getDOMNode().contains(e.target)){
+      if (!ReactDOM.findDOMNode(e.target)){
         AppDispatcher.dispatch({
           type: ActionTypes.SELECT_DATE,
           id: this.props.id,

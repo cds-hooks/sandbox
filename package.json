@@ -15,8 +15,9 @@
     "moment": "^2.10.6",
     "node-uuid": "^1.4.3",
     "object-assign": "^2.0.0",
-    "react": "^0.13.3",
+    "react": "^0.14.9",
     "react-day-picker": "^1.0.5",
+    "react-dom": "^0.14.9",
     "react-markdown": "^1.0.3",
     "request-promise": "^0.4.3",
     "striptags": "^2.0.3"
@@ -35,12 +36,13 @@
     "jest-cli": "*",
     "jquery": "*",
     "node-sass": "*",
+    "react-bootstrap": "^0.31.0",
     "react-hot-loader": "*",
     "react-tools": "*",
     "sass-loader": "*",
     "style-loader": "*",
     "url-loader": "*",
-    "webpack": "^1.13.3",
+    "webpack": "^1.15.0",
     "webpack-dev-server": "^1.16.2"
   },
   "scripts": {
