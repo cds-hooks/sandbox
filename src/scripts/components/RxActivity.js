@@ -11,12 +11,15 @@ const RxActivity = React.createClass({
 
   render() {
     var patient = this.props.all.getIn(['fhirServer', 'patient'])
-    var name = "name"
-    var pid = "pid"
-    if (patient) name = patient.name[0].given.join(" " ) + " " + patient.name[0].family.join(" " )
-    if (patient) pid = patient.id
+    var name = "name";
+    var pid = "pid";
+    if (patient) name = patient.name[0].given.join(" " ) + " " + patient.name[0].family.join(" " );
+    if (patient) pid = patient.id;
+
+    var containerClass = this.props.isServiceViewEnabled ? 'order-entry mock-ehr-view half-view' : 'order-entry mock-ehr-view';
+
     return <div id="main" className="app-main">
-      <div className="order-entry">
+      <div className={containerClass}>
         <h1 className="view-title">Rx View</h1>
         <p><strong>Patient:</strong> {name} <strong>ID:</strong> {pid}</p>
         <div className="input-container">
@@ -44,7 +47,7 @@ const RxActivity = React.createClass({
         <div className="decision-spacer"></div>
         <Cards className="card-holder" decisions={this.props.all.get('decisions')} context={this.props.all.getIn(['fhirServer', 'context'])} />
       </div>
-      <FhirView {...this.props} />
+      <FhirView {...this.props} hook='medication-prescribe' />
     </div>
 
   }

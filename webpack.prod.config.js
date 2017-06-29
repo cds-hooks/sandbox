@@ -22,7 +22,10 @@ module.exports = {
     })
   ],
   resolve: {
-    modules: ['node_modules'],
+    extensions: ['.js', '.jsx']
+  },
+  resolveLoader: {
+    modules: ['node_modules']
   },
   module: {
     loaders: [

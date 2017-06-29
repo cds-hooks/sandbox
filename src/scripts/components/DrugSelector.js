@@ -32,7 +32,7 @@ const DrugSelector = React.createClass({
       AppDispatcher.dispatch({
         type: ActionTypes.PREVIOUS_STEP
       });
-      if (this.props.step !== 'ingredient'){ 
+      if (this.props.step !== 'ingredient'){
         e.preventDefault();
       }
     }
@@ -83,7 +83,7 @@ const DrugSelector = React.createClass({
           <h5>{this.props.ingredient && this.props.ingredient.str || err}</h5>
           <div className="Drug-Selector-holder">
             <table className="drug-choice">
-              {pickList}
+              <tbody>{pickList}</tbody>
             </table>
           </div>
           {done}
@@ -104,10 +104,9 @@ const DrugSelector = React.createClass({
   },
 
   sendSig(){
-    console.log("take", this.refs.sigNumber.getDOMNode().value)
     var sig = {
-      number: this.refs.sigNumber.getDOMNode().value,
-      frequency: this.refs.sigFrequency.getDOMNode().value
+      number: this.refs.sigNumber.value,
+      frequency: this.refs.sigFrequency.value
     }
     AppDispatcher.dispatch({
       type: ActionTypes.NEW_SIG,
