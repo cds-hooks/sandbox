@@ -406,6 +406,7 @@ pre {
   top: 14px;
   right: 30px;
   z-index: 1001;
+
   .configure-hooks {
     display: inline-block;
     padding: 5px 15px;
@@ -415,12 +416,54 @@ pre {
     color: $color-dark;
     border-radius: 4px;
     cursor: pointer;
+    font-size: 100%;
     &:hover {
       background: darken($aqua, 20%);
       text-decoration: none;
     }
     i {
       margin-right: 3px;
+    }
+  }
+
+  .dropdown-menu {
+    background: $aqua;
+    color: $color-dark;
+    padding-top: 0;
+    padding-bottom: 0;
+    overflow: auto;
+    font-size: 100%;
+
+    .dropdown-config-item {
+      width: 100%;
+      height: 35px;
+      line-height: 35px;
+      display: inline-block;
+      font-family: $font-roboto-condensed;
+      cursor: pointer;
+
+      i {
+        margin-right: 3px;
+      }
+
+      a {
+        height: inherit;
+        line-height: inherit;
+        vertical-align: middle;
+        padding-top: 0;
+        padding-bottom: 0;
+      }
+    }
+
+    .divider {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+
+    .dropdown-config-item:hover a:hover {
+      background: darken($aqua, 20%);
+      height: inherit;
+      text-decoration: none;
     }
   }
   &.editor-open {
@@ -708,14 +751,31 @@ table.drug-choice {
   .hook-editor {
     position: static;
     margin: 0 0 15px;
+    width: 100%;
+
+    .dropdown {
+      width: 100%;
+    }
+
     .configure-hooks {
       display: block;
       width: 100%;
-      padding: 10px 0;
+      padding: 10px 5px;
       text-align: center;
       border-radius: 0;
     }
-}
+
+    .dropdown-menu {
+      width: 100%;
+      text-align: center;
+      border-radius: 0;
+      position:static;
+
+      .dropdown-config-item a {
+        text-align: center;
+      }
+    }
+  }
 
 
 }

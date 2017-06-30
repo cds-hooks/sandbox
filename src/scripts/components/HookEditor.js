@@ -2,7 +2,7 @@ import React from 'react';
 import AppDispatcher from '../dispatcher/AppDispatcher';
 import ActionTypes from '../actions/ActionTypes';
 import striptags from 'striptags';
-import {Modal, Button, Alert} from 'react-bootstrap';
+import {Modal, Button, Alert, DropdownButton, MenuItem} from 'react-bootstrap';
 
 const OneHook = React.createClass({
   getInitialState() {
@@ -122,20 +122,34 @@ const HookEditor = React.createClass({
     return this.state.showUrlBannerError ? '' : 'remove-display';
   },
   render() {
-
-    var edit = (
-      <a className='configure-hooks' onClick={this.startEditing}><i className="glyphicon glyphicon-cog"></i> Configure CDS Services</a>
-    );
-
-    var reset = (
-      <a className='configure-hooks' onClick={this.resetHooks}><i className="glyphicon glyphicon-leaf"></i>Reset</a>
-    );
-
-    var add = (
-      <a className='configure-hooks' onClick={this.showModal}><i className="glyphicon glyphicon-plus"></i>Add CDS Service</a>
-    );
-
     var current = this.props.editing && this.props.hooks.map((h, hname) => <OneHook key={h.get('id')} hook={h.toJS()}/>).valueSeq().toJS() || [];
+
+    var addServiceModal = <Modal show={this.state.showModal} onHide={this.hideModal}>
+      <Modal.Header closeButton>
+        <Modal.Title>Add CDS Service</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <Alert bsStyle="danger" className={this.hideAlert()}>
+          <i className="glyphicon glyphicon-exclamation-sign" /> <strong>Invalid endpoint: </strong>URL must end at <i>/cds-services</i>
+        </Alert>
+        <div className="input-container">
+          <label>Discovery Endpoint URL:</label>
+          <input className="form-control"
+                 autofocus={true}
+                 placeholder={"https://example-service.com/cds-services"}
+                 type="text"
+                 onChange={this.handleChange}
+          />
+        </div>
+        <div>
+          <i>Note: See <a href='http://cds-hooks.org/#discovery'>documentation</a> for more details regarding the Discovery endpoint.</i>
+        </div>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button bsStyle="primary" onClick={this.addHook}>Save</Button>
+        <Button onClick={this.hideModal}>Close</Button>
+      </Modal.Footer>
+    </Modal>;
 
     if (this.props.editing)
       current.push(<OneHook key="new" className="new-hook" hook={{
@@ -144,33 +158,27 @@ const HookEditor = React.createClass({
       }}/>)
 
       return (<div id="hook-container" className="hook-editor">
-        <span className="hook-buttons"> {add}{reset}{edit}</span>
-        <Modal show={this.state.showModal} onHide={this.hideModal}>
-          <Modal.Header closeButton>
-            <Modal.Title>Add CDS Service</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <Alert bsStyle="danger" className={this.hideAlert()}>
-              <i className="glyphicon glyphicon-exclamation-sign" /> <strong>Invalid endpoint: </strong>URL must end at <i>/cds-services</i>
-            </Alert>
-            <div className="input-container">
-              <label>Discovery Endpoint URL:</label>
-              <input className="form-control"
-                     autofocus={true}
-                     placeholder={"https://example-service.com/cds-services"}
-                     type="text"
-                     onChange={this.handleChange}
-              />
-            </div>
-            <div>
-              <i>Note: See <a href='http://cds-hooks.org/#discovery'>documentation</a> for more details regarding the Discovery endpoint.</i>
-            </div>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button bsStyle="primary" onClick={this.addHook}>Save</Button>
-            <Button onClick={this.hideModal}>Close</Button>
-          </Modal.Footer>
-        </Modal>
+        <span className="hook-buttons">
+          <DropdownButton className="glyphicon configure-hooks"
+                          title={<span><i className="glyphicon glyphicon-wrench"></i>CDS Services</span>}
+                          id='dropdownConfigureButton' pullRight>
+            <MenuItem className="dropdown-config-item" onClick={this.showModal} eventKey="1">
+              <i className="glyphicon glyphicon-plus" />
+                Add CDS Service
+            </MenuItem>
+            <MenuItem divider />
+            <MenuItem className="dropdown-config-item" onClick={this.resetHooks} eventKey="2">
+              <i className="glyphicon glyphicon-leaf" />
+                Reset Configuration
+            </MenuItem>
+            <MenuItem divider />
+            <MenuItem className="dropdown-config-item" onClick={this.startEditing} eventKey="3">
+              <i className="glyphicon glyphicon-cog" />
+                Configure CDS Services
+            </MenuItem>
+          </DropdownButton>
+          {addServiceModal}
+        </span>
         {current}
       </div>);
   },
