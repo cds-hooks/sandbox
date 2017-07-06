@@ -43,7 +43,7 @@ module.exports = {
 
       {
         test: /\.(ttf|eot|svg)$/,
-        loader: 'file-loader'
+        loader: 'file-loader?name=[name].[ext]'
       },
 
       {
