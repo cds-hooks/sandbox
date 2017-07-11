@@ -76,6 +76,18 @@ function _checkValidPatient(patientID, dfd) {
   return dfd.promise();
 }
 
+function _checkValidFhirServer(serverUrl, dfd) {
+  var tempState = state.set("context", state.get("context").merge({ baseUrl: serverUrl }));
+  var tempClient = fhirClient(tempState.get("context").toJS());
+  tempClient.conformance({}).then(response => {
+    return dfd.resolve(response);
+  }).catch(response => {
+    console.log("Error fetching metadata for requested FHIR server", response);
+    return dfd.resolve(response);
+  });
+  return dfd.promise();
+}
+
 
 var state = Immutable.fromJS({
   "context": {
@@ -119,6 +131,16 @@ var FhirServiceStore = assign({}, EventEmitter.prototype, {
    return _checkValidPatient(patientID, dfd)
   },
 
+  checkFhirServerResponse(serverUrl, dfd) {
+    return _checkValidFhirServer(serverUrl, dfd);
+  },
+
+  changeFhirServer(serverUrl) {
+    state = state.set("context", state.get("context").merge({ baseUrl: serverUrl }));
+    _client = fhirClient(state.get('context').toJS());
+    this.emitChange();
+  },
+
   emitChange: function() {
     this.emit(CHANGE_EVENT)
   },
@@ -153,6 +175,10 @@ FhirServiceStore.dispatchToken = AppDispatcher.register(function(action) {
         state = state.set('selection', selection)
         FhirServiceStore.emitChange()
       }
+      break;
+    case ActionTypes.CHANGE_FHIR_SERVER:
+      FhirServiceStore.changeFhirServer(action.url);
+      break;
     default:
   }
 
