@@ -15,14 +15,14 @@ module.exports = {
     filename: "bundle.js"
   },
   plugins: [
-    new webpack.NoErrorsPlugin(),
+    new webpack.NoEmitOnErrorsPlugin(),
     new webpack.DefinePlugin({
       "runtime.CDS_HOOKS_URL": JSON.stringify(process.env.CDS_HOOKS_URL || "http://hooks.fhir.me:8082"),
       "runtime.FHIR_URL": JSON.stringify(process.env.FHIR_URL || "https://sb-fhir-dstu2.smarthealthit.org/api/smartdstu2/open")
     })
   ],
   resolve: {
-    modulesDirectories: ['node_modules'],
+    modules: ['node_modules'],
   },
   module: {
     loaders: [
