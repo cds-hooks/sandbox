@@ -16,7 +16,7 @@
     "node-uuid": "^1.4.3",
     "object-assign": "^2.0.0",
     "react": "^0.14.9",
-    "react-day-picker": "^1.0.5",
+    "react-day-picker": "~1.2.0",
     "react-dom": "^0.14.9",
     "react-markdown": "^1.0.3",
     "request-promise": "^0.4.3",
