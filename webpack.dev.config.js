@@ -1,4 +1,5 @@
 var webpack = require('webpack');
+var path = require('path');
 
 module.exports = {
   devtool: "eval",
@@ -10,34 +11,34 @@ module.exports = {
     ]
   },
   output: {
-    path: "./build",
+    path: path.join(__dirname, "build"),
     filename: "bundle.js"
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
-    new webpack.NoErrorsPlugin(),
+    new webpack.NoEmitOnErrorsPlugin(),
     new webpack.DefinePlugin({
       "runtime.CDS_HOOKS_URL": JSON.stringify(process.env.CDS_HOOKS_URL || "http://localhost:8081"),
       "runtime.FHIR_URL": JSON.stringify(process.env.FHIR_URL || "https://sb-fhir-dstu2.smarthealthit.org/api/smartdstu2/open")
     })
   ],
   resolve: {
-    modulesDirectories: ['node_modules'],
+    modules: ['node_modules'],
   },
   module: {
     loaders: [
       {
         test: /\.json?$/,
-        loader: "json"
+        loader: "json-loader"
       },{
         test: /\.jsx?$/,
-        loader: "babel?presets[]=react,presets[]=es2015",
+        loader: "babel-loader?presets[]=react,presets[]=es2015",
         exclude: /node_modules/
       },
 
       {
         test: /\.(sass|scss)$/,
-        loader: "style!css!sass?indentedSyntax=true&outputStyle=expanded"
+        loader: "style-loader!css!sass?indentedSyntax=true&outputStyle=expanded"
       },
       {
         test: /\.(ttf|eot|svg)$/,
@@ -56,7 +57,7 @@ module.exports = {
 
       {
         test: /\.html$/,
-        loader: "file?name=[path][name].[ext]&context=./src"
+        loader: "file-loader?name=[path][name].[ext]&context=./src"
       }
     ]
   }

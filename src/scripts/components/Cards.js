@@ -53,6 +53,17 @@ const Cards = React.createClass({
     .map(c => {
 
       var classes = "decision-card alert alert-" + c.indicator;
+
+      if (c.links) c.links.map(l => {
+        if ("smart" === l.type) {
+          if (l.url.indexOf("?") < 0) l.url += "?"
+          else l.url += "&"
+          l.url += "fhirServiceUrl=" + this.props.context.get('baseUrl')
+          l.url += "&patientId=" + this.props.context.get('patient')
+        }
+        return l
+      })
+
       var ret = (
       <div key={c.key} className={classes}>
       <div className="card-top">
@@ -69,7 +80,9 @@ const Cards = React.createClass({
       <a key={l.key} className="source-link" onClick={e => this.launchService(e, l.url)} target="_blank" href={l.url}>
               <span className="glyphicon glyphicon-link" aria-hidden="true"></span>
               {l.label}</a>
-      ))}
+      )
+
+    )}
     </div>
 
     </div>

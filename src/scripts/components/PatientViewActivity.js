@@ -23,7 +23,7 @@ const PatientViewActivity = React.createClass({
         <h2>{name}</h2>
         <p><strong>ID: </strong> {pid} <strong>Birthdate: </strong> {dob}</p>
         <div className="decision-spacer"></div>
-        <Cards className="card-holder" decisions={this.props.all.get('decisions')} />
+        <Cards className="card-holder" decisions={this.props.all.get('decisions')} context={this.props.all.getIn(['fhirServer', 'context'])} />
       </div>
       <FhirView {...this.props} />
     </div>
