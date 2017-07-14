@@ -25,8 +25,8 @@ sudo pip install docker-compose
 #### Local dev environment
 
 ```
-git clone https://github.com/jmandel/cds-hooks-rx-app
-cd cds-hooks-rx-app
+git clone https://github.com/cds-hooks/sandbox.git
+cd sandbox
 sudo docker-compose -f docker-compose-dev.yml  up
 ```
 
@@ -35,7 +35,7 @@ and see changes automatically reloaded at `http://localhost:8080`
 
 Configuration:
 
- * To talk to a FHIR server other than http://hooks.smarthealthit.org:9080,
+ * To talk to a FHIR server other than `https://sb-fhir-dstu2.smarthealthit.org/api/smartdstu2/open`,
    you can pass a query variable to the HTML page, as in
    `http://localhost:8080?fhirServiceUrl=http://my-fhir-server`
 
@@ -50,34 +50,31 @@ docker-compose -f docker-compose-dev.yml up
 
 ### Dev environment sans docker
 
-The simpler story if you're just looking to do local dev is something like:
-
+You can also develop on and run this project locally without Docker by following the steps below.
 
 ### Setup
 
-Install `nodejs` 5.3+ and `npm` 3.3+ and then:
+Install `nodejs` 6.11+ and `npm` 5.0+ on your machine and then install the project and its dependencies locally:
 ```
-npm install -g nodemon
-git clone https://github.com/jmandel/cds-hooks-rx-app
-cd cds-hooks-rx-app
-npm install
-cd mock-cds-backend
+git clone https://github.com/cds-hooks/sandbox.git
+cd sandbox
 npm install
 ```
 
 ### Run it
 
-Frontend
+To load the webpage, run the following command:
 ```
-cd cds-hooks-rx-app 
-npm run-script dev
+npm run dev-frontend
 ```
 
-CDS service
+To run the mock CDS services that accompany this tool, run the following command:
 ```
-cd cds-hooks-rx-app/mock-cds-backend
-nodemon index.js
+npm run dev-services
 ```
+
+Now, you can navigate to `http://localhost:8080` to view the application. Any changes made to the code locally should be
+picked up automatically by the `webpack-dev-server`, and you should see the changes reflect accordingly.
 
 # In production
 
