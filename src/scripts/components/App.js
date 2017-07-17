@@ -10,6 +10,8 @@ import FhirServerStore from '../stores/FhirServerStore'
 import HashStateStore from '../stores/HashStateStore';
 import {EventEmitter} from 'events';
 import moment from 'moment'
+import {Modal, Button, Alert, ListGroup, ListGroupItem} from 'react-bootstrap';
+import $ from 'jquery';
 
 
 window.bodyClicks = new EventEmitter();
@@ -63,16 +65,149 @@ const App = React.createClass({
     })
   },
 
-  changePatient(){
-    var pid = this.state.all.getIn(["fhirServer", "context", "patient"])
-    pid = window.prompt("Patient ID", pid)
-    if (pid) FhirServerStore.setContext({patient: pid})
+  isSmartHealthItSandbox: function() {
+    var fhirServerUrl = this.state.all.getIn(["fhirServer", "context", "baseUrl"]);
+    return fhirServerUrl.toLowerCase().indexOf('smarthealthit.org') > 0;
+  },
+
+  changePatient: function(){
+    var dfd = $.Deferred();
+
+    // If input is empty, close the modal and keep current patient in context
+    if (this.state.patientId === '' || !this.state.patientId) {
+      this.hidePatientModal();
+      this.setState({
+        patientId: this.state.all.getIn(["fhirServer", "context", "patient"]),
+        showPatientEntryError: false,
+        patientEntryErrorCode: ''
+      });
+      dfd = $.Deferred();
+      return;
+    }
+    var patientFetchResponse = FhirServerStore.checkPatientResponse(this.state.patientId, dfd);
+    var currentPatientInContext = AppStore.getState().getIn(["fhirServer", "context", "patient"]);
+
+    // Check if requested patient exists in the FHIR server
+    patientFetchResponse.then(function(status) {
+      if (status === 200) {
+        this.hidePatientModal();
+        this.setState({
+          showPatientEntryError: false,
+          patientEntryErrorCode: ''
+        });
+        FhirServerStore.setContext({ patient: this.state.patientId });
+        dfd = $.Deferred();
+      } else {
+        this.setState({
+          patientEntryErrorCode: status,
+          showPatientEntryError: true,
+          selectedPatient: currentPatientInContext
+        });
+        dfd = $.Deferred();
+      }
+    }.bind(this));
+  },
+
+  handlePatientChange: function(event) {
+    this.setState({
+      patientId: event.target.value.toString().trim()
+    });
+  },
+
+  displayPatientModal: function() {
+    this.setState({
+      showPatientModal: true,
+      patientId: AppStore.getState().getIn(["fhirServer", "context", "patient"]),
+      selectedPatient: AppStore.getState().getIn(["fhirServer", "context", "patient"]),
+    });
+  },
+
+  hidePatientModal: function() {
+    this.setState({
+      showPatientModal: false,
+      showPatientEntryError: false
+    });
+  },
+
+  hideModalAlert: function() {
+    if (this.state.isNewPatientModalWindow) return 'remove-display';
+    return this.state.showPatientEntryError ? '' : 'remove-display';
+  },
+
+  patientSelected: function(patientId) {
+    this.setState({
+      patientId: patientId,
+      selectedPatient: patientId
+    });
   },
 
   render() {
     var hook = (this.state.all.getIn(['decisions', 'hook']))
     var rxClass = hook === "medication-prescribe" ? "nav-button activity-on" : "nav-button activity-off"
     var ptClass = hook === "patient-view" ? "nav-button activity-on" : "nav-button activity-off"
+
+    var patientSelectGroup =(
+      <ListGroup>
+        <ListGroupItem header='Daniel X. Adams'
+                       onClick={this.patientSelected.bind(this, 'SMART-1288992')}
+                       active={this.state.patientId === 'SMART-1288992'}>Male | DOB: 1925-12-23</ListGroupItem>
+        <ListGroupItem header='Lisa P. Coleman'
+                       onClick={this.patientSelected.bind(this, 'SMART-1551992')}
+                       active={this.state.patientId === 'SMART-1551992'}>Female | DOB: 1948-04-14</ListGroupItem>
+        <ListGroupItem header='Tiffany Westin'
+                       onClick={this.patientSelected.bind(this, 'SMART-8888802')}
+                       active={this.state.patientId === 'SMART-8888802'}>Female | DOB: 1975-05-20</ListGroupItem>
+        <ListGroupItem header='Susan A. Clark'
+                       onClick={this.patientSelected.bind(this, 'SMART-1482713')}
+                       active={this.state.patientId === 'SMART-1482713'}>Female | DOB: 2000-12-27</ListGroupItem>
+        <ListGroupItem header='Steve Richey'
+                       onClick={this.patientSelected.bind(this, 'SMART-7777701')}
+                       active={this.state.patientId === 'SMART-7777701'}>Male | DOB: 2011-09-16</ListGroupItem>
+        <ListGroupItem header='Rose Tyler'
+                       onClick={this.patientSelected.bind(this, 'BILIBABY6')}
+                       active={this.state.patientId === 'BILIBABY6'}>Male | DOB: 2016-2-28</ListGroupItem>
+      </ListGroup>);
+
+    var patientModalAlert = this.state.showPatientEntryError ?
+      (<Alert bsStyle="danger">
+        <i className="glyphicon glyphicon-exclamation-sign" />
+        <strong> Error fetching patient: </strong>
+        Patient ID returned a <i>{this.state.patientEntryErrorCode}</i> from the FHIR server
+      </Alert>) : ''
+
+    var patientModal =(
+      <Modal show={this.state.showPatientModal} onHide={this.hidePatientModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Choose a Patient</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {patientModalAlert}
+          <div>
+            <b>Current FHIR Server</b><br />
+            <p>{this.state.all.getIn(["fhirServer", "context", "baseUrl"])}</p>
+          </div>
+          <div className="input-container">
+            <label>Enter Patient ID:</label>
+            <input className="form-control"
+                   autoFocus={true}
+                   placeholder={this.state.all.getIn(["fhirServer", "context", "patient"])}
+                   type="text"
+                   onChange={this.handlePatientChange}
+            />
+          </div>
+          <div className={this.isSmartHealthItSandbox() ? '' : 'hidden'}>
+            <div className="patient-modal-divider"><span>OR</span></div>
+            <div className="input-container">
+              <label>Select a Patient:</label>
+              {patientSelectGroup}
+            </div>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button bsStyle="primary" onClick={this.changePatient}>Save</Button>
+          <Button onClick={this.hidePatientModal}>Close</Button>
+        </Modal.Footer>
+      </Modal>);
 
     return (
       <div id="react-content">
@@ -81,7 +216,8 @@ const App = React.createClass({
           <div className="header-nav">
             <a className={ptClass} onClick={e=>this.setActivity("patient-view")}>Patient View</a>
             <a className={rxClass} onClick={e=>this.setActivity("medication-prescribe")}>Rx View</a>
-            <a className="nav-button change-patient" onClick={this.changePatient}>Change Patient</a>
+            <a className="nav-button change-patient" onClick={this.displayPatientModal}>Change Patient</a>
+            {patientModal}
           </div>
         </div>
 
