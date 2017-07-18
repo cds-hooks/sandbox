@@ -9,9 +9,10 @@ window.addEventListener("message", (e) => {
   AppDispatcher.dispatch({
     type: ActionTypes.EXTERNAL_APP_RETURNED
   })
-
-  e.source.close()
-})
+  if (e.target.document.URL.indexOf(e.origin) === -1) {
+    e.source.close();
+  }
+});
 
 
 var indicators = {
