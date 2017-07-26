@@ -250,6 +250,13 @@ pre {
   display: none;
 }
 
+.remove-margin {
+
+  .alert {
+    margin-bottom: 0;
+  }
+}
+
 .order-entry {
   display: table-cell;
   padding: 30px;

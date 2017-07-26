@@ -60,9 +60,20 @@ var HookStore = assign({}, EventEmitter.prototype, {
    */
   removeChangeListener: function(callback) {
     this.removeListener(CHANGE_EVENT, callback);
+  },
+
+  checkValidService: function(serviceUrl, dfd) {
+    axios({
+      url: serviceUrl,
+      method: 'get',
+    }).then(function (result) {
+      return dfd.resolve(result);
+    }).catch(function (result) {
+      console.log("Error connecting to CDS Service", result);
+      return dfd.resolve(result);
+    })
+    return dfd.promise();
   }
-
-
 });
 
 HookStore.dispatchToken = AppDispatcher.register(function(action) {
@@ -95,8 +106,7 @@ HookStore.dispatchToken = AppDispatcher.register(function(action) {
             })
           });
         }
-
-      })
+      });
       break;
 
     case ActionTypes.NEW_HOOK:
