@@ -32,6 +32,9 @@
     "bootstrap": "*",
     "bootstrap-webpack": "*",
     "css-loader": "*",
+    "exports-loader": "^0.6.2",
+    "express": "~4.15.3",
+    "extract-text-webpack-plugin": "^0.3.8",
     "file-loader": "*",
     "gulp": "^3.9.0",
     "gulp-gh-pages": "^0.5.2",
@@ -51,8 +54,11 @@
   },
   "scripts": {
     "build": "webpack -p --config webpack.prod.config.js",
+    "compile:heroku": "webpack -p --config webpack.prod.config.js --progress",
     "dev-frontend": "webpack-dev-server --host 0.0.0.0 --config webpack.dev.config.js --colors --content-base ./build",
     "dev-services": "nodemon mock-cds-backend/index.js",
+    "heroku-posbuild": "npm install --only=dev && npm run compile:heroku",
+    "start": "node scripts/express/app.js",
     "test": "jest"
   },
   "author": "",
