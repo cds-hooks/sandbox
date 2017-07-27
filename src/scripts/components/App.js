@@ -24,12 +24,10 @@ function bodyClick(e) {
   })
 };
 
-console.log("dispatching")
 AppDispatcher.dispatch({
   type: ActionTypes.NEW_HASH_STATE,
   hash: window.location.hash.slice(1) ? JSON.parse(window.location.hash.slice(1)) : {}
 })
-console.log("DIspatched")
 
 const App = React.createClass({
 
@@ -56,15 +54,29 @@ const App = React.createClass({
     AppDispatcher.dispatch({ type: ActionTypes.LOADED })
     return {
       all: AppStore.getState(),
-      settingContext: false
+      settingContext: false,
+      consoleLogSettingEnabled: true,
+      serviceContextViewEnabled: true
     }
+  },
+
+  setConsoleLogSetting(event) {
+    this.setState({
+      consoleLogSettingEnabled: event
+    });
+  },
+
+  setServiceContextViewSetting() {
+    this.setState({
+      serviceContextViewEnabled: !this.state.serviceContextViewEnabled
+    });
   },
 
   setActivity(code){
     AppDispatcher.dispatch({
       type: ActionTypes.SET_ACTIVITY,
       hook: code
-    })
+    });
   },
 
   isSmartHealthItSandbox: function() {
@@ -346,10 +358,18 @@ const App = React.createClass({
         <HookEditor hooks={this.state.all.getIn(['hooks', 'hooks'])} editing={this.state.all.getIn(['hooks', 'editing'])} />
 
         {
-          hook === 'medication-prescribe' && <RxActivity all={this.state.all}/>
+          hook === 'medication-prescribe' && <RxActivity toggleConsoleLog={this.setConsoleLogSetting}
+                                                         toggleServiceView={this.setServiceContextViewSetting}
+                                                         isConsoleLogEnabled={this.state.consoleLogSettingEnabled}
+                                                         isServiceViewEnabled={this.state.serviceContextViewEnabled}
+                                                         all={this.state.all}/>
         }
         {
-          hook === 'patient-view' && <PatientViewActivity all={this.state.all}/>
+          hook === 'patient-view' && <PatientViewActivity toggleConsoleLog={this.setConsoleLogSetting}
+                                                          toggleServiceView={this.setServiceContextViewSetting}
+                                                          isConsoleLogEnabled={this.state.consoleLogSettingEnabled}
+                                                          isServiceViewEnabled={this.state.serviceContextViewEnabled}
+                                                          all={this.state.all}/>
         }
 
         <div id="bottom-bar" className="app-footer">

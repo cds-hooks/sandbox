@@ -80,8 +80,10 @@ article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, 
 /* Global Tags
 ====================================================================================== */
 body {
-    font-family: $font-roboto;
-    color: #333;
+  font-family: $font-roboto;
+  color: #333;
+  overflow-x: hidden;
+  overflow-y: scroll;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -125,6 +127,12 @@ pre {
   color: #fff;
   font-size: .85em;
   border-radius: 0;
+
+  white-space: -moz-pre-wrap; /* Mozilla */
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap; /* Opera */
+  white-space: pre-wrap; /* CSS3 */
+  word-wrap: break-word; /* IE 5.5+ */
 }
 
 .btn {
@@ -263,12 +271,58 @@ pre {
 }
 
 .order-entry {
-  display: table-cell;
+  display: block;
   padding: 30px;
+  width: 50%;
+}
+
+.mock-ehr-view {
+  display: table-cell;
+  position: relative;
+  vertical-align: top;
+  width: 100%;
+}
+
+.cds-service-view {
+  display: table-cell;
+  position: absolute;
+  right: -50%;
+  width: 50%;
+  transition: right .3s ease-in-out;
+  border-left: 1px solid #0d0630;
+}
+
+.context-open {
+  right: 0;
+  position: relative;
+  height: inherit;
+}
+
+.half-view {
+  width: 50%;
+}
+
+.wrap-context {
+  position: relative;
+}
+
+.context-toggle {
+  position: absolute;
+  top: 75px;
+  left: -75px;
+  z-index: 1;
+
+  -webkit-transform: rotate(-90deg);
+  -moz-transform: rotate(-90deg);
+  -ms-transform: rotate(-90deg);
+}
+
+.service-dropdown-select {
+  display: inline-block;
+  padding-bottom: 15px;
 }
 
 .fhir-view {
-  display: table-cell;
   position: static;
   background: $color-dark;
   height: 100%;
@@ -283,8 +337,8 @@ pre {
   }
   .configure-fhir-view {
     position: absolute;
-    top: 60px;
-    right: 10px;
+    top: 140px;
+    right: 30px;
     margin-top: 10px;
     background: $blue;
     border-radius: 4px;
@@ -300,8 +354,22 @@ pre {
   }
 }
 
+.console-log-option {
+  float: right;
+  display: inline-block;
+  padding-right: 30px;
+  font-family: "Roboto Condensed", sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  color: #333;
+
+  input {
+    margin-left: 5px;
+  }
+}
+
 .fhir-view-visible {
-  width: 45%;
+  width: 100%;
 }
 
 /* cards */
@@ -728,8 +796,28 @@ table.drug-choice {
   }
 }
 
-@media (max-width: 975px) {
+.panel-height {
+  overflow-y: auto;
+}
 
+.panel-body {
+  max-height: 50%;
+}
+
+.panel-container {
+  a {
+    color: #333;
+  }
+
+  a:hover {
+    text-decoration: none;
+    color: #0d0630;
+    cursor: pointer;
+  }
+}
+
+
+@media (max-width: 975px) {
   .app-header {
     position: static;
     height: auto;
@@ -744,6 +832,43 @@ table.drug-choice {
       display: block;
       margin: 0;
       text-align: center;
+    }
+  }
+
+  .mock-ehr-view {
+    display: inline-block;
+  }
+
+  .context-toggle {
+    position: absolute;
+    display: block;
+    width: 100%;
+    top: -28px;
+    left: 0;
+    -webkit-transform: none;
+    -moz-transform: none;
+    -ms-transform: none;
+  }
+
+  .cds-service-view {
+    display: inline-block;
+    height: auto;
+    border-left: none;
+    right: 0;
+    border-top: 1px solid #0d0630;
+    width: 100%;
+    padding: 0;
+
+    .wrap-context {
+      display: none;
+    }
+  }
+
+  .cds-service-view.context-open {
+    padding: 30px;
+
+    .wrap-context {
+      display: block;
     }
   }
 
@@ -766,6 +891,7 @@ table.drug-choice {
   .fhir-view {
     display: block;
     width: 100%;
+
     .configure-fhir-view {
       position: static;
       margin-left: 10px;
@@ -787,6 +913,7 @@ table.drug-choice {
       padding: 10px 5px;
       text-align: center;
       border-radius: 0;
+      margin-left: 0;
     }
 
     .dropdown-menu {
@@ -812,14 +939,29 @@ table.drug-choice {
 
   .order-entry {
     padding: 15px;
+
+    .console-log-option {
+      padding-right: 0;
+    }
+  }
+
+  .cds-service-view.context-open {
+    padding: 15px;
   }
 
   .fhir-view {
-    padding: 15px;
     .configure-fhir-view {
       position: static;
       margin-left: 10px;
     }
+
+    .context-options-container {
+      position: static;
+    }
+  }
+
+  pre {
+    padding: 15px;
   }
 
 }

@@ -21,7 +21,8 @@ FhirServerStore.addChangeListener(_hooksChanged)
 var CHANGE_EVENT = 'change'
 var state = Immutable.fromJS({
   calling: false,
-  cards: []
+  cards: [],
+  services: Immutable.Map(),
 })
 
 function getFhirContext() {
@@ -52,8 +53,6 @@ function _hooksChanged() {
   }
 
   var hookNames = hooks.keySeq()
-  console.log("Eval hooks changed in context", context)
-  console.log("HN", hookNames.count());
 
   state = state.set('cards', Immutable.fromJS([]));
   state = state.set('hooks', hooks)
@@ -64,7 +63,7 @@ function _hooksChanged() {
     {
       resource: r.data,
       response: {
-        status: r.status + " " + r.statusText
+        status: r.status + (r.statusText ? (" " + r.statusText) : "")
       }
     }
   ]
@@ -117,12 +116,33 @@ function hookBody(h, fhir, prefetch) {
     redirect: _base + "service-done.html",
     user: "Practitioner/example",
     patient: state.get('patient'),
+    context: [],
     prefetch: h.get('prefetch', Immutable.Map())
-               .map(v => prefetch.get(v)),
-    context: []
+               .map(v => prefetch.get(v))
   }
   if (fhir)
     ret.context.push(fhir);
+
+  var serviceId = h.get('id')
+  var serviceRequest = Immutable.fromJS({
+    request: Immutable.fromJS(ret),
+    hook: h.get('hook')
+  });
+
+  state = state.setIn(['services', serviceId], serviceRequest);
+
+  var servicesForHook = state.get('services').filter((service) => {
+    return service.get('hook') === state.get('hook')
+  });
+  if (state.get('selectedService') &&
+    servicesForHook.get(state.get('selectedService')) &&
+    servicesForHook.get(state.get('selectedService')).get('request') &&
+    HookStore.getState().get('hooks').get(state.get('selectedService'))) {
+    state = state.set('serviceRequestBody', servicesForHook.get(state.get('selectedService')).get('request'))
+  } else {
+    state = state.set('serviceRequestBody', servicesForHook.first().get('request'))
+    state = state.set('selectedService', servicesForHook.first());
+  }
   return ret;
 }
 
@@ -137,8 +157,8 @@ function addCardsFrom(callCount, hookUrl, result) {
 
   state = state.set('calling', false)
   var result = result.data
-  console.log("3 addCardsFrom", result)
-  var decisions = result.decisions
+
+  var decisions = result.decisions;
   if (decisions && decisions.length > 0) {
     AppDispatcher.dispatch({
       type: ActionTypes.TAKE_SUGGESTION,
@@ -146,23 +166,41 @@ function addCardsFrom(callCount, hookUrl, result) {
         create: decisions[0].create
       }
     })
+  } else {
+    result.decisions = [];
   }
 
-  var cards = result.cards || []
-  console.log("Got cards", cards);
+  var cards = result.cards || [];
   cards = Immutable.fromJS(cards)
-                   .map((v, k) => v.set('key', cardKey++)
-                                   .set('suggestions', v.get('suggestions', []).map(s => s
-                                       .set("key", cardKey++)
-                                       .set("suggestionUrl", hookUrl + "/analytics/" + s.get("uuid"))))
-                                   .set('links', v.get('links', []).map(s => s
-                                       .set("key", cardKey++))
-                                    )).toJS()
-                                     console.log("Added as", cards)
-                                     var newCards = state.get('cards').push(...cards)
-                                     state = state.set('cards', newCards)
+             .map((v, k) => v.set('key', cardKey++)
+                             .set('suggestions', v.get('suggestions', []).map(s => s
+                                 .set("key", cardKey++)
+                                 .set("suggestionUrl", hookUrl + "/analytics/" + s.get("uuid"))))
+                             .set('links', v.get('links', []).map(s => s
+                                 .set("key", cardKey++))
+                              )).toJS();
 
-                                     DecisionStore.emitChange()
+  var newCards = state.get('cards').push(...cards);
+  state = state.set('cards', newCards);
+
+  result.cards = cards;
+  var insertResponse = Immutable.fromJS({
+    response: result
+  });
+  state = state.mergeIn(['services', hookUrl], insertResponse);
+  var servicesForHook = state.get('services').filter((service) => {
+    return service.get('hook') === state.get('hook')
+  });
+  if (state.get('selectedService') &&
+    servicesForHook.get(state.get('selectedService')) &&
+    servicesForHook.get(state.get('selectedService')).get('response') &&
+    HookStore.getState().get('hooks').get(state.get('selectedService'))) {
+    state = state.set('serviceResponseBody', servicesForHook.get(state.get('selectedService')).get('response'))
+  } else {
+    state = state.set('serviceResponseBody', servicesForHook.first().get('response'));
+    state = state.set('selectedService', servicesForHook.first());
+  }
+  DecisionStore.emitChange();
 }
 
 var callCount = 0;
@@ -177,26 +215,35 @@ function callHooks(localState) {
   .filter((h, hookUrl) => h.get('hook') === localState.get('hook'))
 
   if (applicableServices.count() == 0) {
-    console.log("no applicable services")
     state = state.set('calling', false)
-  } else {
-    console.log("call applicable services", applicableServices.count())
   }
 
+  localState.get('prefetch')
+    .then((prefetch) => {
+      var results = applicableServices.map((h, hookUrl) => axios({
+        url: h.get('url'),
+        method: 'post',
+        data: hookBody(h,
+                       localState.get('fhir') && localState.get('fhir').toJS(),
+                       prefetch),
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+      ).forEach((p, hookUrl) => p.then((result) => {
+        if (typeof result === 'string' || result instanceof String) { result = {}; }
+        addCardsFrom(myCallCount, hookUrl, result);
+        state = state.set('')
+      }, () => {
+        var invalidResponse = {
+          cards: [],
+          decisions: []
+        };
+        state = state.set('cards', invalidResponse);
+        state.set('serviceResponseBody', invalidResponse);
+      }));
 
-  localState.get('prefetch').then((prefetch) => {
-    var results = applicableServices.map((h, hookUrl) => axios({
-      url: h.get('url'),
-      method: 'post',
-      data: hookBody(h,
-                     localState.get('fhir') && localState.get('fhir').toJS(),
-                     prefetch),
-        headers: {
-          'Content-Type': 'application/json'
-        }
-    }))
-    .forEach((p, hookUrl) => p.then(result => addCardsFrom(myCallCount, hookUrl, result)))
-  })
+    })
   DecisionStore.emitChange()
 }
 
@@ -211,7 +258,6 @@ var DecisionStore = assign({}, EventEmitter.prototype, {
     console.log("Set hook", hook)
     state = state.merge(_stores[hook].getState())
     state.get('hookStore').processChange()
-    console.log("PC", state.get('hookStore').processChange)
     DecisionStore.emitChange()
   },
 
@@ -221,10 +267,23 @@ var DecisionStore = assign({}, EventEmitter.prototype, {
     }
 
     if (!Immutable.is(resource, state.get('fhir'))) {
+      state = state.set('serviceRequestBody', state.get('serviceRequestBody') || resource);
       state = state.set('fhir', resource)
       state = state.set('cards', Immutable.List())
       setTimeout(() => callHooks(state), DELAY)
     }
+  },
+
+  setService: function(id) {
+    if (state.getIn(['services', id]).get('request')) {
+      state = state.set('selectedService', id);
+      state = state.set('serviceRequestBody', state.getIn(['services', id]).get('request'));
+    }
+    if (state.getIn(['services', id]).get('response')) {
+      state = state.set('selectedService', id);
+      state = state.set('serviceResponseBody', state.getIn(['services', id]).get('response'));
+    }
+    DecisionStore.emitChange();
   },
 
   getStateToPublish: function() {
@@ -282,6 +341,10 @@ DecisionStore.dispatchToken = AppDispatcher.register(function(action) {
           var hash = action.hash
           DecisionStore.setActivity(hash.hook || 'patient-view')
           break
+
+      case ActionTypes.SET_SERVICE:
+          DecisionStore.setService(action.service);
+          break;
 
       default:
           // do nothing
