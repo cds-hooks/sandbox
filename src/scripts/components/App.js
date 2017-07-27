@@ -50,12 +50,14 @@ const App = React.createClass({
     DateStore.setDate("start", {
       date: moment().toDate(),
       enabled: true});
-      DateStore.setDate("end", {
-        date: moment().add(1, 'month').toDate(),
-        enabled: true});
-        AppDispatcher.dispatch({ type: ActionTypes.LOADED })
-        return {all: AppStore.getState(),
-        settingContext: false}
+    DateStore.setDate("end", {
+      date: moment().add(1, 'month').toDate(),
+      enabled: true});
+    AppDispatcher.dispatch({ type: ActionTypes.LOADED })
+    return {
+      all: AppStore.getState(),
+      settingContext: false
+    }
   },
 
   setActivity(code){
@@ -108,9 +110,71 @@ const App = React.createClass({
     }.bind(this));
   },
 
+  changeFhirServer: function() {
+    var dfd = $.Deferred();
+
+    if (this.state.fhirServer === '' || !this.state.fhirServer || !this.state.fhirServer.trim()) {
+      this.setState({
+        showFhirServerEntryError: true,
+        fhirServerEntryErrorCode: '',
+        fhirAlertMessage: 'Enter a valid FHIR server base URL'
+      });
+      dfd = $.Deferred();
+      return;
+    }
+
+    var checkUrl = this.state.fhirServer.trim();
+    if (!/^(https?:)?\/\//i.test(checkUrl)) {
+      checkUrl = 'http://' + checkUrl;
+      this.setState({
+        fhirServer: checkUrl
+      });
+    }
+
+    var serverFetchResponse = FhirServerStore.checkFhirServerResponse(checkUrl, dfd);
+
+    // Check if requested FHIR Server contains metadata endpoint
+    serverFetchResponse.then(function(response) {
+
+      if (response && response.status === 200) {
+        this.hideFhirModal();
+        if(response.data.url.indexOf('https') > -1 && this.state.fhirServer.indexOf('https') < 0) {
+          var tempUrlString = this.state.fhirServer;
+          this.setState({
+            showFhirServerEntryError: false,
+            fhirServerEntryErrorCode: '',
+            fhirServer: tempUrlString.replace("http", "https")
+          });
+        } else {
+          this.setState({
+            showFhirServerEntryError: false
+          });
+        }
+        AppDispatcher.dispatch({
+          type: ActionTypes.CHANGE_FHIR_SERVER,
+          url: this.state.fhirServer
+        });
+        dfd = $.Deferred();
+        this.displayPatientModal();
+      } else {
+        this.setState({
+          showFhirServerEntryError: true,
+          fhirAlertMessage: 'Cannot read from this FHIR server. See console for more details.'
+        });
+        dfd = $.Deferred();
+      }
+    }.bind(this));
+  },
+
   handlePatientChange: function(event) {
     this.setState({
       patientId: event.target.value.toString().trim()
+    });
+  },
+
+  handleFhirServerChange: function(event) {
+    this.setState({
+      fhirServer: event.target.value.toString().trim()
     });
   },
 
@@ -122,6 +186,13 @@ const App = React.createClass({
     });
   },
 
+  displayFhirModal: function() {
+    this.setState({
+      showFhirModal: true,
+      fhirServer: ''
+    });
+  },
+
   hidePatientModal: function() {
     this.setState({
       showPatientModal: false,
@@ -129,9 +200,23 @@ const App = React.createClass({
     });
   },
 
-  hideModalAlert: function() {
-    if (this.state.isNewPatientModalWindow) return 'remove-display';
-    return this.state.showPatientEntryError ? '' : 'remove-display';
+  hideFhirModal: function() {
+    this.setState({
+      showFhirModal: false,
+      showFhirServerEntryError: false
+    });
+  },
+
+  resetFhirServer: function() {
+    this.hideFhirModal();
+    this.setState({
+      fhirServer: 'https://sb-fhir-dstu2.smarthealthit.org/api/smartdstu2/open'
+    });
+    AppDispatcher.dispatch({
+      type: ActionTypes.CHANGE_FHIR_SERVER,
+      url: 'https://sb-fhir-dstu2.smarthealthit.org/api/smartdstu2/open'
+    });
+    this.displayPatientModal();
   },
 
   patientSelected: function(patientId) {
@@ -209,6 +294,41 @@ const App = React.createClass({
         </Modal.Footer>
       </Modal>);
 
+    var fhirModalAlert = this.state.showFhirServerEntryError ?
+      (<Alert bsStyle="danger">
+        <i className="glyphicon glyphicon-exclamation-sign" />
+        <strong> Error: </strong>
+        {this.state.fhirAlertMessage}
+      </Alert>) : '';
+
+    var fhirModal =(
+      <Modal show={this.state.showFhirModal} onHide={this.hideFhirModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Change FHIR Server</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {fhirModalAlert}
+          <div>
+            <b>Current FHIR Server</b><br />
+            <p>{this.state.all.getIn(["fhirServer", "context", "baseUrl"])}</p>
+          </div>
+          <div className="input-container">
+            <label>Enter FHIR Server URL:</label>
+            <input className="form-control"
+                   autoFocus={true}
+                   placeholder={this.state.all.getIn(["fhirServer", "context", "baseUrl"])}
+                   type="text"
+                   onChange={this.handleFhirServerChange}
+            />
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button className='left-aligned-modal-button' bsStyle="link" onClick={this.resetFhirServer}>Reset to default FHIR server</Button>
+          <Button bsStyle="primary" onClick={this.changeFhirServer}>Next</Button>
+          <Button onClick={this.hideFhirModal}>Close</Button>
+        </Modal.Footer>
+      </Modal>);
+
     return (
       <div id="react-content">
         <div id="top-bar" className="app-header">
@@ -218,6 +338,8 @@ const App = React.createClass({
             <a className={rxClass} onClick={e=>this.setActivity("medication-prescribe")}>Rx View</a>
             <a className="nav-button change-patient" onClick={this.displayPatientModal}>Change Patient</a>
             {patientModal}
+            <a className="nav-button change-patient" onClick={this.displayFhirModal}>Change FHIR Server</a>
+            {fhirModal}
           </div>
         </div>
 
