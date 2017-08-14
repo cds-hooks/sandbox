@@ -546,20 +546,6 @@ pre {
       text-decoration: none;
     }
   }
-  &.editor-open {
-    top: 60px;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    padding: 30px;
-    margin: 0 0 60px;
-    background: $trans-black-75;
-    overflow: auto;
-    span.hook-buttons {
-      float: right;
-      margin: 0 0 20px;
-    }
-  }
 }
 .edit-hook {
   position: relative;
@@ -569,12 +555,12 @@ pre {
     padding: 30px;
     font-family: $font-monospace;
     font-size: .85em;
-    color: #fff;
-    border: 2px solid $white;
+    color: #000000;
+    border: 2px solid $dark-grey;
   }
   &.new-hook {
     .edit-hook-inner {
-      border: 2px dashed $white;
+      border: 2px dashed $dark-grey;
     }
   }
   .toggle-hook {
