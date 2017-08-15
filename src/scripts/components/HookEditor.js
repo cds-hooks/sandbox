@@ -345,33 +345,42 @@ const HookEditor = React.createClass({
         enabled: "true"
       }}/>)
 
-      return (<div id="hook-container" className="hook-editor">
-        <span className="hook-buttons">
-          <DropdownButton className="glyphicon configure-hooks"
-                          title={<span><i className="glyphicon glyphicon-wrench"></i>CDS Services</span>}
-                          id='dropdownConfigureButton' pullRight>
-            <MenuItem className="dropdown-config-item" onClick={this.showModal} eventKey="1">
-              <i className="glyphicon glyphicon-plus" />
-                Add CDS Service
-            </MenuItem>
-            <MenuItem divider />
-            <MenuItem className="dropdown-config-item" onClick={this.resetHooks} eventKey="2">
-              <i className="glyphicon glyphicon-leaf" />
-                Reset Configuration
-            </MenuItem>
-            <MenuItem divider />
-            <MenuItem className="dropdown-config-item" onClick={this.startEditing} eventKey="3">
-              <i className="glyphicon glyphicon-cog" />
-                Configure CDS Services
-            </MenuItem>
-          </DropdownButton>
-          {addServiceModal}
-          {serviceConnectionModal}
-        </span>
-        {serviceConfigurationModal}
-      </div>);
-  }
+    var cardRenderLabel = this.props.isMainHooksView ? "Card Demo" : "Return to Hooks";
+    var cardRenderGlyphicon = this.props.isMainHooksView ?
+      "glyphicon glyphicon-pencil" : "glyphicon glyphicon-arrow-left";
 
+    return (<div id="hook-container" className="hook-editor">
+      <span className="hook-buttons card-render-button">
+        <Button onClick={this.props.toggleCardRenderTemplate} className="toolbar-buttons">
+          <i className={cardRenderGlyphicon} />
+          <span>{cardRenderLabel}</span>
+        </Button>
+      </span>
+      <span className="hook-buttons">
+        <DropdownButton className="glyphicon toolbar-buttons"
+                        title={<span><i className="glyphicon glyphicon-wrench"></i>CDS Services</span>}
+                        id='dropdownConfigureButton' pullRight>
+          <MenuItem className="dropdown-config-item" onClick={this.showModal} eventKey="1">
+            <i className="glyphicon glyphicon-plus" />
+              Add CDS Service
+          </MenuItem>
+          <MenuItem divider />
+          <MenuItem className="dropdown-config-item" onClick={this.resetHooks} eventKey="2">
+            <i className="glyphicon glyphicon-leaf" />
+              Reset Configuration
+          </MenuItem>
+          <MenuItem divider />
+          <MenuItem className="dropdown-config-item" onClick={this.startEditing} eventKey="3">
+            <i className="glyphicon glyphicon-cog" />
+              Configure CDS Services
+          </MenuItem>
+        </DropdownButton>
+        {addServiceModal}
+        {serviceConnectionModal}
+      </span>
+      {serviceConfigurationModal}
+    </div>);
+  }
 });
 
 module.exports = HookEditor;

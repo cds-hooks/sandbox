@@ -3,6 +3,7 @@ import ActionTypes from '../actions/ActionTypes'
 import React from 'react';
 import RxActivity from './RxActivity';
 import PatientViewActivity from './PatientViewActivity';
+import CardRenderActivity from './CardRenderActivity';
 import HookEditor from './HookEditor';
 import AppStore from '../stores/AppStore'
 import DateStore from '../stores/DateStore'
@@ -56,7 +57,8 @@ const App = React.createClass({
       all: AppStore.getState(),
       settingContext: false,
       consoleLogSettingEnabled: true,
-      serviceContextViewEnabled: true
+      serviceContextViewEnabled: true,
+      isMainHooksView: true,
     }
   },
 
@@ -238,6 +240,12 @@ const App = React.createClass({
     });
   },
 
+  toggleCardRenderTemplate() {
+    this.setState({
+      isMainHooksView: !this.state.isMainHooksView,
+    });
+  },
+
   render() {
     var hook = (this.state.all.getIn(['decisions', 'hook']))
     var rxClass = hook === "medication-prescribe" ? "nav-button activity-on" : "nav-button activity-off"
@@ -341,35 +349,51 @@ const App = React.createClass({
         </Modal.Footer>
       </Modal>);
 
+    var hookAndPatientOptions = (
+      <div className="header-nav">
+        <a className={ptClass} onClick={e=>this.setActivity("patient-view")}>Patient View</a>
+        <a className={rxClass} onClick={e=>this.setActivity("medication-prescribe")}>Rx View</a>
+        <a className="nav-button change-patient" onClick={this.displayPatientModal}>Change Patient</a>
+        {patientModal}
+        <a className="nav-button change-patient" onClick={this.displayFhirModal}>Change FHIR Server</a>
+        {fhirModal}
+      </div>
+    );
+
     return (
       <div id="react-content">
         <div id="top-bar" className="app-header">
-          <span className="header-brand"><i className="glyphicon glyphicon-flash"></i> <span className="brand-cds">CDS Hooks</span> Sandbox</span>
-          <div className="header-nav">
-            <a className={ptClass} onClick={e=>this.setActivity("patient-view")}>Patient View</a>
-            <a className={rxClass} onClick={e=>this.setActivity("medication-prescribe")}>Rx View</a>
-            <a className="nav-button change-patient" onClick={this.displayPatientModal}>Change Patient</a>
-            {patientModal}
-            <a className="nav-button change-patient" onClick={this.displayFhirModal}>Change FHIR Server</a>
-            {fhirModal}
-          </div>
+          <span className="header-brand"><i className="glyphicon glyphicon-flash" /> <span className="brand-cds">CDS Hooks</span> Sandbox</span>
+          {this.state.isMainHooksView ? hookAndPatientOptions : ''}
         </div>
 
-        <HookEditor hooks={this.state.all.getIn(['hooks', 'hooks'])} editing={this.state.all.getIn(['hooks', 'editing'])} />
+        <HookEditor hooks={this.state.all.getIn(['hooks', 'hooks'])}
+                    editing={this.state.all.getIn(['hooks', 'editing'])}
+                    isMainHooksView={this.state.isMainHooksView}
+                    toggleCardRenderTemplate={this.toggleCardRenderTemplate} />
 
+        {/*Main Hooks View*/}
         {
-          hook === 'medication-prescribe' && <RxActivity toggleConsoleLog={this.setConsoleLogSetting}
-                                                         toggleServiceView={this.setServiceContextViewSetting}
-                                                         isConsoleLogEnabled={this.state.consoleLogSettingEnabled}
-                                                         isServiceViewEnabled={this.state.serviceContextViewEnabled}
-                                                         all={this.state.all}/>
+          this.state.isMainHooksView && hook === 'medication-prescribe'
+          && <RxActivity toggleConsoleLog={this.setConsoleLogSetting}
+                         toggleServiceView={this.setServiceContextViewSetting}
+                         isConsoleLogEnabled={this.state.consoleLogSettingEnabled}
+                         isServiceViewEnabled={this.state.serviceContextViewEnabled}
+                         all={this.state.all}/>
         }
         {
-          hook === 'patient-view' && <PatientViewActivity toggleConsoleLog={this.setConsoleLogSetting}
-                                                          toggleServiceView={this.setServiceContextViewSetting}
-                                                          isConsoleLogEnabled={this.state.consoleLogSettingEnabled}
-                                                          isServiceViewEnabled={this.state.serviceContextViewEnabled}
-                                                          all={this.state.all}/>
+          this.state.isMainHooksView && hook === 'patient-view'
+          && <PatientViewActivity toggleConsoleLog={this.setConsoleLogSetting}
+                                  toggleServiceView={this.setServiceContextViewSetting}
+                                  isConsoleLogEnabled={this.state.consoleLogSettingEnabled}
+                                  isServiceViewEnabled={this.state.serviceContextViewEnabled}
+                                  all={this.state.all}/>
+        }
+
+        {/*Card Render View*/}
+        {
+          !this.state.isMainHooksView && <CardRenderActivity decisions={this.state.all.get('decisions')}
+                                                             context={this.state.all.getIn(['fhirServer', 'context'])} />
         }
 
         <div id="bottom-bar" className="app-footer">

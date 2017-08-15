@@ -9,6 +9,9 @@ cache:
     - node_modules
 script:
   - npm run build
+branches:
+  only:
+    - master
 deploy:
   provider: pages
   skip_cleanup: true

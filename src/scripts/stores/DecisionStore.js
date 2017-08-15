@@ -286,6 +286,24 @@ var DecisionStore = assign({}, EventEmitter.prototype, {
     DecisionStore.emitChange();
   },
 
+  setUserJsonValue: function(val) {
+    state = state.set('tempUserJson', val);
+    DecisionStore.emitChange()
+  },
+
+  getTestCard: function(testResult) {
+    var cardKey = 0;
+    var card = testResult ? Immutable.fromJS(testResult)
+      .map((v, k) => v.set('key', cardKey++)
+        .set('suggestions', v.get('suggestions', []).map(s => s
+          .set("key", cardKey++)))
+        .set('links', v.get('links', []).map(s => s
+          .set("key", cardKey++))
+        )).toJS() : [];
+    state = state.set('tempCard', card);
+    DecisionStore.emitChange();
+  },
+
   getStateToPublish: function() {
     return {
       hook: state.get("hook")
@@ -338,14 +356,24 @@ DecisionStore.dispatchToken = AppDispatcher.register(function(action) {
           break
 
       case ActionTypes.NEW_HASH_STATE:
-          var hash = action.hash
+          var hash = action.hash;
           DecisionStore.setActivity(hash.hook || 'patient-view')
           break
-
       case ActionTypes.SET_SERVICE:
           DecisionStore.setService(action.service);
           break;
-
+      case ActionTypes.UPDATE_TEMP_CARD:
+          var arrayTemp = [];
+          if (Array.isArray(action.result)) {
+            arrayTemp.push(action.result[0]);
+          } else {
+            arrayTemp.push(action.result);
+          }
+          DecisionStore.getTestCard(arrayTemp);
+          break;
+      case ActionTypes.SAVE_USER_JSON:
+          DecisionStore.setUserJsonValue(action.value);
+          break;
       default:
           // do nothing
   }
