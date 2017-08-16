@@ -12,7 +12,8 @@ module.exports = {
   view: null,
   description: {
     id: "patient-hello-world",
-    name: "Patient hello world",
+    name: "Patient hello world", // Remove on complete transition to CDS Hooks 1.0 Spec
+    title: "Patient hello world",
     description: "Greet patient by name",
     hook: "patient-view",
     prefetch: {
@@ -30,7 +31,7 @@ function recommend(data) {
       source: {
         label: "Patient greeting service"
       },
-      indicator: "success"
+      indicator: "info"
     }]
   }
 }

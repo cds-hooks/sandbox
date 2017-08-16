@@ -10,7 +10,8 @@ module.exports = {
   },
 
   description: {
-    name: "CMS Pricing Service",
+    name: "CMS Pricing Service", // Remove on complete transition to CDS Hooks 1.0 Spec
+    title: "CMS Pricing Service",
     id: "cms-price-check",
     description: "Estimate the price of a prescription based on historical pharmacy dispensing data",
     hook: "medication-prescribe"
@@ -77,7 +78,12 @@ function message(summary, label, toPropose) {
       suggestions: label ? [{
         label: label,
         uuid: "123",
-        create: [toPropose]
+        actions: [
+          {
+            type: 'create',
+            resource: toPropose
+          }
+        ]
       }] : []
     }]
   };

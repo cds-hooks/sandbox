@@ -46,15 +46,34 @@ DateStore.dispatchToken = AppDispatcher.register(function(action) {
   switch(action.type) {
 
     case ActionTypes.TAKE_SUGGESTION:
-      var original = _dates, create = action.suggestion.create[0]
-      if (create.startDate) {
-        _dates = _dates.setIn(['start', 'value'], moment(create.startDate).toDate())
-      }
-      if (create.endDate) {
-        _dates = _dates.setIn(['end', 'value'], moment(create.endDate).toDate())
-      }
-      if (!Immutable.is(original, _dates)) {
-        DateStore.emitChange();
+      var original = _dates;
+      if (action.suggestion.hasOwnProperty('actions')) {
+        var actions = action.suggestion.actions;
+        var filteredActions = actions ? actions.filter((action) => { return action.type === 'create' || action.type === 'update' }) : [];
+        var createOrUpdate = filteredActions.length? filteredActions[0] : [];
+        if (createOrUpdate.length && createOrUpdate.resource && createOrUpdate.resource.startDate) {
+          _dates = _dates.setIn(['start', 'value'], moment(createOrUpdate.resource.startDate).toDate())
+        }
+        if (createOrUpdate.length && createOrUpdate.resource && createOrUpdate.resource.endDate) {
+          _dates = _dates.setIn(['end', 'value'], moment(createOrUpdate.resource.endDate).toDate())
+        }
+        if (!Immutable.is(original, _dates)) {
+          DateStore.emitChange();
+        }
+      } else if (action.suggestion["create"] || action.suggestion["delete"]) { // Remove on complete transition to CDS Hooks 1.0 Spec
+        console.error("CDS Service response is un-compliant with the CDS Hooks 1.0 spec for suggestions. " +
+          "Please see http://cds-hooks.org/#cds-service-response for further information.");
+
+        var create = action.suggestion.create[0];
+        if (create.startDate) {
+          _dates = _dates.setIn(['start', 'value'], moment(create.startDate).toDate())
+        }
+        if (create.endDate) {
+          _dates = _dates.setIn(['end', 'value'], moment(create.endDate).toDate())
+        }
+        if (!Immutable.is(original, _dates)) {
+          DateStore.emitChange();
+        }
       }
       break;
 

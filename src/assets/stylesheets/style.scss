@@ -21,7 +21,6 @@ $white: #fff;
 $warning: #f00;
 $warning-text: #f00;
 $info: #31b0d5;
-$success: #9c0;
 $danger: #c00;
 
 $font-roboto: 'Roboto', sans-serif;
@@ -409,12 +408,6 @@ pre {
     font-size: .85em;
     font-style: italic;
     margin: 0 0 5px;
-  }
-  &.alert-success {
-    border-left-color: $green;
-    .card-summary {
-      color: $green;
-    }
   }
   &.alert-info {
     border-left-color: $color-primary;

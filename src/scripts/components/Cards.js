@@ -16,10 +16,9 @@ window.addEventListener("message", (e) => {
 
 
 var indicators = {
-  success: 0,
-  info: 1,
-  warning: 2,
-  danger: 3
+  info: 0,
+  warning: 1,
+  danger: 2
 }
 
 const Cards = React.createClass({

@@ -95,6 +95,7 @@ HookStore.dispatchToken = AppDispatcher.register(function(action) {
             url: action.url + "/"+ service.id,
             enabled: true,
             hook: service.hook,
+            title: service.title || '',
             prefetch: service.prefetch || {}
           }));
 

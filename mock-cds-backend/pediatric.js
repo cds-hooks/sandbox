@@ -23,7 +23,8 @@ module.exports ={
   }, view:  view,
   description: {
     hook: "medication-prescribe",
-    name: "Random grab-bag of mock services",
+    name: "Random grab-bag of mock services", // Remove on complete transition to CDS Hooks 1.0 Spec
+    title: "Random grab-bag of mock services",
     description: "Generate a bunch of cards for various reasons",
     id: "pediatric-dose-check",
     prefetch:{
@@ -128,7 +129,7 @@ function assessJNC(inData, response) {
         source: {
           label: "Joint National Commission"
         },
-        indicator: "success",
+        indicator: "info",
         links: [{
           label: "Tailor therapy",
           url: context.url + "/service/pediatric-dose-check/jnc8/" + hookInstance
@@ -148,7 +149,7 @@ function assessHarvoni(inData, cards) {
   if (! med.medicationCodeableConcept) return;
   var drugName = med.medicationCodeableConcept.text;
   if (!drugName.match(/harvoni|ledipasvir/i)){
-    return 
+    return
   }
 
   _db[hookInstance] = _db[hookInstance] || {}
@@ -160,7 +161,7 @@ function assessHarvoni(inData, cards) {
       source: {
         label: "CareMore PBM",
       },
-      indicator: "success",
+      indicator: "info",
       links: [{
         label: "View status",
         url: context.url + "/service/pediatric-dose-check/harvoni/" + hookInstance
