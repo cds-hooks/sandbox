@@ -43,7 +43,7 @@ const OneHook = React.createClass({
     })
   },
   getCurrent() {
-    var val = this.refs.content.getDOMNode().innerHTML.replace(/\&nbsp;/g, " ");
+    var val = this.refs.content.innerHTML.replace(/\&nbsp;/g, " ");
     var stripped = striptags(val).replace(/&amp;/g, "&");
     var current;
     try {
@@ -98,7 +98,8 @@ const HookEditor = React.createClass({
       showUrlBannerError: false,
       discoveryEndpoint: '',
       isNewInputWindow: true,
-      showConnectionModal: false
+      showConnectionModal: false,
+      showConfigurationModal: false
     };
   },
   componentWillReceiveProps(nextProps) {},
@@ -206,6 +207,9 @@ const HookEditor = React.createClass({
   },
 
   startEditing() {
+    this.setState({
+      showConfigurationModal: true
+    });
     if (!this.props.editing) {
       document.getElementById("hook-container").classList.add("editor-open");
       return AppDispatcher.dispatch({
@@ -214,6 +218,16 @@ const HookEditor = React.createClass({
     } else {
       document.getElementById("hook-container").classList.remove("editor-open");
     }
+    return AppDispatcher.dispatch({
+      type: ActionTypes.SAVE_HOOK,
+      discard: true
+    })
+  },
+
+  closeEditor() {
+    this.setState({
+      showConfigurationModal: false
+    });
     return AppDispatcher.dispatch({
       type: ActionTypes.SAVE_HOOK,
       discard: true
@@ -310,6 +324,21 @@ const HookEditor = React.createClass({
       </Modal>
     );
 
+    var serviceConfigurationModal = (
+      <Modal bsStyle="lg" show={this.state.showConfigurationModal} onHide={this.closeEditor}>
+        <Modal.Header closeButton>
+          <Modal.Title>Configure CDS Services</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          You can edit the service configuration directly here.
+          {current}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={this.closeEditor}>Close</Button>
+        </Modal.Footer>
+      </Modal>
+    );
+
     if (this.props.editing)
       current.push(<OneHook key="new" className="new-hook" hook={{
         id: "new",
@@ -339,7 +368,7 @@ const HookEditor = React.createClass({
           {addServiceModal}
           {serviceConnectionModal}
         </span>
-        {current}
+        {serviceConfigurationModal}
       </div>);
   }
 
