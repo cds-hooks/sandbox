@@ -38,6 +38,8 @@ const FhirView = React.createClass({
       return true;
     } else if (nextProps.hook !== this.props.hook) {
       return true;
+    } else if (nextProps.all.getIn(['hooks', 'hooks']) !== this.props.all.getIn(['hooks', 'hooks'])) {
+      return true;
     }
     return false;
   },
@@ -163,7 +165,7 @@ const FhirView = React.createClass({
           <div className='wrap-context'>
             <h1 className="view-title">CDS Service Exchange</h1>
             <label className='service-dropdown-select'>Select a Service:
-              <select value={this.props.all.getIn(['decisions', 'selectedService'])} onChange={this.handleServiceChange}>
+              <select value={this.props.all.getIn(['decisions', 'serviceSelected'])} onChange={this.handleServiceChange}>
                 {
                   validServices.map((hook, serviceName) =>
                     <option key={hook.get('id')} value={serviceName}>{serviceName}</option>

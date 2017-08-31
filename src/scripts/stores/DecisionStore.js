@@ -50,6 +50,8 @@ function _hooksChanged() {
 
   if (samePatient && sameHooks) {
     return;
+  } else {
+    state = state.set('services', hooks);
   }
 
   var hookNames = hooks.keySeq()
@@ -130,18 +132,14 @@ function hookBody(h, fhir, prefetch) {
   });
 
   state = state.setIn(['services', serviceId], serviceRequest);
-
   var servicesForHook = state.get('services').filter((service) => {
     return service.get('hook') === state.get('hook')
   });
-  if (state.get('selectedService') &&
-    servicesForHook.get(state.get('selectedService')) &&
-    servicesForHook.get(state.get('selectedService')).get('request') &&
-    HookStore.getState().get('hooks').get(state.get('selectedService'))) {
-    state = state.set('serviceRequestBody', servicesForHook.get(state.get('selectedService')).get('request'))
+
+  if (servicesForHook.get(state.get('serviceSelected'))) {
+    state = state.set('serviceRequestBody', servicesForHook.get(state.get('serviceSelected')).get('request'));
   } else {
-    state = state.set('serviceRequestBody', servicesForHook.first().get('request'))
-    state = state.set('selectedService', servicesForHook.first());
+    state = state.set('serviceRequestBody', servicesForHook.first().get('request'));
   }
   return ret;
 }
@@ -188,17 +186,15 @@ function addCardsFrom(callCount, hookUrl, result) {
     response: result
   });
   state = state.mergeIn(['services', hookUrl], insertResponse);
+
   var servicesForHook = state.get('services').filter((service) => {
     return service.get('hook') === state.get('hook')
   });
-  if (state.get('selectedService') &&
-    servicesForHook.get(state.get('selectedService')) &&
-    servicesForHook.get(state.get('selectedService')).get('response') &&
-    HookStore.getState().get('hooks').get(state.get('selectedService'))) {
-    state = state.set('serviceResponseBody', servicesForHook.get(state.get('selectedService')).get('response'))
+
+  if (servicesForHook.get(state.get('serviceSelected'))) {
+    state = state.set('serviceResponseBody', servicesForHook.get(state.get('serviceSelected')).get('response'));
   } else {
     state = state.set('serviceResponseBody', servicesForHook.first().get('response'));
-    state = state.set('selectedService', servicesForHook.first());
   }
   DecisionStore.emitChange();
 }
@@ -239,6 +235,7 @@ function callHooks(localState) {
           cards: [],
           decisions: []
         };
+        console.log("Failed CDS Service response", result);
         state = state.set('cards', invalidResponse);
         state.set('serviceResponseBody', invalidResponse);
       }));
@@ -275,12 +272,11 @@ var DecisionStore = assign({}, EventEmitter.prototype, {
   },
 
   setService: function(id) {
-    if (state.getIn(['services', id]).get('request')) {
-      state = state.set('selectedService', id);
+    if (state.getIn(['services', id]).get('request') &&
+      state.getIn(['services', id]).get('response')) {
+      // Set the request and response for newly selected service from dropdown
+      state = state.set('serviceSelected', id);
       state = state.set('serviceRequestBody', state.getIn(['services', id]).get('request'));
-    }
-    if (state.getIn(['services', id]).get('response')) {
-      state = state.set('selectedService', id);
       state = state.set('serviceResponseBody', state.getIn(['services', id]).get('response'));
     }
     DecisionStore.emitChange();
