@@ -171,15 +171,29 @@ DrugStore.dispatchToken = AppDispatcher.register(function(action) {
 
     case ActionTypes.TAKE_SUGGESTION:
       console.log("take drg suggestion", action)
-      var original = state,
-        create = action.suggestion.create[0]
-      if (create.medicationCodeableConcept) {
-        state = state.set('step', 'done')
-        state = state.setIn(['decisions', 'prescribable'], Immutable.fromJS({
-          "str": create.medicationCodeableConcept.text,
-          "cui": create.medicationCodeableConcept.coding[0].code
-        }))
-        console.log("And set the med", create.medicationCodeableConcept.text)
+      var original = state;
+      if (action.suggestion.hasOwnProperty('actions')) {
+        var actions = action.suggestion.actions;
+        var filteredActions = actions ? actions.filter((action) => { return action.type === 'create' || action.type === 'update' }) : [];
+        var createOrUpdate = filteredActions.length ? filteredActions[0] : [];
+        if (createOrUpdate.length && createOrUpdate.resource && createOrUpdate.resource.medicationCodeableConcept) {
+          state = state.set('step', 'done');
+          state = state.setIn(['decisions', 'prescribable'], Immutable.fromJS({
+            "str": createOrUpdate.resource.medicationCodeableConcept.text,
+            "cui": createOrUpdate.resource.medicationCodeableConcept.coding[0].code
+          }));
+        }
+      } else if (action.suggestion['create'] || action.suggestion['delete']) { // Remove on complete transition to CDS Hooks 1.0 Spec
+        console.error("CDS Service response is un-compliant with the CDS Hooks 1.0 spec for suggestions. " +
+          "Please see http://cds-hooks.org/#cds-service-response for further information.");
+        var create = action.suggestion.create[0];
+        if (create.medicationCodeableConcept) {
+          state = state.set('step', 'done');
+          state = state.setIn(['decisions', 'prescribable'], Immutable.fromJS({
+            "str": create.medicationCodeableConcept.text,
+            "cui": create.medicationCodeableConcept.coding[0].code
+          }));
+        }
       }
       if (!Immutable.is(original, state)) {
         DrugStore.emitChange();
