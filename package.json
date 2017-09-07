@@ -8,6 +8,7 @@
     "babel-preset-react": "^6.24.1",
     "browser-request": "^0.3.3",
     "debounce": "^1.0.0",
+    "fhirclient": "^0.1.11",
     "flux": "^2.0.3",
     "immutable": "^3.7.5",
     "json-loader": "^0.5.2",

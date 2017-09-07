@@ -8,6 +8,7 @@ import HookStore from './HookStore'
 import moment from 'moment'
 import uuid from 'node-uuid'
 import { getIn, paramsToJson } from '../../../mock-cds-backend/utils.js'
+import CDS_SMART_OBJ from '../../smart_authentication';
 
 var AppDispatcher = require('../dispatcher/AppDispatcher')
 var EventEmitter = require('events').EventEmitter
@@ -70,6 +71,18 @@ function _hooksChanged() {
     }
   ]
 
+  var headerForPrefetch;
+  if (CDS_SMART_OBJ.accessToken && CDS_SMART_OBJ.accessToken.access_token) {
+    headerForPrefetch = {
+      'Authorization': 'Bearer ' + CDS_SMART_OBJ.accessToken.access_token,
+      'Accept': 'application/json+fhir'
+    }
+  } else {
+    headerForPrefetch = {
+      'Accept': 'application/json+fhir'
+    }
+  }
+
   var prefetch = hooks
     .reduce((coll, v)=> coll.union(
       v.get('prefetch', Immutable.Map())
@@ -79,6 +92,7 @@ function _hooksChanged() {
       url,
       axios({
         url: context.baseUrl + '/' + fillTemplate(url, context),
+        headers: headerForPrefetch,
         method: 'get'
       })
     ])
@@ -116,11 +130,19 @@ function hookBody(h, fhir, prefetch) {
     hookInstance: ids.hookInstance,
     fhirServer: FhirServerStore.getState().getIn(['context', 'baseUrl']),
     redirect: _base + "service-done.html",
-    user: "Practitioner/example",
+    user: FhirServerStore.getState().getIn(['context', 'user']) || "Practitioner/example",
     patient: state.get('patient'),
     context: [],
     prefetch: h.get('prefetch', Immutable.Map())
                .map(v => prefetch.get(v))
+  };
+  if (CDS_SMART_OBJ.accessToken) {
+    ret.fhirAuthorization = {
+      scope: CDS_SMART_OBJ.accessToken.scope,
+      token_type: 'code',
+      expires_in: CDS_SMART_OBJ.accessToken.expires_in,
+      access_token: CDS_SMART_OBJ.accessToken.token_type + ' ' + CDS_SMART_OBJ.accessToken.access_token
+    }
   }
   if (fhir)
     ret.context.push(fhir);

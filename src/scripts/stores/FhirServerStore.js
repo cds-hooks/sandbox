@@ -2,7 +2,8 @@ import axios from 'axios'
 import ActionTypes from '../actions/ActionTypes'
 import moment from 'moment'
 import uuid from 'node-uuid'
-import { getIn, paramsToJson } from '../../../mock-cds-backend/utils.js'
+import { getIn, paramsToJson } from '../../../mock-cds-backend/utils.js';
+import CDS_SMART_OBJ from '../../smart_authentication';
 
 var AppDispatcher = require('../dispatcher/AppDispatcher')
 var EventEmitter = require('events').EventEmitter
@@ -33,7 +34,8 @@ var _client;
 
 function _fetchData() {
   console.log("Will get stat efor ",  state.getIn(['context', 'patient']))
-  _client.search({
+  var trueFhirObj = (CDS_SMART_OBJ.hasOwnProperty('smartObj')) ? CDS_SMART_OBJ.smartObj.api : _client;
+  trueFhirObj.search({
     type: 'Condition',
     query: {
       patient: state.getIn(['context', 'patient'])
@@ -44,10 +46,8 @@ function _fetchData() {
       if (!Immutable.is(original, state)) {
         FhirServiceStore.emitChange()
       }
-    }).catch(e => {
-      console.log("Error fetching conditions", e)
-  })
-  _client.read({
+  });
+  trueFhirObj.read({
     type: 'Patient',
     id: state.getIn(['context', 'patient'])
   }).then(b => {
@@ -57,22 +57,22 @@ function _fetchData() {
       if (!Immutable.is(original, state)) {
         FhirServiceStore.emitChange()
       }
-    }).catch(e => {
-      console.log("Error fetching patient", e)
-  })
-
+  });
 }
 
 function _checkValidPatient(patientID, dfd) {
-  _client.read({
+  var trueFhirObj = (CDS_SMART_OBJ.hasOwnProperty('smartObj')) ? CDS_SMART_OBJ.smartObj.api : _client;
+  trueFhirObj.read({
     type: 'Patient',
     id: patientID
   }).then(response => {
     return dfd.resolve(response.status);
-  }).catch(response => {
-    console.log("Error fetching patient", response);
+  }, response => {
+    if (CDS_SMART_OBJ.hasOwnProperty('smartObj')) {
+      return dfd.resolve(response.data.status);
+    }
     return dfd.resolve(response.status);
-  })
+  });
   return dfd.promise();
 }
 
@@ -101,9 +101,11 @@ var state = Immutable.fromJS({
 
 
 var FhirServiceStore = assign({}, EventEmitter.prototype, {
-  setContext: function(fhirContext) {
+  setContext: function(fhirContext, defaultFhirServer) {
     state = state.set('context', state.get('context').merge(fhirContext))
-    _client = fhirClient(state.get('context').toJS())
+    if (defaultFhirServer) {
+      _client = fhirClient(state.get('context').toJS())
+    }
     _fetchData()
   },
   getState: function() {
@@ -132,13 +134,17 @@ var FhirServiceStore = assign({}, EventEmitter.prototype, {
   },
 
   checkFhirServerResponse(serverUrl, dfd) {
-    return _checkValidFhirServer(serverUrl, dfd);
+    if (!CDS_SMART_OBJ.hasOwnProperty('smartObj')) {
+      return _checkValidFhirServer(serverUrl, dfd);
+    }
   },
 
   changeFhirServer(serverUrl) {
-    state = state.set("context", state.get("context").merge({ baseUrl: serverUrl }));
-    _client = fhirClient(state.get('context').toJS());
-    this.emitChange();
+    if (!CDS_SMART_OBJ.hasOwnProperty('smartObj')) {
+      state = state.set("context", state.get("context").merge({ baseUrl: serverUrl }));
+      _client = fhirClient(state.get('context').toJS());
+      this.emitChange();
+    }
   },
 
   emitChange: function() {
@@ -191,6 +197,6 @@ var fhirContext = {
   baseUrl: qs.fhirServiceUrl || runtime.FHIR_URL
 }
 
-FhirServiceStore.setContext(fhirContext)
+FhirServiceStore.setContext(fhirContext, true)
 
 module.exports = FhirServiceStore
