@@ -139,9 +139,9 @@ function hookBody(h, fhir, prefetch) {
   if (CDS_SMART_OBJ.accessToken) {
     ret.fhirAuthorization = {
       scope: CDS_SMART_OBJ.accessToken.scope,
-      token_type: 'code',
+      token_type: 'Bearer',
       expires_in: CDS_SMART_OBJ.accessToken.expires_in,
-      access_token: CDS_SMART_OBJ.accessToken.token_type + ' ' + CDS_SMART_OBJ.accessToken.access_token
+      access_token: CDS_SMART_OBJ.accessToken.access_token
     }
   }
   if (fhir)
