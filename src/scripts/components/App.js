@@ -25,10 +25,17 @@ function bodyClick(e) {
   })
 };
 
-AppDispatcher.dispatch({
-  type: ActionTypes.NEW_HASH_STATE,
-  hash: window.location.hash.slice(1) ? JSON.parse(window.location.hash.slice(1)) : {}
-})
+if(window.location.hash.slice(1).indexOf('state=') < 0) {
+  AppDispatcher.dispatch({
+    type: ActionTypes.NEW_HASH_STATE,
+    hash: window.location.hash.slice(1) ? JSON.parse(window.location.hash.slice(1)) : {}
+  })
+} else {
+  AppDispatcher.dispatch({
+    type: ActionTypes.NEW_HASH_STATE,
+    hash: {}
+  })
+}
 
 const App = React.createClass({
 
@@ -105,7 +112,7 @@ const App = React.createClass({
 
     // Check if requested patient exists in the FHIR server
     patientFetchResponse.then(function(status) {
-      if (status === 200) {
+      if (status === 200 || status === 'success') {
         this.hidePatientModal();
         this.setState({
           showPatientEntryError: false,
@@ -149,8 +156,7 @@ const App = React.createClass({
 
     // Check if requested FHIR Server contains metadata endpoint
     serverFetchResponse.then(function(response) {
-
-      if (response && response.status === 200) {
+      if (response && (response.status === 200 || response.status === 'success')) {
         this.hideFhirModal();
         if(response.data.url.indexOf('https') > -1 && this.state.fhirServer.indexOf('https') < 0) {
           var tempUrlString = this.state.fhirServer;
@@ -349,13 +355,15 @@ const App = React.createClass({
         </Modal.Footer>
       </Modal>);
 
+    var fhirServerChangeButtonClass = CDS_SMART_OBJ.hasOwnProperty('smartObj') ? 'hidden' : 'nav-button change-patient';
+
     var hookAndPatientOptions = (
       <div className="header-nav">
         <a className={ptClass} onClick={e=>this.setActivity("patient-view")}>Patient View</a>
         <a className={rxClass} onClick={e=>this.setActivity("medication-prescribe")}>Rx View</a>
         <a className="nav-button change-patient" onClick={this.displayPatientModal}>Change Patient</a>
         {patientModal}
-        <a className="nav-button change-patient" onClick={this.displayFhirModal}>Change FHIR Server</a>
+        <a className={fhirServerChangeButtonClass} onClick={this.displayFhirModal}>Change FHIR Server</a>
         {fhirModal}
       </div>
     );
