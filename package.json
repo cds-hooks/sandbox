@@ -12,6 +12,7 @@
     "flux": "^2.0.3",
     "immutable": "^3.7.5",
     "json-loader": "^0.5.2",
+    "jsrsasign": "^8.0.3",
     "less": "^2.5.3",
     "moment": "^2.10.6",
     "node-uuid": "^1.4.3",

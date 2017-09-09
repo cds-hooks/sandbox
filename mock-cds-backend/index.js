@@ -22,7 +22,7 @@ server.use(function(req, res, next){
   }
   next()
 })
-
+restify.CORS.ALLOW_HEADERS.push('authorization');
 server.use(restify.CORS());
 server.on('uncaughtException', function (request, response, route, error) {
   console.log("Err on", route, error)
