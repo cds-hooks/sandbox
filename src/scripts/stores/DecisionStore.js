@@ -9,6 +9,7 @@ import moment from 'moment'
 import uuid from 'node-uuid'
 import { getIn, paramsToJson } from '../../../mock-cds-backend/utils.js'
 import CDS_SMART_OBJ from '../../smart_authentication';
+import $ from 'jquery';
 
 var AppDispatcher = require('../dispatcher/AppDispatcher')
 var EventEmitter = require('events').EventEmitter
@@ -236,18 +237,29 @@ function callHooks(localState) {
     state = state.set('calling', false)
   }
 
+  var requestHeader;
+  if (CDS_SMART_OBJ.jwt) {
+    requestHeader = {
+      'Authorization': 'Bearer ' + CDS_SMART_OBJ.jwt,
+      'Content-Type': 'application/json'
+    };
+  } else {
+    requestHeader = {
+      'Content-Type': 'application/json'
+    };
+  }
+
   localState.get('prefetch')
     .then((prefetch) => {
-      var results = applicableServices.map((h, hookUrl) => axios({
-        url: h.get('url'),
-        method: 'post',
-        data: hookBody(h,
-                       localState.get('fhir') && localState.get('fhir').toJS(),
-                       prefetch),
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
+      var results = applicableServices.map((h, hookUrl) =>
+          axios({
+            url: h.get('url'),
+            method: 'post',
+            data: hookBody(h,
+              localState.get('fhir') && localState.get('fhir').toJS(),
+              prefetch),
+            headers: requestHeader
+          })
       ).forEach((p, hookUrl) => p.then((result) => {
         if (typeof result === 'string' || result instanceof String) { result = {}; }
         addCardsFrom(myCallCount, hookUrl, result);

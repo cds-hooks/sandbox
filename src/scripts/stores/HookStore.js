@@ -6,6 +6,7 @@ import axios from 'axios'
 import ActionTypes from '../actions/ActionTypes'
 import defaultHooks from './HookStore.defaults'
 import { schema, paramsToJson } from '../../../mock-cds-backend/utils.js'
+import CDS_SMART_OBJ from '../../smart_authentication';
 
 var CHANGE_EVENT = 'change';
 var state = Immutable.fromJS({
@@ -84,9 +85,16 @@ HookStore.dispatchToken = AppDispatcher.register(function(action) {
         HookStore.emitChange()
         break
     case ActionTypes.QUICK_ADD_HOOK:
+      var discoveryRequestHeader;
+      if (CDS_SMART_OBJ.jwt) {
+        discoveryRequestHeader = {
+          'Authorization': 'Bearer ' + CDS_SMART_OBJ.jwt
+        };
+      }
       axios({
         url: action.url,
         method: 'get',
+        headers: discoveryRequestHeader || {}
       }).then(function(result){
         if (result && result.hasOwnProperty('data') && result.data.hasOwnProperty('services')) {
           var services = result.data.services;
