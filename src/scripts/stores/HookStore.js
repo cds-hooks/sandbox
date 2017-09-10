@@ -2,11 +2,14 @@ var AppDispatcher = require('../dispatcher/AppDispatcher');
 var EventEmitter = require('events').EventEmitter;
 var assign = require('object-assign');
 var Immutable = require('immutable');
+var JWT = require('jsrsasign');
 import axios from 'axios'
 import ActionTypes from '../actions/ActionTypes'
 import defaultHooks from './HookStore.defaults'
 import { schema, paramsToJson } from '../../../mock-cds-backend/utils.js'
 import CDS_SMART_OBJ from '../../smart_authentication';
+import uuid from 'node-uuid';
+import $ from 'jquery';
 
 var CHANGE_EVENT = 'change';
 var state = Immutable.fromJS({
@@ -91,31 +94,74 @@ HookStore.dispatchToken = AppDispatcher.register(function(action) {
           'Authorization': 'Bearer ' + CDS_SMART_OBJ.jwt
         };
       }
-      axios({
-        url: action.url,
-        method: 'get',
-        headers: discoveryRequestHeader || {}
-      }).then(function(result){
-        if (result && result.hasOwnProperty('data') && result.data.hasOwnProperty('services')) {
-          var services = result.data.services;
-          var generated = services.map(service => ({
-            id: action.url + "/" + service.id,
-            url: action.url + "/"+ service.id,
-            enabled: true,
-            hook: service.hook,
-            title: service.title || '',
-            prefetch: service.prefetch || {}
-          }));
+      var ret = $.Deferred();
 
-          generated.forEach(h => {
-            AppDispatcher.dispatch({
-              type: ActionTypes.SAVE_HOOK,
-              id: h.url,
-              value: h
-            })
+      function generateJwt(hookUrl, buildJwt) {
+        if (window.sessionStorage['privatePem']) {
+          return ret.resolve(buildJwt(hookUrl, window.sessionStorage['privatePem']));
+        } else {
+          $.ajax({
+            async: false,
+            url: 'https://raw.githubusercontent.com/cerner/cds-hooks-sandbox/master/ecprivatekey.pem',
+            success: function(data) {
+              window.sessionStorage['privatePem'] = data;
+              return ret.resolve(buildJwt(hookUrl, data))
+            }
           });
         }
-      });
+      }
+
+      function buildJwt(hookUrl, data) {
+        var payload = JSON.stringify({
+          iss: 'http://sandbox.cds-hooks.org',
+          aud: hookUrl,
+          exp: Math.round((Date.now() / 1000) + 3600),
+          iat: Math.round((Date.now() / 1000)),
+          jti: uuid.v4()
+        });
+        var header = JSON.stringify({
+          alg: 'ES256',
+          typ: 'JWT'
+        });
+        return JWT.jws.JWS.sign(null, header, payload, data);
+      }
+
+      function jwtPromise(hookUrl, buildJwt) {
+        generateJwt(hookUrl, buildJwt);
+        return ret.promise();
+      }
+      jwtPromise(action.url, buildJwt).then(
+        (data) => {
+          axios({
+            url: action.url,
+            method: 'get',
+            headers: {
+              'Authorization': 'Bearer ' + data,
+              'Content-Type': 'application/json'
+            }
+          }).then(function(result){
+            if (result && result.hasOwnProperty('data') && result.data.hasOwnProperty('services')) {
+              var services = result.data.services;
+              var generated = services.map(service => ({
+                id: action.url + "/" + service.id,
+                url: action.url + "/"+ service.id,
+                enabled: true,
+                hook: service.hook,
+                title: service.title || '',
+                prefetch: service.prefetch || {}
+              }));
+
+              generated.forEach(h => {
+                AppDispatcher.dispatch({
+                  type: ActionTypes.SAVE_HOOK,
+                  id: h.url,
+                  value: h
+                })
+              });
+            }
+          });
+        }
+      );
       break;
 
     case ActionTypes.NEW_HOOK:
