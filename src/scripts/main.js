@@ -30,7 +30,7 @@ CDS_SMART_OBJ.fetchContext().then(
     }
     ReactDOM.render(<App/>, document.getElementById('react-wrapper'));
   }, () => {
-    var fhirUrl = 'https://api.hspconsortium.org/cdshooksdstu2/open';
+    var fhirUrl = 'https://sb-fhir-dstu2.smarthealthit.org/api/smartdstu2/open';
     var userId = 'Practitioner/example';
     var clientId = '48163c5e-88b5-4cb3-92d3-23b800caa927';
     setJWT(fhirUrl, userId, clientId);
