@@ -12,6 +12,7 @@ import CDS_SMART_OBJ from '../../smart_authentication';
 import $ from 'jquery';
 
 var AppDispatcher = require('../dispatcher/AppDispatcher')
+var JWT = require('jsrsasign');
 var EventEmitter = require('events').EventEmitter
 var assign = require('object-assign')
 var Immutable = require('immutable')
@@ -237,29 +238,63 @@ function callHooks(localState) {
     state = state.set('calling', false)
   }
 
-  var requestHeader;
-  if (CDS_SMART_OBJ.jwt) {
-    requestHeader = {
-      'Authorization': 'Bearer ' + CDS_SMART_OBJ.jwt,
-      'Content-Type': 'application/json'
-    };
-  } else {
-    requestHeader = {
-      'Content-Type': 'application/json'
-    };
+  var ret = $.Deferred();
+
+  function generateJwt(hookUrl, buildJwt) {
+    if (window.sessionStorage['privatePem']) {
+      return ret.resolve(buildJwt(hookUrl, window.sessionStorage['privatePem']));
+    } else {
+      $.ajax({
+        async: false,
+        url: 'https://raw.githubusercontent.com/cerner/cds-hooks-sandbox/master/ecprivatekey.pem',
+        success: function(data) {
+          window.sessionStorage['privatePem'] = data;
+          return ret.resolve(buildJwt(hookUrl, data))
+        }
+      });
+    }
+  }
+
+
+  function buildJwt(hookUrl, data) {
+    var payload = JSON.stringify({
+      iss: 'http://sandbox.cds-hooks.org',
+      aud: hookUrl,
+      exp: Math.round((Date.now() / 1000) + 3600),
+      iat: Math.round((Date.now() / 1000)),
+      jti: uuid.v4()
+    });
+    var header = JSON.stringify({
+      alg: 'ES256',
+      typ: 'JWT'
+    });
+    return JWT.jws.JWS.sign(null, header, payload, data);
+  }
+
+  function jwtPromise(hookUrl, buildJwt) {
+    generateJwt(hookUrl, buildJwt);
+    return ret.promise();
   }
 
   localState.get('prefetch')
     .then((prefetch) => {
-      var results = applicableServices.map((h, hookUrl) =>
-          axios({
-            url: h.get('url'),
-            method: 'post',
-            data: hookBody(h,
-              localState.get('fhir') && localState.get('fhir').toJS(),
-              prefetch),
-            headers: requestHeader
-          })
+      var results = applicableServices.map((h, hookUrl) => {
+          return jwtPromise(h.get('url'), buildJwt).then(
+            (val) => {
+              return axios({
+                url: h.get('url'),
+                method: 'post',
+                data: hookBody(h,
+                  localState.get('fhir') && localState.get('fhir').toJS(),
+                  prefetch),
+                headers: {
+                  'Authorization': 'Bearer ' + val,
+                  'Content-Type': 'application/json'
+                }
+              });
+            }
+          )
+      }
       ).forEach((p, hookUrl) => p.then((result) => {
         if (typeof result === 'string' || result instanceof String) { result = {}; }
         addCardsFrom(myCallCount, hookUrl, result);
