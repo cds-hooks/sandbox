@@ -18,6 +18,14 @@ var DateStore = assign({}, EventEmitter.prototype, {
   },
 
   getDates: function(){
+    if (_dates.size === 0) {
+      this.setDate("start", {
+        date: moment().toDate(),
+        enabled: true});
+      this.setDate("end", {
+        date: moment().add(1, 'month').toDate(),
+        enabled: true});
+    }
     return _dates.toJS()
   },
 
@@ -51,10 +59,10 @@ DateStore.dispatchToken = AppDispatcher.register(function(action) {
         var actions = action.suggestion.actions;
         var filteredActions = actions ? actions.filter((action) => { return action.type === 'create' || action.type === 'update' }) : [];
         var createOrUpdate = filteredActions.length? filteredActions[0] : [];
-        if (createOrUpdate.length && createOrUpdate.resource && createOrUpdate.resource.startDate) {
+        if (createOrUpdate && createOrUpdate.resource && createOrUpdate.resource.startDate) {
           _dates = _dates.setIn(['start', 'value'], moment(createOrUpdate.resource.startDate).toDate())
         }
-        if (createOrUpdate.length && createOrUpdate.resource && createOrUpdate.resource.endDate) {
+        if (createOrUpdate && createOrUpdate.resource && createOrUpdate.resource.endDate) {
           _dates = _dates.setIn(['end', 'value'], moment(createOrUpdate.resource.endDate).toDate())
         }
         if (!Immutable.is(original, _dates)) {

@@ -26,6 +26,7 @@ var state = Immutable.fromJS({
   calling: false,
   cards: [],
   services: Immutable.Map(),
+  cardLinkInvoked: false
 })
 
 function getFhirContext() {
@@ -42,10 +43,13 @@ function _externalAppReturned() {
   console.log("Handling external return by re-running hooks")
   callHooks(state)
 }
-
 function _hooksChanged() {
   var context = getFhirContext()
-  var hooks = HookStore.getState().get('hooks').filter((v,k) => v.get('enabled'))
+  var newHooks = HookStore.getState().get('hooks');
+  if (!state.get('hooks')) {
+    state = state.set('hooks', newHooks);
+  }
+  var hooks = newHooks.filter((v,k) => v.get('enabled'));
   var patient = FhirServerStore.getState().getIn(['context', 'patient']);
 
   var samePatient = patient === state.get('patient')
@@ -57,10 +61,8 @@ function _hooksChanged() {
     state = state.set('services', hooks);
   }
 
-  var hookNames = hooks.keySeq()
-
   state = state.set('cards', Immutable.fromJS([]));
-  state = state.set('hooks', hooks)
+  state = state.set('hooks', hooks);
   state = state.set('patient', patient)
 
   var response = (url, r) => [
@@ -88,7 +90,7 @@ function _hooksChanged() {
   var prefetch = hooks
     .reduce((coll, v)=> coll.union(
       v.get('prefetch', Immutable.Map())
-       .valueSeq()),
+        .valueSeq()),
       Immutable.Set())
     .map(url => [
       url,
@@ -99,8 +101,8 @@ function _hooksChanged() {
       })
     ])
     .map(([url, p]) => p
-         .then(r => response(url, r))
-         .catch(r => response(url, r)))
+      .then(r => response(url, r))
+      .catch(r => response(url, r)))
 
   state = state.set('prefetch', Promise
     .all(prefetch)
@@ -126,10 +128,11 @@ if (!_base.match(/.*\//)) {
 }
 
 function hookBody(h, fhir, prefetch) {
-  var ids = idService.createIds()
+  var ids = idService.createIds();
+  var serviceId = h.get('id')
   var ret = {
     hook: h.get('hook'),
-    hookInstance: ids.hookInstance,
+    hookInstance: uuid.v4(),
     fhirServer: FhirServerStore.getState().getIn(['context', 'baseUrl']),
     redirect: _base + "service-done.html",
     user: FhirServerStore.getState().getIn(['context', 'user']) || "Practitioner/example",
@@ -149,7 +152,6 @@ function hookBody(h, fhir, prefetch) {
   if (fhir)
     ret.context.push(fhir);
 
-  var serviceId = h.get('id')
   var serviceRequest = Immutable.fromJS({
     request: Immutable.fromJS(ret),
     hook: h.get('hook')
@@ -178,7 +180,7 @@ function addCardsFrom(callCount, hookUrl, result) {
   }
 
   state = state.set('calling', false)
-  var result = result.data
+  var result = result.data;
 
   var decisions = result.decisions;
   if (decisions && decisions.length > 0) {
@@ -245,7 +247,6 @@ function callHooks(localState) {
       return ret.resolve(buildJwt(hookUrl, window.sessionStorage['privatePem']));
     } else {
       $.ajax({
-        async: false,
         url: 'https://raw.githubusercontent.com/cerner/cds-hooks-sandbox/master/ecprivatekey.pem',
         success: function(data) {
           window.sessionStorage['privatePem'] = data;
@@ -322,9 +323,9 @@ var DecisionStore = assign({}, EventEmitter.prototype, {
 
   setActivity: function(hook) {
     console.log("Set hook", hook)
-    state = state.merge(_stores[hook].getState())
-    state.get('hookStore').processChange()
-    DecisionStore.emitChange()
+    state = state.merge(_stores[hook].getState());
+    state.get('hookStore').processChange();
+    DecisionStore.emitChange();
   },
 
   setActivityState: function(hook, resource) {
@@ -336,7 +337,9 @@ var DecisionStore = assign({}, EventEmitter.prototype, {
       state = state.set('serviceRequestBody', state.get('serviceRequestBody') || resource);
       state = state.set('fhir', resource)
       state = state.set('cards', Immutable.List())
-      setTimeout(() => callHooks(state), DELAY)
+      if (CDS_SMART_OBJ.processedContext) {
+        setTimeout(() => callHooks(state), DELAY)
+      }
     }
   },
 
@@ -366,6 +369,11 @@ var DecisionStore = assign({}, EventEmitter.prototype, {
           .set("key", cardKey++))
         )).toJS() : [];
     state = state.set('tempCard', card);
+    DecisionStore.emitChange();
+  },
+
+  cardLinkClick: function() {
+    state = state.set('cardLinkInvoked', true);
     DecisionStore.emitChange();
   },
 
@@ -413,6 +421,10 @@ DecisionStore.dispatchToken = AppDispatcher.register(function(action) {
           }
           break
 
+      case ActionTypes.INVOKE_CARD_LINK:
+          DecisionStore.cardLinkClick();
+          break;
+
       case ActionTypes.LOADED:
           break
 
@@ -449,6 +461,5 @@ var _stores = {
   'medication-prescribe': MedicationPrescribeStore.register(DecisionStore),
   'patient-view': PatientViewStore.register(DecisionStore)
 };
-_hooksChanged()
 
 module.exports = DecisionStore

@@ -53,12 +53,6 @@ const App = React.createClass({
   },
 
   getInitialState() {
-    DateStore.setDate("start", {
-      date: moment().toDate(),
-      enabled: true});
-    DateStore.setDate("end", {
-      date: moment().add(1, 'month').toDate(),
-      enabled: true});
     AppDispatcher.dispatch({ type: ActionTypes.LOADED })
     return {
       all: AppStore.getState(),
@@ -158,7 +152,9 @@ const App = React.createClass({
     serverFetchResponse.then(function(response) {
       if (response && (response.status === 200 || response.status === 'success')) {
         this.hideFhirModal();
-        if(response.data.url.indexOf('https') > -1 && this.state.fhirServer.indexOf('https') < 0) {
+        if(((response.data.url && response.data.url.indexOf('https') > -1) ||
+          (response.url && response.url.indexOf('https') > -1))
+          && this.state.fhirServer.indexOf('https') < 0) {
           var tempUrlString = this.state.fhirServer;
           this.setState({
             showFhirServerEntryError: false,

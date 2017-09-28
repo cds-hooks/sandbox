@@ -4,11 +4,15 @@ import ReactMarkdown from 'react-markdown';
 import AppDispatcher from '../dispatcher/AppDispatcher'
 import ActionTypes from '../actions/ActionTypes'
 import striptags from 'striptags'
+import CDS_SMART_OBJ from '../../smart_authentication';
+import DecisionStore from '../stores/DecisionStore';
 
 window.addEventListener("message", (e) => {
-  AppDispatcher.dispatch({
-    type: ActionTypes.EXTERNAL_APP_RETURNED
-  })
+  if (CDS_SMART_OBJ.processedContext && DecisionStore.getState().cardLinkInvoked) {
+    AppDispatcher.dispatch({
+      type: ActionTypes.EXTERNAL_APP_RETURNED
+    });
+  }
   if (e.target.document.URL.indexOf(e.origin) === -1) {
     e.source.close();
   }
@@ -36,13 +40,20 @@ const Cards = React.createClass({
     var popup = window.open(url, '_blank');
   },
 
+  toggleClickedLinks(e) {
+    e.preventDefault();
+    AppDispatcher.dispatch({
+      type: ActionTypes.INVOKE_CARD_LINK
+    });
+  },
+
   render() {
     function source(s) {
       if (!s || !s.label) return
 
-      return <div className="card-source">
-        Source: <a href={s.url || "#"}> {s.label}</a>
-        </div>
+      return (<div className="card-source">
+        Source: <a href={s.url || "#"} onClick={e => this.toggleClickedLinks(e)}> {s.label}</a>
+        </div>);
     }
 
     var cards = this.props.decisions.get('cards')

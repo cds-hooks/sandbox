@@ -4,6 +4,7 @@ import moment from 'moment'
 import uuid from 'node-uuid'
 import { getIn, paramsToJson } from '../../../mock-cds-backend/utils.js';
 import CDS_SMART_OBJ from '../../smart_authentication';
+import $ from 'jquery';
 
 var AppDispatcher = require('../dispatcher/AppDispatcher')
 var EventEmitter = require('events').EventEmitter
@@ -31,32 +32,39 @@ var fhirClient = function(config) {
 
 var _client;
 
-
 function _fetchData() {
   console.log("Will get stat efor ",  state.getIn(['context', 'patient']))
   var trueFhirObj = (CDS_SMART_OBJ.hasOwnProperty('smartObj')) ? CDS_SMART_OBJ.smartObj.api : _client;
-  trueFhirObj.search({
-    type: 'Condition',
-    query: {
-      patient: state.getIn(['context', 'patient'])
+  var original = state;
+  var deferObj = $.Deferred();
+  function fhirSearch() {
+    trueFhirObj.read({
+      type: 'Patient',
+      id: state.getIn(['context', 'patient'])
+    }).then(b => {
+      state = state.set('patient', b.data);
+      trueFhirObj.search({
+        type: 'Condition',
+        query: {
+          patient: state.getIn(['context', 'patient'])
+        }
+      }).then(c => {
+        state = state.set('conditions', c.data.entry);
+      });
+      console.log("Got patient", b.data);
+      return deferObj.resolve(state);
+    });
+  }
+
+  function fhirPromise() {
+    fhirSearch();
+    return deferObj.promise();
+  }
+
+  fhirPromise().then((state) => {
+    if (!Immutable.is(original, state)) {
+      FhirServiceStore.emitChange();
     }
-  }).then(b => {
-      var original = state;
-      state = state.set('conditions', b.data.entry)
-      if (!Immutable.is(original, state)) {
-        FhirServiceStore.emitChange()
-      }
-  });
-  trueFhirObj.read({
-    type: 'Patient',
-    id: state.getIn(['context', 'patient'])
-  }).then(b => {
-      var original = state;
-      state = state.set('patient', b.data)
-      console.log("Got patient", b.data)
-      if (!Immutable.is(original, state)) {
-        FhirServiceStore.emitChange()
-      }
   });
 }
 
@@ -106,7 +114,8 @@ var FhirServiceStore = assign({}, EventEmitter.prototype, {
     if (defaultFhirServer) {
       _client = fhirClient(state.get('context').toJS())
     }
-    _fetchData()
+    _fetchData();
+    this.emitChange();
   },
   getState: function() {
     return state
@@ -189,14 +198,5 @@ FhirServiceStore.dispatchToken = AppDispatcher.register(function(action) {
   }
 
 })
-
-import querystring from 'querystring'
-var qs = querystring.parse(window.location.search.slice(1))
-var fhirContext = {
-  patient: qs.patientId || "SMART-1288992",
-  baseUrl: qs.fhirServiceUrl || runtime.FHIR_URL
-}
-
-FhirServiceStore.setContext(fhirContext, true)
 
 module.exports = FhirServiceStore

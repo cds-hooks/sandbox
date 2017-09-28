@@ -17,7 +17,7 @@ var server = restify.createServer({
 
 server.use(restify.bodyParser());
 server.use(function(req, res, next){
-  if (req.method !== 'GET' && req._contentType.match('json\\+fhir')){
+  if (req.method !== 'GET' && req._contentType && req._contentType.match('json\\+fhir')){
     req.body = req.body ? JSON.parse(req.body.toString()) : {}
   }
   next()
