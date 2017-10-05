@@ -26,8 +26,16 @@ CDS_SMART_OBJ.fetchContext().then(
       fhirContext.user = CDS_SMART_OBJ.smartObj.userId;
       FhirServerStore.setContext(fhirContext);
     }
+    CDS_SMART_OBJ.processedContext = true;
     ReactDOM.render(<App/>, document.getElementById('react-wrapper'));
   }, () => {
+    var qs = querystring.parse(window.location.search.slice(1))
+    var fhirContext = {
+      patient: qs.patientId || "SMART-1288992",
+      baseUrl: qs.fhirServiceUrl || runtime.FHIR_URL
+    }
+    FhirServerStore.setContext(fhirContext, true);
+    CDS_SMART_OBJ.processedContext = true;
     ReactDOM.render(<App/>, document.getElementById('react-wrapper'));
   }
 );

@@ -176,7 +176,7 @@ DrugStore.dispatchToken = AppDispatcher.register(function(action) {
         var actions = action.suggestion.actions;
         var filteredActions = actions ? actions.filter((action) => { return action.type === 'create' || action.type === 'update' }) : [];
         var createOrUpdate = filteredActions.length ? filteredActions[0] : [];
-        if (createOrUpdate.length && createOrUpdate.resource && createOrUpdate.resource.medicationCodeableConcept) {
+        if (createOrUpdate && createOrUpdate.resource && createOrUpdate.resource.medicationCodeableConcept) {
           state = state.set('step', 'done');
           state = state.setIn(['decisions', 'prescribable'], Immutable.fromJS({
             "str": createOrUpdate.resource.medicationCodeableConcept.text,

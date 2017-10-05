@@ -88,12 +88,6 @@ HookStore.dispatchToken = AppDispatcher.register(function(action) {
         HookStore.emitChange()
         break
     case ActionTypes.QUICK_ADD_HOOK:
-      var discoveryRequestHeader;
-      if (CDS_SMART_OBJ.jwt) {
-        discoveryRequestHeader = {
-          'Authorization': 'Bearer ' + CDS_SMART_OBJ.jwt
-        };
-      }
       var ret = $.Deferred();
 
       function generateJwt(hookUrl, buildJwt) {
@@ -101,7 +95,6 @@ HookStore.dispatchToken = AppDispatcher.register(function(action) {
           return ret.resolve(buildJwt(hookUrl, window.sessionStorage['privatePem']));
         } else {
           $.ajax({
-            async: false,
             url: 'https://raw.githubusercontent.com/cerner/cds-hooks-sandbox/master/ecprivatekey.pem',
             success: function(data) {
               window.sessionStorage['privatePem'] = data;
@@ -158,6 +151,7 @@ HookStore.dispatchToken = AppDispatcher.register(function(action) {
                   value: h
                 })
               });
+              HookStore.emitChange();
             }
           });
         }
@@ -191,7 +185,6 @@ HookStore.dispatchToken = AppDispatcher.register(function(action) {
       } else {
         state = state.set('editing', false);
       }
-      HookStore.emitChange();
       break;
 
     case ActionTypes.DELETE_HOOK:
