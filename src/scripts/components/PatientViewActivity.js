@@ -14,7 +14,10 @@ const PatientViewActivity = React.createClass({
     var name = "name";
     var dob = "dob"
     var pid = "pid"
-    if (patient) name = patient.name[0].given.join(" ") + " " + patient.name[0].family.join(" ")
+    if(patient) {
+      var familyName = (Array.isArray(patient.name[0].family))?patient.name[0].family.join(" " ):patient.name[0].family;
+      name = patient.name[0].given.join(" " ) + " " + familyName;
+    }
     if (patient) pid = patient.id
     if (patient) dob = patient.birthDate
 
