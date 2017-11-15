@@ -13,7 +13,10 @@ const RxActivity = React.createClass({
     var patient = this.props.all.getIn(['fhirServer', 'patient'])
     var name = "name";
     var pid = "pid";
-    if (patient) name = patient.name[0].given.join(" " ) + " " + patient.name[0].family.join(" " );
+    if(patient) {
+      var familyName = (Array.isArray(patient.name[0].family))?patient.name[0].family.join(" " ):patient.name[0].family;
+      name = patient.name[0].given.join(" " ) + " " + familyName;
+    }
     if (patient) pid = patient.id;
 
     var containerClass = this.props.isServiceViewEnabled ? 'order-entry mock-ehr-view half-view' : 'order-entry mock-ehr-view';
