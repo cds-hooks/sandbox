@@ -1,4 +1,0 @@
-#!/bin/sh
-
-export PORT=$HTTP_PORT_BACKEND
-cd mock-cds-backend && npm run dev
