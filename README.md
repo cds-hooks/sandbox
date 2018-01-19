@@ -102,7 +102,7 @@ and see changes automatically reloaded at `http://localhost:8080`
 
 Configuration:
 
- * To talk to a FHIR server other than `https://sb-fhir-dstu2.smarthealthit.org/api/smartdstu2/open`,
+ * To talk to a FHIR server other than `https://api.hspconsortium.org/cdshooksdstu2/open`,
    you can pass a query variable to the HTML page, as in
    `http://localhost:8080?fhirServiceUrl=http://my-fhir-server`
 

@@ -82,9 +82,9 @@ const App = React.createClass({
     });
   },
 
-  isSmartHealthItSandbox: function() {
+  isHSPCSandbox: function() {
     var fhirServerUrl = this.state.all.getIn(["fhirServer", "context", "baseUrl"]);
-    return fhirServerUrl.toLowerCase().indexOf('smarthealthit.org') > 0;
+    return fhirServerUrl.toLowerCase().indexOf('hspconsortium.org') > 0;
   },
 
   changePatient: function(){
@@ -226,11 +226,11 @@ const App = React.createClass({
   resetFhirServer: function() {
     this.hideFhirModal();
     this.setState({
-      fhirServer: 'https://sb-fhir-dstu2.smarthealthit.org/api/smartdstu2/open'
+      fhirServer: 'https://api.hspconsortium.org/cdshooksdstu2/open'
     });
     AppDispatcher.dispatch({
       type: ActionTypes.CHANGE_FHIR_SERVER,
-      url: 'https://sb-fhir-dstu2.smarthealthit.org/api/smartdstu2/open'
+      url: 'https://api.hspconsortium.org/cdshooksdstu2/open'
     });
     this.displayPatientModal();
   },
@@ -270,9 +270,9 @@ const App = React.createClass({
         <ListGroupItem header='Steve Richey'
                        onClick={this.patientSelected.bind(this, 'SMART-7777701')}
                        active={this.state.patientId === 'SMART-7777701'}>Male | DOB: 2011-09-16</ListGroupItem>
-        <ListGroupItem header='Rose Tyler'
-                       onClick={this.patientSelected.bind(this, 'BILIBABY6')}
-                       active={this.state.patientId === 'BILIBABY6'}>Male | DOB: 2016-2-28</ListGroupItem>
+        <ListGroupItem header='Baby Bili'
+                       onClick={this.patientSelected.bind(this, 'BILIBABY')}
+                       active={this.state.patientId === 'BILIBABY'}>Male | DOB: 2016-01-04</ListGroupItem>
       </ListGroup>);
 
     var patientModalAlert = this.state.showPatientEntryError ?
@@ -302,7 +302,7 @@ const App = React.createClass({
                    onChange={this.handlePatientChange}
             />
           </div>
-          <div className={this.isSmartHealthItSandbox() ? '' : 'hidden'}>
+          <div className={this.isHSPCSandbox() ? '' : 'hidden'}>
             <div className="patient-modal-divider"><span>OR</span></div>
             <div className="input-container">
               <label>Select a Patient:</label>

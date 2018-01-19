@@ -19,7 +19,7 @@ module.exports = {
     new webpack.NoEmitOnErrorsPlugin(),
     new webpack.DefinePlugin({
       "runtime.CDS_HOOKS_URL": JSON.stringify(process.env.CDS_HOOKS_URL || "http://localhost:8081"),
-      "runtime.FHIR_URL": JSON.stringify(process.env.FHIR_URL || "https://sb-fhir-dstu2.smarthealthit.org/api/smartdstu2/open")
+      "runtime.FHIR_URL": JSON.stringify(process.env.FHIR_URL || "https://api.hspconsortium.org/cdshooksdstu2/open")
     })
   ],
   resolve: {

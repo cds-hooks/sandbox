@@ -4,7 +4,7 @@ frontend:
    - "8080:8080"
   environment:
     HTTP_PORT_FRONTEND: 8080
-    FHIR_URL: https://fhir-open-api-dstu2.smarthealthit.org
+    FHIR_URL: https://api.hspconsortium.org/cdshooksdstu2/open
     CDS_HOOKS_URL: http://localhost:8081
   command: run-frontend
 backend:
