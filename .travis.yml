@@ -1,0 +1,21 @@
+language: node_js
+sudo: required
+before_script:
+  - sudo apt-get update
+node_js:
+  - '6'
+cache:
+  directories:
+    - node_modules
+script:
+  - npm run build
+branches:
+  only:
+    - master
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN
+  local_dir: build
+  on:
+    branch: master

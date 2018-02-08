@@ -1,0 +1,7 @@
+build/
+tests/
+node_modules/
+coverage/
+polyfills/
+__mocks__
+webpack.config.dev.js
