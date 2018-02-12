@@ -6,7 +6,8 @@
   "scripts": {
     "start": "webpack-dev-server --config webpack.config.dev.js --inline --content-base ./build",
     "build": "webpack --config webpack.config.dev.js --progress --colors --display-error-details",
-    "lint": "./node_modules/.bin/eslint ./src --fix"
+    "lint": "./node_modules/.bin/eslint ./src --fix",
+    "test": "jest --coverage"
   },
   "author": "",
   "license": "Apache-2.0",
@@ -25,6 +26,7 @@
   ],
   "dependencies": {
     "axios": "^0.17.1",
+    "query-string": "^5.1.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-redux": "^5.0.6",
@@ -47,10 +49,23 @@
     "eslint-plugin-jsx-a11y": "^6.0.3",
     "eslint-plugin-react": "^7.5.1",
     "extract-text-webpack-plugin": "^3.0.2",
+    "identity-obj-proxy": "^3.0.0",
     "jest": "^22.1.4",
+    "redux-logger": "^3.0.6",
     "redux-mock-store": "^1.4.0",
     "style-loader": "^0.19.1",
     "webpack": "^3.10.0",
     "webpack-dev-server": "^2.11.0"
+  },
+  "jest": {
+    "setupFiles": [
+      "./tests/jest-setup.js"
+    ],
+    "moduleNameMapper": {
+      "\\.(css|scss)$": "identity-obj-proxy"
+    },
+    "coveragePathIgnorePatterns": [
+      "/jest-setup.js"
+    ]
   }
 }
