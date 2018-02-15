@@ -1,0 +1,27 @@
+{
+  "name": "cds-hooks-sandbox",
+  "success_url": "/",
+  "scripts": {},
+  "env": {
+    "NODE_ENV": {
+      "description": "development environment",
+      "value": "development"
+    },
+    "NPM_CONFIG_PRODUCTION": {
+      "description": "development environment",
+      "value": "false"
+    },
+    "NODE_MODULES_CACHE": {
+      "description": "No cache",
+      "value": "false"
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "free"
+    }
+  },
+  "addons": [],
+  "buildpacks": []
+}
