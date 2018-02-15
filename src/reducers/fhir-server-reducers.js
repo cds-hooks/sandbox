@@ -24,6 +24,11 @@ const fhirServerReducers = (state = initialState, action) => {
         newState.isDefaultFhirServer = action.baseUrl === state.defaultFhirServer;
         return newState;
       }
+      case types.SMART_AUTH_SUCCESS: {
+        return Object.assign({}, state, {
+          accessToken: action.authResponse.tokenResponse,
+        });
+      }
       default:
         return state;
     }

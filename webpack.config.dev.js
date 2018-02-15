@@ -6,10 +6,13 @@ const BUILD_DIR = path.resolve(__dirname, './build');
 const SRC_DIR = path.resolve(__dirname, './src');
 
 const config = {
-  entry: ['babel-polyfill', `${SRC_DIR}/index.jsx`],
+  entry: {
+    'app': ['babel-polyfill', `${SRC_DIR}/index.jsx`],
+    'smart-launch': ['babel-polyfill', `${SRC_DIR}/retrieve-data-helpers/smart-authorize.js`],
+  },
   output: {
     path: BUILD_DIR,
-    filename: 'bundle.js',
+    filename: '[name].bundle.js',
   },
   context: __dirname,
   resolve: {
@@ -45,7 +48,7 @@ const config = {
     new ExtractTextPlugin('styles.css'),
     new webpack.DefinePlugin({
       'runtime.FHIR_URL': JSON.stringify(process.env.FHIR_URL || 'https://api.hspconsortium.org/cdshooksdstu2/open')
-    })
+    }),
   ],
 };
 

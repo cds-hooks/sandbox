@@ -42,6 +42,22 @@ describe('FHIR Server Reducers', () => {
     });
   });
 
+  describe('SMART_AUTH_SUCCESS', () => {
+    it('should handle the SMART_AUTH_SUCCESS action', () => {
+      const authResponseMock = {tokenResponse: { foo: 'access-token' }};
+      const action = {
+        type: types.SMART_AUTH_SUCCESS,
+        authResponse: authResponseMock,
+      };
+
+      const newState = Object.assign({}, state, {
+        accessToken: authResponseMock.tokenResponse,
+      });
+
+      expect(reducer(state, action)).toEqual(newState);
+    });
+  });
+
   describe('Pass-through Actions', () => {
     it('should return state if an action should pass through this reducer without change to state', () => {
       const action = { type: 'SOME_OTHER_ACTION' };
