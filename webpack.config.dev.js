@@ -42,6 +42,14 @@ const config = {
         loader: 'babel-loader',
         exclude: /node_modules/,
       },
+      {
+        test: /\.pem/,
+        use: [
+          {
+            loader: 'raw-loader'
+          }
+        ]
+      },
     ],
   },
   plugins: [
