@@ -10,6 +10,7 @@ import store from '../../store/store';
 
 import styles from './main-view.css';
 import PatientView from '../PatientView/patient-view';
+import ContextView from '../ContextView/context-view';
 import { setLoadingStatus } from '../../actions/ui-actions';
 
 export class MainView extends Component {
@@ -52,6 +53,7 @@ export class MainView extends Component {
     const hookView = this.props.hook === 'patient-view' ? <PatientView /> : 'Med Prescribe View';
     const container = <div className={styles.container}>
       {hookView}
+      <ContextView />
     </div>;
     return (
       <div>

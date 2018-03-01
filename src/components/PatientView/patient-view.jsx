@@ -32,8 +32,10 @@ export class PatientView extends Component {
     let dob = this.props.patient.birthDate || "Missing DOB";
     let pid = this.props.patient.id || "Missing Patient ID";
 
+    let isHalfView = this.props.isContextVisible ? styles['half-view'] : '';
+
     return (
-      <div className={cx(styles['patient-view'])}>
+      <div className={cx(styles['patient-view'], isHalfView)}>
         <h1 className={styles['view-title']}>Patient View</h1>
         <h2>{name}</h2>
         <div className={styles['patient-data-text']}>
@@ -50,6 +52,7 @@ const mapStateToProps = (store) => {
   }
 
   return {
+    isContextVisible: store.hookState.isContextVisible,
     patient: store.patientState.currentPatient,
     services: pickBy(store.cdsServicesState.configuredServices, isCorrectHook)
   }

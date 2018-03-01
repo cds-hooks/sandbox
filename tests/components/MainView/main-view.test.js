@@ -13,7 +13,6 @@ describe('MainView component', () => {
   let pureComponent;
   let mockStore;
   let mockStoreWrapper = configureStore([]);
-  console.warn = jest.fn();
 
   let ConnectedMainView;
   let mockPromiseSmartCall = jest.fn();
@@ -63,6 +62,7 @@ describe('MainView component', () => {
     expect(shallowedComponent.find('LoadingOverlay')).toHaveLength(1);
     // TODO: Add logic to check view when app can flex between med and patient view
     expect(shallowedComponent.find('Connect(PatientView)')).toHaveLength(1);
+    expect(shallowedComponent.find('Connect(ContextView)')).toHaveLength(1);
   });
 
   it('matches props passed down from Redux decorator', () => {
@@ -84,7 +84,7 @@ describe('MainView component', () => {
     const newStore = Object.assign({}, storeState, { hookState: { currentHook: 'med-prescribe' } });
     setup(newStore);
     const shallowedComponent = pureComponent.shallow();
-    expect(shallowedComponent.childAt(1).text()).toEqual('Med Prescribe View');
+    expect(shallowedComponent.childAt(1).text()).toContain('Med Prescribe View');
   });
 
   it('only renders the loading component if loading status is active', () => {
@@ -92,6 +92,7 @@ describe('MainView component', () => {
     setup(newStore);
     const shallowedComponent = pureComponent.shallow();
     expect(shallowedComponent.find('Connect(PatientView')).toHaveLength(0);
+    expect(shallowedComponent.find('Connect(ContextView)')).toHaveLength(0);
   });
 
   it('calls a function to set the loading status on state on mount', () => {

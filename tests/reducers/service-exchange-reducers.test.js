@@ -49,13 +49,34 @@ describe('Services Exchange Reducers', () => {
         url: 'http://example.com/cds-services/id-2'
       }, storedExchange);
 
-      state = { selectedService: url };
+      state = { selectedService: url, exchanges: {} };
 
       const newState = Object.assign({}, state, {
         exchanges: {
           [action.url]: storedExchange
         }
       });
+      expect(reducer(state, action)).toEqual(newState);
+    });
+  });
+
+  describe('SELECT_SERVICE_CONTEXT', () => {
+    it('should return the state if no service is passed in', () => {
+      const action = { type: types.SELECT_SERVICE_CONTEXT };
+      expect(reducer(state, action)).toEqual(state);
+    });
+
+    it('should return the state if selected service in state already matches passed in service to select', () => {
+      state = { selectedService: url, exchanges: {} };
+      const action = { type: types.SELECT_SERVICE_CONTEXT, service: url };
+      expect(reducer(state, action)).toEqual(state);
+    });
+
+    it('should store selected service if passed in value does not match current selected service', () => {
+      state = { selectedService: url, exchanges: {} };
+      const newService = 'http://new.com/cds-services/id-1';
+      const action = { type: types.SELECT_SERVICE_CONTEXT, service: newService };
+      const newState = { selectedService: newService, exchanges: {}};
       expect(reducer(state, action)).toEqual(newState);
     });
   });
