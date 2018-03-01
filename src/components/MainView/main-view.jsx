@@ -1,12 +1,18 @@
-import React from 'react';
+import React, {Component} from 'react';
+import { connect } from 'react-redux';
+import LoadingOverlay from 'terra-overlay/lib/LoadingOverlay';
+
 import smartLaunchPromise from '../../retrieve-data-helpers/smart-launch';
 import retrieveFhirMetadata from '../../retrieve-data-helpers/fhir-metadata-retrieval';
 import retrievePatient from '../../retrieve-data-helpers/patient-retrieval';
 import retrieveDiscoveryServices from '../../retrieve-data-helpers/discovery-services-retrieval';
-import callServices from '../../retrieve-data-helpers/service-exchange';
 import store from '../../store/store';
 
-class MainView extends React.Component {
+import styles from './main-view.css';
+import PatientView from '../PatientView/patient-view';
+import { setLoadingStatus } from '../../actions/ui-actions';
+
+export class MainView extends Component {
   constructor(props) {
     super(props);
   }
@@ -23,6 +29,7 @@ class MainView extends React.Component {
    *       patient in context.
    */
   componentDidMount() {
+    this.props.setLoader(true);
     smartLaunchPromise().then(() => {
       return retrievePatient();
     }, () => {
@@ -37,22 +44,37 @@ class MainView extends React.Component {
     }, () => {
       // TODO: Manually enter a patient in context if Patient resource fails to return
     }).then(() => {
-      // TODO: Set UI loader property to false
-
-      // Below is just a test to see if service exchange works. Normally, this should go into the
-      // patient view component
-      const defaultPatientService = 'https://fhir-org-cds-services.appspot.com/cds-services/patient-hello-world';
-      callServices(defaultPatientService);
+      this.props.setLoader(false);
     });
   }
 
   render() {
+    const hookView = this.props.hook === 'patient-view' ? <PatientView /> : <div>Med Prescribe View</div>;
+    const container = <div className={styles.container}>
+      {hookView}
+    </div>;
     return (
       <div>
-        Insert application UI here or loading spinner
+        <LoadingOverlay isOpen={this.props.isLoadingData} isAnimated />
+        {this.props.isLoadingData ? '' : container}
       </div>
     );
   }
 }
 
-export default MainView;
+const mapStateToProps = (store) => {
+  return {
+    hook: store.hookState.currentHook,
+    isLoadingData: store.hookState.isLoadingData,
+  }
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    setLoader: (status) => {
+      dispatch(setLoadingStatus(status));
+    }
+  }
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(MainView);

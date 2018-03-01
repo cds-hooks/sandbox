@@ -95,7 +95,7 @@ function prefetchDataPromises(baseUrl, prefetch) {
  */
 function callServices(url, context) {
   const state = store.getState();
-  const hook = state.hookState;
+  const hook = state.hookState.currentHook;
   const fhirServer = state.fhirServerState.currentFhirServer;
   const user = state.patientState.defaultUserId;
 

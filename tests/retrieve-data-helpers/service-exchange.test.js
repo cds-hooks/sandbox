@@ -60,7 +60,7 @@ describe('Service Exchange', () => {
     };
 
     defaultStore = {
-      hookState: 'patient-view',
+      hookState: { currentHook: 'patient-view' },
       patientState: {
         defaultUserId: 'Practitioner/example',
         currentPatient: {
