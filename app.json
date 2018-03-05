@@ -8,7 +8,7 @@
       "value": "development"
     },
     "NPM_CONFIG_PRODUCTION": {
-      "description": "development environment",
+      "description": "production environment",
       "value": "false"
     },
     "NODE_MODULES_CACHE": {
