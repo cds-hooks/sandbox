@@ -44,14 +44,23 @@ describe('FHIR Server Reducers', () => {
 
   describe('SMART_AUTH_SUCCESS', () => {
     it('should handle the SMART_AUTH_SUCCESS action', () => {
-      const authResponseMock = {tokenResponse: { foo: 'access-token' }};
+      const authResponseMock = {
+        tokenResponse: { foo: 'access-token' },
+        server: { serviceUrl: 'http://example.com' }
+      };
+      const metadataMock = { fhirVersion: '1.0.2' };
       const action = {
         type: types.SMART_AUTH_SUCCESS,
         authResponse: authResponseMock,
+        metadata: metadataMock,
       };
 
       const newState = Object.assign({}, state, {
         accessToken: authResponseMock.tokenResponse,
+        currentFhirServer: authResponseMock.server.serviceUrl,
+        currentMetadata: metadataMock,
+        isDefaultFhirServer: false,
+        fhirVersion: metadataMock.fhirVersion,
       });
 
       expect(reducer(state, action)).toEqual(newState);

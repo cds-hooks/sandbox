@@ -1,4 +1,3 @@
-import { signalSuccessFhirServerRetrieval } from '../actions/fhir-server-actions';
 import { signalSuccessSmartAuth, signalFailureSmartAuth } from '../actions/smart-auth-actions';
 import store from '../store/store';
 
@@ -18,14 +17,11 @@ function smartLaunchPromise() {
     const onAuthSuccess = (smart) => {
       console.log('Launched as a SMART app');
       if (smart.tokenResponse) {
-        let fhirBaseUrl;
         if (smart.server && smart.server.serviceUrl) {
-          fhirBaseUrl = smart.server.serviceUrl;
           const conformanceQuery = smart.api.conformance({});
           const deferredToPromise = Promise.resolve(conformanceQuery);
           deferredToPromise.then((result) => {
-            store.dispatch(signalSuccessSmartAuth(smart));
-            store.dispatch(signalSuccessFhirServerRetrieval(fhirBaseUrl, result.data));
+            store.dispatch(signalSuccessSmartAuth(smart, result.data));
             return resolve(result.data);
           }).catch((err) => {
             console.error('Failed to get metadata from secured FHIR server. Launching sandbox openly', err);

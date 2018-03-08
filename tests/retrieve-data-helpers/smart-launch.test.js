@@ -85,13 +85,9 @@ describe('SMART Launch', () => {
           const actions = mockStore.getActions();
           const expectedActions = [{
               type: 'SMART_AUTH_SUCCESS',
-              authResponse: smartResponse
-            }, {
-              type: 'GET_FHIR_SERVER_SUCCESS',
-              baseUrl: securedFhirServer,
-              metadata: expectedMetadata
-            }
-          ];
+              authResponse: smartResponse,
+              metadata: expectedMetadata,
+            }];
           return smartLaunchPromise().then(() => {
             expect(actions).toEqual(expectedActions);
           });

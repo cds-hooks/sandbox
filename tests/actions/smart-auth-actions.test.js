@@ -4,12 +4,14 @@ import * as actions from '../../src/actions/smart-auth-actions';
 describe('Smart Auth Actions', () => {
   it('creates action to signal a successful SMART authorization with a secured FHIR server', () => {
     const authResponse = { foo: 'foo' };
+    const metadata = { biz: 'biz' };
     const expectedAction = {
       type: types.SMART_AUTH_SUCCESS,
       authResponse,
+      metadata
     };
 
-    expect(actions.signalSuccessSmartAuth(authResponse)).toEqual(expectedAction);
+    expect(actions.signalSuccessSmartAuth(authResponse, metadata)).toEqual(expectedAction);
   });
 
   it('creates action to signal a failed SMART authorization', () => {

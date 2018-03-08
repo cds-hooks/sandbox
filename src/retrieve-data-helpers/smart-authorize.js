@@ -1,6 +1,6 @@
-import { localhostClientId as clientId } from '../config/client-id';
+import { localhostClientId as clientId, allScopes } from '../config/fhir-config';
 
 FHIR.oauth2.authorize({
   client_id: clientId,
-  scope: 'patient/*.* user/*.* launch openid profile online_access',
+  scope: allScopes,
 });

@@ -5,10 +5,11 @@ import * as types from './action-types';
  * @param authResponse - data returned from SMART flow, including the accessToken
  * @returns {{type, authResponse: *}} - Action to dispatch
  */
-export function signalSuccessSmartAuth(authResponse) {
+export function signalSuccessSmartAuth(authResponse, metadata) {
   return {
     type: types.SMART_AUTH_SUCCESS,
     authResponse,
+    metadata,
   };
 }
 
