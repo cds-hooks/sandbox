@@ -3,11 +3,13 @@ sudo: required
 before_script:
   - sudo apt-get update
 node_js:
-  - '6'
+  - 'lts/*'
 cache:
   directories:
     - node_modules
 script:
+  - npm run lint
+  - npm run test
   - npm run build
 branches:
   only:
