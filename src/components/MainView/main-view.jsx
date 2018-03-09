@@ -1,4 +1,5 @@
 import React from 'react';
+import smartLaunchPromise from '../../retrieve-data-helpers/smart-launch';
 import retrieveFhirMetadata from '../../retrieve-data-helpers/fhir-metadata-retrieval';
 
 class MainView extends React.Component {
@@ -18,10 +19,15 @@ class MainView extends React.Component {
    *       patient in context.
    */
   componentDidMount() {
-    retrieveFhirMetadata().then(() => {
-      // TODO: Call Patient in context method
+    smartLaunchPromise().then(() => {
+      // TODO: Call patient in context
     }, () => {
-      // TODO: Manually enter a FHIR server (modal) if default FHIR server fails to load
+      // TODO: Display an error banner indicating smart launch failed, and it will launch openly
+      return retrieveFhirMetadata().then(() => {
+        // TODO: Call patient in context
+      }, () => {
+        // TODO: Manually enter a FHIR server (modal) if default FHIR server fails to load
+      });
     });
   }
 
