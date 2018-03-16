@@ -28,7 +28,7 @@ export function signalSuccessServicesRetrieval(services) {
 
 /**
  * Signals failed retrieval of CDS Services. May be used to update state to show an error banner.
- * @returns {{type, services: *}} - Action to dispatch
+ * @returns {{type}} - Action to dispatch
  */
 export function signalFailureServicesRetrieval() {
   return {
