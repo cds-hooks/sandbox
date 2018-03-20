@@ -36,3 +36,6 @@ export const STORE_SERVICE_EXCHANGE = 'STORE_SERVICE_EXCHANGE';
 // Misc UI actions
 export const SET_LOADING_STATUS = 'SET_LOADING_STATUS';
 export const SET_CONTEXT_VISIBILITY = 'SET_CONTEXT_VISIBILITY';
+
+// Hooks
+export const SET_HOOK = 'SET_HOOK';

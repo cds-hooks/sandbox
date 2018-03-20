@@ -1,0 +1,82 @@
+.logo-title {
+  display: inline-block;
+  height: 100%;
+  line-height: 37px;
+  vertical-align: top;
+  color: #fff;
+
+  padding-left: .3571em;
+  padding-right: 4em;
+}
+
+.icon {
+  color: #fff;
+  cursor: pointer;
+  background-color: transparent;
+  border-width: 0;
+}
+
+.padding-right {
+  padding-right: .3571em;
+}
+
+.nav-tabs {
+  align-items: center;
+  -ms-flex-align: center;
+  display: -ms-flexbox;
+  display: flex;
+  height: 100%;
+  -ms-flex-pack: center;
+  width: 100%;
+  justify-content: center;
+  position: relative;
+}
+
+.nav-container {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex: 1 1 auto;
+  flex: 1 1 auto;
+  height: 100%;
+  position: relative;
+}
+
+.nav-links {
+  border-right: .07143rem solid #dedfe0;
+  padding: 0 1.5rem;
+  text-align: center;
+  color: #fff;
+  display: block;
+  -ms-flex: 0 0 auto;
+  flex: 0 0 auto;
+  font-size: .9286rem;
+  height: 100%;
+  max-width: 17.143rem;
+  min-width: 5.714rem;
+  position: relative;
+  text-decoration: none;
+  line-height: 2.571rem;
+  background-color: transparent;
+}
+
+.nav-links:first-child {
+  border-left: .07143rem solid #fff;
+}
+
+.nav-links:hover {
+  background-color: #5070ab;
+  cursor: pointer;
+}
+
+.active-link {
+  background-color: #fff;
+  color: #1c1f21;
+  font-weight: bold;
+  bottom: -.07143rem;
+}
+
+@media (max-width: 600px) {
+  .logo-title {
+    display: none;
+  }
+}
