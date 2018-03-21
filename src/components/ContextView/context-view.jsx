@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import cx from 'classnames';
-import pickBy from 'lodash/pickBy';
 import forIn from 'lodash/forIn';
 
 import SelectField from 'terra-form/lib/SelectField';
@@ -11,6 +10,7 @@ import styles from './context-view.css';
 
 import { selectService } from '../../actions/service-exchange-actions';
 import { setContextVisibility } from '../../actions/ui-actions';
+import { getServicesByHook } from '../../reducers/helpers/services-filter';
 
 export class ContextView extends Component {
   constructor(props) {
@@ -93,10 +93,6 @@ export class ContextView extends Component {
 }
 
 const mapStateToProps = (store) => {
-  function isCorrectHook(service) {
-    return service.hook && service.hook === store.hookState.currentHook;
-  }
-
   function getFirstServiceForHook(services) {
     const serviceKeys = Object.keys(services);
     if (serviceKeys.length) {
@@ -107,9 +103,9 @@ const mapStateToProps = (store) => {
 
   return {
     isContextVisible: store.hookState.isContextVisible,
-    services: pickBy(store.cdsServicesState.configuredServices, isCorrectHook),
+    services: getServicesByHook(store.hookState.currentHook, store.cdsServicesState.configuredServices),
     selectedService: store.serviceExchangeState.selectedService,
-    initialService: getFirstServiceForHook(pickBy(store.cdsServicesState.configuredServices, isCorrectHook)),
+    initialService: getFirstServiceForHook(getServicesByHook(store.hookState.currentHook, store.cdsServicesState.configuredServices)),
     exchanges: store.serviceExchangeState.exchanges,
   };
 };

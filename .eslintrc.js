@@ -16,5 +16,6 @@ module.exports = {
     "import/no-named-as-default": 0,
     "react/no-did-mount-set-state": 0,
     "react/require-default-props": 0,
+    "class-methods-use-this": 0,
   }
 };

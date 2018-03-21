@@ -13,7 +13,8 @@ describe('Services Exchange Reducers', () => {
     };
     storedExchange = {
       request: 'request',
-      response: 'response'
+      response: 'response',
+      responseStatus: 200,
     };
   });
 

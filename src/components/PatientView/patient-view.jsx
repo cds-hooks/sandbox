@@ -4,6 +4,7 @@ import cx from 'classnames';
 import pickBy from 'lodash/pickBy';
 import forIn from 'lodash/forIn';
 
+import Card from '../Card/card';
 import styles from './patient-view.css';
 import callServices from '../../retrieve-data-helpers/service-exchange';
 
@@ -41,6 +42,7 @@ export class PatientView extends Component {
         <div className={styles['patient-data-text']}>
           <p><strong>ID: </strong> {pid} <strong>Birthdate: </strong> {dob}</p>
         </div>
+        {Object.keys(this.props.services).length ? <Card /> : 'Retrieving services...'}
       </div>
     );
   }

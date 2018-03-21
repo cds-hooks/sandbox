@@ -95,12 +95,13 @@ describe('PatientView component', () => {
     expect(shallowedComponent.find('.half-view')).toHaveLength(0);
   });
 
-  it('does not call callServices on any services not configured for the patient view hook', () => {
+  it('does not call callServices on any services not configured for the patient view hook or display a Card', () => {
     const noServicesState = Object.assign({}, storeState, { 
       cdsServicesState: { configuredServices: {} } 
     });
     setup(noServicesState);
     let shallowedComponent = pureComponent.shallow();
     expect(mockSpy).toHaveBeenCalledTimes(0);
+    expect(shallowedComponent.find('Card').length).toEqual(0);
   });
 });
