@@ -4,7 +4,7 @@
   "description": "A SPA tool that simulates the CDS Hooks standard on a mock-ehr system",
   "main": "build/bundle.js",
   "scripts": {
-    "start": "webpack-dev-server --config webpack.config.dev.js --inline --content-base ./build",
+    "start": "webpack --config webpack.config.dev.js --progress --colors --display-error-details",
     "build": "webpack --config webpack.config.dev.js --progress --colors --display-error-details",
     "lint": "./node_modules/.bin/eslint ./src --fix",
     "test": "jest --coverage"
