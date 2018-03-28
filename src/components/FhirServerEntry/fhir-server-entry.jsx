@@ -44,6 +44,7 @@ export class FhirServerEntry extends Component {
 
   handleCloseModal() {
     this.setState({ isOpen: false, shouldDisplayError: false, errorMessage: '' });
+    if (this.props.closePrompt) this.props.closePrompt();
   }
 
   handleChange(e) {
@@ -52,7 +53,8 @@ export class FhirServerEntry extends Component {
 
   async handleSubmit() {
     if (this.state.userInput === '' || !this.state.userInput || !this.state.userInput.trim()) {
-      return this.setState({ shouldDisplayError: true, errorMessage: 'Enter a valid FHIR server base url' });
+      this.setState({ shouldDisplayError: true, errorMessage: 'Enter a valid FHIR server base url' });
+      return;
     }
     let checkUrl = this.state.userInput.trim();
     if (!/^(https?:)?\/\//i.test(checkUrl)) {
@@ -62,22 +64,22 @@ export class FhirServerEntry extends Component {
       });
     }
     try {
-      await retrieveFhirMetadata(checkUrl);
+      await retrieveFhirMetadata(checkUrl).then(() => {
+        if (this.props.resolve) this.props.resolve();
+        this.handleCloseModal();
+      });
     } catch (e) {
-      return this.setState({
+      this.setState({
         shouldDisplayError: true,
         errorMessage: 'Failed to connect to the FHIR server. See console for details.',
       });
     }
-    this.setState({ isOpen: false, shouldDisplayError: false, errorMessage: '' });
-    this.props.resolve();
-    this.props.closePrompt();
-    return null;
   }
 
   async handleResetDefaultServer() {
     await retrieveFhirMetadata();
-    this.setState({ isOpen: false, shouldDisplayError: false, errorMessage: '' });
+    if (this.props.resolve) this.props.resolve();
+    this.handleCloseModal();
   }
 
   render() {
@@ -87,7 +89,7 @@ export class FhirServerEntry extends Component {
 
     const footerContainer = (
       <div className={styles['right-align']}>
-        {this.props.resolve ? '' :
+        {this.props.isEntryRequired ? '' :
         <div className={styles['left-aligned-text']}>
           <Button
             text="Reset to default FHIR server"

@@ -16,6 +16,7 @@ describe('PatientEntry component', () => {
   let mockSpy;
   let mockResolve;
   let mockClosePrompt;
+  let isEntryRequired;
 
   function setup(state) {
     mockStore = mockStoreWrapper(state);
@@ -26,7 +27,8 @@ describe('PatientEntry component', () => {
     if (mockResolve && mockClosePrompt) {
       component = <ConnectedView store={mockStore} 
                                  resolve={mockResolve}
-                                 isOpen={true} 
+                                 isOpen={true}
+                                 isEntryRequired={isEntryRequired} 
                                  closePrompt={mockClosePrompt} />
     } else {
       component = <ConnectedView store={mockStore}/>;
@@ -45,6 +47,7 @@ describe('PatientEntry component', () => {
     mockSpy = jest.fn();
     mockResolve = jest.fn();
     mockClosePrompt = jest.fn();
+    isEntryRequired = true;
   });
 
   afterEach(() => {
@@ -72,6 +75,13 @@ describe('PatientEntry component', () => {
     let shallowedComponent = pureComponent.shallow();
     await shallowedComponent.find('Dialog').dive().find('ContentContainer').dive().find('.right-align').find('Button').at(1).simulate('click');
     expect(shallowedComponent.state('isOpen')).toEqual(false);
+  });
+
+  it('does not have cancel options on the modal if a patient is required', async () => {
+    isEntryRequired = false;
+    setup(storeState);
+    let shallowedComponent = pureComponent.shallow();
+    expect(await shallowedComponent.find('Dialog').dive().find('ContentContainer').dive().find('.right-align').find('Button').length).toEqual(2);
   });
 
   describe('User input', () => {

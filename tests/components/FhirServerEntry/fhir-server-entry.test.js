@@ -16,6 +16,7 @@ describe('FhirServerEntry component', () => {
   let mockSpy;
   let mockResolve;
   let mockClosePrompt;
+  let isEntryRequired;
 
   function setup(state) {
     mockStore = mockStoreWrapper(state);
@@ -26,7 +27,8 @@ describe('FhirServerEntry component', () => {
     if (mockResolve && mockClosePrompt) {
       component = <ConnectedView store={mockStore} 
                                  resolve={mockResolve}
-                                 isOpen={true} 
+                                 isOpen={true}
+                                 isEntryRequired={isEntryRequired} 
                                  closePrompt={mockClosePrompt} />
     } else {
       component = <ConnectedView store={mockStore}/>;
@@ -42,6 +44,7 @@ describe('FhirServerEntry component', () => {
     mockSpy = jest.fn();
     mockResolve = jest.fn();
     mockClosePrompt = jest.fn();
+    isEntryRequired = true;
   });
 
   afterEach(() => {
@@ -62,13 +65,12 @@ describe('FhirServerEntry component', () => {
   });
 
   it('handles resetting the fhir server and closes the modal', async () => {
-    mockResolve = null;
-    mockClosePrompt = null;
+    isEntryRequired = false;
     setup(storeState);
     let shallowedComponent = pureComponent.shallow();
     await shallowedComponent.find('Dialog').dive().find('ContentContainer').dive().find('.right-align').find('Button').at(0).simulate('click');
     expect(shallowedComponent.state('isOpen')).toEqual(false);
-    expect(mockSpy).toHaveBeenCalled();
+    expect(mockResolve).toHaveBeenCalled();
   });
 
   it('handles closing the modal in the component', async () => {
@@ -87,6 +89,7 @@ describe('FhirServerEntry component', () => {
     };
 
     it('displays an error if input is empty', () => {
+      mockSpy = jest.fn(() => { Promise.resolve(1) });
       setup(storeState);
       let shallowedComponent = pureComponent.shallow();
       enterInputAndSave(shallowedComponent, '');

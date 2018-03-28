@@ -1,6 +1,6 @@
 import queryString from 'query-string';
 import axios from 'axios';
-import { signalSuccessFhirServerRetrieval, signalFailureFhirServerRetrieval, setCurrentFhirServer } from '../actions/fhir-server-actions';
+import { signalSuccessFhirServerRetrieval, signalFailureFhirServerRetrieval, setTestFhirServer } from '../actions/fhir-server-actions';
 import store from '../store/store';
 
 /**
@@ -16,7 +16,7 @@ function retrieveFhirMetadata(testUrl) {
       testFhirServer = parsed.fhirServiceUrl || store.getState().fhirServerState.defaultFhirServer;
     }
     const headers = { Accept: 'application/json+fhir' };
-    store.dispatch(setCurrentFhirServer(testFhirServer));
+    store.dispatch(setTestFhirServer(testFhirServer));
     axios({
       method: 'get',
       url: `${testFhirServer}/metadata`,

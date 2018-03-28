@@ -1,6 +1,7 @@
 import * as types from '../actions/action-types';
 
 const initialState = {
+  testFhirServer: null,
   currentFhirServer: 'https://api.hspconsortium.org/cdshooksdstu2/open',
   currentMetadata: null,
   defaultFhirServer: 'https://api.hspconsortium.org/cdshooksdstu2/open',
@@ -18,6 +19,7 @@ const fhirServerReducers = (state = initialState, action) => {
           currentFhirServer: action.baseUrl,
           currentMetadata: action.metadata,
           fhirVersion: action.metadata.fhirVersion,
+          testFhirServer: null,
         });
         newState.isDefaultFhirServer = action.baseUrl === state.defaultFhirServer;
         return newState;
@@ -32,9 +34,9 @@ const fhirServerReducers = (state = initialState, action) => {
         newState.isDefaultFhirServer = newState.currentFhirServer === state.defaultFhirServer;
         return newState;
       }
-      case types.SET_CURRENT_FHIR_SERVER: {
+      case types.SET_TEST_FHIR_SERVER: {
         return Object.assign({}, state, {
-          currentFhirServer: action.fhirServer,
+          testFhirServer: action.fhirServer,
         });
       }
       default:

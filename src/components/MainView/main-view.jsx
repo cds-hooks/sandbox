@@ -59,7 +59,9 @@ export class MainView extends Component {
       });
     }));
     if (this.state.patientPrompt) this.setState({ patientPrompt: false });
-    await retrieveDiscoveryServices();
+    await retrieveDiscoveryServices().catch(() => {
+      this.props.setLoadingStatus(false);
+    });
     this.props.setLoadingStatus(false);
   }
 
