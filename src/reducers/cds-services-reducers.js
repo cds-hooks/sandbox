@@ -4,7 +4,6 @@ import * as types from '../actions/action-types';
 const initialState = {
   configuredServices: {},
   defaultUrl: 'https://fhir-org-cds-services.appspot.com/cds-services',
-  // defaultUrl: 'http://localhost:3000/cds-services',
   testServicesUrl: null,
 };
 
