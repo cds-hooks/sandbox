@@ -104,7 +104,7 @@
       "./tests/jest-setup.js"
     ],
     "moduleNameMapper": {
-      "\\.(jpg|jpeg|png|svg)$": "<rootDir>/src/assets/__mocks__/fileMock.js",
+      "\\.(jpg|jpeg|png|svg|pem)$": "<rootDir>/src/assets/__mocks__/fileMock.js",
       "\\.(css|scss)$": "identity-obj-proxy"
     },
     "coveragePathIgnorePatterns": [

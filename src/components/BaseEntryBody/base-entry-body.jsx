@@ -8,26 +8,37 @@ import styles from './base-entry-body.css';
 const BaseEntryBody = ({
   currentFhirServer, formFieldLabel, shouldDisplayError,
   errorMessage, placeholderText, inputOnChange, inputName,
-}) => (
-  <div className={styles.container}>
-    <Text weight={400} fontSize={16}>Current FHIR server</Text><br />
-    <Text weight={200} fontSize={14}>{currentFhirServer}</Text>
-    <div className={styles['vertical-separation']}>
-      <Field
-        label={formFieldLabel}
-        isInvalid={shouldDisplayError}
-        error={errorMessage}
-        required
-      >
-        <Input
-          name={inputName}
-          placeholder={placeholderText}
-          onChange={inputOnChange}
+}) => {
+  let fhirServerDisplay;
+  if (currentFhirServer) {
+    fhirServerDisplay = (
+      <div>
+        <Text weight={400} fontSize={16}>Current FHIR server</Text><br />
+        <Text weight={200} fontSize={14}>{currentFhirServer}</Text>
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.container}>
+      {fhirServerDisplay}
+      <div className={styles['vertical-separation']}>
+        <Field
+          label={formFieldLabel}
+          isInvalid={shouldDisplayError}
+          error={errorMessage}
           required
-        />
-      </Field>
+        >
+          <Input
+            name={inputName}
+            placeholder={placeholderText}
+            onChange={inputOnChange}
+            required
+          />
+        </Field>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default BaseEntryBody;

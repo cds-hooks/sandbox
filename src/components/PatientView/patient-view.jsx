@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import cx from 'classnames';
 import pickBy from 'lodash/pickBy';
 import forIn from 'lodash/forIn';
+import isEqual from 'lodash/isEqual';
 
 import Card from '../Card/card';
 import styles from './patient-view.css';
@@ -20,7 +21,9 @@ export class PatientView extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.patient !== prevProps.patient || this.props.fhirServer !== prevProps.fhirServer) {
+    if (this.props.patient !== prevProps.patient ||
+        this.props.fhirServer !== prevProps.fhirServer ||
+        !isEqual(this.props.services, prevProps.services)) {
       this.executeRequests();
     }
   }

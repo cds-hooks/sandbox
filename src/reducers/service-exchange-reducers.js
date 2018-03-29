@@ -17,9 +17,6 @@ const serviceExchangeReducers = (state = initialState, action) => {
           service.responseStatus = action.responseStatus;
           const exchanges = Object.assign({}, state.exchanges);
           exchanges[action.url] = service;
-          if (state.selectedService) {
-            return Object.assign({}, state, { exchanges });
-          }
           return Object.assign({}, state, { selectedService: action.url, exchanges });
         }
         break;

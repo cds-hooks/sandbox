@@ -11,6 +11,7 @@ import Button from 'terra-button';
 import IconLeft from 'terra-icon/lib/icon/IconLeft';
 import IconEdit from 'terra-icon/lib/icon/IconEdit';
 
+import ServicesEntry from '../ServicesEntry/services-entry';
 import PatientEntry from '../PatientEntry/patient-entry';
 import FhirServerEntry from '../FhirServerEntry/fhir-server-entry';
 
@@ -28,6 +29,7 @@ export class Header extends Component {
       settingsOpen: false,
       isChangePatientOpen: false,
       isChangeFhirServerOpen: false,
+      isAddServicesOpen: false,
     };
 
     this.switchHook = this.switchHook.bind(this);
@@ -37,7 +39,8 @@ export class Header extends Component {
 
     this.openSettingsMenu = this.openSettingsMenu.bind(this);
     this.closeSettingsMenu = this.closeSettingsMenu.bind(this);
-    this.addCDSServices = this.addCDSServices.bind(this);
+    this.openAddServices = this.openAddServices.bind(this);
+    this.closeAddServices = this.closeAddServices.bind(this);
     this.openChangePatient = this.openChangePatient.bind(this);
     this.closeChangePatient = this.closeChangePatient.bind(this);
     this.openChangeFhirServer = this.openChangeFhirServer.bind(this);
@@ -61,10 +64,13 @@ export class Header extends Component {
 
   switchHook(hook) { this.props.setHook(hook); }
 
-  addCDSServices() {
-    // TODO: Prompt user to add CDS Service Endpoint
-    this.closeSettingsMenu();
+  openAddServices() {
+    this.setState({ isAddServicesOpen: true });
+    if (this.state.settingsOpen) {
+      this.closeSettingsMenu();
+    }
   }
+  closeAddServices() { this.setState({ isAddServicesOpen: false }); }
 
   async openChangePatient(e, testCurrentPatient) {
     if (testCurrentPatient) {
@@ -96,7 +102,7 @@ export class Header extends Component {
         targetRef={this.getSettingsNode}
         isArrowDisplayed
       >
-        <Menu.Item text="Add CDS Services (placeholder)" key="add-services" onClick={this.addCDSServices} />
+        <Menu.Item text="Add CDS Services" key="add-services" onClick={this.openAddServices} />
         <Menu.Item text="Change Patient" key="change-patient" onClick={this.openChangePatient} />
         <Menu.Item text="Change FHIR Server" key="change-fhir-server" onClick={this.openChangeFhirServer} />
       </Menu>);
@@ -135,6 +141,10 @@ export class Header extends Component {
           style={{ backgroundColor: '#384e77' }}
         />
         {gearMenu}
+        {this.state.isAddServicesOpen ? <ServicesEntry
+          isOpen={this.state.isAddServicesOpen}
+          closePrompt={this.closeAddServices}
+        /> : null}
         {this.state.isChangePatientOpen ? <PatientEntry
           isOpen={this.state.isChangePatientOpen}
           closePrompt={this.closeChangePatient}

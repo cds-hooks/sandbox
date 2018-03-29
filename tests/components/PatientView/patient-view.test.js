@@ -67,7 +67,10 @@ describe('PatientView component', () => {
 
   it('contains relevant messages for missing patient in context', () => {
     storeState = {
-      hookState: { isContextVisible: true },
+      hookState: { 
+        currentHook: 'patient-view',
+        isContextVisible: true 
+      },
       patientState: {
         currentPatient: {}
       },
