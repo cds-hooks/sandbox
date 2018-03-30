@@ -5,9 +5,9 @@ const uuid = require('uuid/v4');
 
 function generateJWT(audience) {
   const jwtPayload = JSON.stringify({
-    iss: `${window.location.protocol}//sandbox.cds-hooks.org`,
+    iss: 'https://sandbox.cds-hooks.org',
     aud: audience,
-    exp: Math.round((Date.now() / 1000) + 3600),
+    exp: Math.round((Date.now() / 1000) + 300),
     iat: Math.round((Date.now() / 1000)),
     jti: uuid(),
   });

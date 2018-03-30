@@ -21,9 +21,9 @@ describe('JWT Generator', () => {
   it('generates a JWT with the given audience', () => {
     const audience = 'http://example-services.com/cds-services/1';
     const expectedPayload = JSON.stringify({
-      iss: `${window.location.protocol}//sandbox.cds-hooks.org`,
+      iss: `https://sandbox.cds-hooks.org`,
       aud: audience,
-      exp: Math.round((Date.now() / 1000) + 3600),
+      exp: Math.round((Date.now() / 1000) + 300),
       iat: Math.round((Date.now() / 1000)),
       jti: mockUUID,
     });
