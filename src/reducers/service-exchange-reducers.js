@@ -29,6 +29,31 @@ const serviceExchangeReducers = (state = initialState, action) => {
         }
         break;
       }
+
+      case types.RESET_SERVICES: {
+        return Object.assign({}, state, {
+          selectedService: '',
+          exchanges: {},
+        });
+      }
+
+      case types.TOGGLE_SERVICE: {
+        return Object.assign({}, state, {
+          selectedService: state.selectedService === action.service ? '' : state.selectedService,
+        });
+      }
+
+      case types.DELETE_SERVICE: {
+        if (state.exchanges[action.service]) {
+          const exchangesCopy = JSON.parse(JSON.stringify(state.exchanges));
+          delete exchangesCopy[action.service];
+          return Object.assign({}, state, {
+            exchanges: exchangesCopy,
+            selectedService: state.selectedService === action.service ? '' : state.selectedService,
+          });
+        }
+        break;
+      }
       default: {
         return state;
       }

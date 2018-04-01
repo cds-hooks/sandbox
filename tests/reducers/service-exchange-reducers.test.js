@@ -66,6 +66,75 @@ describe('Services Exchange Reducers', () => {
     });
   });
 
+  describe('RESET_SERVICES', () => {
+    it('should reset the exchanges hash and any selected service', () => {
+      state.exchanges[url] = storedExchange;
+      const stateCopy = JSON.parse(JSON.stringify(state));
+      stateCopy.exchanges = {};
+      stateCopy.selectedService = '';
+      const action = { type: types.RESET_SERVICES };
+      expect(reducer(state, action)).toEqual(stateCopy);
+    });
+  });
+
+  describe('TOGGLE_SERVICE', () => {
+    it('should clear the selectedService property if it matches the service in incoming action', () => {
+      const service = 'http://example.com';
+      state.selectedService = service;
+      const action = {
+        type: types.TOGGLE_SERVICE,
+        service,
+      };
+      const expectedState = Object.assign({}, state, { selectedService: '' });
+      expect(reducer(state, action)).toEqual(expectedState);
+    });
+
+    it('should not clear selectedService property if the toggled service does not match selectedService', () => {
+      const service = 'http://example.com';
+      state.selectedService = service;
+      const action = {
+        type: types.TOGGLE_SERVICE,
+        service: 'http://example22.com',
+      };
+      expect(reducer(state, action)).toEqual(state);
+    });
+  });
+
+  describe('DELETE_SERVICE', () => {
+    it('should remove stored service exchanges where the exchange URL matches the URL passed in action', () => {
+      state.exchanges[url] = storedExchange;
+      state.selectedService = url;
+      const stateCopy = JSON.parse(JSON.stringify(state));
+      stateCopy.exchanges =  {};
+      stateCopy.selectedService = '';
+      const action = {
+        type: types.DELETE_SERVICE,
+        service: url,
+      };
+      expect(reducer(state, action)).toEqual(stateCopy);
+    });
+
+    it('should not update selectedService if the action service property does not match', () => {
+      const otherSelectedService = 'http://some-otherthing.com';
+      state.selectedService = otherSelectedService;
+      state.exchanges[url] = storedExchange;
+      const stateCopy = Object.assign({}, state, { exchanges: {} });
+      const action = {
+        type: types.DELETE_SERVICE,
+        service: url,
+      };
+      expect(reducer(state, action)).toEqual(stateCopy);
+    });
+
+    it('should not update state if action service property does not exist in exchanges', () => {
+      const action = {
+        type: types.DELETE_SERVICE,
+        service: url,
+      };
+      expect(reducer(state, action)).toEqual(state);
+    });
+  });
+
   describe('Pass-through Actions', () => {
     it('should return state if an action should pass through this reducer without change to state', () => {
       const action = { type: 'SOME_OTHER_ACTION' };

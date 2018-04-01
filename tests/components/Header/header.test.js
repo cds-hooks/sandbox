@@ -1,3 +1,5 @@
+jest.mock('../../../src/retrieve-data-helpers/discovery-services-retrieval', () => {return jest.fn();});
+
 import React from 'react';
 import { shallow, mount } from 'enzyme';
 import { Provider } from 'react-redux';
@@ -66,7 +68,7 @@ describe('Header component', () => {
     });
 
     it('should open the modal to change a patient if the Change Patient option is clicked directly', () => {
-      shallowedComponent.find('Menu').childAt(1).simulate('click');
+      shallowedComponent.find('Menu').childAt(4).simulate('click');
       expect(shallowedComponent.state('isChangePatientOpen')).toBeTruthy();
       expect(shallowedComponent.state('settingsOpen')).toBeFalsy();
       expect(shallowedComponent.find('Connect(PatientEntry)').length).toEqual(1);
@@ -79,7 +81,7 @@ describe('Header component', () => {
     });
 
     it('should open the modal to change the FHIR server if the Change FHIR Server option is clicked directly', () => {
-      shallowedComponent.find('Menu').childAt(2).simulate('click');
+      shallowedComponent.find('Menu').childAt(5).simulate('click');
       expect(shallowedComponent.state('isChangeFhirServerOpen')).toBeTruthy();
       expect(shallowedComponent.state('settingsOpen')).toBeFalsy();
       expect(shallowedComponent.find('Connect(FhirServerEntry)').length).toEqual(1);
@@ -96,6 +98,30 @@ describe('Header component', () => {
       expect(shallowedComponent.state('isAddServicesOpen')).toBeTruthy();
       expect(shallowedComponent.state('settingsOpen')).toBeFalsy();
       expect(shallowedComponent.find('ServicesEntry').length).toEqual(1);
+    });
+  });
+
+  describe('Reset Default Services', () => {
+    beforeEach(() => {
+      shallowedComponent.childAt(0).dive().find('.icon').first().simulate('click');
+    });
+
+    it('should open the modal to add CDS Services if the Add Services option is clicked directly', () => {
+      shallowedComponent.find('Menu').childAt(1).simulate('click');
+      expect(mockStore.getActions()).toEqual([{ type: types.RESET_SERVICES }]);
+    });
+  });
+
+  describe('Configure CDS Services', () => {
+    beforeEach(() => {
+      shallowedComponent.childAt(0).dive().find('.icon').first().simulate('click');
+    });
+
+    it('should open the modal to add CDS Services if the Add Services option is clicked directly', () => {
+      shallowedComponent.find('Menu').childAt(2).simulate('click');
+      expect(shallowedComponent.state('isConfigureServicesOpen')).toBeTruthy();
+      expect(shallowedComponent.state('settingsOpen')).toBeFalsy();
+      expect(shallowedComponent.find('Connect(ConfigureServices)').length).toEqual(1);
     });
   });
 });

@@ -8,7 +8,7 @@ import store from '../../store/store';
  */
 export function getServicesByHook(hook, services) {
   function filterByHook(service) {
-    return service.hook === hook;
+    return service.hook === hook && service.enabled;
   }
   return pickBy(services, filterByHook);
 }

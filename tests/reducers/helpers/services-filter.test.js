@@ -76,12 +76,15 @@ describe('Services Filters', () => {
   describe('getServicesByHook', () => {
     let getServicesByHook;
     let matchUrl = 'http://matched-hook.com/id';
+    let extraMatchUrl = 'http://not-enabled.com/id';
     let noMatchUrl = 'http://no-match-hook.com/id';
-    let serviceMatchesHook = { hook: 'patient-view' };
-    let serviceNoMatchHook = { hook: 'not-match' };
+    let serviceMatchesHook = { hook: 'patient-view', enabled: true };
+    let serviceNotEnabled = { hook: 'patient-view', enabled: false };
+    let serviceNoMatchHook = { hook: 'not-match', enabled: true };
     let configuredServices = {
       [matchUrl]: serviceMatchesHook,
       [noMatchUrl]: serviceNoMatchHook,
+      [extraMatchUrl]: serviceNotEnabled,
     };
 
     beforeEach(() => {
@@ -91,6 +94,8 @@ describe('Services Filters', () => {
     it('returns relevant services by hook', () => {
       expect(getServicesByHook('patient-view', configuredServices)).toEqual({[matchUrl]: serviceMatchesHook});
     });
+
+
   });
 
   describe('getCardsFromServices', () => {
