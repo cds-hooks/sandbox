@@ -75,7 +75,11 @@
   bottom: -.07143rem;
 }
 
-@media (max-width: 600px) {
+.extensions {
+  margin-right: 8px;
+}
+
+@media (max-width: 630px) {
   .logo-title {
     display: none;
   }

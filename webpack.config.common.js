@@ -14,6 +14,11 @@ const globalCss = [
   /node_modules\/terra-icon\/lib\/Icon/,
 ];
 
+const codeMirrorCss = [
+  path.resolve(path.resolve(__dirname), 'node_modules/codemirror/lib'),
+  path.resolve(path.resolve(__dirname), 'node_modules/codemirror/addon/lint/'),
+];
+
 const cssLoaderNoModules = {
   loader: 'css-loader',
   options: {
@@ -75,6 +80,7 @@ const config = {
       {
         test: /\.(scss|css)$/,
         include: globalCss,
+        exclude: codeMirrorCss,
         use: ExtractTextPlugin.extract({
           fallback: 'style-loader',
           use: [
@@ -86,7 +92,7 @@ const config = {
       },
       {
         test: /\.(scss|css)$/,
-        exclude: globalCss,
+        exclude: globalCss.concat(codeMirrorCss),
         use: ExtractTextPlugin.extract({
           fallback: 'style-loader',
           use: [
@@ -95,6 +101,10 @@ const config = {
             sassLoader,
           ],
         }),
+      },
+      {
+        test: /node_modules\/.*\.css$/,
+        use: ['style-loader', 'css-loader'],
       },
       {
         test: /\.(png|jpg|gif)$/,

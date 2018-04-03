@@ -1,0 +1,73 @@
+.app-main {
+  display: table;
+  width: 100%;
+  min-height: 100vh;
+  table-layout: fixed;
+}
+
+.card-render-view-container {
+  height: 100%;
+  display: table-cell;
+  vertical-align: top;
+  padding: 10px;
+  width: 50%;
+}
+
+.card-render-json-container {
+  width: 50%;
+  display: table-cell;
+  height: 100%;
+  border-left: 1px solid #000000;
+  padding: 10px;
+}
+
+.card-render-json-border {
+  border: solid 2px #000000;
+  border-radius: 6px;
+}
+
+.card-render-json-title {
+  vertical-align: top;
+  width: 70%;
+  display: inline-block;
+}
+
+.card-render-space {
+  height: 90%;
+  width: 100%;
+}
+
+.full-width {
+  width: 100%;
+  vertical-align: top;
+}
+
+.card-render-json-reset {
+  display: inline-block;
+  width: 30%;
+  text-align: right;
+}
+
+:global .CodeMirror {
+  border-radius: 6px;
+  color: #fff;
+  height: 90%;
+  font-family: Inconsolata, Menlo, Consolas, monospace !important;
+  font-size: 90%;
+}
+
+@media (max-width: 975px) {
+  .app-main {
+    height: auto;
+  }
+
+  .card-render-view-container {
+    display: block;
+    width: 100%;
+  }
+
+  .card-render-json-container {
+    display: block;
+    width: 100%;
+  }
+}
