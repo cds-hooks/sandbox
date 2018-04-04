@@ -12,6 +12,7 @@ const SRC_DIR = path.resolve(__dirname, './src');
 
 const globalCss = [
   /node_modules\/terra-icon\/lib\/Icon/,
+  /node_modules\/terra-date-picker/,
 ];
 
 const codeMirrorCss = [

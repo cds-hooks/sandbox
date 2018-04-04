@@ -5,10 +5,11 @@ import * as types from './action-types';
  * @param patient - Patient resource returned by FHIR server
  * @returns {{type, patient: *}} - Action to dispatch
  */
-export function signalSuccessPatientRetrieval(patient) {
+export function signalSuccessPatientRetrieval(patient, conditions) {
   return {
     type: types.GET_PATIENT_SUCCESS,
     patient,
+    conditions,
   };
 }
 

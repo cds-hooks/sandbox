@@ -34,8 +34,21 @@ function retrievePatient(testPatient) {
       headers,
     }).then((result) => {
       if (result.data && result.data.resourceType === 'Patient') {
-        store.dispatch(signalSuccessPatientRetrieval(result.data));
-        return resolve();
+        return axios({
+          method: 'get',
+          url: `${fhirServer}/Condition?patient=${patient}`,
+          headers,
+        }).then((conditionsResult) => {
+          if (result.data) {
+            store.dispatch(signalSuccessPatientRetrieval(result.data, conditionsResult.data));
+            return resolve();
+          }
+          store.dispatch(signalSuccessPatientRetrieval(result.data));
+          return resolve();
+        }).catch(() => {
+          store.dispatch(signalSuccessPatientRetrieval(result.data));
+          return resolve();
+        });
       }
       return reject();
     }).catch((err) => {
