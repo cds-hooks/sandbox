@@ -4,8 +4,11 @@
   "description": "A SPA tool that simulates the CDS Hooks standard on a mock-ehr system",
   "main": "build/bundle.js",
   "scripts": {
-    "start": "webpack-dev-server --config webpack.config.dev.js --inline --content-base ./build",
+    "start": "node scripts/express/app.js",
+    "dev": "webpack-dev-server --config webpack.config.dev.js --inline --content-base ./build",
+    "compile:heroku": "webpack --config webpack.config.dev.js --progress --colors --display-error-details",
     "build": "webpack --config webpack.config.dev.js --progress --colors --display-error-details",
+    "heroku-postbuild": "npm install --only=dev && npm run compile:heroku",
     "lint": "./node_modules/.bin/eslint ./src --fix",
     "test": "jest --coverage"
   },
@@ -26,6 +29,8 @@
   ],
   "dependencies": {
     "axios": "^0.17.1",
+    "jsrsasign": "^8.0.6",
+    "lodash": "^4.17.5",
     "query-string": "^5.1.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
@@ -51,8 +56,11 @@
     "eslint-plugin-react": "^7.5.1",
     "express": "^4.16.2",
     "extract-text-webpack-plugin": "^3.0.2",
+    "file-loader": "^1.1.11",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^22.1.4",
+    "raw-loader": "^0.5.1",
+    "redux-immutable-state-invariant": "^2.1.0",
     "redux-logger": "^3.0.6",
     "redux-mock-store": "^1.4.0",
     "style-loader": "^0.19.1",
