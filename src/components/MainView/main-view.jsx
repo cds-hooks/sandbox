@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import LoadingOverlay from 'terra-overlay/lib/LoadingOverlay';
 
@@ -29,7 +29,7 @@ export class MainView extends Component {
    *       patient in context.
    */
   componentDidMount() {
-    this.props.setLoader(true);
+    this.props.setLoadingStatus(true);
     smartLaunchPromise().then(() => {
       return retrievePatient();
     }, () => {
@@ -44,12 +44,12 @@ export class MainView extends Component {
     }, () => {
       // TODO: Manually enter a patient in context if Patient resource fails to return
     }).then(() => {
-      this.props.setLoader(false);
+      this.props.setLoadingStatus(false);
     });
   }
 
   render() {
-    const hookView = this.props.hook === 'patient-view' ? <PatientView /> : <div>Med Prescribe View</div>;
+    const hookView = this.props.hook === 'patient-view' ? <PatientView /> : 'Med Prescribe View';
     const container = <div className={styles.container}>
       {hookView}
     </div>;
@@ -71,7 +71,7 @@ const mapStateToProps = (store) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    setLoader: (status) => {
+    setLoadingStatus: (status) => {
       dispatch(setLoadingStatus(status));
     }
   }
