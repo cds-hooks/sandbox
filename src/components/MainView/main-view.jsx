@@ -6,7 +6,6 @@ import smartLaunchPromise from '../../retrieve-data-helpers/smart-launch';
 import retrieveFhirMetadata from '../../retrieve-data-helpers/fhir-metadata-retrieval';
 import retrievePatient from '../../retrieve-data-helpers/patient-retrieval';
 import retrieveDiscoveryServices from '../../retrieve-data-helpers/discovery-services-retrieval';
-import store from '../../store/store';
 
 import styles from './main-view.css';
 import PatientView from '../PatientView/patient-view';
@@ -14,10 +13,6 @@ import ContextView from '../ContextView/context-view';
 import { setLoadingStatus } from '../../actions/ui-actions';
 
 export class MainView extends Component {
-  constructor(props) {
-    super(props);
-  }
-
   /**
    * TODO: Grab the following pieces of data (w/ face-up loading spinner) before displaying the EHR-view:
    *       1. Initiate SMART App launch (if applicable)
@@ -31,18 +26,11 @@ export class MainView extends Component {
    */
   componentDidMount() {
     this.props.setLoadingStatus(true);
-    smartLaunchPromise().then(() => {
-      return retrievePatient();
-    }, () => {
+    smartLaunchPromise().then(() => retrievePatient(), () =>
       // TODO: Display an error banner indicating smart launch failed, and it will launch openly
-      return retrieveFhirMetadata().then(() => {
-        return retrievePatient();
-      }, () => {
+      retrieveFhirMetadata().then(() => retrievePatient(), () => {
         // TODO: Manually enter a FHIR server (modal) if default FHIR server fails to load
-      });
-    }).then(() => {
-      return retrieveDiscoveryServices();
-    }, () => {
+      })).then(() => retrieveDiscoveryServices(), () => {
       // TODO: Manually enter a patient in context if Patient resource fails to return
     }).then(() => {
       this.props.setLoadingStatus(false);
@@ -51,10 +39,11 @@ export class MainView extends Component {
 
   render() {
     const hookView = this.props.hook === 'patient-view' ? <PatientView /> : 'Med Prescribe View';
-    const container = <div className={styles.container}>
-      {hookView}
-      <ContextView />
-    </div>;
+    const container = (
+      <div className={styles.container}>
+        {hookView}
+        <ContextView />
+      </div>);
     return (
       <div>
         <LoadingOverlay isOpen={this.props.isLoadingData} isAnimated />
@@ -64,19 +53,15 @@ export class MainView extends Component {
   }
 }
 
-const mapStateToProps = (store) => {
-  return {
-    hook: store.hookState.currentHook,
-    isLoadingData: store.hookState.isLoadingData,
-  }
-};
+const mapStateToProps = store => ({
+  hook: store.hookState.currentHook,
+  isLoadingData: store.hookState.isLoadingData,
+});
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    setLoadingStatus: (status) => {
-      dispatch(setLoadingStatus(status));
-    }
-  }
-};
+const mapDispatchToProps = dispatch => ({
+  setLoadingStatus: (status) => {
+    dispatch(setLoadingStatus(status));
+  },
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(MainView);

@@ -5,3 +5,5 @@ coverage/
 polyfills/
 __mocks__
 webpack.config.dev.js
+fhir-client.min.js
+aggregated-translations

@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import cx from 'classnames';
 
 import Card from 'terra-card';
@@ -9,12 +9,12 @@ import IconChevronDown from 'terra-icon/lib/icon/IconChevronDown';
 
 import styles from './exchange-panel.css';
 
-export class ExchangePanel extends Component {
+export default class ExchangePanel extends Component {
   constructor(props) {
     super(props);
 
     this.state = ({
-      isExpanded: this.props.isExpanded
+      isExpanded: this.props.isExpanded,
     });
 
     this.toggleExpansion = this.toggleExpansion.bind(this);
@@ -27,18 +27,20 @@ export class ExchangePanel extends Component {
   render() {
     const text = this.props.panelText ? JSON.stringify(this.props.panelText, null, 2).split(/\n/) : '';
     const textHtml = text ? text.map((l, i) => (
-      <div key={i}>{l}</div>
+      <div key={`${l}-${i}`}>{l}</div>
     )) : '';
 
     const iconToggle = this.state.isExpanded ? <IconChevronDown /> : <IconChevronRight />;
 
     return (
       <Card>
-        <Heading className={styles['header-toggle']}
-                 level={1}
-                 size='medium'
-                 weight={700}
-                 onClick={this.toggleExpansion}>
+        <Heading
+          className={styles['header-toggle']}
+          level={1}
+          size="medium"
+          weight={700}
+          onClick={this.toggleExpansion}
+        >
           {iconToggle}
           {this.props.panelHeader}
         </Heading>
@@ -55,5 +57,3 @@ export class ExchangePanel extends Component {
     );
   }
 }
-
-export default ExchangePanel;

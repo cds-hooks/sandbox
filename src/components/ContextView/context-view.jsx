@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import cx from 'classnames';
 import pickBy from 'lodash/pickBy';
@@ -13,7 +13,6 @@ import { selectService } from '../../actions/service-exchange-actions';
 import { setContextVisibility } from '../../actions/ui-actions';
 
 export class ContextView extends Component {
-
   constructor(props) {
     super(props);
     this.onSelectChange = this.onSelectChange.bind(this);
@@ -30,7 +29,7 @@ export class ContextView extends Component {
   }
 
   /**
-   * When the Context View toggle is clicked, this triggers a state update so that the 
+   * When the Context View toggle is clicked, this triggers a state update so that the
    * Context View is hidden or expanded to allow the EHR view to take 100% width
    */
   onContextToggle() {
@@ -64,24 +63,30 @@ export class ContextView extends Component {
       contextToggledClass = styles['context-open'];
     }
 
-    return(
-      <div className={cx(styles['container'], contextToggledClass)}>
+    return (
+      <div className={cx(styles.container, contextToggledClass)}>
         <div className={styles['wrap-context']}>
-          <h1 className={styles['title']}>CDS Service Exchange</h1>
-          <SelectField label={<b>Select a Service</b>}
-                       value={`${serviceInContext}`}
-                       options={this.createDropdownServices()} 
-                       onChange={this.onSelectChange} />
-          <ExchangePanel panelHeader={' Request'}
-                         panelText={serviceExchange ? serviceExchange['request'] : 'No request made to CDS Service'}
-                         isExpanded={false} />
-          <ExchangePanel panelHeader={' Response'}
-                         panelText={serviceExchange ? serviceExchange['response'] : 'No response made to CDS Service'}
-                         isExpanded={true} />
+          <h1 className={styles.title}>CDS Service Exchange</h1>
+          <SelectField
+            label={<b>Select a Service</b>}
+            value={`${serviceInContext}`}
+            options={this.createDropdownServices()}
+            onChange={this.onSelectChange}
+          />
+          <ExchangePanel
+            panelHeader=" Request"
+            panelText={serviceExchange ? serviceExchange.request : 'No request made to CDS Service'}
+            isExpanded={false}
+          />
+          <ExchangePanel
+            panelHeader=" Response"
+            panelText={serviceExchange ? serviceExchange.response : 'No response made to CDS Service'}
+            isExpanded
+          />
         </div>
         <button onClick={this.onContextToggle} className={styles['context-toggle']}>
           Context Toggle
-        </button>               
+        </button>
       </div>
     );
   }
@@ -97,6 +102,7 @@ const mapStateToProps = (store) => {
     if (serviceKeys.length) {
       return services[serviceKeys[0]];
     }
+    return null;
   }
 
   return {
@@ -105,18 +111,16 @@ const mapStateToProps = (store) => {
     selectedService: store.serviceExchangeState.selectedService,
     initialService: getFirstServiceForHook(pickBy(store.cdsServicesState.configuredServices, isCorrectHook)),
     exchanges: store.serviceExchangeState.exchanges,
-  }
-};
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    selectService: (service) => {
-      dispatch(selectService(service));
-    },
-    toggleContext: () => {
-      dispatch(setContextVisibility());
-    }
   };
 };
+
+const mapDispatchToProps = dispatch => ({
+  selectService: (service) => {
+    dispatch(selectService(service));
+  },
+  toggleContext: () => {
+    dispatch(setContextVisibility());
+  },
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(ContextView);
