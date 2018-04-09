@@ -10,9 +10,25 @@ import retrieveDiscoveryServices from '../../retrieve-data-helpers/discovery-ser
 import styles from './main-view.css';
 import PatientView from '../PatientView/patient-view';
 import ContextView from '../ContextView/context-view';
+import FhirServerEntry from '../FhirServerEntry/fhir-server-entry';
+import PatientEntry from '../PatientEntry/patient-entry';
 import { setLoadingStatus } from '../../actions/ui-actions';
 
 export class MainView extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      fhirServerPrompt: false,
+      fhirServerPromptHold: null,
+      patientPrompt: false,
+      patientPromptHold: null,
+    };
+
+    this.closeFhirServerPrompt = this.closeFhirServerPrompt.bind(this);
+    this.closePatientPrompt = this.closePatientPrompt.bind(this);
+  }
+
   /**
    * TODO: Grab the following pieces of data (w/ face-up loading spinner) before displaying the EHR-view:
    *       1. Initiate SMART App launch (if applicable)
@@ -24,17 +40,34 @@ export class MainView extends Component {
    *       ERROR scenarios: If any errors occur, display an input box for the user to specify FHIR server or
    *       patient in context.
    */
-  componentDidMount() {
+  async componentDidMount() {
     this.props.setLoadingStatus(true);
-    smartLaunchPromise().then(() => retrievePatient(), () =>
-      // TODO: Display an error banner indicating smart launch failed, and it will launch openly
-      retrieveFhirMetadata().then(() => retrievePatient(), () => {
-        // TODO: Manually enter a FHIR server (modal) if default FHIR server fails to load
-      })).then(() => retrieveDiscoveryServices(), () => {
-      // TODO: Manually enter a patient in context if Patient resource fails to return
-    }).then(() => {
-      this.props.setLoadingStatus(false);
+    await smartLaunchPromise().catch(async () => {
+      await retrieveFhirMetadata().catch(() => new Promise((resolve) => {
+        this.setState({
+          fhirServerPrompt: true,
+          fhirServerPromptHold: resolve,
+        });
+      }));
     });
+    if (this.state.fhirServerPrompt) this.setState({ fhirServerPrompt: false });
+    await retrievePatient().catch(() => new Promise((resolve) => {
+      this.setState({
+        patientPrompt: true,
+        patientPromptHold: resolve,
+      });
+    }));
+    if (this.state.patientPrompt) this.setState({ patientPrompt: false });
+    await retrieveDiscoveryServices();
+    this.props.setLoadingStatus(false);
+  }
+
+  closeFhirServerPrompt() {
+    this.setState({ fhirServerPrompt: false });
+  }
+
+  closePatientPrompt() {
+    this.setState({ patientPrompt: false });
   }
 
   render() {
@@ -47,6 +80,18 @@ export class MainView extends Component {
     return (
       <div>
         <LoadingOverlay isOpen={this.props.isLoadingData} isAnimated />
+        {this.state.fhirServerPrompt ? <FhirServerEntry
+          isOpen={this.state.fhirServerPrompt}
+          isEntryRequired
+          closePrompt={this.closeFhirServerPrompt}
+          resolve={this.state.fhirServerPromptHold}
+        /> : null}
+        {this.state.patientPrompt ? <PatientEntry
+          isOpen={this.state.patientPrompt}
+          isEntryRequired
+          closePrompt={this.closePatientPrompt}
+          resolve={this.state.patientPromptHold}
+        /> : null}
         {this.props.isLoadingData ? '' : container}
       </div>
     );

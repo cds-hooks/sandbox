@@ -52,11 +52,6 @@ describe('PatientView component', () => {
     jest.resetModules();
   });
 
-  it('renders a connected component and its unconnected counterpart', () => {
-    expect(wrapper.length).toEqual(1);
-    expect(pureComponent.length).toEqual(1);
-  });
-
   it('matches props passed down from Redux decorator', () => {
     expect(pureComponent.prop('patient')).toEqual(storeState.patientState.currentPatient);
   });

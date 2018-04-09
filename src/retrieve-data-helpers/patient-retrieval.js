@@ -8,9 +8,9 @@ import { signalSuccessPatientRetrieval, signalFailurePatientRetrieval } from '..
  * and dispatch successful or failed connection to the endpoint on the FHIR server.
  * @returns {Promise} - Promise to resolve elsewhere
  */
-function retrievePatient() {
+function retrievePatient(testPatient) {
   return new Promise((resolve, reject) => {
-    let patient = '';
+    let patient = testPatient || '';
     const { accessToken } = store.getState().fhirServerState;
     const fhirServer = store.getState().fhirServerState.currentFhirServer;
     const headers = {
@@ -20,9 +20,9 @@ function retrievePatient() {
     // Grab patient ID from access token (if Sandbox launched securely)
     // Otherwise grab patient ID from query parameters OR default patient ID in store
     if (accessToken) {
-      ({ patient } = accessToken);
+      if (!patient) ({ patient } = accessToken);
       headers.Authorization = `Bearer ${accessToken.access_token}`;
-    } else {
+    } else if (!patient) {
       const parsed = queryString.parse(window.location.search);
       patient = parsed.patientId || store.getState().patientState.defaultPatientId;
     }
