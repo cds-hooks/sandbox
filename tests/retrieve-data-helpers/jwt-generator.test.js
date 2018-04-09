@@ -7,7 +7,7 @@ describe('JWT Generator', () => {
 
   beforeEach(() => {
     jest.setMock('uuid/v4', (() => mockUUID));
-    jest.setMock('../../ecprivkey.pem', mockPrivateKey);
+    jest.setMock('../../keys/ecprivkey.pem', mockPrivateKey);
     jest.setMock('jsrsasign', {
       jws: { JWS: { sign: signMethodMock  } }
     });

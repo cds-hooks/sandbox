@@ -1,4 +1,4 @@
-import privKey from '../../ecprivkey.pem';
+import privKey from '../../keys/ecprivkey.pem';
 
 const JWT = require('jsrsasign');
 const uuid = require('uuid/v4');
