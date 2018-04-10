@@ -66,7 +66,7 @@ export class ContextView extends Component {
     return (
       <div className={cx(styles.container, contextToggledClass)}>
         <div className={styles['wrap-context']}>
-          <h1 className={styles.title}>CDS Service Exchange</h1>
+          <h1 className={styles.title}>CDS Developer Panel</h1>
           <SelectField
             label={<b>Select a Service</b>}
             value={`${serviceInContext}`}
@@ -85,7 +85,7 @@ export class ContextView extends Component {
           />
         </div>
         <button onClick={this.onContextToggle} className={styles['context-toggle']}>
-          Context Toggle
+          CDS Developer Panel
         </button>
       </div>
     );
