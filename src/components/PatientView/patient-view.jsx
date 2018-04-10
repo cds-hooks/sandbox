@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import cx from 'classnames';
 import pickBy from 'lodash/pickBy';
@@ -28,12 +28,14 @@ export class PatientView extends Component {
   }
 
   render() {
-    let name = this.props.patient.name || "Missing Name";
-    let dob = this.props.patient.birthDate || "Missing DOB";
-    let pid = this.props.patient.id || "Missing Patient ID";
+    const name = this.props.patient.name || 'Missing Name';
+    const dob = this.props.patient.birthDate || 'Missing DOB';
+    const pid = this.props.patient.id || 'Missing Patient ID';
+
+    const isHalfView = this.props.isContextVisible ? styles['half-view'] : '';
 
     return (
-      <div className={cx(styles['patient-view'])}>
+      <div className={cx(styles['patient-view'], isHalfView)}>
         <h1 className={styles['view-title']}>Patient View</h1>
         <h2>{name}</h2>
         <div className={styles['patient-data-text']}>
@@ -50,9 +52,10 @@ const mapStateToProps = (store) => {
   }
 
   return {
+    isContextVisible: store.hookState.isContextVisible,
     patient: store.patientState.currentPatient,
-    services: pickBy(store.cdsServicesState.configuredServices, isCorrectHook)
-  }
+    services: pickBy(store.cdsServicesState.configuredServices, isCorrectHook),
+  };
 };
 
 export default connect(mapStateToProps)(PatientView);

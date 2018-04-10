@@ -26,6 +26,7 @@ describe('PatientView component', () => {
 
   beforeEach(() => {
     storeState = {
+      hookState: { isContextVisible: true },
       patientState: {
         currentPatient: {
           name: 'Test',
@@ -70,6 +71,7 @@ describe('PatientView component', () => {
 
   it('contains relevant messages for missing patient in context', () => {
     storeState = {
+      hookState: { isContextVisible: true },
       patientState: {
         currentPatient: {}
       },
@@ -89,6 +91,13 @@ describe('PatientView component', () => {
     expect(shallowedComponent.text()).toContain('Missing DOB');
     expect(shallowedComponent.text()).toContain('Missing Patient ID');
     expect(mockSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('hides the view beyond the context toggle if context view status is set to false', () => {
+    const newStoreState = Object.assign({}, storeState, { hookState: { isContextVisible: false } });
+    setup(newStoreState);
+    let shallowedComponent = pureComponent.shallow();
+    expect(shallowedComponent.find('.half-view')).toHaveLength(0);
   });
 
   it('does not call callServices on any services not configured for the patient view hook', () => {

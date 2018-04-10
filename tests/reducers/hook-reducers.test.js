@@ -8,6 +8,7 @@ describe('Hook Reducer', () => {
     state = {
       currentHook: 'patient-view',
       isLoadingData: false,
+      isContextVisible: true,
     };
   });
 
@@ -23,6 +24,18 @@ describe('Hook Reducer', () => {
       };
 
       const newState = Object.assign({}, state, { isLoadingData: action.isLoaderOn});
+      expect(reducer(state, action)).toEqual(newState);
+    });
+  });
+
+  describe('SET_CONTEXT_VISIBILITY', () => {
+    it('should handle the SET_CONTEXT_VISIBILITY action accordingly', () => {
+      const action = {
+        type: types.SET_CONTEXT_VISIBILITY,
+        isContextVisible: false,
+      };
+
+      const newState = Object.assign({}, state, { isContextVisible: action.isContextVisible});
       expect(reducer(state, action)).toEqual(newState);
     });
   });

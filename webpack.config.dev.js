@@ -5,6 +5,7 @@ const I18nAggregatorPlugin = require('terra-i18n-plugin');
 const i18nSupportedLocales = require('terra-i18n/lib/i18nSupportedLocales');
 const Autoprefixer = require('autoprefixer');
 const CustomProperties = require('postcss-custom-properties');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const BUILD_DIR = path.resolve(__dirname, './build');
 const SRC_DIR = path.resolve(__dirname, './src');
@@ -118,6 +119,14 @@ const config = {
       baseDirectory: __dirname,
       supportedLocales: i18nSupportedLocales,
     }),
+    new CopyWebpackPlugin([
+      {
+        from: '*.html',
+      },
+      {
+        from: './fhir-client.min.js',
+      }
+    ]),
     new webpack.NamedChunksPlugin(),
     new webpack.DefinePlugin({
       'runtime.FHIR_URL': JSON.stringify(process.env.FHIR_URL || 'https://api.hspconsortium.org/cdshooksdstu2/open')

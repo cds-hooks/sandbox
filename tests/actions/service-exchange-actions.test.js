@@ -15,4 +15,14 @@ describe('Service Exchange Actions', () => {
 
     expect(actions.storeExchange(url, request, response)).toEqual(expectedAction);
   });
+
+  it('creates action to set the CDS Service to display a request and response for', () => {
+    const service = 'foo-service.com/cds-services/foo';
+    const expectedAction = {
+      type: types.SELECT_SERVICE_CONTEXT,
+      service,
+    };
+
+    expect(actions.selectService(service)).toEqual(expectedAction);
+  });
 });

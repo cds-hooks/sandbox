@@ -23,6 +23,14 @@ const serviceExchangeReducers = (state = initialState, action) => {
         }
         break;
       }
+
+      // Select a CDS Service to display exchange context for
+      case types.SELECT_SERVICE_CONTEXT: {
+        if (action.service && state.selectedService !== action.service) {
+          return Object.assign({}, state, { selectedService: action.service });
+        }
+        break;
+      }
       default: {
         return state;
       }

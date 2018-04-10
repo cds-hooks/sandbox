@@ -11,9 +11,9 @@ import MainView from './components/MainView/main-view';
 
 ReactDOM.render(
   <Provider store={store}>
-    <Base locale='en-US'>
+    <Base locale="en-US">
       <MainView />
     </Base>
   </Provider>,
-  document.getElementById('root')
+  document.getElementById('root'),
 );
