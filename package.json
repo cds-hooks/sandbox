@@ -38,7 +38,7 @@
     "react-dom": "^16.2.0",
     "react-redux": "^5.0.6",
     "redux": "^3.7.2",
-    "terra-application-header-layout": "^2.1.0",
+    "terra-application-header-layout": "2.1.0",
     "terra-base": "^3.2.0",
     "terra-button": "^2.1.0",
     "terra-card": "^2.1.0",
