@@ -23,4 +23,14 @@ describe('FHIR Server Actions', () => {
     expect(actions.signalFailureFhirServerRetrieval())
       .toEqual(expectedAction);
   });
+
+  it('creates action to set current fhir server in the application', () => {
+    const fhirServer = 'http://testing.com';
+    const expectedAction = {
+      type: types.SET_CURRENT_FHIR_SERVER,
+      fhirServer: fhirServer,
+    };
+
+    expect(actions.setCurrentFhirServer(fhirServer)).toEqual(expectedAction);
+  });
 });

@@ -15,10 +15,10 @@ describe('MainView component', () => {
   let mockStoreWrapper = configureStore([]);
 
   let ConnectedMainView;
-  let mockPromiseSmartCall = jest.fn();
-  let mockPromiseFhirCall = jest.fn();
-  let mockPromisePatientCall = jest.fn();
-  let mockPromiseDiscoveryCall = jest.fn();
+  let mockPromiseSmartCall = jest.fn(() => 1);
+  let mockPromiseFhirCall = jest.fn(() => 1);
+  let mockPromisePatientCall = jest.fn(() => 1);
+  let mockPromiseDiscoveryCall = jest.fn(() => 1);
 
   function setup(state) {
     mockStore = mockStoreWrapper(state);
@@ -49,13 +49,6 @@ describe('MainView component', () => {
     jest.clearAllMocks();
   })
 
-
-  it('renders a connected component and its unconnected counterpart', () => {
-    setup(storeState);
-    expect(wrapper.length).toEqual(1);
-    expect(pureComponent.length).toEqual(1);
-  });
-
   it('renders relevant child components', () => {
     setup(storeState);
     const shallowedComponent = pureComponent.shallow();
@@ -77,6 +70,27 @@ describe('MainView component', () => {
     Promise.resolve(pureComponent.shallow()).then(() => {
       expect(mockPromiseFhirCall).toHaveBeenCalled();
       done();  
+    });
+  });
+
+  it('opens a fhir server entry prompt if fhir server call failed', async (done) => {
+    mockPromiseSmartCall = jest.fn(() => Promise.reject(0));
+    mockPromiseFhirCall = jest.fn(() => Promise.reject(0));
+    setup(storeState);
+    let shallowedComponent = await pureComponent.shallow();
+    Promise.resolve(shallowedComponent).then(() => {
+      expect(shallowedComponent.state('fhirServerPrompt')).toEqual(true);
+      done();
+    });
+  });
+
+  it ('opens a patient entry modal if patient fetching failed', async (done) => {
+    mockPromisePatientCall = jest.fn(() => Promise.reject(0));
+    setup(storeState);
+    let shallowedComponent = await pureComponent.shallow();
+    Promise.resolve( await shallowedComponent).then(async () => {
+      await expect(shallowedComponent.state('patientPrompt')).toEqual(true);
+      done();
     });
   });
 

@@ -65,6 +65,39 @@ describe('Patient Retrieval', () => {
       });
     });
 
+    it('resolves and dispatches a success actoin with passed in patient', () => {
+      setMocksAndTestFunction(defaultStore);
+      const passedInPateintId = 'passed-id';
+      mockAxios.onGet(`${fhirServer}/Patient/${passedInPateintId}`)
+        .reply(200, expectedPatient);
+      const spy = jest.spyOn(actions, 'signalSuccessPatientRetrieval');
+      return retrievePatient(passedInPateintId).then(() => {
+        expect(spy).toHaveBeenCalledWith(expectedPatient);
+        spy.mockReset();
+        spy.mockRestore();
+      });
+    });
+
+    it('resolves and dispatches a success action with passed in patient despite access token patient being set', () => {
+      setMocksAndTestFunction(Object.assign({}, defaultStore, {
+        fhirServerState: {
+          ...defaultStore.fhirServerState,
+          accessToken: {
+            patient: 'access-token-patient-id',
+          },
+        },
+      }));
+      const spy = jest.spyOn(actions, 'signalSuccessPatientRetrieval');
+      const passedInPatientId = 'passed-id';
+      mockAxios.onGet(`${fhirServer}/Patient/${passedInPatientId}`)
+        .reply(200, expectedPatient);
+      return retrievePatient(passedInPatientId).then(() => {
+        expect(spy).toHaveBeenCalledWith(expectedPatient);
+        spy.mockReset();
+        spy.mockRestore();
+      });
+    });
+
     it('resolves and dispatches a success action with patient from window location', () => {
       setMocksAndTestFunction(defaultStore);
       mockAxios.onGet(`${fhirServer}/Patient/${expectedPatient.id}`)
