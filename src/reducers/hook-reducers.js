@@ -18,6 +18,11 @@ const hookReducers = (state = initialState, action) => {
       case types.SET_CONTEXT_VISIBILITY: {
         return Object.assign({}, state, { isContextVisible: !state.isContextVisible });
       }
+
+      // Set hook for the application
+      case types.SET_HOOK: {
+        return Object.assign({}, state, { currentHook: action.hook });
+      }
       default:
         return state;
     }

@@ -8,6 +8,7 @@ import retrievePatient from '../../retrieve-data-helpers/patient-retrieval';
 import retrieveDiscoveryServices from '../../retrieve-data-helpers/discovery-services-retrieval';
 
 import styles from './main-view.css';
+import Header from '../Header/header';
 import PatientView from '../PatientView/patient-view';
 import ContextView from '../ContextView/context-view';
 import FhirServerEntry from '../FhirServerEntry/fhir-server-entry';
@@ -92,6 +93,7 @@ export class MainView extends Component {
           closePrompt={this.closePatientPrompt}
           resolve={this.state.patientPromptHold}
         /> : null}
+        <div className={styles.pin}><Header /></div>
         {this.props.isLoadingData ? '' : container}
       </div>
     );

@@ -40,6 +40,18 @@ describe('Hook Reducer', () => {
     });
   });
 
+  describe('SET_HOOK', () => {
+    it('should handle the SET_HOOK action accordingly', () => {
+      const action = {
+        type: types.SET_HOOK,
+        hook: 'medication-prescribe',
+      };
+
+      const newState = Object.assign({}, state, { currentHook: action.hook });
+      expect(reducer(state, action)).toEqual(newState);
+    })
+  });
+
   describe('Pass-through Actions', () => {
     it('should return state if an action should pass through this reducer without change to state', () => {
       const action = { type: 'SOME_OTHER_ACTION' };

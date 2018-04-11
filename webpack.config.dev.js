@@ -98,6 +98,17 @@ const config = {
         }),
       },
       {
+        test: /\.(png|jpg|gif)$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '[name].[ext]'
+            }
+          }
+        ] 
+      },
+      {
         test: /\.jsx?/,
         include: SRC_DIR,
         loader: 'babel-loader',

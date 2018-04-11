@@ -6,6 +6,18 @@
   position: relative;
 }
 
+.pin {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: inherit;
+  z-index: 100;
+}
+
+.pin + .container {
+  padding-top: 36px;
+}
+
 @media (max-width: 975px) {
   .container {
     display: inline-block;
