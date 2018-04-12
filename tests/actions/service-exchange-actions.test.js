@@ -5,15 +5,17 @@ describe('Service Exchange Actions', () => {
   it('creates action to signal a successful request/response exchange for a CDS Service', () => {
     const request = 'request';
     const response = 'response';
+    const responseStatus = 200;
     const url = 'http://example.com/cds-services/id-1';
     const expectedAction = {
       type: types.STORE_SERVICE_EXCHANGE,
       url,
       request,
-      response
+      response,
+      responseStatus,
     };
 
-    expect(actions.storeExchange(url, request, response)).toEqual(expectedAction);
+    expect(actions.storeExchange(url, request, response, responseStatus)).toEqual(expectedAction);
   });
 
   it('creates action to set the CDS Service to display a request and response for', () => {

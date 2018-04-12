@@ -44,7 +44,7 @@ describe('Service Exchange', () => {
 
   beforeEach(() => {
     mockPatient = 'patient-1';
-    mockFhirServer = 'http://fhir-server.com';
+    mockFhirServer = 'http://fhir-server-example.com';
     mockServiceWithPrefetch = 'http://example.com/cds-services/id-1';
     mockServiceWithoutPrefetch = 'http://example.com/cds-services/id-2';
     mockServiceNoEncoding = 'http://example.com/cds-services/id-3';
@@ -114,14 +114,15 @@ describe('Service Exchange', () => {
 
       it('resolves and dispatches a successful CDS Service call when prefetch is retrieved', () => {
         defaultStore.fhirServerState.accessToken = { access_token: 'mock-access-token' };
+        const serviceResultStatus = 200;
         mockAxios.onGet(`${mockFhirServer}/Observation?code=${encodeURIComponent('http://loinc.org|2857-1')}&patient=${mockPatient}`)
           .reply((config) => {
             expect(config.headers['Authorization']).toEqual('Bearer mock-access-token');
             return [200, prefetchedData];
           })
-          .onPost(mockServiceWithPrefetch).reply(200, mockServiceResult);
+          .onPost(mockServiceWithPrefetch).reply(serviceResultStatus, mockServiceResult);
         return callServices(mockServiceWithPrefetch).then(() => {
-          expect(spy).toHaveBeenCalledWith(mockServiceWithPrefetch, mockRequest, mockServiceResult);
+          expect(spy).toHaveBeenCalledWith(mockServiceWithPrefetch, mockRequest, mockServiceResult, serviceResultStatus);
         });
       });
 
@@ -148,11 +149,12 @@ describe('Service Exchange', () => {
 
     describe('and the prefetch call is unsuccessful', () => {
       it('continues to POST to CDS service without the prefetch property that failed', ()=> {
+        const serviceResultStatus = 200;
         mockAxios.onGet(`${mockFhirServer}/Observation?code=${encodeURIComponent('http://loinc.org|2857-1')}&patient=${mockPatient}`)
           .reply(404)
-          .onPost(mockServiceWithPrefetch).reply(200, mockServiceResult);
+          .onPost(mockServiceWithPrefetch).reply(serviceResultStatus, mockServiceResult);
         return callServices(mockServiceWithPrefetch).then(() => {
-          expect(spy).toHaveBeenCalledWith(mockServiceWithPrefetch, mockRequest, mockServiceResult);
+          expect(spy).toHaveBeenCalledWith(mockServiceWithPrefetch, mockRequest, mockServiceResult, serviceResultStatus);
         });
       });
     });
@@ -166,9 +168,10 @@ describe('Service Exchange', () => {
     });
 
     it('resolves and dispatches data from a successful CDS service call', () => {
-      mockAxios.onPost(mockServiceWithoutPrefetch).reply(200, mockServiceResult);
+      const serviceResultStatus = 200;
+      mockAxios.onPost(mockServiceWithoutPrefetch).reply(serviceResultStatus, mockServiceResult);
       return callServices(mockServiceWithoutPrefetch).then(() => {
-        expect(spy).toHaveBeenCalledWith(mockServiceWithoutPrefetch, mockRequest, mockServiceResult);
+        expect(spy).toHaveBeenCalledWith(mockServiceWithoutPrefetch, mockRequest, mockServiceResult, serviceResultStatus);
       });
     });
 

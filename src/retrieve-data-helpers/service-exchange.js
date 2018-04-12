@@ -132,7 +132,7 @@ function callServices(url, context) {
         },
       }).then((result) => {
         if (result.data && Object.keys(result.data).length) {
-          store.dispatch(storeExchange(url, request, result.data));
+          store.dispatch(storeExchange(url, request, result.data, result.status));
           return;
         }
         store.dispatch(storeExchange(url, request, 'No response returned. ' +
@@ -151,7 +151,7 @@ function callServices(url, context) {
     headers: { Accept: 'application/json' },
   }).then((result) => {
     if (result.data && Object.keys(result.data).length) {
-      store.dispatch(storeExchange(url, request, result.data));
+      store.dispatch(storeExchange(url, request, result.data, result.status));
       return;
     }
     store.dispatch(storeExchange(url, request, 'No response returned. ' +
