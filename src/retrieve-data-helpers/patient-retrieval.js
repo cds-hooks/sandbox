@@ -20,7 +20,9 @@ function retrievePatient(testPatient) {
     // Grab patient ID from access token (if Sandbox launched securely)
     // Otherwise grab patient ID from query parameters OR default patient ID in store
     if (accessToken) {
-      if (!patient) ({ patient } = accessToken);
+      if (!patient) {
+        ({ patient } = accessToken);
+      }
       headers.Authorization = `Bearer ${accessToken.access_token}`;
     } else if (!patient) {
       const parsed = queryString.parse(window.location.search);

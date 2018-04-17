@@ -51,15 +51,17 @@ export class MainView extends Component {
         });
       }));
     });
-    if (this.state.fhirServerPrompt) this.setState({ fhirServerPrompt: false });
+    if (this.state.fhirServerPrompt) { this.setState({ fhirServerPrompt: false }); }
     await retrievePatient().catch(() => new Promise((resolve) => {
       this.setState({
         patientPrompt: true,
         patientPromptHold: resolve,
       });
     }));
-    if (this.state.patientPrompt) this.setState({ patientPrompt: false });
-    await retrieveDiscoveryServices();
+    if (this.state.patientPrompt) { this.setState({ patientPrompt: false }); }
+    await retrieveDiscoveryServices().catch(() => {
+      this.props.setLoadingStatus(false);
+    });
     this.props.setLoadingStatus(false);
   }
 

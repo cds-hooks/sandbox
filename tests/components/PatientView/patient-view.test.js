@@ -34,6 +34,7 @@ describe('PatientView component', () => {
           id: 'test-patient'
         }
       },
+      fhirServerState: { currentFhirServer: 'http://example-server.com' },
       cdsServicesState: {
         configuredServices: {
           'http://example.com/cds-services/id-1': {
@@ -70,6 +71,7 @@ describe('PatientView component', () => {
       patientState: {
         currentPatient: {}
       },
+      fhirServerState: { currentFhirServer: 'http://example-server.com' },
       cdsServicesState: {
         configuredServices: {
           'http://example.com/cds-services/id-1': {

@@ -19,6 +19,12 @@ export class PatientView extends Component {
     this.executeRequests();
   }
 
+  componentDidUpdate(prevProps) {
+    if (this.props.patient !== prevProps.patient || this.props.fhirServer !== prevProps.fhirServer) {
+      this.executeRequests();
+    }
+  }
+
   executeRequests() {
     if (Object.keys(this.props.services).length) {
       // For each service, call service for request/response exchange
@@ -56,6 +62,7 @@ const mapStateToProps = (store) => {
   return {
     isContextVisible: store.hookState.isContextVisible,
     patient: store.patientState.currentPatient,
+    fhirServer: store.fhirServerState.currentFhirServer,
     services: pickBy(store.cdsServicesState.configuredServices, isCorrectHook),
   };
 };

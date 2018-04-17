@@ -85,7 +85,7 @@ describe('MainView component', () => {
     });
   });
 
-  it ('opens a patient entry modal if patient fetching failed', async (done) => {
+  it('opens a patient entry modal if patient fetching failed', async (done) => {
     mockPromisePatientCall = jest.fn(() => Promise.reject(0));
     setup(storeState);
     let shallowedComponent = await pureComponent.shallow();

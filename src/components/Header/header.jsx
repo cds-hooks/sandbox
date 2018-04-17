@@ -8,6 +8,10 @@ import IconSettings from 'terra-icon/lib/icon/IconSettings';
 import IconChevronDown from 'terra-icon/lib/icon/IconChevronDown';
 import Menu from 'terra-menu';
 
+import PatientEntry from '../PatientEntry/patient-entry';
+import FhirServerEntry from '../FhirServerEntry/fhir-server-entry';
+
+import retrievePatient from '../../retrieve-data-helpers/patient-retrieval';
 import { setHook } from '../../actions/hook-actions';
 import cdsHooksLogo from '../../assets/cds-hooks-logo.png';
 import styles from './header.css';
@@ -18,15 +22,27 @@ export class Header extends Component {
 
     this.state = {
       settingsOpen: false,
+      isChangePatientOpen: false,
+      isChangeFhirServerOpen: false,
     };
 
     this.switchHook = this.switchHook.bind(this);
     this.getNavClasses = this.getNavClasses.bind(this);
     this.setSettingsNode = this.setSettingsNode.bind(this);
     this.getSettingsNode = this.getSettingsNode.bind(this);
+
     this.openSettingsMenu = this.openSettingsMenu.bind(this);
     this.closeSettingsMenu = this.closeSettingsMenu.bind(this);
     this.addCDSServices = this.addCDSServices.bind(this);
+    this.openChangePatient = this.openChangePatient.bind(this);
+    this.closeChangePatient = this.closeChangePatient.bind(this);
+    this.openChangeFhirServer = this.openChangeFhirServer.bind(this);
+    this.closeChangeFhirServer = this.closeChangeFhirServer.bind(this);
+  }
+
+  shouldComponentUpdate(nextProps) {
+    if (nextProps.patientId !== this.props.patientId) { return false; }
+    return true;
   }
 
   setSettingsNode(node) { this.settingsNode = node; }
@@ -46,6 +62,27 @@ export class Header extends Component {
     this.closeSettingsMenu();
   }
 
+  async openChangePatient(e, testCurrentPatient) {
+    if (testCurrentPatient) {
+      try {
+        await retrievePatient(this.props.patientId);
+      } catch (err) {
+        this.setState({ isChangePatientOpen: true });
+        if (this.state.settingsOpen) { this.closeSettingsMenu(); }
+      }
+    } else {
+      this.setState({ isChangePatientOpen: true });
+      if (this.state.settingsOpen) { this.closeSettingsMenu(); }
+    }
+  }
+  closeChangePatient() { this.setState({ isChangePatientOpen: false }); }
+
+  openChangeFhirServer() {
+    this.setState({ isChangeFhirServerOpen: true });
+    if (this.state.settingsOpen) { this.closeSettingsMenu(); }
+  }
+  closeChangeFhirServer() { this.setState({ isChangeFhirServerOpen: false }); }
+
   render() {
     const logo = <div><span><img src={cdsHooksLogo} alt="" height="30" width="30" /></span><b className={styles['logo-title']}>CDS Hooks Sandbox</b></div>;
     const gearMenu = (
@@ -56,8 +93,8 @@ export class Header extends Component {
         isArrowDisplayed
       >
         <Menu.Item text="Add CDS Services (placeholder)" key="add-services" onClick={this.addCDSServices} />
-        <Menu.Item text="Change Patient (placeholder)" key="change-patient" />
-        <Menu.Item text="Change FHIR Server (placeholder)" key="change-fhir-server" />
+        <Menu.Item text="Change Patient" key="change-patient" onClick={this.openChangePatient} />
+        <Menu.Item text="Change FHIR Server" key="change-fhir-server" onClick={this.openChangeFhirServer} />
       </Menu>);
 
     const navigation = (
@@ -77,6 +114,16 @@ export class Header extends Component {
       <div>
         <ApplicationHeaderLayout logo={logo} navigation={navigation} utilities={utilities} style={{ backgroundColor: '#384e77' }} />
         {gearMenu}
+        {this.state.isChangePatientOpen ? <PatientEntry
+          isOpen={this.state.isChangePatientOpen}
+          closePrompt={this.closeChangePatient}
+        /> : null}
+        {this.state.isChangeFhirServerOpen ? <FhirServerEntry
+          isOpen={this.state.isChangeFhirServerOpen}
+          closePrompt={this.closeChangeFhirServer}
+          isEntryRequired={false}
+          resolve={e => this.openChangePatient(e, true)}
+        /> : null}
       </div>
     );
   }
@@ -84,6 +131,7 @@ export class Header extends Component {
 
 const mapStateToProps = store => ({
   hook: store.hookState.currentHook,
+  patientId: store.patientState.currentPatient.id,
 });
 
 const mapDispatchToProps = dispatch => ({

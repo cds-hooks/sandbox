@@ -12,6 +12,7 @@ describe('FHIR Server Reducers', () => {
       fhirVersion: '1.0.2',
       isDefaultFhirServer: true,
       accessToken: null,
+      testFhirServer: null,
     };
   });
 
@@ -66,14 +67,14 @@ describe('FHIR Server Reducers', () => {
     });
   });
 
-  describe('SET_CURRENT_FHIR_SERVER', () => {
-    it('should handle the SET_CURRENT_FHIR_SERVER action', () => {
+  describe('SET_TEST_FHIR_SERVER', () => {
+    it('should handle the SET_TEST_FHIR_SERVER action', () => {
       const action = {
-        type: types.SET_CURRENT_FHIR_SERVER,
+        type: types.SET_TEST_FHIR_SERVER,
         fhirServer: 'http://testing.com',
       };
 
-      const newState = Object.assign({}, state, { currentFhirServer: action.fhirServer });
+      const newState = Object.assign({}, state, { testFhirServer: action.fhirServer });
       expect(reducer(state, action)).toEqual(newState);
     });
   });

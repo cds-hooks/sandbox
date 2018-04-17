@@ -25,12 +25,12 @@ export function signalFailureFhirServerRetrieval() {
 }
 
 /**
- * Set the current FHIR server in context of the application
- * @param fhirServer - FHIR server to set as server in context of Sandbox
+ * Set the test FHIR server in context of the application
+ * @param fhirServer - FHIR server to test connectivity for
  */
-export function setCurrentFhirServer(fhirServer) {
+export function setTestFhirServer(fhirServer) {
   return {
-    type: types.SET_CURRENT_FHIR_SERVER,
+    type: types.SET_TEST_FHIR_SERVER,
     fhirServer,
   };
 }

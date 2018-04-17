@@ -19,7 +19,8 @@ describe('Header component', () => {
 
   beforeEach(() => {
     storeState = { 
-      hookState: { currentHook: 'patient-view' } 
+      hookState: { currentHook: 'patient-view' },
+      patientState: { currentPatient: { id: 'patient-123' } }
     };
     mockStore = mockStoreWrapper(storeState);
     let component = <ConnectedView store={mockStore} />;
@@ -54,5 +55,31 @@ describe('Header component', () => {
     expect(shallowedComponent.state('settingsOpen')).toBeTruthy();
     shallowedComponent.find('Menu').childAt(0).simulate('click');
     expect(shallowedComponent.state('settingsOpen')).toBeFalsy();
+  });
+
+  describe('Change Patient', () => {
+    beforeEach(() => {
+      shallowedComponent.childAt(0).dive().find('.icon').first().simulate('click');
+    });
+
+    it('should open the modal to change a patient if the Change Patient option is clicked directly', () => {
+      shallowedComponent.find('Menu').childAt(1).simulate('click');
+      expect(shallowedComponent.state('isChangePatientOpen')).toBeTruthy();
+      expect(shallowedComponent.state('settingsOpen')).toBeFalsy();
+      expect(shallowedComponent.find('Connect(PatientEntry)').length).toEqual(1);
+    });
+  });
+
+  describe('Change FHIR Server', () => {
+    beforeEach(() => {
+      shallowedComponent.childAt(0).dive().find('.icon').first().simulate('click');
+    });
+
+    it('should open the modal to change the FHIR server if the Change FHIR Server option is clicked directly', () => {
+      shallowedComponent.find('Menu').childAt(2).simulate('click');
+      expect(shallowedComponent.state('isChangeFhirServerOpen')).toBeTruthy();
+      expect(shallowedComponent.state('settingsOpen')).toBeFalsy();
+      expect(shallowedComponent.find('Connect(FhirServerEntry)').length).toEqual(1);
+    });
   });
 });
