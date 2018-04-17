@@ -44,7 +44,7 @@ export class FhirServerEntry extends Component {
 
   handleCloseModal() {
     this.setState({ isOpen: false, shouldDisplayError: false, errorMessage: '' });
-    if (this.props.closePrompt) this.props.closePrompt();
+    if (this.props.closePrompt) { this.props.closePrompt(); }
   }
 
   handleChange(e) {
@@ -65,7 +65,7 @@ export class FhirServerEntry extends Component {
     }
     try {
       await retrieveFhirMetadata(checkUrl).then(() => {
-        if (this.props.resolve) this.props.resolve();
+        if (this.props.resolve) { this.props.resolve(); }
         this.handleCloseModal();
       });
     } catch (e) {
@@ -78,7 +78,7 @@ export class FhirServerEntry extends Component {
 
   async handleResetDefaultServer() {
     await retrieveFhirMetadata();
-    if (this.props.resolve) this.props.resolve();
+    if (this.props.resolve) { this.props.resolve(); }
     this.handleCloseModal();
   }
 

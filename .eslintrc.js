@@ -17,5 +17,6 @@ module.exports = {
     "react/no-did-mount-set-state": 0,
     "react/require-default-props": 0,
     "class-methods-use-this": 0,
+    "curly": [2, "all"],
   }
 };

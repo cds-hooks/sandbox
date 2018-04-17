@@ -41,7 +41,7 @@ export class Header extends Component {
   }
 
   shouldComponentUpdate(nextProps) {
-    if (nextProps.patientId !== this.props.patientId) return false;
+    if (nextProps.patientId !== this.props.patientId) { return false; }
     return true;
   }
 
@@ -62,24 +62,24 @@ export class Header extends Component {
     this.closeSettingsMenu();
   }
 
-  async openChangePatient(testCurrentPatient) {
+  async openChangePatient(e, testCurrentPatient) {
     if (testCurrentPatient) {
       try {
         await retrievePatient(this.props.patientId);
       } catch (err) {
         this.setState({ isChangePatientOpen: true });
-        if (this.state.settingsOpen) this.closeSettingsMenu();
+        if (this.state.settingsOpen) { this.closeSettingsMenu(); }
       }
     } else {
       this.setState({ isChangePatientOpen: true });
-      if (this.state.settingsOpen) this.closeSettingsMenu();
+      if (this.state.settingsOpen) { this.closeSettingsMenu(); }
     }
   }
   closeChangePatient() { this.setState({ isChangePatientOpen: false }); }
 
   openChangeFhirServer() {
     this.setState({ isChangeFhirServerOpen: true });
-    if (this.state.settingsOpen) this.closeSettingsMenu();
+    if (this.state.settingsOpen) { this.closeSettingsMenu(); }
   }
   closeChangeFhirServer() { this.setState({ isChangeFhirServerOpen: false }); }
 
@@ -93,7 +93,7 @@ export class Header extends Component {
         isArrowDisplayed
       >
         <Menu.Item text="Add CDS Services (placeholder)" key="add-services" onClick={this.addCDSServices} />
-        <Menu.Item text="Change Patient" key="change-patient" onClick={() => this.openChangePatient()} />
+        <Menu.Item text="Change Patient" key="change-patient" onClick={this.openChangePatient} />
         <Menu.Item text="Change FHIR Server" key="change-fhir-server" onClick={this.openChangeFhirServer} />
       </Menu>);
 
@@ -122,7 +122,7 @@ export class Header extends Component {
           isOpen={this.state.isChangeFhirServerOpen}
           closePrompt={this.closeChangeFhirServer}
           isEntryRequired={false}
-          resolve={() => this.openChangePatient(true)}
+          resolve={e => this.openChangePatient(e, true)}
         /> : null}
       </div>
     );

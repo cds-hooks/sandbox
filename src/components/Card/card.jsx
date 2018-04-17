@@ -78,7 +78,7 @@ export class Card extends Component {
    * @param {*} source - Object as part of the card to build the UI for
    */
   renderSource(source) {
-    if (!source.label) return null;
+    if (!source.label) { return null; }
     let icon;
     if (source.icon) {
       icon = <img className={styles['card-icon']} src={source.icon} alt="Could not fetch icon" width="100" height="100" />;
@@ -166,7 +166,7 @@ export class Card extends Component {
 
         renderedCards.push(builtCard);
       });
-    if (renderedCards.length === 0) return <div>No Cards</div>;
+    if (renderedCards.length === 0) { return <div>No Cards</div>; }
     return <div>{renderedCards}</div>;
   }
 }

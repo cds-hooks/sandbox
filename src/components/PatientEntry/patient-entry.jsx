@@ -45,7 +45,7 @@ export class PatientEntry extends Component {
 
   handleCloseModal() {
     this.setState({ isOpen: false, shouldDisplayError: false, errorMessage: '' });
-    if (this.props.closePrompt) this.props.closePrompt();
+    if (this.props.closePrompt) { this.props.closePrompt(); }
   }
 
   handleChange(e) {
@@ -60,7 +60,7 @@ export class PatientEntry extends Component {
 
     try {
       await retrievePatient(this.state.userInput).then(() => {
-        if (this.props.resolve) this.props.resolve();
+        if (this.props.resolve) { this.props.resolve(); }
         this.handleCloseModal();
       });
     } catch (e) {
