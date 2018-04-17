@@ -16,23 +16,17 @@ import { Card } from '../Card/card';
 export class CardDemo extends Component {
   constructor(props) {
     super(props);
+    let displayJSONError = false;
+    let errorText = '';
     try {
-      const checkJson = JSON.parse(this.props.tempUserJson);
-      if (checkJson && typeof checkJson === 'object') {
-        this.state = {
-          displayJSONError: false,
-          errorText: '',
-        };
-      }
+      JSON.parse(props.tempUserJson);
     } catch (e) {
-      this.state = {
-        displayJSONError: true,
-        errorText: 'Cannot parse the JSON',
-      };
+      displayJSONError = true;
+      errorText = 'Cannot parse the JSON';
     }
     this.state = {
-      displayJSONError: false,
-      errorText: '',
+      displayJSONError,
+      errorText,
     };
 
     this.getExampleCard = this.getExampleCard.bind(this);
@@ -101,7 +95,10 @@ export class CardDemo extends Component {
       const parsedJSON = JSON.parse(newJSON);
       if (parsedJSON && typeof parsedJSON === 'object') {
         if (this.state.displayJSONError) {
-          this.setState({ displayJSONError: false });
+          this.setState({
+            displayJSONError: false,
+            errorText: '',
+          });
         }
 
         this.props.storeTempCardResponse(newJSON);
