@@ -21,6 +21,7 @@ describe('Service Exchange', () => {
   let mockServiceWithoutPrefetch;
   let mockHookInstance;
   let mockRequest;
+  let mockRequestWithContext;
 
   let noDataMessage = 'No response returned. Check developer tools for more details.';
   let failedServiceCallMessage = 'Could not get a response from the CDS Service. See developer tools for more details';
@@ -58,6 +59,14 @@ describe('Service Exchange', () => {
       patient: mockPatient,
       context: { patientId: mockPatient }
     };
+    mockRequestWithContext = Object.assign({}, mockRequest, {
+      context: {
+        ...mockRequest.context,
+        medications: [{
+          foo: 'foo',
+        }],
+      },
+    });
 
     defaultStore = {
       hookState: { currentHook: 'patient-view' },
@@ -186,6 +195,20 @@ describe('Service Exchange', () => {
       mockAxios.onPost(mockServiceWithoutPrefetch).reply(500);
       return callServices(mockServiceWithoutPrefetch).then(() => {
         expect(spy).toHaveBeenCalledWith(mockServiceWithoutPrefetch, mockRequest, failedServiceCallMessage);
+      });
+    });
+
+    it('resolves with context passed in for the context parameter', () => {
+      const serviceResultStatus = 200;
+      mockAxios.onPost(mockServiceWithoutPrefetch).reply(serviceResultStatus, mockServiceResult);
+      const context = [
+        {
+          key: 'medications',
+          value: [{ foo: 'foo' }],
+        },
+      ];
+      return callServices(mockServiceWithoutPrefetch, context).then(() => {
+        expect(spy).toHaveBeenCalledWith(mockServiceWithoutPrefetch, mockRequestWithContext, mockServiceResult, serviceResultStatus)
       });
     });
   });

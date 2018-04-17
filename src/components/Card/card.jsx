@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import ReactMarkdown from 'react-markdown';
 import cx from 'classnames';
+import axios from 'axios';
 
 import TerraCard from 'terra-card';
 import Text from 'terra-text';
@@ -11,6 +12,7 @@ import Button from 'terra-button';
 import styles from './card.css';
 import retrieveLaunchContext from '../../retrieve-data-helpers/launch-context-retrieval';
 import { getServicesByHook, getCardsFromServices } from '../../reducers/helpers/services-filter';
+import { takeSuggestion } from '../../actions/medication-select-actions';
 
 const propTypes = {
   isDemoCard: PropTypes.bool,
@@ -23,6 +25,23 @@ export class Card extends Component {
     this.launchSource = this.launchSource.bind(this);
     this.renderSource = this.renderSource.bind(this);
     this.modifySmartLaunchUrls = this.modifySmartLaunchUrls.bind(this);
+  }
+
+  takeSuggestion(suggestion, url) {
+    if (!this.props.isDemoCard) {
+      if (suggestion.label) {
+        if (suggestion.uuid) {
+          axios({
+            method: 'POST',
+            url: `${url}/analytics/${suggestion.uuid}`,
+            data: {},
+          });
+        }
+        this.props.takeSuggestion(suggestion);
+      } else {
+        console.error('There was no label on this suggestions', suggestion);
+      }
+    }
   }
 
   /**
@@ -152,7 +171,7 @@ export class Card extends Component {
           suggestionsSection = card.suggestions.map((item, ind) => (
             <Button
               key={ind}
-              onClick={() => {}}
+              onClick={() => this.takeSuggestion(item, card.serviceUrl)}
               text={item.label}
               variant={Button.Opts.Variants.EMPHASIS}
             />
@@ -204,4 +223,10 @@ const mapStateToProps = store => ({
   patientId: store.patientState.currentPatient.id,
 });
 
-export default connect(mapStateToProps)(Card);
+const mapDispatchToProps = dispatch => ({
+  takeSuggestion: (suggestion) => {
+    dispatch(takeSuggestion(suggestion));
+  },
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Card);

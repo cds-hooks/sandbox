@@ -276,6 +276,84 @@ describe('Medication Reducers', () => {
     });
   });
 
+  describe('TAKE_SUGGESTION', () => {
+    it('should handle the TAKE_SUGGESTION action for a "create" suggestion', () => {
+      state.fhirResource = {
+        medicationCodeableConcept: {
+          foo: 'foo',
+        },
+      };
+      let createSuggestion = {
+        actions: [
+          {
+            type: 'create',
+            description: 'test',
+            resource: {
+              medicationCodeableConcept: {
+                text: 'new drug',
+                coding: [
+                  {
+                    code: '999',
+                  },
+                ],
+              },
+            },
+          },
+        ],
+      };
+      const action = {
+        type: types.TAKE_SUGGESTION,
+        suggestion: createSuggestion,
+      };
+
+      const newState = Object.assign({}, state, {
+        ...state,
+        medListPhase: 'done',
+        decisions: {
+          ...state.decisions,
+          prescribable: {
+            name: 'new drug',
+            id: '999',
+          },
+        },
+      });
+      expect(reducer(state, action)).toEqual(newState);
+    });
+
+    it('should handle the TAKE_SUGGESTION action for a "delete" suggestion', () => {
+      const suggestion = {
+        actions: [
+          {
+            type: 'delete',
+            description: 'test',
+          },
+        ],
+      };
+      const action = {
+        type: types.TAKE_SUGGESTION,
+        suggestion,
+      };
+
+      const newState = Object.assign({}, state, {
+        ...state,
+        medListPhase: 'ingredient',
+        options: {
+          ingredient: [],
+          components: [],
+          prescribable: [],
+        },
+        decisions: {
+          ingredient: null,
+          components: null,
+          prescribable: null,
+        },
+        fhirResource: null,
+      });
+
+      expect(reducer(state, action)).toEqual(newState);
+    });
+  });
+
   describe('Pass-through Actions', () => {
     it('should return state if an action should pass through this reducer without change to state', () => {
       const action = { type: 'SOME_OTHER_ACTION' };

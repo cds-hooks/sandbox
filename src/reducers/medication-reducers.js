@@ -1,4 +1,5 @@
 import moment from 'moment';
+import isEqual from 'lodash/isEqual';
 import * as types from '../actions/action-types';
 import rxnorm from '../assets/medication-list';
 import { getConditionCodingFromCode } from './helpers/services-filter';
@@ -321,6 +322,59 @@ const medicationReducers = (state = initialState, action) => {
             },
           },
         });
+      }
+
+      case types.TAKE_SUGGESTION: {
+        if (action.suggestion && action.suggestion.actions) {
+          const { actions } = action.suggestion;
+          for (let i = 0; i < actions.length; i += 1) {
+            if (actions[i].type) {
+              if (!actions[i].description) {
+                console.error('Missing required "description" field in suggestion action', actions[i]);
+              }
+              if (actions[i].type === 'create' || actions[i].type === 'update') {
+                // Updating internal medication if new medication comes through suggestion
+                if (actions[i].resource && actions[i].resource.medicationCodeableConcept && state.fhirResource &&
+                  !isEqual(actions[i].resource.medicationCodeableConcept, state.fhirResource.medicationCodeableConcept)) {
+                  const newMedication = actions[i].resource.medicationCodeableConcept;
+                  if (newMedication.text && newMedication.coding && newMedication.coding[0] && newMedication.coding[0].code) {
+                    return Object.assign({}, state, {
+                      medListPhase: 'done',
+                      decisions: {
+                        ...state.decisions,
+                        prescribable: {
+                          name: newMedication.text,
+                          id: newMedication.coding[0].code,
+                        },
+                      },
+                    });
+                  }
+                }
+              } else if (actions[i].type === 'delete') {
+                return Object.assign({}, state, {
+                  medListPhase: 'ingredient',
+                  options: {
+                    ingredient: [],
+                    components: [],
+                    prescribable: [],
+                  },
+                  decisions: {
+                    ingredient: null,
+                    components: null,
+                    prescribable: null,
+                  },
+                  fhirResource: null,
+                });
+              }
+            } else {
+              console.error('Missing required "type" field in suggestion action', actions[i]);
+              if (!actions[i].description) {
+                console.error('Missing required "description" field in suggestion action', actions[i]);
+              }
+            }
+          }
+        }
+        return state;
       }
 
       default:

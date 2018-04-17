@@ -51,7 +51,13 @@ export class RxView extends Component {
     this.toggleEnabledDate = this.toggleEnabledDate.bind(this);
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidMount() {
+    if (this.props.prescription) {
+      this.executeRequests();
+    }
+  }
+
+  async componentDidUpdate(prevProps) {
     if (!isEqual(prevProps.prescription, this.props.prescription) ||
         prevProps.patient !== this.props.patient ||
         prevProps.fhirServer !== this.props.fhirServer ||
@@ -59,7 +65,10 @@ export class RxView extends Component {
         !isEqual(prevProps.medicationInstructions, this.props.medicationInstructions) ||
         !isEqual(prevProps.prescriptionDates, this.props.prescriptionDates) ||
         prevProps.selectedConditionCode !== this.props.selectedConditionCode) {
-      this.props.updateFhirResource(this.props.fhirVersion, this.props.patient.id);
+      await this.props.updateFhirResource(this.props.fhirVersion, this.props.patient.id);
+      if (this.props.prescription) {
+        this.executeRequests();
+      }
     }
     return null;
   }
@@ -117,7 +126,12 @@ export class RxView extends Component {
     if (Object.keys(this.props.services).length) {
       // For each service, call service for request/response exchange
       forIn(this.props.services, (val, key) => {
-        callServices(key);
+        // TODO: Once default services are fixed to parse FHIR bundle, change this to FHIR bundle format
+        const context = [{
+          key: 'medications',
+          value: [this.props.medicationOrder],
+        }];
+        callServices(key, context);
       });
     }
   }

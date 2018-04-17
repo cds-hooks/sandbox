@@ -100,8 +100,13 @@ function callServices(url, context) {
   const user = state.patientState.defaultUserId;
 
   const patient = state.patientState.currentPatient.id;
-  const activityContext = context || {};
+  const activityContext = {};
   activityContext.patientId = patient;
+  if (context && context.length) {
+    context.forEach((contextKey) => {
+      activityContext[contextKey.key] = contextKey.value;
+    });
+  }
 
   const hookInstance = uuidv4();
   const request = {
@@ -148,7 +153,10 @@ function callServices(url, context) {
     method: 'post',
     url,
     data: request,
-    headers: { Accept: 'application/json' },
+    headers: {
+      Accept: 'application/json',
+      Authorization: `Bearer ${generateJWT(url)}`,
+    },
   }).then((result) => {
     if (result.data && Object.keys(result.data).length) {
       store.dispatch(storeExchange(url, request, result.data, result.status));

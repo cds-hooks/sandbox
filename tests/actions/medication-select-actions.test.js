@@ -82,4 +82,14 @@ describe('Medication Select Actions', () => {
 
     expect(actions.toggleDate(range)).toEqual(expectedAction);
   });
+
+  it('creates action to take a suggestion', () => {
+    const suggestion = { foo: 'foo' };
+    const expectedAction = {
+      type: types.TAKE_SUGGESTION,
+      suggestion,
+    };
+
+    expect(actions.takeSuggestion(suggestion)).toEqual(expectedAction);
+  });
 });

@@ -54,6 +54,13 @@ const serviceExchangeReducers = (state = initialState, action) => {
         }
         break;
       }
+      // Clear the selected service to display request/response for when the view changes
+      case types.SET_HOOK: {
+        return Object.assign({}, state, {
+          selectedService: '',
+        });
+      }
+
       default: {
         return state;
       }
