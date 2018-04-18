@@ -27,6 +27,11 @@
   margin: 0 0 5px;
 }
 
+.source-link {
+  color: blue;
+  text-decoration: none;
+}
+
 .card-summary {
   margin: 0 0 5px;
 }

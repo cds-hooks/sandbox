@@ -20,7 +20,10 @@ describe('Header component', () => {
   beforeEach(() => {
     storeState = { 
       hookState: { currentHook: 'patient-view' },
-      patientState: { currentPatient: { id: 'patient-123' } }
+      patientState: { currentPatient: { id: 'patient-123' } },
+      cardDemoState: {
+        isCardDemoView: false,
+      }, 
     };
     mockStore = mockStoreWrapper(storeState);
     let component = <ConnectedView store={mockStore} />;

@@ -13,6 +13,7 @@ import PatientView from '../PatientView/patient-view';
 import ContextView from '../ContextView/context-view';
 import FhirServerEntry from '../FhirServerEntry/fhir-server-entry';
 import PatientEntry from '../PatientEntry/patient-entry';
+import CardDemo from '../CardDemo/card-demo';
 import { setLoadingStatus } from '../../actions/ui-actions';
 
 export class MainView extends Component {
@@ -75,11 +76,13 @@ export class MainView extends Component {
 
   render() {
     const hookView = this.props.hook === 'patient-view' ? <PatientView /> : 'Med Prescribe View';
-    const container = (
+    const container = !this.props.isCardDemoView ? (
       <div className={styles.container}>
         {hookView}
         <ContextView />
-      </div>);
+      </div>
+    ) : <div className={styles.container}><CardDemo /></div>;
+
     return (
       <div>
         <LoadingOverlay isOpen={this.props.isLoadingData} isAnimated />
@@ -105,6 +108,7 @@ export class MainView extends Component {
 const mapStateToProps = store => ({
   hook: store.hookState.currentHook,
   isLoadingData: store.hookState.isLoadingData,
+  isCardDemoView: store.cardDemoState.isCardDemoView,
 });
 
 const mapDispatchToProps = dispatch => ({

@@ -39,3 +39,7 @@ export const SET_CONTEXT_VISIBILITY = 'SET_CONTEXT_VISIBILITY';
 
 // Hooks
 export const SET_HOOK = 'SET_HOOK';
+
+// Card Demo
+export const STORE_USER_CARD_JSON = 'STORE_USER_CARD_JSON';
+export const TOGGLE_DEMO_VIEW = 'TOGGLE_DEMO_VIEW';

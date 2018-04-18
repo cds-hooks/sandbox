@@ -36,6 +36,9 @@ describe('MainView component', () => {
       hookState: {
         currentHook: 'patient-view',
         isLoadingData: false,
+      },
+      cardDemoState: {
+        isCardDemoView: false,
       }
     }
     mockPromiseSmartCall.mockReturnValue(Promise.resolve(1));
