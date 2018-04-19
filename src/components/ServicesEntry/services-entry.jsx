@@ -21,7 +21,7 @@ export class ServicesEntry extends Component {
     super(props);
 
     this.state = {
-      isOpen: this.props.isOpen,
+      isOpen: props.isOpen,
       userInput: '',
       shouldDisplayError: false,
       errorMessage: '',
@@ -100,7 +100,7 @@ export class ServicesEntry extends Component {
             onClose={this.handleCloseModal}
           >
             <BaseEntryBody
-              formFieldLabel="Enter Discovery Endpoint URL"
+              formFieldLabel="Enter discovery endpoint url"
               shouldDisplayError={this.state.shouldDisplayError}
               errorMessage={this.state.errorMessage}
               placeholderText="https://example-services.com/cds-services"
