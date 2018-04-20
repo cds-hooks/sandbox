@@ -9,6 +9,8 @@ describe('Services Filters', () => {
   let noCardsExchange;
   let emptyCardsExchange;
   let testStore;
+  let testValidCondition;
+  let testInvalidCondition;
 
   beforeEach(() => {
     completeServiceExchange = 'http://complete-exchange.com/id';
@@ -17,7 +19,35 @@ describe('Services Filters', () => {
     emptyResponseExchange = 'http://empty-response-exchange.com/id';
     noCardsExchange = 'http://no-cards-exchange.com/id';
     emptyCardsExchange = 'http://empty-cards-exchange/id';
+    testValidCondition = {
+      resource: {
+        code: {
+          coding: [
+            {
+              code: 'valid-code',
+            },
+          ],
+        },
+      },
+    };
+    testInvalidCondition = {
+      resource: {
+        code: {
+          coding: [{
+            code: 'invalid-code',
+          }],
+        },
+      },
+    };
     testStore = {
+      patientState: {
+        currentPatient: {
+          conditionsResources: [
+            testValidCondition,
+            testInvalidCondition,
+          ],
+        },
+      },
       serviceExchangeState: {
         exchanges: {
           [noResponseExchange]: {},
@@ -80,6 +110,16 @@ describe('Services Filters', () => {
           testStore.serviceExchangeState.exchanges[exampleServiceExchange].response.cards[0],
         ]
       })
+    });
+  });
+
+  describe('getConditionCodingFromCode', () => {
+    let getConditionCodingFromCode;
+    beforeEach(() => {
+      getConditionCodingFromCode = filters.getConditionCodingFromCode;
+    });
+    it('filters conditions based on passed in code', () => {
+      expect(getConditionCodingFromCode('valid-code')).toEqual(testValidCondition);
     });
   });
 });

@@ -9,6 +9,7 @@ describe('Patient Retrieval', () => {
   const fhirServer = 'http://mock-server.com/fhir';
   let mockStore = {};
   const expectedPatient = {};
+  const expectedConditions = {};
   let retrievePatient;
   let defaultStore = {};
   console.error = jest.fn();
@@ -27,6 +28,8 @@ describe('Patient Retrieval', () => {
   beforeEach(() => {
     expectedPatient.id = 'default-patient-id';
     expectedPatient.resourceType = 'Patient';
+    expectedConditions.resourceType = 'Bundle';
+    expectedConditions.id = 'conditions-123';
     defaultStore = {
       fhirServerState: {
         currentFhirServer: fhirServer,
@@ -65,7 +68,7 @@ describe('Patient Retrieval', () => {
       });
     });
 
-    it('resolves and dispatches a success actoin with passed in patient', () => {
+    it('resolves and dispatches a success action with passed in patient', () => {
       setMocksAndTestFunction(defaultStore);
       const passedInPateintId = 'passed-id';
       mockAxios.onGet(`${fhirServer}/Patient/${passedInPateintId}`)
@@ -107,6 +110,38 @@ describe('Patient Retrieval', () => {
         expect(spy).toHaveBeenCalledWith(expectedPatient);
         spy.mockReset();
         spy.mockRestore();
+      });
+    });
+
+    describe('And a conditions fetch is successful', () => {
+      it('resolves and dispatches a success action with patient/conditions', () => {
+        setMocksAndTestFunction(defaultStore);
+        const spy = jest.spyOn(actions, 'signalSuccessPatientRetrieval');
+        mockAxios.onGet(`${fhirServer}/Patient/${expectedPatient.id}`)
+          .reply(200, expectedPatient);
+        mockAxios.onGet(`${fhirServer}/Condition?patient=${expectedPatient.id}`)
+          .reply(200, expectedConditions);
+        return retrievePatient().then(() => {
+          expect(spy).toHaveBeenCalledWith(expectedPatient, expectedConditions);
+          spy.mockReset();
+          spy.mockRestore();
+        });
+      });
+    });
+
+    describe('And a conditions fetch is unsuccessful', () => {
+      it('still resolves and dispatches a success action with patient', () => {
+        setMocksAndTestFunction(defaultStore);
+        const spy = jest.spyOn(actions, 'signalSuccessPatientRetrieval');
+        mockAxios.onGet(`${fhirServer}/Patient/${expectedPatient.id}`)
+          .reply(200, expectedPatient);
+        mockAxios.onGet(`${fhirServer}/Condition?patient=${expectedPatient.id}`)
+          .reply(404);
+        return retrievePatient().then(() => {
+          expect(spy).toHaveBeenCalledWith(expectedPatient);
+          spy.mockReset();
+          spy.mockRestore();
+        });
       });
     });
 

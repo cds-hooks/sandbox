@@ -1,0 +1,285 @@
+import moment from 'moment';
+import reducer from '../../src/reducers/medication-reducers';
+import * as types from '../../src/actions/action-types';
+import rxnorm from '../../src/assets/medication-list';
+import { getConditionCodingFromCode } from '../../src/reducers/helpers/services-filter';
+
+describe('Medication Reducers', () => {
+  let state = {};
+  console.error = jest.fn();
+
+  beforeEach(() => {
+    state = {
+      medications: Object.keys(rxnorm.pillToComponentSets).map(pill => (
+        {
+          id: pill,
+          name: rxnorm.cuiToName[pill],
+        }
+      )),
+      medListPhase: 'begin',
+      userInput: '',
+      options: {
+        ingredient: [],
+        components: [],
+        prescribable: [],
+      },
+      decisions: {
+        ingredient: null,
+        components: null,
+        prescribable: null,
+      },
+      medicationInstructions: {
+        number: 1,
+        frequency: 'daily',
+      },
+      prescriptionDates: {
+        start: {
+          enabled: true,
+          value: '',
+        },
+        end: {
+          enabled: true,
+          value: '',
+        },
+      },
+      selectedConditionCode: '',
+      fhirResource: null,
+    };
+  });
+
+  it('returns the initial state without action', () => {
+    expect(reducer(undefined, {})).toEqual(state);
+  });
+
+  describe('STORE_USER_MED_INPUT', () => {
+    it('should handle the STORE_USER_MED_INPUT action', () => {
+      const input = 'STRIX';
+      const action = {
+        type: types.STORE_USER_MED_INPUT,
+        input,
+      };
+
+      const newState = Object.assign({}, state, {
+        medListPhase: 'ingredient',
+        options: {
+          ...state.options,
+          ingredient: [
+            {
+              name: 'STRIX',
+              id: '1374865',
+            },
+          ],
+        },
+        userInput: input,
+      });
+
+      expect(reducer(state, action)).toEqual(newState);
+    });
+  });
+
+  describe('STORE_USER_CHOSEN_MEDICATION', () => {
+    it('handles the ingredient phase', () => {
+      state.medListPhase = 'ingredient';
+      const medication = {
+        name: 'Soma',
+        id: ['1185414'],
+      };
+      const action = {
+        type: types.STORE_USER_CHOSEN_MEDICATION,
+        medication,
+      };
+
+      const newState = Object.assign({}, state, {
+        medListPhase: 'components',
+        decisions: {
+          ...state.decisions,
+          ingredient: medication,
+        },
+        options: {
+          ...state.options,
+          components: [{
+            id: ['730917'],
+            name: 'Carisoprodol 250 MG [Soma]'},{
+            id: ['573558'],
+            name: 'Carisoprodol 350 MG [Soma]'},
+          ],
+        },
+      });
+
+      expect(reducer(state, action)).toEqual(newState);
+    });
+
+    it('handles the components phase', () => {
+      state.medListPhase = 'components';
+      const medication = {
+        name: 'Carisoprodol 250 MG [Soma]',
+        id: ['730917'],
+      };
+      const action = {
+        type: types.STORE_USER_CHOSEN_MEDICATION,
+        medication,
+      };
+      
+      const newState = Object.assign({}, state, {
+        medListPhase: 'prescribable',
+        decisions: {
+          ...state.decisions,
+          components: action.medication,
+        },
+        options: {
+          ...state.options,
+          prescribable: [{
+            name: 'Carisoprodol 250 MG Oral Tablet [Soma]',
+            id: '730918',
+          }],
+        },
+      });
+      expect(reducer(state, action)).toEqual(newState);
+    });
+
+    it('handles the prescribable phase', () => {
+      state.medListPhase = 'prescribable';
+      const medication = {
+        name: 'Carisoprodol 250 MG Oral Tablet [Soma]',
+        id: '730918',
+      };
+      const action = {
+        type: types.STORE_USER_CHOSEN_MEDICATION,
+        medication,
+      };
+
+      const newState = Object.assign({}, state, {
+        medListPhase: 'done',
+        userInput: '',
+        decisions: {
+          ...state.decisions,
+          prescribable: action.medication,
+        },
+      });
+
+      expect(reducer(state, action)).toEqual(newState);
+    });
+  });
+
+  describe('UPDATE_FHIR_MEDICATION_ORDER', () => {
+    it('handles the UPDATE_FHIR_MEDICATION_ORDER action for STU3', () => {
+      const patientId = 'patient-123';
+      const fhirVersion = '3.0.1';
+      const action = {
+        type: types.UPDATE_FHIR_MEDICATION_ORDER,
+        fhirVersion,
+        patientId,
+        state
+      };
+
+      const fhirResource = {
+        resourceType: 'MedicationRequest',
+        authoredOn: moment().format('YYYY-MM-DD'),
+        status: 'draft',
+        subject: {
+          reference: `Patient/${patientId}`,
+        },
+      };
+
+      const newState = Object.assign({}, state, {
+        fhirResource,
+      });
+
+      expect(reducer(state, action)).toEqual(newState);
+    });
+  });
+
+  describe('STORE_USER_CONDITION', () => {
+    it('should handle the STORE_USER_CONDITION action', () => {
+      const conditionCode = '123';
+      const action = {
+        type: types.STORE_USER_CONDITION,
+        condition: conditionCode,
+      };
+
+      const newState = Object.assign({}, state, {
+        selectedConditionCode: conditionCode,
+      });
+
+      expect(reducer(state, action)).toEqual(newState);
+    });
+  });
+
+  describe('STORE_MED_DOSAGE_AMOUNT', () => {
+    it('should handle the STORE_MED_DOSAGE_AMOUNT action', () => {
+      const amount = 3;
+      const frequency = 'daily';
+      const action = {
+        type: types.STORE_MED_DOSAGE_AMOUNT,
+        amount,
+        frequency,
+      };
+
+      const newState = Object.assign({}, state, {
+        medicationInstructions: {
+          number: amount,
+          frequency,
+        },
+      });
+
+      expect(reducer(state, action)).toEqual(newState);
+    });
+  });
+
+  describe('STORE_DATE', () => {
+    it('should handle the STORE_DATE action', () => {
+      const range = 'start';
+      const date = {
+        value: '2018-04-13',
+        enabled: true,
+      };
+
+      const action = {
+        type: types.STORE_DATE,
+        range,
+        date,
+      };
+
+      const newState = Object.assign({}, state, {
+        prescriptionDates: {
+          ...state.prescriptionDates,
+          start: {
+            value: date.value,
+            enabled: date.enabled,
+          },
+        },
+      });
+
+      expect(reducer(state, action)).toEqual(newState);
+    });
+  });
+
+  describe('TOGGLE_DATE', () => {
+    it('should handle the TOGGLE_DATE action', () => {
+      const range = 'end';
+      const action = {
+        type: types.TOGGLE_DATE,
+        range,
+      };
+
+      const newState = Object.assign({}, state, {
+        prescriptionDates: {
+          ...state.prescriptionDates,
+          end: {
+            ...state.prescriptionDates.end,
+            enabled: !state.prescriptionDates.end.enabled,
+          },
+        },
+      });
+
+      expect(reducer(state, action)).toEqual(newState);
+    });
+  });
+
+  describe('Pass-through Actions', () => {
+    it('should return state if an action should pass through this reducer without change to state', () => {
+      const action = { type: 'SOME_OTHER_ACTION' };
+      expect(reducer(state, action)).toEqual(state);
+    });
+  });
+});

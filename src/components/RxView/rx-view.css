@@ -1,0 +1,53 @@
+.rx-view {
+  height: auto;
+  display: inline-block;
+  padding: 30px;
+  margin: 0 0 20px;
+  vertical-align: top;
+  width: 100%;
+}
+
+.half-view {
+  width: 50%;
+}
+
+.view-title {
+  padding: 0 0 10px;
+  margin: 0 0 10px;
+  font-size: 1.5em;
+  letter-spacing: -0.025em;
+  color: #384E77; /* $color-primary */
+  border-bottom: 2px solid #eee;
+}
+
+.patient-data-text {
+  font-size: 1em;
+  margin: 0 0 20px;
+  color: #888;
+}
+
+.dose-instruction {
+  border: 1px solid #ddd;
+  padding: 5px 5px 0 10px;
+}
+
+.dosage-amount {
+  margin-right: 3em;
+}
+
+.dosage-timing {
+  margin-top: 1em;
+}
+
+@media (max-width: 975px) {
+  .rx-view {
+    padding: 10px;
+    display: inline-block;
+    position: relative;
+  }
+
+  .half-view {
+    width: 100%;
+    display: inline-block;
+  }
+}

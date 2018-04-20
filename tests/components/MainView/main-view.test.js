@@ -102,7 +102,7 @@ describe('MainView component', () => {
     const newStore = Object.assign({}, storeState, { hookState: { currentHook: 'med-prescribe' } });
     setup(newStore);
     const shallowedComponent = pureComponent.shallow();
-    expect(shallowedComponent.childAt(2).text()).toContain('Med Prescribe View');
+    expect(shallowedComponent.find('Connect(RxView)')).toHaveLength(1);
   });
 
   it('only renders the loading component if loading status is active', () => {
