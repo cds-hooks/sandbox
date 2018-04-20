@@ -17,12 +17,14 @@ export function signalRetrievingServices(testUrl) {
 /**
  * Signals successful retrieval of CDS Services. Used to update state with CDS Services found (definitions).
  * @param services - CDS Services found at discovery endpoint
+ * @param discoveryUrl - Discovery endpoint URL
  * @returns {{type, services: *}} - Action to dispatch
  */
-export function signalSuccessServicesRetrieval(services) {
+export function signalSuccessServicesRetrieval(services, discoveryUrl) {
   return {
     type: types.DISCOVER_CDS_SERVICES_SUCCESS,
     services,
+    discoveryUrl,
   };
 }
 

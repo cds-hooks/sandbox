@@ -49,7 +49,16 @@ describe('Hook Reducer', () => {
 
       const newState = Object.assign({}, state, { currentHook: action.hook });
       expect(reducer(state, action)).toEqual(newState);
-    })
+    });
+
+    it('should keep the current hook if the incoming hook is not valid', () => {
+      const action = {
+        type: types.SET_HOOK,
+        hook: '',
+      };
+
+      expect(reducer(state, action)).toEqual(state);
+    });
   });
 
   describe('Pass-through Actions', () => {

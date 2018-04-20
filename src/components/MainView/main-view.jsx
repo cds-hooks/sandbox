@@ -16,6 +16,7 @@ import FhirServerEntry from '../FhirServerEntry/fhir-server-entry';
 import PatientEntry from '../PatientEntry/patient-entry';
 import CardDemo from '../CardDemo/card-demo';
 import { setLoadingStatus } from '../../actions/ui-actions';
+import { setHook } from '../../actions/hook-actions';
 
 export class MainView extends Component {
   constructor(props) {
@@ -45,8 +46,10 @@ export class MainView extends Component {
    */
   async componentDidMount() {
     this.props.setLoadingStatus(true);
+    this.props.setHook(localStorage.getItem('PERSISTED_hook') || 'patient-view');
     await smartLaunchPromise().catch(async () => {
-      await retrieveFhirMetadata().catch(() => new Promise((resolve) => {
+      const persistedFhirServer = localStorage.getItem('PERSISTED_fhirServer');
+      await retrieveFhirMetadata(persistedFhirServer).catch(() => new Promise((resolve) => {
         this.setState({
           fhirServerPrompt: true,
           fhirServerPromptHold: resolve,
@@ -54,13 +57,23 @@ export class MainView extends Component {
       }));
     });
     if (this.state.fhirServerPrompt) { this.setState({ fhirServerPrompt: false }); }
-    await retrievePatient().catch(() => new Promise((resolve) => {
+    const persistedPatientId = localStorage.getItem('PERSISTED_patientId');
+    await retrievePatient(persistedPatientId).catch(() => new Promise((resolve) => {
       this.setState({
         patientPrompt: true,
         patientPromptHold: resolve,
       });
     }));
     if (this.state.patientPrompt) { this.setState({ patientPrompt: false }); }
+    const persistedServices = localStorage.getItem('PERSISTED_cdsServices');
+    if (persistedServices) {
+      const parsedServices = JSON.parse(persistedServices);
+      if (parsedServices && parsedServices.length) {
+        await parsedServices.forEach(async (discoveryEndpoint) => {
+          await retrieveDiscoveryServices(discoveryEndpoint);
+        });
+      }
+    }
     await retrieveDiscoveryServices().catch(() => {
       this.props.setLoadingStatus(false);
     });
@@ -115,6 +128,9 @@ const mapStateToProps = store => ({
 const mapDispatchToProps = dispatch => ({
   setLoadingStatus: (status) => {
     dispatch(setLoadingStatus(status));
+  },
+  setHook: (hook) => {
+    dispatch(setHook(hook));
   },
 });
 

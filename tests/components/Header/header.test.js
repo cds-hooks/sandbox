@@ -25,7 +25,10 @@ describe('Header component', () => {
       patientState: { currentPatient: { id: 'patient-123' } },
       cardDemoState: {
         isCardDemoView: false,
-      }, 
+      },
+      fhirServerState: {
+        accessToken: null,
+      },
     };
     mockStore = mockStoreWrapper(storeState);
     let component = <ConnectedView store={mockStore} />;
@@ -60,6 +63,29 @@ describe('Header component', () => {
     expect(shallowedComponent.state('settingsOpen')).toBeTruthy();
     shallowedComponent.find('Menu').childAt(0).simulate('click');
     expect(shallowedComponent.state('settingsOpen')).toBeFalsy();
+  });
+
+  it('should display option to change FHIR server if no access token is configured for the application', () => {
+    shallowedComponent.childAt(0).dive().find('.icon').first().simulate('click');
+    expect(shallowedComponent.find('Menu').children().length).toEqual(6);
+    expect(shallowedComponent.find('Menu').childAt(5).key()).toEqual('change-fhir-server');
+  });
+
+  it('should not display option to change FHIR server if an access token is configured for the application', () => {
+    storeState = Object.assign({}, storeState, {
+      ...storeState,
+      fhirServerState: {
+        accessToken: {
+          serviceDiscoveryUrl: 'http://pre-configured-service.com/cds-services',
+        },
+      },
+    });
+    mockStore = mockStoreWrapper(storeState);
+    let component = <ConnectedView store={mockStore} />;
+    shallowedComponent = shallow(component).find(Header).shallow();
+
+    shallowedComponent.childAt(0).dive().find('.icon').first().simulate('click');
+    expect(shallowedComponent.find('Menu').children().length).toEqual(5);
   });
 
   describe('Change Patient', () => {

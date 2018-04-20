@@ -163,7 +163,7 @@ export class Card extends Component {
         const sourceSection = card.source && Object.keys(card.source).length ? this.renderSource(card.source) : '';
 
         // -- Detail --
-        const detailSection = card.detail ? <ReactMarkdown source={card.detail} /> : '';
+        const detailSection = card.detail ? <ReactMarkdown escapeHtml={false} softBreak="br" source={card.detail} /> : '';
 
         // -- Suggestions --
         let suggestionsSection;

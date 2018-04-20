@@ -7,6 +7,12 @@
   border-left-width: 3px;
 }
 
+.decision-card img {
+  display: block;
+  width: 100px;
+  margin: 0 0 5px;
+}
+
 .card-icon {
   display: block;
   width: 100px;

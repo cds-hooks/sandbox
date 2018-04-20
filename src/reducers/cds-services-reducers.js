@@ -1,8 +1,22 @@
 import isEqual from 'lodash/isEqual';
+import uniq from 'lodash/uniq';
 import * as types from '../actions/action-types';
+import store from '../store/store';
+
+const getPersistedServices = () => {
+  const persistedServices = localStorage.getItem('PERSISTED_cdsServices');
+  if (persistedServices) {
+    const parsedServices = JSON.parse(persistedServices);
+    if (parsedServices && parsedServices.length) {
+      return [].concat(parsedServices);
+    }
+  }
+  return [];
+};
 
 const initialState = {
   configuredServices: {},
+  configuredServiceUrls: getPersistedServices(),
   defaultUrl: 'https://fhir-org-cds-services.appspot.com/cds-services',
   testServicesUrl: null,
 };
@@ -26,7 +40,7 @@ const cdsServicesReducers = (state = initialState, action) => {
           // and if not, store the service definitions by the specific CDS Service URL in the
           // configuredServices property of the reducer state
           action.services.forEach((service) => {
-            const serviceUrl = `${state.testServicesUrl}/${service.id}`;
+            const serviceUrl = `${action.discoveryUrl}/${service.id}`;
             const serviceEndpoint = state.configuredServices[serviceUrl];
             if (!serviceEndpoint || !isEqual(serviceEndpoint, service)) {
               const serviceCopy = Object.assign({}, service);
@@ -42,9 +56,25 @@ const cdsServicesReducers = (state = initialState, action) => {
             for (let i = 0; i < newServicesKeys.length; i += 1) {
               newServices[newServicesKeys[i]] = incomingServices[newServicesKeys[i]];
             }
+            let newConfiguredServiceUrls = state.configuredServiceUrls;
+            // Don't add default CDS Service endpoint to cached services, as it will be called when the Sandbox starts up already
+            if (action.discoveryUrl !== state.defaultUrl) {
+              const { accessToken } = store.getState().fhirServerState;
+              // Don't add CDS Service endpoint from access token "serviceDiscoveryURL" property to cached services, as it has already
+              // been called during the SMART authentication step. Ignore http(s) in case the serviceDiscoveryURL was not configured with a
+              // http(s) protocol in the access token
+              if ((accessToken && accessToken.serviceDiscoveryURL &&
+                accessToken.serviceDiscoveryURL.replace(/^https?:\/\//i, '') !== action.discoveryUrl.replace(/^https?:\/\//i, ''))
+                || !accessToken) {
+                const concatArr = newConfiguredServiceUrls.concat([action.discoveryUrl]);
+                newConfiguredServiceUrls = uniq(concatArr);
+              }
+            }
+            localStorage.setItem('PERSISTED_cdsServices', JSON.stringify(newConfiguredServiceUrls));
             return Object.assign({}, state, {
               testServicesUrl: null,
               configuredServices: newServices,
+              configuredServiceUrls: newConfiguredServiceUrls,
             });
           }
         }
@@ -52,8 +82,10 @@ const cdsServicesReducers = (state = initialState, action) => {
       }
 
       case types.RESET_SERVICES: {
+        localStorage.removeItem('PERSISTED_cdsServices');
         return Object.assign({}, state, {
           configuredServices: {},
+          configuredServiceUrls: [],
           testServicesUrl: '',
         });
       }

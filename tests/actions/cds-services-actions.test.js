@@ -14,12 +14,14 @@ describe('CDS Services Actions', () => {
 
   it('creates action to signal a successful connection to CDS Services', () => {
     const services = { hook: 'patient-view', id: 'example-service' };
+    const discoveryUrl = 'http://discovery.com/cds-services';
     const expectedAction = {
       type: types.DISCOVER_CDS_SERVICES_SUCCESS,
       services,
+      discoveryUrl,
     };
 
-    expect(actions.signalSuccessServicesRetrieval(services)).toEqual(expectedAction);
+    expect(actions.signalSuccessServicesRetrieval(services, discoveryUrl)).toEqual(expectedAction);
   });
 
   it('creates action to signal a failed connection to CDS Services', () => {

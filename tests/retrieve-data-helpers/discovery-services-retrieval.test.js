@@ -60,7 +60,7 @@ describe('Discovery Services Retrieval', () => {
         });
 
       return retrieveServices().then(() => {
-        expect(spy).toHaveBeenCalledWith([service]);
+        expect(spy).toHaveBeenCalledWith([service], defaultServicesUrl);
         spy.mockReset();
         spy.mockRestore();
       });

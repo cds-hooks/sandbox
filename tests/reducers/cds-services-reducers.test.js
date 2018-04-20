@@ -3,17 +3,20 @@ import * as types from '../../src/actions/action-types';
 
 describe('CDS Services Reducer', () => {
   let state = {};
+  let persistedService = 'http://stored-service.com/cds-services';
 
   beforeEach(() => {
+    localStorage.setItem('PERSISTED_cdsServices', JSON.stringify([persistedService]));
     state = {
       configuredServices: {},
+      configuredServiceUrls: [persistedService],
       defaultUrl: 'https://fhir-org-cds-services.appspot.com/cds-services',
       testServicesUrl: null,
     };
   });
 
   it('should return the initial state without action', () => {
-    expect(reducer(undefined, {})).toEqual(state);
+    expect(reducer(undefined, {})).toEqual(Object.assign({}, state, { configuredServiceUrls: [] }));
   });
 
   describe('DISCOVER_CDS_SERVICES', () => {
@@ -56,6 +59,7 @@ describe('CDS Services Reducer', () => {
       const action = {
         type: types.DISCOVER_CDS_SERVICES_SUCCESS,
         services: [service],
+        discoveryUrl: exampleUrl,
       };
       expect(reducer(state, action)).toEqual(state);
     });
@@ -71,14 +75,17 @@ describe('CDS Services Reducer', () => {
       const action = {
         type: types.DISCOVER_CDS_SERVICES_SUCCESS,
         services: [service],
+        discoveryUrl: exampleUrl,
       };
       const configuredServices = {};
       configuredServices[`${service.url}`] = service;
       const newState = Object.assign({}, state, {
         configuredServices: configuredServices,
+        configuredServiceUrls: [persistedService, exampleUrl],
         testServicesUrl: null,
       });
       expect(reducer(state, action)).toEqual(newState);
+      expect(localStorage.getItem('PERSISTED_cdsServices')).toEqual(JSON.stringify([persistedService, exampleUrl]));
     });
   });
 
@@ -87,6 +94,7 @@ describe('CDS Services Reducer', () => {
       state.configuredServices['http://example.com'] = { enabled: true };
       const stateCopy = JSON.parse(JSON.stringify(state));
       stateCopy.configuredServices = {};
+      stateCopy.configuredServiceUrls = [];
       stateCopy.testServicesUrl = '';
       const action = {
         type: types.RESET_SERVICES,
