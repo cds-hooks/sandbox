@@ -43,22 +43,6 @@ describe('Services Exchange Reducers', () => {
       });
       expect(reducer(state, action)).toEqual(newState);
     });
-
-    it('should store the request/response of an exchange and not set selectedService if set already', () => {
-      const action = Object.assign({
-        type: types.STORE_SERVICE_EXCHANGE,
-        url: 'http://example.com/cds-services/id-2'
-      }, storedExchange);
-
-      state = { selectedService: url, exchanges: {} };
-
-      const newState = Object.assign({}, state, {
-        exchanges: {
-          [action.url]: storedExchange
-        }
-      });
-      expect(reducer(state, action)).toEqual(newState);
-    });
   });
 
   describe('SELECT_SERVICE_CONTEXT', () => {

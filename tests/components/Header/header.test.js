@@ -85,4 +85,17 @@ describe('Header component', () => {
       expect(shallowedComponent.find('Connect(FhirServerEntry)').length).toEqual(1);
     });
   });
+
+  describe('Add Services', () => {
+    beforeEach(() => {
+      shallowedComponent.childAt(0).dive().find('.icon').first().simulate('click');
+    });
+
+    it('should open the modal to add CDS Services if the Add Services option is clicked directly', () => {
+      shallowedComponent.find('Menu').childAt(0).simulate('click');
+      expect(shallowedComponent.state('isAddServicesOpen')).toBeTruthy();
+      expect(shallowedComponent.state('settingsOpen')).toBeFalsy();
+      expect(shallowedComponent.find('ServicesEntry').length).toEqual(1);
+    });
+  });
 });

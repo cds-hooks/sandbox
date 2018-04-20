@@ -39,4 +39,15 @@ describe('BaseEntryBody component', () => {
     wrapper.find('Input').simulate('change', {'target': {'value': 'test'}});
     expect(inputOnChange).toHaveBeenCalled();
   });
+
+  it('should not render text displaying the current fhir server if the prop is not passed in', () => {
+    wrapper = shallow(<BaseEntryBody formFieldLabel={formFieldLabel} 
+      shouldDisplayError={shouldDisplayError} 
+      errorMessage={errorMessage} 
+      placeholderText={placeholderText} 
+      inputOnChange={inputOnChange} 
+      inputName={inputName} />);
+
+    expect(wrapper.find('Text').length).toEqual(0);
+  });
 });
