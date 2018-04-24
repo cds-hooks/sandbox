@@ -50,6 +50,36 @@ const cdsServicesReducers = (state = initialState, action) => {
         }
         break;
       }
+
+      case types.RESET_SERVICES: {
+        return Object.assign({}, state, {
+          configuredServices: {},
+          testServicesUrl: '',
+        });
+      }
+
+      case types.TOGGLE_SERVICE: {
+        if (state.configuredServices[action.service]) {
+          const servicesCopy = JSON.parse(JSON.stringify(state.configuredServices));
+          servicesCopy[action.service].enabled = !servicesCopy[action.service].enabled;
+          return Object.assign({}, state, {
+            configuredServices: servicesCopy,
+          });
+        }
+        return state;
+      }
+
+      case types.DELETE_SERVICE: {
+        if (state.configuredServices[action.service]) {
+          const servicesCopy = JSON.parse(JSON.stringify(state.configuredServices));
+          delete servicesCopy[action.service];
+          return Object.assign({}, state, {
+            configuredServices: servicesCopy,
+          });
+        }
+        return state;
+      }
+
       default: {
         return state;
       }

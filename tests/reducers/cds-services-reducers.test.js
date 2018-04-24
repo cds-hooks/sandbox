@@ -82,6 +82,71 @@ describe('CDS Services Reducer', () => {
     });
   });
 
+  describe('RESET_SERVICES', () => {
+    it('removes all configured services from the app', () => {
+      state.configuredServices['http://example.com'] = { enabled: true };
+      const stateCopy = JSON.parse(JSON.stringify(state));
+      stateCopy.configuredServices = {};
+      stateCopy.testServicesUrl = '';
+      const action = {
+        type: types.RESET_SERVICES,
+      }
+      expect(reducer(state, action)).toEqual(stateCopy);
+    });
+  });
+
+  describe('TOGGLE_SERVICE', () => {
+    it('toggles the enabled status for a CDS Service if it exists', () => {
+      const service = 'http://example.com';
+      state.configuredServices[service] = { enabled: true };
+      const action = {
+        type: types.TOGGLE_SERVICE,
+        service,
+      };
+
+      const newState = Object.assign({}, state, {
+        configuredServices: {
+          [service]: { enabled: false },
+        },
+      });
+      expect(reducer(state, action)).toEqual(newState);
+    });
+
+    it('does not change state if the CDS Service does not exist', () => {
+      const service = 'http://example.com';
+      const action = {
+        type: types.TOGGLE_SERVICE,
+        service,
+      };
+      expect(reducer(state, action)).toEqual(state);
+    });
+  });
+
+  describe('DELETE_SERVICE', () => {
+    it('removes a CDS Service from app config if it exists', () => {
+      const service = 'http://example.com';
+      state.configuredServices[service] = { enabled: true };
+      const action = {
+        type: types.DELETE_SERVICE,
+        service,
+      };
+
+      const newState = Object.assign({}, state, {
+        configuredServices: {},
+      });
+      expect(reducer(state, action)).toEqual(newState);
+    });
+
+    it('does not change state if the CDS Service does not exist', () => {
+      const service = 'http://example.com';
+      const action = {
+        type: types.DELETE_SERVICE,
+        service,
+      };
+      expect(reducer(state, action)).toEqual(state);
+    });
+  });
+
   describe('Pass-through Actions', () => {
     it('should return state if an action should pass through this reducer without change to state', () => {
       const action = { type: 'SOME_OTHER_ACTION' };

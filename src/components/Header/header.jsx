@@ -11,13 +11,16 @@ import Button from 'terra-button';
 import IconLeft from 'terra-icon/lib/icon/IconLeft';
 import IconEdit from 'terra-icon/lib/icon/IconEdit';
 
+import ConfigureServices from '../ConfigureServices/configure-services';
 import ServicesEntry from '../ServicesEntry/services-entry';
 import PatientEntry from '../PatientEntry/patient-entry';
 import FhirServerEntry from '../FhirServerEntry/fhir-server-entry';
 
 import retrievePatient from '../../retrieve-data-helpers/patient-retrieval';
+import retrieveDiscoveryServices from '../../retrieve-data-helpers/discovery-services-retrieval';
 import { setHook } from '../../actions/hook-actions';
 import { toggleDemoView } from '../../actions/card-demo-actions';
+import { resetServices } from '../../actions/cds-services-actions';
 import cdsHooksLogo from '../../assets/cds-hooks-logo.png';
 import styles from './header.css';
 
@@ -30,6 +33,7 @@ export class Header extends Component {
       isChangePatientOpen: false,
       isChangeFhirServerOpen: false,
       isAddServicesOpen: false,
+      isConfigureServicesOpen: false,
     };
 
     this.switchHook = this.switchHook.bind(this);
@@ -45,6 +49,10 @@ export class Header extends Component {
     this.closeChangePatient = this.closeChangePatient.bind(this);
     this.openChangeFhirServer = this.openChangeFhirServer.bind(this);
     this.closeChangeFhirServer = this.closeChangeFhirServer.bind(this);
+    this.openConfigureServices = this.openConfigureServices.bind(this);
+    this.closeConfigureServices = this.closeConfigureServices.bind(this);
+
+    this.resetServices = this.resetServices.bind(this);
   }
 
   shouldComponentUpdate(nextProps) {
@@ -63,6 +71,16 @@ export class Header extends Component {
   openSettingsMenu() { this.setState({ settingsOpen: true }); }
 
   switchHook(hook) { this.props.setHook(hook); }
+  resetServices() {
+    this.props.resetServices();
+    retrieveDiscoveryServices();
+  }
+
+  openConfigureServices() {
+    this.setState({ isConfigureServicesOpen: true });
+    if (this.state.settingsOpen) { this.closeSettingsMenu(); }
+  }
+  closeConfigureServices() { this.setState({ isConfigureServicesOpen: false }); }
 
   openAddServices() {
     this.setState({ isAddServicesOpen: true });
@@ -103,6 +121,9 @@ export class Header extends Component {
         isArrowDisplayed
       >
         <Menu.Item text="Add CDS Services" key="add-services" onClick={this.openAddServices} />
+        <Menu.Item text="Reset Default Services" key="reset-services" onClick={this.resetServices} />
+        <Menu.Item text="Configure CDS Services" key="configure-services" onClick={this.openConfigureServices} />
+        <Menu.Divider key="Divider1" />
         <Menu.Item text="Change Patient" key="change-patient" onClick={this.openChangePatient} />
         <Menu.Item text="Change FHIR Server" key="change-fhir-server" onClick={this.openChangeFhirServer} />
       </Menu>);
@@ -145,6 +166,10 @@ export class Header extends Component {
           isOpen={this.state.isAddServicesOpen}
           closePrompt={this.closeAddServices}
         /> : null}
+        {this.state.isConfigureServicesOpen ? <ConfigureServices
+          isOpen={this.state.isConfigureServicesOpen}
+          closePrompt={this.closeConfigureServices}
+        /> : null}
         {this.state.isChangePatientOpen ? <PatientEntry
           isOpen={this.state.isChangePatientOpen}
           closePrompt={this.closeChangePatient}
@@ -172,6 +197,9 @@ const mapDispatchToProps = dispatch => ({
   },
   toggleCardDemoView: () => {
     dispatch(toggleDemoView());
+  },
+  resetServices: () => {
+    dispatch(resetServices());
   },
 });
 

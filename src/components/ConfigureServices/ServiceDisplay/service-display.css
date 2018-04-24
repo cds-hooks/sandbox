@@ -1,0 +1,46 @@
+.container {
+  position: relative;
+  margin: 0 0 20px;
+  display: inline-block;
+  width: 100%;
+}
+
+.definition-body {
+  padding: 30px;
+  font-family: Inconsolata,Menlo,Consolas,monospace;
+  word-wrap: break-word; 
+  color: #000;
+  border: 2px solid #333;
+  font-size: .85em;
+}
+
+.url-container {
+  width: 80%;
+  display: inline-block;
+}
+
+.btn-container {
+  width: 20%;
+  display: inline-block;
+  padding-bottom: 5px;
+  text-align: right;
+}
+
+.btn-container > button {
+  margin-left: 5px;
+}
+
+@media screen and (max-width: 46em) {
+  .url-container {
+    width: 100%;
+  }
+
+  .btn-container {
+    width: 100%;
+    text-align: left;
+  }
+
+  .btn-container > button {
+    margin: 0;
+  }
+}

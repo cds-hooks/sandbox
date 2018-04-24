@@ -33,10 +33,12 @@ describe('ServiceContextView component', () => {
           [patientServiceUrl]: {
             hook: 'patient-view',
             url: patientServiceUrl,
+            enabled: true,
           },
           [medServiceUrl]: {
             hook: 'medication-prescribe',
             url: medServiceUrl,
+            enabled: true,
           },
         },
       },

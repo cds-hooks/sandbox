@@ -40,7 +40,8 @@ describe('PatientView component', () => {
           'http://example.com/cds-services/id-1': {
             url: 'http://example.com/cds-services/id-1',
             id: 'id-1',
-            hook: 'patient-view'
+            hook: 'patient-view',
+            enabled: true,
           }
         }
       }
@@ -80,7 +81,8 @@ describe('PatientView component', () => {
           'http://example.com/cds-services/id-1': {
             url: 'http://example.com/cds-services/id-1',
             id: 'id-1',
-            hook: 'patient-view'
+            hook: 'patient-view',
+            enabled: true,
           }
         }
       }

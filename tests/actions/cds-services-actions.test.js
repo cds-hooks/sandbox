@@ -29,4 +29,29 @@ describe('CDS Services Actions', () => {
 
     expect(actions.signalFailureServicesRetrieval()).toEqual(expectedAction);
   });
+
+  it('creates action to delete configured CDS Services', () => {
+    const expectedAction = { type: types.RESET_SERVICES };
+    expect(actions.resetServices()).toEqual(expectedAction);
+  });
+
+  it('creates action to toggle enabled status on a CDS Service', () => {
+    const service = 'https://example.com/cds-services/id-1';
+    const expectedAction = {
+      type: types.TOGGLE_SERVICE,
+      service,
+    };
+
+    expect(actions.toggleService(service)).toEqual(expectedAction);
+  });
+
+  it('creates action to remove a CDS Service from configuration', () => {
+    const service = 'https://example.com/cds-services/id-1';
+    const expectedAction = {
+      type: types.DELETE_SERVICE,
+      service,
+    };
+
+    expect(actions.deleteService(service)).toEqual(expectedAction);
+  });
 });
