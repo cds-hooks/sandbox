@@ -349,6 +349,11 @@ const medicationReducers = (state = initialState, action) => {
                       },
                     });
                   }
+                  console.warn('Suggested resource does not have text and/or coding code in medicationCodeableConcept property', newMedication);
+                } else if (!actions[i].resource) {
+                  console.warn('Could not find an accompanying resource for the suggestion', actions[i]);
+                } else if (!actions[i].resource.medicationCodeableConcept) {
+                  console.warn('Suggested resource does not have a medicationCodeableConcept', actions[i].resource);
                 }
               } else if (actions[i].type === 'delete') {
                 return Object.assign({}, state, {

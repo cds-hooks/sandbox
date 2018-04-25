@@ -39,7 +39,7 @@ export class Card extends Component {
         }
         this.props.takeSuggestion(suggestion);
       } else {
-        console.error('There was no label on this suggestions', suggestion);
+        console.error('There was no label on this suggestion', suggestion);
       }
     }
   }
