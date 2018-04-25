@@ -135,6 +135,15 @@ describe('Services Exchange Reducers', () => {
     });
   });
 
+  describe('SET_HOOK', () => {
+    it('should clear the selected service on a hook change', () => {
+      const action = {
+        type: types.SET_HOOK,
+      };
+      expect(reducer(state, action)).toEqual(Object.assign({}, state, { selectedService: '' }));
+    });
+  });
+
   describe('Pass-through Actions', () => {
     it('should return state if an action should pass through this reducer without change to state', () => {
       const action = { type: 'SOME_OTHER_ACTION' };

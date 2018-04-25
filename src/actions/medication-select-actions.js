@@ -57,3 +57,10 @@ export function toggleDate(range) {
     range,
   };
 }
+
+export function takeSuggestion(suggestion) {
+  return {
+    type: types.TAKE_SUGGESTION,
+    suggestion,
+  };
+}

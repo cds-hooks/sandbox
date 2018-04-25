@@ -1,10 +1,13 @@
 import React from 'react';
 import { mount, shallow } from 'enzyme';
 import { Provider } from 'react-redux';
+import MockAdapter from 'axios-mock-adapter';
 
 describe('Card component', () => {
   console.error = jest.fn();
   let storeState;
+  let mockAxios;
+  let axios;
 
   let Card;
   let shallowedComponent;
@@ -16,6 +19,10 @@ describe('Card component', () => {
   let fhirBaseUrl;
   let accessToken;
   let cardResponses;
+  let takeSuggestion;
+  let suggestion;
+  let invalidSuggestion;
+  let serviceUrl;
 
   let windowSpy;
 
@@ -25,7 +32,8 @@ describe('Card component', () => {
     let component = <Card fhirServerUrl={fhirBaseUrl} 
                           fhirAccessToken={accessToken} 
                           patientId={patientId} 
-                          cardResponses={cardResponses} />;
+                          cardResponses={cardResponses}
+                          takeSuggestion={takeSuggestion} />;
     shallowedComponent = shallow(component);
   }
 
@@ -37,23 +45,37 @@ describe('Card component', () => {
     patientId = 'patient-id';
     hook = 'patient-view';
     smartLink = 'http://example-smart.com/launch';
+    serviceUrl = 'http://service.com/id-1';
+    axios = require('axios').default;
+    mockAxios = new MockAdapter(axios);
     mockSpy = jest.fn(() => {
       return Promise.resolve(`${fhirBaseUrl}/launch=123iss=456`);
     });
+    takeSuggestion = jest.fn();
+    suggestion = {
+      label: 'sug-label',
+      uuid: 'uuid-example',
+      resource: {
+        foo: 'foo',
+      },
+    };
+    invalidSuggestion = { foo: 'foo' };
     cardResponses = {
       cards: [
         {
           links: [{ type: 'smart', url: smartLink }],
-          suggestions: [{ label: 'sug-label' }],
+          suggestions: [suggestion, invalidSuggestion],
           summary: 'Summary',
           indicator: 'warning',
           source: { label: 'Patient service', url: 'http://example-source.com', icon: 'http://icon.com' },
           detail: 'detail',
+          serviceUrl,
         },
         {
           indicator: 'info',
           summary: 'summary',
           source: { label: 'test-label' },
+          serviceUrl,
         }
       ],
     };
@@ -104,5 +126,16 @@ describe('Card component', () => {
     });
     shallowedComponent.find('.links-section').find('Button').simulate('click', { preventDefault() {} });
     expect(windowSpy).not.toHaveBeenCalled();
+  });
+
+  it('takes a suggestion if there is a label', () => {
+    shallowedComponent.find('.suggestions-section').find('Button').at(0).simulate('click', { preventDefault() {} });
+    mockAxios.onPost(`${serviceUrl}/analytics/uuid-example`).reply(200);
+    expect(takeSuggestion).toHaveBeenCalledWith(suggestion);
+  });
+
+  it('does not take a suggestion if it is does not have a label', () => {
+    shallowedComponent.find('.suggestions-section').find('Button').at(1).simulate('click', { preventDefault() {} });
+    expect(takeSuggestion).not.toHaveBeenCalled();
   });
 });

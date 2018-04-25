@@ -22,7 +22,7 @@ describe('RxView component', () => {
   let prescription;
 
   let chooseCondition, onMedicationChangeInput, chooseMedication,
-  updateDosageInstructions, updateDate, toggleEnabledDate;
+  updateDosageInstructions, updateDate, toggleEnabledDate, updateFhirResource;
 
   function setup(patient, medListPhase, prescription) {
     jest.setMock('../../../src/retrieve-data-helpers/service-exchange', mockSpy);
@@ -49,7 +49,7 @@ describe('RxView component', () => {
         services={services} hook={'medication-prescribe'} medListPhase={medListPhase} 
         medications={medications} prescription={prescription} onMedicationChangeInput={onMedicationChangeInput} 
         chooseMedication={chooseMedication} chooseCondition={chooseCondition} updateDosageInstructions={updateDosageInstructions} 
-        updateDate={updateDate} toggleEnabledDate={toggleEnabledDate} />;
+        updateDate={updateDate} toggleEnabledDate={toggleEnabledDate} updateFhirResource={updateFhirResource} />;
     renderedComponent = shallow(component, intlContexts.shallowContext);
   }
 
@@ -92,6 +92,7 @@ describe('RxView component', () => {
     updateDosageInstructions = jest.fn(); 
     updateDate = jest.fn();
     toggleEnabledDate = jest.fn();
+    updateFhirResource = jest.fn(() => 1);
   });
 
   afterEach(() => {
@@ -150,5 +151,18 @@ describe('RxView component', () => {
     expect(toggleEnabledDate).toHaveBeenCalled();
     renderedComponent.find('.dosage-timing').find('DatePicker').at(1).simulate('change', { target: { value: '2018-04-14' } });
     expect(updateDate).toHaveBeenCalled();
+  });
+
+  it('updates the FHIR resource and calls CDS Services if a prescription is selected', async (done) => {
+    setup(patient, medListPhase, medications, prescription);
+    prescription = {
+      name: 'another prescribable med',
+      id: '456',
+    };
+    let newComponent = await renderedComponent.setProps({ prescription: prescription });
+    Promise.resolve(newComponent).then(() => {
+      expect(mockSpy).toHaveBeenCalledTimes(2);
+      done();
+    });
   });
 });

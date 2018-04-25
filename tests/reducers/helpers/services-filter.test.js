@@ -111,8 +111,12 @@ describe('Services Filters', () => {
     it('gathers all cards into one cards array from passed in services', () => {
       expect(getCardsFromServices(arrayOfServices)).toEqual({
         cards: [
-          testStore.serviceExchangeState.exchanges[completeServiceExchange].response.cards[0],
-          testStore.serviceExchangeState.exchanges[exampleServiceExchange].response.cards[0],
+          Object.assign({}, testStore.serviceExchangeState.exchanges[completeServiceExchange].response.cards[0], {
+            serviceUrl: completeServiceExchange,
+          }),
+          Object.assign({}, testStore.serviceExchangeState.exchanges[exampleServiceExchange].response.cards[0], {
+            serviceUrl: exampleServiceExchange,
+          }),
         ]
       })
     });

@@ -56,3 +56,5 @@ export const STORE_DATE = 'STORE_DATE';
 export const TOGGLE_DATE = 'TOGGLE_DATE';
 export const UPDATE_FHIR_MEDICATION_ORDER = 'UPDATE_FHIR_MEDICATION_ORDER';
 
+// Suggestions
+export const TAKE_SUGGESTION = 'TAKE_SUGGESTION';
