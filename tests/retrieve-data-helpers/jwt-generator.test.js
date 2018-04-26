@@ -32,6 +32,7 @@ describe('JWT Generator', () => {
       alg: 'ES256',
       typ: 'JWT',
       kid: 'd9cd3c4f-eb08-4304-b973-44f352fd2ca2',
+      jku: 'https://raw.githubusercontent.com/cds-hooks/sandbox-2.0/master/keys/jwk-keypair.json'
     });
     expect(generateJWT(audience)).toEqual(signedJwtMock);
     expect(signMethodMock).toHaveBeenCalledWith(null, expectedHeader, expectedPayload, mockPrivateKey);
