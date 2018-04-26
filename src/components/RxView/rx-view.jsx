@@ -126,10 +126,14 @@ export class RxView extends Component {
     if (Object.keys(this.props.services).length) {
       // For each service, call service for request/response exchange
       forIn(this.props.services, (val, key) => {
-        // TODO: Once default services are fixed to parse FHIR bundle, change this to FHIR bundle format
         const context = [{
           key: 'medications',
-          value: [this.props.medicationOrder],
+          value: {
+            resourceType: 'Bundle',
+            entry: [{
+              resource: this.props.medicationOrder,
+            }],
+          },
         }];
         callServices(key, context);
       });
