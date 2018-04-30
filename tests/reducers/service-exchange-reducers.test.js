@@ -43,6 +43,24 @@ describe('Services Exchange Reducers', () => {
       });
       expect(reducer(state, action)).toEqual(newState);
     });
+
+    it('should store the request/response of an exchange but keep the selectedService if already set', () => {
+      state.selectedService = url;
+      const extraUrl = 'http://some-other-url.com/cds-services/1';
+      const action = Object.assign({
+        type: types.STORE_SERVICE_EXCHANGE,
+        url: extraUrl,
+      }, storedExchange);
+
+
+      const newState = Object.assign({}, state, {
+        selectedService: url,
+        exchanges: {
+          [extraUrl]: storedExchange
+        }
+      });
+      expect(reducer(state, action)).toEqual(newState);
+    });
   });
 
   describe('SELECT_SERVICE_CONTEXT', () => {

@@ -21,7 +21,7 @@ const hookReducers = (state = initialState, action) => {
 
       // Set hook for the application
       case types.SET_HOOK: {
-        return Object.assign({}, state, { currentHook: action.hook });
+        return Object.assign({}, state, { currentHook: action.hook || state.currentHook });
       }
       default:
         return state;

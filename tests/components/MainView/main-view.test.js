@@ -5,7 +5,8 @@ import { shallow, mount } from 'enzyme';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 
-import {setLoadingStatus} from '../../../src/actions/ui-actions';
+import { setLoadingStatus } from '../../../src/actions/ui-actions';
+import { setHook } from '../../../src/actions/hook-actions';
 
 describe('MainView component', () => {
   let storeState;
@@ -116,6 +117,57 @@ describe('MainView component', () => {
   it('calls a function to set the loading status on state on mount', () => {
     const shallowedComponent = pureComponent.shallow();
     expect(mockStore.getActions()[0]).toEqual(setLoadingStatus(true));
-    expect(mockStore.getActions()[1]).toEqual(setLoadingStatus(false));
+    expect(mockStore.getActions()[2]).toEqual(setLoadingStatus(false));
+  });
+
+  describe('Persisted State Values', () => {
+    it('calls a function to set the hook status on state on mount from a persisted value on localStorage', () => {
+      localStorage.setItem('PERSISTED_hook', 'medication-prescribe');
+      setup(storeState);
+      const shallowedComponent = pureComponent.shallow();
+      expect(mockStore.getActions()[1]).toEqual(setHook('medication-prescribe'));
+    });
+
+    it('calls a function to set the hook status on state on mount to patient-view if no persisted hook value present on localStorage', () => {
+      localStorage.setItem('PERSISTED_hook', null);
+      setup(storeState);
+      const shallowedComponent = pureComponent.shallow();
+      expect(mockStore.getActions()[1]).toEqual(setHook('patient-view'));
+    });
+
+    it('tries to configure a persisted FHIR server from localStorage', async (done) => {
+      mockPromiseSmartCall = jest.fn(() => Promise.reject(0));
+      const persistedFhirServer = 'http://persisted.com';
+      localStorage.setItem('PERSISTED_fhirServer', persistedFhirServer);
+      setup(storeState);
+      const shallowedComponent = await pureComponent.shallow();
+      Promise.resolve(shallowedComponent).then(() => {
+        expect(mockPromiseFhirCall).toHaveBeenCalledWith(localStorage.getItem('PERSISTED_fhirServer'));
+        done();
+      });
+    });
+
+    it('tries to configure a persisted Patient ID from localStorage', async (done) => {
+      mockPromisePatientCall = jest.fn(() => Promise.reject(0));
+      const persistedPatientId = '123';
+      localStorage.setItem('PERSISTED_patientId', persistedPatientId);
+      setup(storeState);
+      const shallowedComponent = await pureComponent.shallow();
+      Promise.resolve(shallowedComponent).then(async () => {
+        await expect(mockPromisePatientCall).toHaveBeenCalledWith(localStorage.getItem('PERSISTED_patientId'));
+        done();
+      });
+    });
+
+    it('tries to discover any CDS Services from local storage', async (done) => {
+      const persistedServices = ['http://persisted.com/cds-services'];
+      localStorage.setItem('PERSISTED_cdsServices', JSON.stringify(persistedServices));
+      setup(storeState);
+      const shallowedComponent = await pureComponent.shallow();
+      Promise.resolve(await shallowedComponent).then(async () => {
+        expect(await mockPromiseDiscoveryCall).toHaveBeenCalledWith(persistedServices[0]);
+        done();
+      });
+    });
   });
 });

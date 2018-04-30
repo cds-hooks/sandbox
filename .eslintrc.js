@@ -7,6 +7,7 @@ module.exports = {
     "window": true,
     "FHIR": true,
     "document": true,
+    "localStorage": true,
   },
   "rules": {
     "no-console": 0,

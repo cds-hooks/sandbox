@@ -28,7 +28,7 @@ function retrieveDiscoveryServices(testUrl) {
       },
     }).then((result) => {
       if (result.data && result.data.services && result.data.services.length) {
-        store.dispatch(signalSuccessServicesRetrieval(result.data.services));
+        store.dispatch(signalSuccessServicesRetrieval(result.data.services, discoveryUrl));
         return resolve();
       }
       return reject();
