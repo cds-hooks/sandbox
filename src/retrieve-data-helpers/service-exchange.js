@@ -37,8 +37,8 @@ function completePrefetchTemplate(prefetch) {
   const prefetchRequests = Object.assign({}, prefetch);
   Object.keys(prefetchRequests).forEach((prefetchKey) => {
     let prefetchTemplate = prefetchRequests[prefetchKey];
-    prefetchTemplate = prefetchTemplate.replace(/{{\s*Patient\.id\s*}}/g, patient);
-    prefetchTemplate = prefetchTemplate.replace(/{{\s*User\.id\s*}}/g, user);
+    prefetchTemplate = prefetchTemplate.replace(/{{\s*context\.patientId\s*}}/g, patient);
+    prefetchTemplate = prefetchTemplate.replace(/{{\s*user\s*}}/g, user);
     prefetchRequests[prefetchKey] = encodeUriParameters(prefetchTemplate);
   });
   return prefetchRequests;
