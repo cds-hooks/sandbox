@@ -8,6 +8,7 @@ describe('Service Exchange', () => {
   let mockAxios;
   let axios;
   let actions;
+  let fhirConfig;
 
   let mockStore = {};
   let defaultStore = {};
@@ -22,6 +23,8 @@ describe('Service Exchange', () => {
   let mockHookInstance;
   let mockRequest;
   let mockRequestWithContext;
+  let mockRequestWithFhirAuthorization;
+  let mockAccessToken;
 
   let noDataMessage = 'No response returned. Check developer tools for more details.';
   let failedServiceCallMessage = 'Could not get a response from the CDS Service. See developer tools for more details';
@@ -44,6 +47,7 @@ describe('Service Exchange', () => {
   }
 
   beforeEach(() => {
+    fhirConfig = require('../../src/config/fhir-config');
     mockPatient = 'patient-1';
     mockFhirServer = 'http://fhir-server-example.com';
     mockServiceWithPrefetch = 'http://example.com/cds-services/id-1';
@@ -51,6 +55,10 @@ describe('Service Exchange', () => {
     mockServiceNoEncoding = 'http://example.com/cds-services/id-3';
     mockServiceWithPrefetchEncoded = 'http://example.com/cds-services/id-4';
     mockHookInstance = '123';
+    mockAccessToken = {
+      access_token: 'access-token',
+      expires_in: '600',
+    }
     mockRequest = {
       hookInstance: mockHookInstance,
       hook: 'patient-view',
@@ -65,6 +73,15 @@ describe('Service Exchange', () => {
         medications: [{
           foo: 'foo',
         }],
+      },
+    });
+    mockRequestWithFhirAuthorization = Object.assign({}, mockRequest, {
+      fhirAuthorization: {
+        access_token: mockAccessToken.access_token,
+        token_type: 'Bearer',
+        expires_in: mockAccessToken.expires_in,
+        scope: fhirConfig.allScopes,
+        subject: fhirConfig.productionClientId,
       },
     });
 
@@ -122,16 +139,17 @@ describe('Service Exchange', () => {
       });
 
       it('resolves and dispatches a successful CDS Service call when prefetch is retrieved', () => {
-        defaultStore.fhirServerState.accessToken = { access_token: 'mock-access-token' };
+        defaultStore.fhirServerState.accessToken = mockAccessToken;
+        mockRequestWithFhirAuthorization.prefetch = {test: {resource: prefetchedData, response: {status: 200}}};
         const serviceResultStatus = 200;
         mockAxios.onGet(`${mockFhirServer}/Observation?code=${encodeURIComponent('http://loinc.org|2857-1')}&patient=${mockPatient}`)
           .reply((config) => {
-            expect(config.headers['Authorization']).toEqual('Bearer mock-access-token');
+            expect(config.headers['Authorization']).toEqual(`Bearer ${mockAccessToken.access_token}`);
             return [200, prefetchedData];
           })
           .onPost(mockServiceWithPrefetch).reply(serviceResultStatus, mockServiceResult);
         return callServices(mockServiceWithPrefetch).then(() => {
-          expect(spy).toHaveBeenCalledWith(mockServiceWithPrefetch, mockRequest, mockServiceResult, serviceResultStatus);
+          expect(spy).toHaveBeenCalledWith(mockServiceWithPrefetch, mockRequestWithFhirAuthorization, mockServiceResult, serviceResultStatus);
         });
       });
 

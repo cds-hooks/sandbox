@@ -2,6 +2,7 @@ import axios from 'axios';
 import queryString from 'query-string';
 import store from '../store/store';
 import { storeExchange } from '../actions/service-exchange-actions';
+import { productionClientId, allScopes } from '../config/fhir-config';
 import generateJWT from './jwt-generator';
 
 const uuidv4 = require('uuid/v4');
@@ -109,6 +110,17 @@ function callServices(url, context) {
   }
 
   const hookInstance = uuidv4();
+  const accessTokenProperty = store.getState().fhirServerState.accessToken;
+  let fhirAuthorization;
+  if (accessTokenProperty) {
+    fhirAuthorization = {
+      access_token: accessTokenProperty.access_token,
+      token_type: 'Bearer',
+      expires_in: accessTokenProperty.expires_in,
+      scope: allScopes,
+      subject: productionClientId,
+    };
+  }
   const request = {
     hookInstance,
     hook,
@@ -117,6 +129,10 @@ function callServices(url, context) {
     patient,
     context: activityContext,
   };
+
+  if (fhirAuthorization) {
+    request.fhirAuthorization = fhirAuthorization;
+  }
 
   const serviceDefinition = state.cdsServicesState.configuredServices[url];
 
