@@ -83,19 +83,19 @@ describe('Service Exchange', () => {
         configuredServices: {
           [`${mockServiceWithPrefetch}`]: {
             prefetch: {
-              test: 'Observation?patient={{Patient.id}}&code=http://loinc.org|2857-1'
+              test: 'Observation?patient={{context.patientId}}&code=http://loinc.org|2857-1'
             }
           },
           [`${mockServiceWithPrefetchEncoded}`]: {
             prefetch: {
-              first: 'Conditions?patient={{Patient.id}}',
-              test: `Observation?patient={{Patient.id}}&code=${encodeURIComponent('http://loinc.org|2857-1')}`,
-              second: 'Patient/{{Patient.id}}'
+              first: 'Conditions?patient={{context.patientId}}',
+              test: `Observation?patient={{context.patientId}}&code=${encodeURIComponent('http://loinc.org|2857-1')}`,
+              second: 'Patient/{{context.patientId}}'
             }
           },
           [`${mockServiceNoEncoding}`]: {
             prefetch: {
-              test: 'Patient/{{Patient.id}}'
+              test: 'Patient/{{context.patientId}}'
             }
           },
           [`${mockServiceWithoutPrefetch}`]: {}
