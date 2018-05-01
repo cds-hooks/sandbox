@@ -22,7 +22,7 @@ describe('RxView component', () => {
   let prescription;
 
   let chooseCondition, onMedicationChangeInput, chooseMedication,
-  updateDosageInstructions, updateDate, toggleEnabledDate, updateFhirResource;
+  updateDosageInstructions, updateDate, toggleEnabledDate, updateFhirResource, medicationOrder;
 
   function setup(patient, medListPhase, prescription) {
     jest.setMock('../../../src/retrieve-data-helpers/service-exchange', mockSpy);
@@ -49,7 +49,8 @@ describe('RxView component', () => {
         services={services} hook={'medication-prescribe'} medListPhase={medListPhase} 
         medications={medications} prescription={prescription} onMedicationChangeInput={onMedicationChangeInput} 
         chooseMedication={chooseMedication} chooseCondition={chooseCondition} updateDosageInstructions={updateDosageInstructions} 
-        updateDate={updateDate} toggleEnabledDate={toggleEnabledDate} updateFhirResource={updateFhirResource} />;
+        updateDate={updateDate} toggleEnabledDate={toggleEnabledDate} updateFhirResource={updateFhirResource}
+        medicationOrder={medicationOrder} />;
     renderedComponent = shallow(component, intlContexts.shallowContext);
   }
 
@@ -85,6 +86,7 @@ describe('RxView component', () => {
       id: '345',
     };
     medListPhase = 'begin';
+    medicationOrder = { foo: 'foo' };
     mockSpy = jest.fn();
     chooseCondition = jest.fn();
     onMedicationChangeInput = jest.fn(); 
@@ -162,6 +164,15 @@ describe('RxView component', () => {
     let newComponent = await renderedComponent.setProps({ prescription: prescription });
     Promise.resolve(newComponent).then(() => {
       expect(mockSpy).toHaveBeenCalledTimes(2);
+      expect(mockSpy).toHaveBeenCalledWith('http://example.com/cds-services/id-1', [{
+        key: 'medications',
+        value: {
+          resourceType: 'Bundle',
+          entry: [{
+            resource: medicationOrder,
+          }],
+        },
+      }]);
       done();
     });
   });
