@@ -14,6 +14,7 @@ import retrieveFhirMetadata from '../../retrieve-data-helpers/fhir-metadata-retr
 
 const propTypes = {
   currentFhirServer: PropTypes.string.isRequired,
+  defaultFhirServer: PropTypes.string.isRequired,
   isEntryRequired: PropTypes.bool,
   isOpen: PropTypes.bool,
   resolve: PropTypes.func,
@@ -26,8 +27,8 @@ export class FhirServerEntry extends Component {
     this.state = {
       isOpen: this.props.isOpen,
       userInput: '',
-      shouldDisplayError: false,
-      errorMessage: '',
+      shouldDisplayError: Boolean(props.initialError),
+      errorMessage: props.initialError || '',
     };
 
     this.handleCloseModal = this.handleCloseModal.bind(this);
@@ -68,16 +69,23 @@ export class FhirServerEntry extends Component {
         if (this.props.resolve) { this.props.resolve(); }
         this.handleCloseModal();
       });
-    } catch (e) {
-      this.setState({
-        shouldDisplayError: true,
-        errorMessage: 'Failed to connect to the FHIR server. See console for details.',
-      });
+    } catch (err) {
+      if (err && err.response && err.response.status === 401) {
+        this.setState({
+          shouldDisplayError: true,
+          errorMessage: 'Cannot configure secured FHIR endpoints. Please use an open (unsecured) FHIR endpoint.',
+        });
+      } else {
+        this.setState({
+          shouldDisplayError: true,
+          errorMessage: 'Failed to connect to the FHIR server. See console for details.',
+        });
+      }
     }
   }
 
   async handleResetDefaultServer() {
-    await retrieveFhirMetadata();
+    await retrieveFhirMetadata(this.props.defaultFhirServer);
     if (this.props.resolve) { this.props.resolve(); }
     this.handleCloseModal();
   }
@@ -139,6 +147,7 @@ FhirServerEntry.propTypes = propTypes;
 
 const mapStateToProps = store => ({
   currentFhirServer: store.fhirServerState.currentFhirServer,
+  defaultFhirServer: store.fhirServerState.defaultFhirServer,
 });
 
 export default connect(mapStateToProps)(FhirServerEntry);

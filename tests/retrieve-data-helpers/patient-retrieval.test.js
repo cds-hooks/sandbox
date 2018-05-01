@@ -81,6 +81,20 @@ describe('Patient Retrieval', () => {
       });
     });
 
+    it('resolves and dispatches a success action with patient from localStorage', () => {
+      const persistedPatientId = 'default-patient-id';
+      localStorage.setItem('PERSISTED_patientId', persistedPatientId);
+      setMocksAndTestFunction(defaultStore);
+      mockAxios.onGet(`${fhirServer}/Patient/${persistedPatientId}`)
+        .reply(200, expectedPatient);
+      const spy = jest.spyOn(actions, 'signalSuccessPatientRetrieval');
+      return retrievePatient().then(() => {
+        expect(spy).toHaveBeenCalledWith(expectedPatient);
+        spy.mockReset();
+        spy.mockRestore();
+      }); 
+    });
+
     it('resolves and dispatches a success action with passed in patient despite access token patient being set', () => {
       setMocksAndTestFunction(Object.assign({}, defaultStore, {
         fhirServerState: {
