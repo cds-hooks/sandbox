@@ -57,7 +57,7 @@ describe('Service Exchange', () => {
     mockHookInstance = '123';
     mockAccessToken = {
       access_token: 'access-token',
-      expires_in: 'now',
+      expires_in: '600',
     }
     mockRequest = {
       hookInstance: mockHookInstance,
