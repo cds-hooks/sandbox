@@ -67,7 +67,6 @@ describe('Header component', () => {
 
   it('should display option to change FHIR server if no access token is configured for the application', () => {
     shallowedComponent.childAt(0).dive().find('.icon').first().simulate('click');
-    expect(shallowedComponent.find('Menu').children().length).toEqual(6);
     expect(shallowedComponent.find('Menu').childAt(5).key()).toEqual('change-fhir-server');
   });
 
@@ -85,7 +84,7 @@ describe('Header component', () => {
     shallowedComponent = shallow(component).find(Header).shallow();
 
     shallowedComponent.childAt(0).dive().find('.icon').first().simulate('click');
-    expect(shallowedComponent.find('Menu').children().length).toEqual(5);
+    expect(shallowedComponent.find('Menu').childAt(5).key()).toEqual('Divider2');
   });
 
   describe('Change Patient', () => {
@@ -134,6 +133,7 @@ describe('Header component', () => {
 
     it('should open the modal to add CDS Services if the Add Services option is clicked directly', () => {
       shallowedComponent.find('Menu').childAt(1).simulate('click');
+      expect(shallowedComponent.state('settingsOpen')).toBeFalsy();
       expect(mockStore.getActions()).toEqual([{ type: types.RESET_SERVICES }]);
     });
   });
@@ -148,6 +148,20 @@ describe('Header component', () => {
       expect(shallowedComponent.state('isConfigureServicesOpen')).toBeTruthy();
       expect(shallowedComponent.state('settingsOpen')).toBeFalsy();
       expect(shallowedComponent.find('Connect(ConfigureServices)').length).toEqual(1);
+    });
+  });
+
+  describe('Clear Cached Configuration', () => {
+    beforeEach(() => {
+      shallowedComponent.childAt(0).dive().find('.icon').first().simulate('click');
+    });
+
+    it('should open the modal and clear cached services if the Clear Cached Configuration button is clicked', () => {
+      localStorage.setItem('PERSISTED_patientId', 'patient-123');
+      expect(localStorage.getItem('PERSISTED_patientId')).toEqual('patient-123');
+      shallowedComponent.find('Menu').childAt(7).simulate('click');
+      expect(shallowedComponent.state('settingsOpen')).toBeFalsy();
+      expect(localStorage.getItem('PERSISTED_patientId')).toEqual(null);
     });
   });
 });

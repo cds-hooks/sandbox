@@ -51,6 +51,7 @@ export class Header extends Component {
     this.closeChangeFhirServer = this.closeChangeFhirServer.bind(this);
     this.openConfigureServices = this.openConfigureServices.bind(this);
     this.closeConfigureServices = this.closeConfigureServices.bind(this);
+    this.clearCache = this.clearCache.bind(this);
 
     this.resetServices = this.resetServices.bind(this);
   }
@@ -74,6 +75,16 @@ export class Header extends Component {
   resetServices() {
     this.props.resetServices();
     retrieveDiscoveryServices();
+    this.closeSettingsMenu();
+  }
+
+  clearCache() {
+    // Temporary removal until all persisted values are refactored into one localStorage property
+    localStorage.removeItem('PERSISTED_cdsServices');
+    localStorage.removeItem('PERSISTED_fhirServer');
+    localStorage.removeItem('PERSISTED_hook');
+    localStorage.removeItem('PERSISTED_patientId');
+    this.closeSettingsMenu();
   }
 
   openConfigureServices() {
@@ -113,7 +124,7 @@ export class Header extends Component {
 
   render() {
     const logo = <div><span><img src={cdsHooksLogo} alt="" height="30" width="30" /></span><b className={styles['logo-title']}>CDS Hooks Sandbox</b></div>;
-    const menuItems = [
+    let menuItems = [
       <Menu.Item text="Add CDS Services" key="add-services" onClick={this.openAddServices} />,
       <Menu.Item text="Reset Default Services" key="reset-services" onClick={this.resetServices} />,
       <Menu.Item text="Configure CDS Services" key="configure-services" onClick={this.openConfigureServices} />,
@@ -123,6 +134,10 @@ export class Header extends Component {
     if (!this.props.isSecuredSandbox) {
       menuItems.push(<Menu.Item text="Change FHIR Server" key="change-fhir-server" onClick={this.openChangeFhirServer} />);
     }
+    menuItems = menuItems.concat([
+      <Menu.Divider key="Divider2" />,
+      <Menu.Item text="Clear Cached Configuration" key="clear-cached-configuration" onClick={this.clearCache} />,
+    ]);
     const gearMenu = (
       <Menu
         isOpen={this.state.settingsOpen}
