@@ -6,7 +6,7 @@ describe('FHIR Server Reducers', () => {
 
   beforeEach(() => {
     state = {
-      currentFhirServer: 'https://api.hspconsortium.org/cdshooksdstu2/open',
+      currentFhirServer: '',
       currentMetadata: null,
       defaultFhirServer: 'https://api.hspconsortium.org/cdshooksdstu2/open',
       fhirVersion: '1.0.2',

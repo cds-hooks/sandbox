@@ -25,6 +25,7 @@ export class MainView extends Component {
     this.state = {
       fhirServerPrompt: false,
       fhirServerPromptHold: null,
+      fhirServerInitialError: '',
       patientPrompt: false,
       patientPromptHold: null,
     };
@@ -48,17 +49,20 @@ export class MainView extends Component {
     this.props.setLoadingStatus(true);
     this.props.setHook(localStorage.getItem('PERSISTED_hook') || 'patient-view');
     await smartLaunchPromise().catch(async () => {
-      const persistedFhirServer = localStorage.getItem('PERSISTED_fhirServer');
-      await retrieveFhirMetadata(persistedFhirServer).catch(() => new Promise((resolve) => {
+      await retrieveFhirMetadata().catch(err => new Promise((resolve) => {
+        let fhirErrorResponse = this.state.fhirServerInitialError;
+        if (err && err.response && err.response.status === 401) {
+          fhirErrorResponse = 'Cannot configure secured FHIR endpoints. Please use an open (unsecured) FHIR endpoint.';
+        }
         this.setState({
           fhirServerPrompt: true,
           fhirServerPromptHold: resolve,
+          fhirServerInitialError: fhirErrorResponse,
         });
       }));
     });
     if (this.state.fhirServerPrompt) { this.setState({ fhirServerPrompt: false }); }
-    const persistedPatientId = localStorage.getItem('PERSISTED_patientId');
-    await retrievePatient(persistedPatientId).catch(() => new Promise((resolve) => {
+    await retrievePatient().catch(() => new Promise((resolve) => {
       this.setState({
         patientPrompt: true,
         patientPromptHold: resolve,
@@ -81,7 +85,10 @@ export class MainView extends Component {
   }
 
   closeFhirServerPrompt() {
-    this.setState({ fhirServerPrompt: false });
+    this.setState({
+      fhirServerPrompt: false,
+      fhirServerInitialError: '',
+    });
   }
 
   closePatientPrompt() {
@@ -105,6 +112,7 @@ export class MainView extends Component {
           isEntryRequired
           closePrompt={this.closeFhirServerPrompt}
           resolve={this.state.fhirServerPromptHold}
+          initialError={this.state.fhirServerInitialError}
         /> : null}
         {this.state.patientPrompt ? <PatientEntry
           isOpen={this.state.patientPrompt}

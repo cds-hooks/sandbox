@@ -69,6 +69,32 @@ describe('FHIR Metadata Retrieval', () => {
       });
     });
 
+    it('resolves and dispatches action with a FHIR server from localStorage', () => {
+      const persistedFhirServer = 'http://persisted.com';
+      localStorage.setItem('PERSISTED_fhirServer', persistedFhirServer);
+      const spy = jest.spyOn(actions, 'signalSuccessFhirServerRetrieval');
+      mockAxios.onGet(`${persistedFhirServer}/metadata`).reply(200, expectedMetadata);
+      mockAxios.onGet(`${persistedFhirServer}/Patient`).reply(200);
+      return retrieveFhirMetadata().then(() => {
+        expect(spy).toHaveBeenCalledWith(persistedFhirServer, expectedMetadata);
+        spy.mockReset();
+        spy.mockRestore();
+      });
+    });
+
+    it('rejects the Promise if hitting a Patient endpoint results in a 401 error', () => {
+      const spy = jest.spyOn(actions, 'signalFailureFhirServerRetrieval');
+      const passedInUrl = 'http://test-url.com';
+      mockAxios.onGet(`${passedInUrl}/metadata`).reply(200, expectedMetadata);
+      mockAxios.onGet(`${passedInUrl}/Patient`).reply(401);
+
+      return retrieveFhirMetadata(passedInUrl).catch(() => {
+        expect(spy).toHaveBeenCalled();
+        spy.mockReset();
+        spy.mockRestore();
+      });
+    });
+
     it('rejects the Promise and does not dispatch any actions for insufficient result data', () => {
       const spy = jest.spyOn(actions, 'signalSuccessFhirServerRetrieval');
       mockAxios.onGet(`${defaultFhirServer}/metadata`).reply(200, {});

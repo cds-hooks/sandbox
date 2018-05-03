@@ -17,6 +17,8 @@ describe('FhirServerEntry component', () => {
   let mockResolve;
   let mockClosePrompt;
   let isEntryRequired;
+  let initialError;
+  let defaultFhirServer;
 
   function setup(state) {
     mockStore = mockStoreWrapper(state);
@@ -29,6 +31,8 @@ describe('FhirServerEntry component', () => {
                                  resolve={mockResolve}
                                  isOpen={true}
                                  isEntryRequired={isEntryRequired} 
+                                 initialError={initialError}
+                                 defaultFhirServer={defaultFhirServer}
                                  closePrompt={mockClosePrompt} />
     } else {
       component = <ConnectedView store={mockStore}/>;
@@ -39,11 +43,15 @@ describe('FhirServerEntry component', () => {
 
   beforeEach(() => {
     storeState = {
-      fhirServerState: { currentFhirServer: 'http://test-fhir.com' }
+      fhirServerState: { 
+        currentFhirServer: 'http://test-fhir.com',
+        defaultFhirServer: 'http://default-fhir-server.com',
+      },
     };
     mockSpy = jest.fn();
     mockResolve = jest.fn();
     mockClosePrompt = jest.fn();
+    initialError = '';
     isEntryRequired = true;
   });
 
@@ -71,6 +79,7 @@ describe('FhirServerEntry component', () => {
     await shallowedComponent.find('Dialog').dive().find('ContentContainer').dive().find('.right-align').find('Button').at(0).simulate('click');
     expect(shallowedComponent.state('isOpen')).toEqual(false);
     expect(mockResolve).toHaveBeenCalled();
+    expect(mockSpy).toHaveBeenCalled();
   });
 
   it('handles closing the modal in the component', async () => {
@@ -102,6 +111,19 @@ describe('FhirServerEntry component', () => {
       setup(storeState);
       let shallowedComponent = pureComponent.shallow();
       enterInputAndSave(shallowedComponent, 'test');
+      expect(shallowedComponent.state('shouldDisplayError')).toEqual(true);
+      expect(shallowedComponent.state('errorMessage')).not.toEqual('');
+    });
+
+    it('displays an error message if input resolves to a 401 error', () => {
+      mockSpy = jest.fn(() => { 
+        throw new Error({
+          response: { status: 401 },
+        }); 
+      });
+      setup(storeState);
+      let shallowedComponent = pureComponent.shallow();
+      enterInputAndSave(shallowedComponent, 'http://secured-fhir-endpoint.com');
       expect(shallowedComponent.state('shouldDisplayError')).toEqual(true);
       expect(shallowedComponent.state('errorMessage')).not.toEqual('');
     });

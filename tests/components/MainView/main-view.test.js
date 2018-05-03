@@ -80,11 +80,14 @@ describe('MainView component', () => {
 
   it('opens a fhir server entry prompt if fhir server call failed', async (done) => {
     mockPromiseSmartCall = jest.fn(() => Promise.reject(0));
-    mockPromiseFhirCall = jest.fn(() => Promise.reject(0));
+    mockPromiseFhirCall = jest.fn(() => Promise.reject({
+      response: { status: 401 },
+    }));
     setup(storeState);
     let shallowedComponent = await pureComponent.shallow();
     Promise.resolve(shallowedComponent).then(() => {
       expect(shallowedComponent.state('fhirServerPrompt')).toEqual(true);
+      expect(shallowedComponent.state('fhirServerIntialResponse')).not.toEqual('');
       done();
     });
   });
@@ -133,30 +136,6 @@ describe('MainView component', () => {
       setup(storeState);
       const shallowedComponent = pureComponent.shallow();
       expect(mockStore.getActions()[1]).toEqual(setHook('patient-view'));
-    });
-
-    it('tries to configure a persisted FHIR server from localStorage', async (done) => {
-      mockPromiseSmartCall = jest.fn(() => Promise.reject(0));
-      const persistedFhirServer = 'http://persisted.com';
-      localStorage.setItem('PERSISTED_fhirServer', persistedFhirServer);
-      setup(storeState);
-      const shallowedComponent = await pureComponent.shallow();
-      Promise.resolve(shallowedComponent).then(() => {
-        expect(mockPromiseFhirCall).toHaveBeenCalledWith(localStorage.getItem('PERSISTED_fhirServer'));
-        done();
-      });
-    });
-
-    it('tries to configure a persisted Patient ID from localStorage', async (done) => {
-      mockPromisePatientCall = jest.fn(() => Promise.reject(0));
-      const persistedPatientId = '123';
-      localStorage.setItem('PERSISTED_patientId', persistedPatientId);
-      setup(storeState);
-      const shallowedComponent = await pureComponent.shallow();
-      Promise.resolve(shallowedComponent).then(async () => {
-        await expect(mockPromisePatientCall).toHaveBeenCalledWith(localStorage.getItem('PERSISTED_patientId'));
-        done();
-      });
     });
 
     it('tries to discover any CDS Services from local storage', async (done) => {
