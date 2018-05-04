@@ -18,6 +18,7 @@ import FhirServerEntry from '../FhirServerEntry/fhir-server-entry';
 
 import retrievePatient from '../../retrieve-data-helpers/patient-retrieval';
 import retrieveDiscoveryServices from '../../retrieve-data-helpers/discovery-services-retrieval';
+import retrieveFhirMetadata from '../../retrieve-data-helpers/fhir-metadata-retrieval';
 import { setHook } from '../../actions/hook-actions';
 import { toggleDemoView } from '../../actions/card-demo-actions';
 import { resetServices } from '../../actions/cds-services-actions';
@@ -52,7 +53,7 @@ export class Header extends Component {
     this.openConfigureServices = this.openConfigureServices.bind(this);
     this.closeConfigureServices = this.closeConfigureServices.bind(this);
 
-    this.resetServices = this.resetServices.bind(this);
+    this.resetConfiguration = this.resetConfiguration.bind(this);
   }
 
   shouldComponentUpdate(nextProps) {
@@ -71,9 +72,21 @@ export class Header extends Component {
   openSettingsMenu() { this.setState({ settingsOpen: true }); }
 
   switchHook(hook) { this.props.setHook(hook); }
-  resetServices() {
+
+  async resetConfiguration() {
+    // Temporary removal until all persisted values are refactored into one localStorage property
+    this.closeSettingsMenu();
+    localStorage.removeItem('PERSISTED_cdsServices');
     this.props.resetServices();
     retrieveDiscoveryServices();
+
+    localStorage.removeItem('PERSISTED_fhirServer');
+    await retrieveFhirMetadata();
+
+    localStorage.removeItem('PERSISTED_hook');
+
+    localStorage.removeItem('PERSISTED_patientId');
+    await retrievePatient();
   }
 
   openConfigureServices() {
@@ -113,16 +126,19 @@ export class Header extends Component {
 
   render() {
     const logo = <div><span><img src={cdsHooksLogo} alt="" height="30" width="30" /></span><b className={styles['logo-title']}>CDS Hooks Sandbox</b></div>;
-    const menuItems = [
-      <Menu.Item text="Add CDS Services" key="add-services" onClick={this.openAddServices} />,
-      <Menu.Item text="Reset Default Services" key="reset-services" onClick={this.resetServices} />,
-      <Menu.Item text="Configure CDS Services" key="configure-services" onClick={this.openConfigureServices} />,
-      <Menu.Divider key="Divider1" />,
-      <Menu.Item text="Change Patient" key="change-patient" onClick={this.openChangePatient} />,
+    let menuItems = [
+      <Menu.Item className={styles['add-services']} text="Add CDS Services" key="add-services" onClick={this.openAddServices} />,
+      <Menu.Item className={styles['configure-services']} text="Configure CDS Services" key="configure-services" onClick={this.openConfigureServices} />,
+      <Menu.Divider className={styles['divider-1']} key="Divider1" />,
+      <Menu.Item className={styles['change-patient']} text="Change Patient" key="change-patient" onClick={this.openChangePatient} />,
     ];
     if (!this.props.isSecuredSandbox) {
-      menuItems.push(<Menu.Item text="Change FHIR Server" key="change-fhir-server" onClick={this.openChangeFhirServer} />);
+      menuItems.push(<Menu.Item className={styles['change-fhir-server']} text="Change FHIR Server" key="change-fhir-server" onClick={this.openChangeFhirServer} />);
     }
+    menuItems = menuItems.concat([
+      <Menu.Divider className={styles['divider-2']} key="Divider2" />,
+      <Menu.Item className={styles['reset-configuration']} text="Reset Configuration" key="reset-configuration" onClick={this.resetConfiguration} />,
+    ]);
     const gearMenu = (
       <Menu
         isOpen={this.state.settingsOpen}
