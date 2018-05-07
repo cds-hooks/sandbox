@@ -15,6 +15,7 @@ import ConfigureServices from '../ConfigureServices/configure-services';
 import ServicesEntry from '../ServicesEntry/services-entry';
 import PatientEntry from '../PatientEntry/patient-entry';
 import FhirServerEntry from '../FhirServerEntry/fhir-server-entry';
+import ShareConfiguration from '../ShareConfiguration/share-configuration';
 
 import retrievePatient from '../../retrieve-data-helpers/patient-retrieval';
 import retrieveDiscoveryServices from '../../retrieve-data-helpers/discovery-services-retrieval';
@@ -34,6 +35,7 @@ export class Header extends Component {
       isChangeFhirServerOpen: false,
       isAddServicesOpen: false,
       isConfigureServicesOpen: false,
+      isShareConfigurationOpen: false,
     };
 
     this.switchHook = this.switchHook.bind(this);
@@ -51,6 +53,8 @@ export class Header extends Component {
     this.closeChangeFhirServer = this.closeChangeFhirServer.bind(this);
     this.openConfigureServices = this.openConfigureServices.bind(this);
     this.closeConfigureServices = this.closeConfigureServices.bind(this);
+    this.openShareConfiguration = this.openShareConfiguration.bind(this);
+    this.closeShareConfiguration = this.closeShareConfiguration.bind(this);
 
     this.resetServices = this.resetServices.bind(this);
   }
@@ -111,9 +115,15 @@ export class Header extends Component {
   }
   closeChangeFhirServer() { this.setState({ isChangeFhirServerOpen: false }); }
 
+  openShareConfiguration() {
+    this.setState({ isShareConfigurationOpen: true });
+    if (this.state.settingsOpen) { this.closeSettingsMenu(); }
+  }
+  closeShareConfiguration() { this.setState({ isShareConfigurationOpen: false }); }
+
   render() {
     const logo = <div><span><img src={cdsHooksLogo} alt="" height="30" width="30" /></span><b className={styles['logo-title']}>CDS Hooks Sandbox</b></div>;
-    const menuItems = [
+    let menuItems = [
       <Menu.Item text="Add CDS Services" key="add-services" onClick={this.openAddServices} />,
       <Menu.Item text="Reset Default Services" key="reset-services" onClick={this.resetServices} />,
       <Menu.Item text="Configure CDS Services" key="configure-services" onClick={this.openConfigureServices} />,
@@ -123,6 +133,11 @@ export class Header extends Component {
     if (!this.props.isSecuredSandbox) {
       menuItems.push(<Menu.Item text="Change FHIR Server" key="change-fhir-server" onClick={this.openChangeFhirServer} />);
     }
+    menuItems = menuItems.concat([
+      <Menu.Divider key="Divider2" />,
+      <Menu.Item text="Share Configuration" key="share-configuration" onClick={this.openShareConfiguration} />,
+    ]);
+
     const gearMenu = (
       <Menu
         isOpen={this.state.settingsOpen}
@@ -184,6 +199,10 @@ export class Header extends Component {
           closePrompt={this.closeChangeFhirServer}
           isEntryRequired={false}
           resolve={e => this.openChangePatient(e, true)}
+        /> : null}
+        {this.state.isShareConfigurationOpen ? <ShareConfiguration 
+          isOpen={this.state.isShareConfigurationOpen}
+          closePrompt={this.closeShareConfiguration}
         /> : null}
       </div>
     );

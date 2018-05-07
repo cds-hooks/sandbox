@@ -65,6 +65,7 @@
     "terra-overlay": "^2.1.0",
     "terra-responsive-element": "^2.4.0",
     "terra-spacer": "^2.1.0",
+    "terra-table": "^2.7.0",
     "terra-text": "^2.1.0",
     "terra-toggle": "^2.1.0",
     "uuid": "^3.2.1"
