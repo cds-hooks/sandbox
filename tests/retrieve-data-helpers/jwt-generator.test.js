@@ -1,3 +1,5 @@
+import { productionClientId } from '../../src/config/fhir-config';
+
 describe('JWT Generator', () => {
   let generateJWT;
   let signedJwtMock = '1234';
@@ -22,6 +24,7 @@ describe('JWT Generator', () => {
     const audience = 'http://example-services.com/cds-services/1';
     const expectedPayload = JSON.stringify({
       iss: `https://sandbox.cds-hooks.org`,
+      sub: productionClientId,
       aud: audience,
       exp: Math.round((Date.now() / 1000) + 300),
       iat: Math.round((Date.now() / 1000)),
