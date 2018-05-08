@@ -1,4 +1,5 @@
 import privKey from '../../keys/ecprivkey.pem';
+import { productionClientId } from '../config/fhir-config';
 
 const JWT = require('jsrsasign');
 const uuid = require('uuid/v4');
@@ -6,6 +7,7 @@ const uuid = require('uuid/v4');
 function generateJWT(audience) {
   const jwtPayload = JSON.stringify({
     iss: 'https://sandbox.cds-hooks.org',
+    sub: productionClientId,
     aud: audience,
     exp: Math.round((Date.now() / 1000) + 300),
     iat: Math.round((Date.now() / 1000)),
