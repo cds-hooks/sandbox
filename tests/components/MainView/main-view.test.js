@@ -1,9 +1,11 @@
 jest.mock('../../../keys/ecprivkey.pem');
+jest.dontMock('query-string');
 
 import React from 'react';
 import { shallow, mount } from 'enzyme';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
+import queryString from 'query-string';
 
 import { setLoadingStatus } from '../../../src/actions/ui-actions';
 import { setHook } from '../../../src/actions/hook-actions';
@@ -145,6 +147,40 @@ describe('MainView component', () => {
       const shallowedComponent = await pureComponent.shallow();
       Promise.resolve(await shallowedComponent).then(async () => {
         expect(await mockPromiseDiscoveryCall).toHaveBeenCalledWith(persistedServices[0]);
+        done();
+      });
+    });
+  });
+
+  describe('URL Parameter Values', () => {
+    it('grabs the hook from the hook URL query parameter and sets it if its a known hook', async () => {
+      jsdom.reconfigure({
+        url: 'http://example.com/?hook=medication-prescribe',
+      });
+      setup(storeState);
+      const shallowedComponent = await pureComponent.shallow();
+      expect(mockStore.getActions()[1]).toEqual(setHook('medication-prescribe'));
+    });
+
+    it('sets stored local storage hook for unsupported hooks in the URL param', async () => {
+      localStorage.setItem('PERSISTED_hook', 'medication-prescribe');
+      jsdom.reconfigure({
+        url: 'http://example.com/?hook=abc-123',
+      });
+      setup(storeState);
+      const shallowedComponent = await pureComponent.shallow();
+      expect(mockStore.getActions()[1]).toEqual(setHook('medication-prescribe'));
+    });
+
+    it('calls the discovery endpoints of service discovery URLs in query parameters', async (done) => {
+      jsdom.reconfigure({
+        url: 'http://example.com/?serviceDiscoveryURL=https://service-1.com/cds-services,foo.com/cds-services',
+      });
+      setup(storeState);
+      const shallowedComponent = await pureComponent.shallow();
+      Promise.resolve(await shallowedComponent).then(async () => {
+        expect(await mockPromiseDiscoveryCall).toHaveBeenCalledWith('https://service-1.com/cds-services');
+        expect(await mockPromiseDiscoveryCall).toHaveBeenCalledWith('http://foo.com/cds-services');
         done();
       });
     });

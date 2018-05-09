@@ -1,8 +1,99 @@
 import moment from 'moment';
 import isEqual from 'lodash/isEqual';
+import queryString from 'query-string';
 import * as types from '../actions/action-types';
 import rxnorm from '../assets/medication-list';
 import { getConditionCodingFromCode } from './helpers/services-filter';
+
+// Check if there is an associated name with the passed in drug ID to potentially create a prescribable object
+const getPrescribableFromID = (id) => {
+  const drugName = id ? rxnorm.cuiToName[id] : '';
+  if (drugName) {
+    return {
+      name: drugName,
+      id,
+    };
+  }
+  return null;
+};
+
+const getQueryParam = (param) => {
+  const parsedParams = queryString.parse(window.location.search);
+  return parsedParams[param];
+};
+
+// Construct the FHIR resource for MedicationRequest/Order from a chosen condition and/or medication
+const createFhirResource = (fhirVersion, patientId, state) => {
+  const isSTU3 = fhirVersion === '3.0.1';
+  const resource = {
+    resourceType: isSTU3 ? 'MedicationRequest' : 'MedicationOrder',
+  };
+  resource[`${isSTU3 ? 'authoredOn' : 'dateWritten'}`] = moment().format('YYYY-MM-DD');
+  let startDate;
+  let endDate;
+  if (state.prescriptionDates.start.value && state.prescriptionDates.start.enabled) {
+    startDate = moment(state.prescriptionDates.start.value).format('YYYY-MM-DD');
+  }
+  if (state.prescriptionDates.end.value && state.prescriptionDates.end.enabled) {
+    endDate = moment(state.prescriptionDates.end.value).format('YYYY-MM-DD');
+  }
+
+  resource.status = 'draft';
+  resource[`${isSTU3 ? 'subject' : 'patient'}`] = {
+    reference: `Patient/${patientId}`,
+  };
+  if (state.decisions.prescribable && state.medListPhase === 'done') {
+    const freqs = {
+      daily: 1,
+      bid: 2,
+      tid: 3,
+      qid: 4,
+    };
+
+    if (state.medicationInstructions) {
+      const { medicationInstructions } = state;
+      resource.dosageInstruction = [{
+        doseQuantity: {
+          value: medicationInstructions.number,
+          system: 'http://unitsofmeasure.org',
+          code: '{pill}',
+        },
+        timing: {
+          repeat: {
+            frequency: freqs[medicationInstructions.frequency],
+            period: 1,
+          },
+        },
+      }];
+      resource.dosageInstruction[0].timing.repeat[`${isSTU3 ? 'periodUnit' : 'periodUnits'}`] = 'd';
+      if (startDate || endDate) {
+        resource.dosageInstruction[0].timing.repeat.boundsPeriod = {
+          start: startDate,
+          end: endDate,
+        };
+      }
+    }
+
+    const med = state.decisions.prescribable;
+
+    resource.medicationCodeableConcept = {
+      text: med.name,
+      coding: [{
+        display: med.name,
+        system: 'http://www.nlm.nih.gov/research/umls/rxnorm',
+        code: med.id,
+      }],
+    };
+  }
+
+  if (state.selectedConditionCode) {
+    const chosenCondition = getConditionCodingFromCode(state.selectedConditionCode);
+    if (chosenCondition && chosenCondition.resource && chosenCondition.resource.code) {
+      resource[`${isSTU3 ? 'reasonCode' : 'reasonCodeableConcept'}`] = chosenCondition.resource.code;
+    }
+  }
+  return resource;
+};
 
 const initialState = {
   /**
@@ -24,7 +115,7 @@ const initialState = {
    * keep track of what stage the medication-selection is in (any of the 3 strings above, or 'begin' and 'done'),
    * in order to get the right rx code
    */
-  medListPhase: 'begin',
+  medListPhase: getPrescribableFromID(getQueryParam('prescribedMedication')) ? 'done' : 'begin',
   /**
    * The input value the user types in for the medication input form
    */
@@ -44,14 +135,14 @@ const initialState = {
   decisions: {
     ingredient: null,
     components: null,
-    prescribable: null,
+    prescribable: getPrescribableFromID(getQueryParam('prescribedMedication')) || null,
   },
   /**
    * The frequency of the medication the user may modify
    */
   medicationInstructions: {
-    number: 1,
-    frequency: 'daily',
+    number: parseInt(getQueryParam('prescribedInstructionNumber'), 10) || 1,
+    frequency: getQueryParam('prescribedInstructionFrequency') || 'daily',
   },
   /**
    * The dates and enabled status of the medication start and end dates
@@ -59,17 +150,17 @@ const initialState = {
   prescriptionDates: {
     start: {
       enabled: true,
-      value: '',
+      value: getQueryParam('prescribedMedicationStartDate') || undefined,
     },
     end: {
       enabled: true,
-      value: '',
+      value: getQueryParam('prescribedMedicationEndDate') || undefined,
     },
   },
   /**
    * The code of the Condition the user selects associated with the Patient in context
    */
-  selectedConditionCode: '',
+  selectedConditionCode: getQueryParam('prescribedReason') || '',
   /**
    * The FHIR Medication Order that gets built out for the 'medications' context property in a request
    */
@@ -147,79 +238,6 @@ const getMedicationPrescribableList = input => (
     }
   )).sort(compareDrugNames)
 );
-
-// Construct the FHIR resource for MedicationRequest/Order from a chosen condition and/or medication
-const createFhirResource = (fhirVersion, patientId, state) => {
-  const isSTU3 = fhirVersion === '3.0.1';
-  const resource = {
-    resourceType: isSTU3 ? 'MedicationRequest' : 'MedicationOrder',
-  };
-  resource[`${isSTU3 ? 'authoredOn' : 'dateWritten'}`] = moment().format('YYYY-MM-DD');
-  let startDate;
-  let endDate;
-  if (state.prescriptionDates.start.value && state.prescriptionDates.start.enabled) {
-    startDate = moment(state.prescriptionDates.start.value).format('YYYY-MM-DD');
-  }
-  if (state.prescriptionDates.end.value && state.prescriptionDates.end.enabled) {
-    endDate = moment(state.prescriptionDates.end.value).format('YYYY-MM-DD');
-  }
-
-  resource.status = 'draft';
-  resource[`${isSTU3 ? 'subject' : 'patient'}`] = {
-    reference: `Patient/${patientId}`,
-  };
-  if (state.decisions.prescribable && state.medListPhase === 'done') {
-    const freqs = {
-      daily: 1,
-      bid: 2,
-      tid: 3,
-      qid: 4,
-    };
-
-    if (state.medicationInstructions) {
-      const { medicationInstructions } = state;
-      resource.dosageInstruction = [{
-        doseQuantity: {
-          value: medicationInstructions.number,
-          system: 'http://unitsofmeasure.org',
-          code: '{pill}',
-        },
-        timing: {
-          repeat: {
-            frequency: freqs[medicationInstructions.frequency],
-            period: 1,
-          },
-        },
-      }];
-      resource.dosageInstruction[0].timing.repeat[`${isSTU3 ? 'periodUnit' : 'periodUnits'}`] = 'd';
-      if (startDate || endDate) {
-        resource.dosageInstruction[0].timing.repeat.boundsPeriod = {
-          start: startDate,
-          end: endDate,
-        };
-      }
-    }
-
-    const med = state.decisions.prescribable;
-
-    resource.medicationCodeableConcept = {
-      text: med.name,
-      coding: [{
-        display: med.name,
-        system: 'http://www.nlm.nih.gov/research/umls/rxnorm',
-        code: med.id,
-      }],
-    };
-  }
-
-  if (state.selectedConditionCode) {
-    const chosenCondition = getConditionCodingFromCode(state.selectedConditionCode);
-    if (chosenCondition && chosenCondition.resource && chosenCondition.resource.code) {
-      resource[`${isSTU3 ? 'reasonCode' : 'reasonCodeableConcept'}`] = chosenCondition.resource.code;
-    }
-  }
-  return resource;
-};
 
 const medicationReducers = (state = initialState, action) => {
   if (action.type) {

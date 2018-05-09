@@ -35,11 +35,11 @@ describe('Medication Reducers', () => {
       prescriptionDates: {
         start: {
           enabled: true,
-          value: '',
+          value: undefined,
         },
         end: {
           enabled: true,
-          value: '',
+          value: undefined,
         },
       },
       selectedConditionCode: '',

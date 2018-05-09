@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import LoadingOverlay from 'terra-overlay/lib/LoadingOverlay';
+import queryString from 'query-string';
 
 import smartLaunchPromise from '../../retrieve-data-helpers/smart-launch';
 import retrieveFhirMetadata from '../../retrieve-data-helpers/fhir-metadata-retrieval';
@@ -32,22 +33,28 @@ export class MainView extends Component {
 
     this.closeFhirServerPrompt = this.closeFhirServerPrompt.bind(this);
     this.closePatientPrompt = this.closePatientPrompt.bind(this);
+    this.getQueryParam = this.getQueryParam.bind(this);
   }
 
   /**
-   * TODO: Grab the following pieces of data (w/ face-up loading spinner) before displaying the EHR-view:
-   *       1. Initiate SMART App launch (if applicable)
-   *       2. Retrieve FHIR server in context (default configured)
-   *       3. Retrieve Patient in context (default configured)
-   *       4. Retrieve CDS Services in context (default configured)
-   *       Finally, load the application UI
+   * Grab the following pieces of data (w/ face-up loading spinner) before displaying the EHR-view:
+   *   1. Initiate SMART App launch (if applicable)
+   *   2. Retrieve FHIR server in context (from URL param, local storage, or default configured)
+   *   3. Retrieve Patient in context (from URL param, local storage, or default configured)
+   *   4. Retrieve CDS Services in context (from URL param, local storage, or default configured)
+   *   Finally, load the application UI
    *
-   *       ERROR scenarios: If any errors occur, display an input box for the user to specify FHIR server or
-   *       patient in context.
+   *   ERROR scenarios: If any errors occur, display an input box for the user to specify FHIR server or
+   *   patient in context.
    */
   async componentDidMount() {
     this.props.setLoadingStatus(true);
-    this.props.setHook(localStorage.getItem('PERSISTED_hook') || 'patient-view');
+    const validHooks = ['patient-view', 'medication-prescribe'];
+    let parsedHook = this.getQueryParam('hook');
+    if (validHooks.indexOf(parsedHook) < 0) {
+      parsedHook = null;
+    }
+    this.props.setHook(parsedHook || localStorage.getItem('PERSISTED_hook') || 'patient-view');
     await smartLaunchPromise().catch(async () => {
       await retrieveFhirMetadata().catch(err => new Promise((resolve) => {
         let fhirErrorResponse = this.state.fhirServerInitialError;
@@ -69,19 +76,46 @@ export class MainView extends Component {
       });
     }));
     if (this.state.patientPrompt) { this.setState({ patientPrompt: false }); }
-    const persistedServices = localStorage.getItem('PERSISTED_cdsServices');
-    if (persistedServices) {
-      const parsedServices = JSON.parse(persistedServices);
-      if (parsedServices && parsedServices.length) {
-        await parsedServices.forEach(async (discoveryEndpoint) => {
+    const parsedDiscoveryEndpoints = this.getQueryParam('serviceDiscoveryURL');
+    if (parsedDiscoveryEndpoints) {
+      let servicesList = parsedDiscoveryEndpoints.split(',');
+      if (servicesList.length) {
+        // Ensure that all services have a protocol in the URL string
+        servicesList = servicesList.map((url) => {
+          let urlCopy = url;
+          if (!/^(https?:)?\/\//i.test(url)) {
+            urlCopy = `http://${url}`;
+          }
+          return urlCopy;
+        });
+        await servicesList.forEach(async (discoveryEndpoint) => {
           await retrieveDiscoveryServices(discoveryEndpoint);
         });
+      }
+    } else {
+      const persistedServices = localStorage.getItem('PERSISTED_cdsServices');
+      if (persistedServices) {
+        const parsedServices = JSON.parse(persistedServices);
+        if (parsedServices && parsedServices.length) {
+          await parsedServices.forEach(async (discoveryEndpoint) => {
+            await retrieveDiscoveryServices(discoveryEndpoint);
+          });
+        }
       }
     }
     await retrieveDiscoveryServices().catch(() => {
       this.props.setLoadingStatus(false);
     });
     this.props.setLoadingStatus(false);
+  }
+
+  /**
+   * Get all query parameters from the current URL and return the value of the passed in param for this function
+   * @param {*} param - URL parameter to get the value for
+   */
+  getQueryParam(param) {
+    const parsedParams = queryString.parse(window.location.search);
+    return parsedParams[param];
   }
 
   closeFhirServerPrompt() {

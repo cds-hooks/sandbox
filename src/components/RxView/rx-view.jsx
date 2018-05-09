@@ -29,15 +29,16 @@ export class RxView extends Component {
 
     this.state = {
       value: '',
+      conditionCode: '',
       dosageAmount: 1,
       dosageFrequency: 'daily',
       startRange: {
         enabled: true,
-        value: '',
+        value: undefined,
       },
       endRange: {
         enabled: true,
-        value: '',
+        value: undefined,
       },
     };
 
@@ -51,9 +52,34 @@ export class RxView extends Component {
     this.toggleEnabledDate = this.toggleEnabledDate.bind(this);
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     if (this.props.prescription) {
+      if (!this.props.medicationOrder) {
+        await this.props.updateFhirResource(this.props.fhirVersion, this.props.patient.id);
+      }
       this.executeRequests();
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.medicationInstructions.number !== this.state.dosageAmount ||
+      nextProps.medicationInstructions.frequency !== this.state.dosageFrequency ||
+      nextProps.selectedConditionCode !== this.state.conditionCode ||
+      nextProps.prescriptionDates.start.value !== this.state.startRange.value ||
+      nextProps.prescriptionDates.end.value !== this.state.endRange.value) {
+      this.setState({
+        conditionCode: nextProps.selectedConditionCode,
+        dosageAmount: nextProps.medicationInstructions.number,
+        dosageFrequency: nextProps.medicationInstructions.frequency,
+        startRange: {
+          enabled: this.state.startRange.enabled,
+          value: nextProps.prescriptionDates.start.value,
+        },
+        endRange: {
+          enabled: this.state.endRange.enabled,
+          value: nextProps.prescriptionDates.end.value,
+        },
+      });
     }
   }
 
@@ -73,8 +99,10 @@ export class RxView extends Component {
     return null;
   }
 
-  selectCondition(e, value) {
+  // Note: A second parameter (selected value) is supplied automatically by the Terra onChange function for the Form Select component
+  selectCondition(event, value) {
     this.props.chooseCondition(value);
+    this.setState({ conditionCode: value });
   }
 
   changeMedicationInput(event) {
@@ -82,20 +110,22 @@ export class RxView extends Component {
     debounce(this.props.onMedicationChangeInput(event.target.value), 50);
   }
 
-  changeDosageAmount(e) {
-    let transformedNumber = Number(e.target.value) || 1;
+  changeDosageAmount(event) {
+    let transformedNumber = Number(event.target.value) || 1;
     if (transformedNumber > 5) { transformedNumber = 5; }
     if (transformedNumber < 1) { transformedNumber = 1; }
     this.setState({ dosageAmount: transformedNumber });
     this.props.updateDosageInstructions(transformedNumber, this.state.dosageFrequency);
   }
 
-  changeDosageFrequency(e, value) {
+  // Note: A second parameter (selected value) is supplied automatically by the Terra onChange function for the Form Select component
+  changeDosageFrequency(event, value) {
     this.setState({ dosageFrequency: value });
     this.props.updateDosageInstructions(this.state.dosageAmount, value);
   }
 
-  selectStartDate(e, value) {
+  // Note: A second parameter (date value) is supplied automatically by the Terra onChange function for the DatePicker component
+  selectStartDate(event, value) {
     const newStartRange = {
       enabled: this.state.startRange.enabled,
       value,
@@ -106,7 +136,8 @@ export class RxView extends Component {
     this.props.updateDate('start', newStartRange);
   }
 
-  selectEndDate(e, value) {
+  // Note: A second parameter (date value) is supplied automatically by the Terra onChange function for the DatePicker component
+  selectEndDate(event, value) {
     const newEndRange = {
       enabled: this.state.endRange.enabled,
       value,
@@ -117,8 +148,8 @@ export class RxView extends Component {
     this.props.updateDate('end', newEndRange);
   }
 
-  toggleEnabledDate(e, range) {
-    this.setState({ [`${range}Range`]: e.target.value });
+  toggleEnabledDate(event, range) {
+    this.setState({ [`${range}Range`]: event.target.value });
     this.props.toggleEnabledDate(range);
   }
 
@@ -158,7 +189,7 @@ export class RxView extends Component {
             label="Treating"
             labelAttrs={{ className: styles['condition-select'] }}
           >
-            <Select name="condition-select" onChange={this.selectCondition}>
+            <Select name="condition-select" value={this.state.conditionCode} onChange={this.selectCondition}>
               {this.props.patient.conditionsResources.map((c) => {
                 const { code } = c.resource.code.coding[0];
                 return (
@@ -204,7 +235,7 @@ export class RxView extends Component {
               isInline
             />
             <Field label="Frequency" isInline>
-              <Select name="dosage-frequency" onChange={this.changeDosageFrequency} defaultValue={this.state.dosageFrequency}>
+              <Select name="dosage-frequency" onChange={this.changeDosageFrequency} value={this.state.dosageFrequency}>
                 <Select.Option key="daily" value="daily" display="daily" />
                 <Select.Option key="twice-daily" value="bid" display="twice daily" />
                 <Select.Option key="three-daily" value="tid" display="three times daily" />
@@ -223,6 +254,7 @@ export class RxView extends Component {
             >
               <DatePicker
                 name="start-date"
+                selectedDate={this.state.startRange.value}
                 onChange={this.selectStartDate}
               />
             </Field>
@@ -236,6 +268,7 @@ export class RxView extends Component {
             >
               <DatePicker
                 name="end-date"
+                selectedDate={this.state.endRange.value}
                 onChange={this.selectEndDate}
               />
             </Field>
