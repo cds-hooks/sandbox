@@ -40,7 +40,7 @@ function retrieveFhirMetadata(testUrl) {
         return reject();
       }).catch((err) => {
         if (err.response && err.response.status === 401) {
-          console.error('Cannot use secured FHIR endpoint on an open-launched Sandbox. See https://github.com/cds-hooks/sandbox-2.0#testing-w-secured-fhir-servers' +
+          console.error('Cannot use secured FHIR endpoint on an open-launched Sandbox. See https://github.com/cds-hooks/sandbox#testing-w-secured-fhir-servers' +
           ' for more details on testing the Sandbox against a secured FHIR endpoint.');
         } else {
           console.error('Could not connect to metadata endpoint of the FHIR server', err);

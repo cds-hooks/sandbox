@@ -2,7 +2,7 @@
 
 The CDS Hooks Sandbox (coined here as "Sandbox") is a tool that allows users to simulate the workflow of the [CDS Hooks](http://cds-hooks.org/) standard. It acts as a sort of "mock"-EHR that can be used as a demonstration tool for showing how CDS Hooks would work with an EHR system, as well as a testing tool to try out different CDS Services to ensure compatibility with the spec.
 
-Try out the live tool at [https://cds-hooks.github.io/sandbox-2.0](https://cds-hooks.github.io/sandbox-2.0)!
+Try out the live tool at [https://sandbox.cds-hooks.org](https://sandbox.cds-hooks.org)!
 
 
 ## How it Works
@@ -35,7 +35,7 @@ The tool also allows for testing against different patients and FHIR servers (se
 
 ## Testing w/ Secured FHIR Servers
 
-Currently, launching the Sandbox by simply navigating to `https://cds-hooks.github.io/sandbox-2.0` means the tool can only be tested against an open FHIR server endpoint. However, the Sandbox tool can be launched as a SMART application from an [HSPC sandbox instance](https://sandbox.hspconsortium.org), and the tool can then test against a secured FHIR server endpoint. This endpoint would be the FHIR server of the HSPC sandbox instance the CDS Hooks Sandbox is launched from. By default, an app is configured on each HSPC sandbox, which allows users to launch the Sandbox as a SMART app from their own HSPC instance and test the Sandbox against a secured FHIR endpoint. Additionally, if the Sandbox is launched against a secured HSPC FHIR endpoint, it can also launch SMART apps from Card links securely as well.
+Currently, launching the Sandbox by simply navigating to `https://sandbox.cds-hooks.org` means the tool can only be tested against an open FHIR server endpoint. However, the Sandbox tool can be launched as a SMART application from an [HSPC sandbox instance](https://sandbox.hspconsortium.org), and the tool can then test against a secured FHIR server endpoint. This endpoint would be the FHIR server of the HSPC sandbox instance the CDS Hooks Sandbox is launched from. By default, an app is configured on each HSPC sandbox, which allows users to launch the Sandbox as a SMART app from their own HSPC instance and test the Sandbox against a secured FHIR endpoint. Additionally, if the Sandbox is launched against a secured HSPC FHIR endpoint, it can also launch SMART apps from Card links securely as well.
 
 To test the Sandbox against a secured FHIR server, see steps below.
 
@@ -55,7 +55,7 @@ You can develop on and run this project locally by using the following steps bel
 
 If you don't already have it, install the [LTS version](https://nodejs.org/en/download/) of `Node.js` on your machine and then install the project and its dependencies locally via the steps below in your terminal/shell:
 ```
-git clone https://github.com/cds-hooks/sandbox-2.0.git
+git clone https://github.com/cds-hooks/sandbox.git
 cd sandbox
 npm install
 ```
@@ -95,6 +95,6 @@ We welcome any contributions to help further enhance this tool for the CDS Hooks
 1. [Fork this project](https://help.github.com/articles/fork-a-repo/) to make a copy of this repository onto your own Github profile
 1. Make necessary code changes onto your forked project and run the application locally to ensure expected behavior
 2. Lint and test the code changes to guarantee the project is maintained moving forward 
-3. Issue a pull request on the `cds-hooks/Sandbox-2.0` repository with your changes for review
+3. Issue a pull request on the `cds-hooks/sandbox` repository with your changes for review
 4. Make any changes/revisions (as necessary)
 5. The project maintainers will merge the pull request in once approved
