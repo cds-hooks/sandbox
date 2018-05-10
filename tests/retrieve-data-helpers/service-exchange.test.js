@@ -20,6 +20,7 @@ describe('Service Exchange', () => {
   let mockServiceWithPrefetchEncoded;
   let mockServiceNoEncoding;
   let mockServiceWithoutPrefetch;
+  let mockServiceWithEmptyPrefetch;
   let mockHookInstance;
   let mockRequest;
   let mockRequestWithContext;
@@ -115,6 +116,9 @@ describe('Service Exchange', () => {
               test: 'Patient/{{context.patientId}}'
             }
           },
+          [`${mockServiceWithEmptyPrefetch}`]: {
+            prefetch: {},
+          },
           [`${mockServiceWithoutPrefetch}`]: {}
         }
       }
@@ -199,6 +203,14 @@ describe('Service Exchange', () => {
       mockAxios.onPost(mockServiceWithoutPrefetch).reply(serviceResultStatus, mockServiceResult);
       return callServices(mockServiceWithoutPrefetch).then(() => {
         expect(spy).toHaveBeenCalledWith(mockServiceWithoutPrefetch, mockRequest, mockServiceResult, serviceResultStatus);
+      });
+    });
+
+    it('resolves and dispatches data from a successful CDS Service call with empty an prefetch object', () => {
+      const serviceResultStatus = 200;
+      mockAxios.onPost(mockServiceWithEmptyPrefetch).reply(serviceResultStatus, mockServiceResult);
+      return callServices(mockServiceWithEmptyPrefetch).then(() => {
+        expect(spy).toHaveBeenCalledWith(mockServiceWithEmptyPrefetch, mockRequest, mockServiceResult, serviceResultStatus);
       });
     });
 
