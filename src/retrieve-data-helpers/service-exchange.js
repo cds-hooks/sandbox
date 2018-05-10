@@ -136,7 +136,7 @@ function callServices(url, context) {
 
   const serviceDefinition = state.cdsServicesState.configuredServices[url];
 
-  if (serviceDefinition.prefetch) {
+  if (serviceDefinition.prefetch && Object.keys(serviceDefinition.prefetch).length) {
     const fulFilled = prefetchDataPromises(fhirServer, serviceDefinition.prefetch);
     return fulFilled.then((prefetch) => {
       if (prefetch && Object.keys(prefetch).length) {
