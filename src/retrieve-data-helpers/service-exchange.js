@@ -69,10 +69,7 @@ function prefetchDataPromises(baseUrl, prefetch) {
         headers,
       }).then((result) => {
         if (result.data && Object.keys(result.data).length) {
-          resultingPrefetch[prefetchKeys[i]] = {
-            response: { status: result.status },
-            resource: result.data,
-          };
+          resultingPrefetch[prefetchKeys[i]] = result.data;
         }
         if (i === prefetchKeys.length - 1) {
           resolve(resultingPrefetch);
