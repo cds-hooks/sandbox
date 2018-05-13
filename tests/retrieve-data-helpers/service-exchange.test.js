@@ -30,7 +30,7 @@ describe('Service Exchange', () => {
   let noDataMessage = 'No response returned. Check developer tools for more details.';
   let failedServiceCallMessage = 'Could not get a response from the CDS Service. See developer tools for more details';
 
-  let prefetchedData = { test: 'prefetch' };
+  let prefetchedData = 'prefetch';
   const mockServiceResult = { test: 'result' };
   const jwtMock = 'jwt-mock';
 
@@ -139,12 +139,12 @@ describe('Service Exchange', () => {
     });
     describe('and the prefetch call is successful with data', () => {
       beforeEach(() => {
-        mockRequest.prefetch = {test: {resource: prefetchedData, response: {status: 200}}};
+        mockRequest.prefetch = { test: prefetchedData };
       });
 
       it('resolves and dispatches a successful CDS Service call when prefetch is retrieved', () => {
         defaultStore.fhirServerState.accessToken = mockAccessToken;
-        mockRequestWithFhirAuthorization.prefetch = {test: {resource: prefetchedData, response: {status: 200}}};
+        mockRequestWithFhirAuthorization.prefetch = { test: prefetchedData };
         const serviceResultStatus = 200;
         mockAxios.onGet(`${mockFhirServer}/Observation?code=${encodeURIComponent('http://loinc.org|2857-1')}&patient=${mockPatient}`)
           .reply((config) => {
