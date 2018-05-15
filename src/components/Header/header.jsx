@@ -10,6 +10,8 @@ import Menu from 'terra-menu';
 import Button from 'terra-button';
 import IconLeft from 'terra-icon/lib/icon/IconLeft';
 import IconEdit from 'terra-icon/lib/icon/IconEdit';
+import pickBy from 'lodash/pickBy';
+import forIn from 'lodash/forIn';
 
 import ConfigureServices from '../ConfigureServices/configure-services';
 import ServicesEntry from '../ServicesEntry/services-entry';
@@ -19,11 +21,14 @@ import FhirServerEntry from '../FhirServerEntry/fhir-server-entry';
 import retrievePatient from '../../retrieve-data-helpers/patient-retrieval';
 import retrieveDiscoveryServices from '../../retrieve-data-helpers/discovery-services-retrieval';
 import retrieveFhirMetadata from '../../retrieve-data-helpers/fhir-metadata-retrieval';
+import callServices from '../../retrieve-data-helpers/service-exchange';
 import { setHook } from '../../actions/hook-actions';
 import { toggleDemoView } from '../../actions/card-demo-actions';
 import { resetServices } from '../../actions/cds-services-actions';
 import cdsHooksLogo from '../../assets/cds-hooks-logo.png';
 import styles from './header.css';
+
+import store from '../../store/store';
 
 export class Header extends Component {
   constructor(props) {
@@ -71,7 +76,34 @@ export class Header extends Component {
   closeSettingsMenu() { this.setState({ settingsOpen: false }); }
   openSettingsMenu() { this.setState({ settingsOpen: true }); }
 
-  switchHook(hook) { this.props.setHook(hook); }
+  switchHook(hook) {
+    const state = store.getState();
+    const filterService = service => service.hook === hook && service.enabled;
+    const services = pickBy(state.cdsServicesState.configuredServices, filterService);
+
+    // If the current view tab is being clicked, re-invoke the configured services on this hook.
+    // Otherwise, set the new hook/view.
+    if (this.props.hook === hook) {
+      if (services && Object.keys(services).length) {
+        forIn(services, (val, key) => {
+          // If the tab is clicked again, make sure the Sandbox is qualified to call out to EHR's based
+          // on current context (i.e. for the Rx View, ensure a medication has been prescribed before
+          // re-invoking the services on that hook if the Rx View tab is clicked multiple times)
+          if (hook === 'medication-prescribe') {
+            const medicationPrescribed = state.medicationState.decisions.prescribable &&
+              state.medicationState.medListPhase === 'done';
+            if (medicationPrescribed) {
+              callServices(key);
+            }
+          } else {
+            callServices(key);
+          }
+        });
+      }
+    } else {
+      this.props.setHook(hook);
+    }
+  }
 
   async resetConfiguration() {
     // Temporary removal until all persisted values are refactored into one localStorage property
@@ -206,11 +238,11 @@ export class Header extends Component {
   }
 }
 
-const mapStateToProps = store => ({
-  hook: store.hookState.currentHook,
-  patientId: store.patientState.currentPatient.id,
-  isCardDemoView: store.cardDemoState.isCardDemoView,
-  isSecuredSandbox: store.fhirServerState.accessToken,
+const mapStateToProps = appStore => ({
+  hook: appStore.hookState.currentHook,
+  patientId: appStore.patientState.currentPatient.id,
+  isCardDemoView: appStore.cardDemoState.isCardDemoView,
+  isSecuredSandbox: appStore.fhirServerState.accessToken,
 });
 
 const mapDispatchToProps = dispatch => ({

@@ -96,7 +96,7 @@ const mapStateToProps = (store) => {
   function getFirstServiceForHook(services) {
     const serviceKeys = Object.keys(services);
     if (serviceKeys.length) {
-      return services[serviceKeys[0]];
+      return serviceKeys[0];
     }
     return null;
   }
