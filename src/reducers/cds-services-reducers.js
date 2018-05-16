@@ -65,7 +65,7 @@ const cdsServicesReducers = (state = initialState, action) => {
               // http(s) protocol in the access token
               if ((accessToken && accessToken.serviceDiscoveryURL &&
                 accessToken.serviceDiscoveryURL.replace(/^https?:\/\//i, '') !== action.discoveryUrl.replace(/^https?:\/\//i, ''))
-                || !accessToken) {
+                || (accessToken && !accessToken.serviceDiscoveryURL) || !accessToken) {
                 const concatArr = newConfiguredServiceUrls.concat([action.discoveryUrl]);
                 newConfiguredServiceUrls = uniq(concatArr);
               }
