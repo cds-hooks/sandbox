@@ -20,6 +20,8 @@ describe('RxView component', () => {
   let medListPhase;
   let medications;
   let prescription;
+  let medicationInstructions;
+  let prescriptionDates;
 
   let chooseCondition, onMedicationChangeInput, chooseMedication,
   updateDosageInstructions, updateDate, toggleEnabledDate, updateFhirResource, medicationOrder;
@@ -50,7 +52,7 @@ describe('RxView component', () => {
         medications={medications} prescription={prescription} onMedicationChangeInput={onMedicationChangeInput} 
         chooseMedication={chooseMedication} chooseCondition={chooseCondition} updateDosageInstructions={updateDosageInstructions} 
         updateDate={updateDate} toggleEnabledDate={toggleEnabledDate} updateFhirResource={updateFhirResource}
-        medicationOrder={medicationOrder} />;
+        medicationOrder={medicationOrder} medicationInstructions={medicationInstructions} prescriptionDates={prescriptionDates}  />;
     renderedComponent = shallow(component, intlContexts.shallowContext);
   }
 
@@ -84,6 +86,20 @@ describe('RxView component', () => {
     prescription = {
       name: 'prescribable med',
       id: '345',
+    };
+    medicationInstructions = {
+      number: '1',
+      frequency: 'daily',
+    };
+    prescriptionDates = {
+      start: {
+        enabled: true,
+        value: '2018-05-18',
+      },
+      end: {
+        enabled: true,
+        value: '2019-05-18',
+      },
     };
     medListPhase = 'begin';
     medicationOrder = { foo: 'foo' };
@@ -119,8 +135,9 @@ describe('RxView component', () => {
 
   it('allows for selecting a condition', () => {
     setup(patient, medListPhase, medications, prescription);
-    renderedComponent.find('Field').at(0).find('Select').simulate('change', { target: { value: 'condition-123' } });
+    renderedComponent.find('Field').at(0).find('Select').simulate('change', { target: { value: 'condition-123' } }, 'condition-123');
     expect(chooseCondition).toHaveBeenCalled();
+    expect(renderedComponent.state('conditionCode')).toEqual('condition-123');
   });
 
   it('allows for choosing a medication', () => {
@@ -148,7 +165,7 @@ describe('RxView component', () => {
   it('allows for selecting date ranges', () => {
     setup(patient, medListPhase, medications, prescription);
     renderedComponent.find('.dosage-timing').find('DatePicker').at(0).simulate('change', { target: { value: '2018-04-13' } });
-    renderedComponent.find('.dosage-timing').find('Field').at(0).dive().find('Checkbox').simulate('change', { target: { checked: false } });
+    renderedComponent.find('.dosage-timing').find('Field').at(0).dive().find('Checkbox').simulate('change', { target: { value: false } });
     expect(updateDate).toHaveBeenCalled();
     expect(toggleEnabledDate).toHaveBeenCalled();
     renderedComponent.find('.dosage-timing').find('DatePicker').at(1).simulate('change', { target: { value: '2018-04-14' } });
@@ -174,6 +191,44 @@ describe('RxView component', () => {
         },
       }]);
       done();
+    });
+  });
+
+  it('updates medication order FHIR resource if a medication was chosen but the FHIR resource was not updated', () => {
+    medicationOrder = null;
+    setup(patient, medListPhase, medications, prescription);
+    expect(updateFhirResource).toHaveBeenCalled();
+  });
+
+  it('updates the form fields in the UI if incoming props for those values differ', async () => {
+    setup(patient, medListPhase, medications, prescription);
+    let newComponent = await renderedComponent.setProps({ 
+      medicationInstructions: {
+        number: 3,
+        frequency: 'bid'
+      },
+      selectedConditionCode: '123123',
+      prescriptionDates: {
+        start: {
+          value: '2018-05-20',
+          enabled: true,
+        },
+        end: {
+          value: '2018-06-01',
+          enabled: true,
+        },
+      },
+    });
+    expect(renderedComponent.state('conditionCode')).toEqual('123123');
+    expect(renderedComponent.state('dosageAmount')).toEqual(3);
+    expect(renderedComponent.state('dosageFrequency')).toEqual('bid');
+    expect(renderedComponent.state('startRange')).toEqual({
+      enabled: true,
+      value: '2018-05-20',
+    });
+    expect(renderedComponent.state('endRange')).toEqual({
+      enabled: true,
+      value: '2018-06-01',
     });
   });
 });

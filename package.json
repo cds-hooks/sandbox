@@ -94,6 +94,8 @@
     "file-loader": "^1.1.11",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^22.1.4",
+    "jest-environment-jsdom": "^22.4.3",
+    "jest-environment-jsdom-global": "^1.0.3",
     "node-sass": "^4.7.2",
     "postcss-custom-properties": "^7.0.0",
     "postcss-loader": "^2.1.1",
@@ -120,6 +122,7 @@
     "coveragePathIgnorePatterns": [
       "/jest-setup.js",
       "/store.js"
-    ]
+    ],
+    "testEnvironment": "jest-environment-jsdom-global"
   }
 }
