@@ -69,7 +69,7 @@ describe('ServiceContextView component', () => {
   it('matches props passed down from Redux decorator', () => {
     const serviceKeys = Object.keys(filteredServices);
     expect(pureComponent.prop('services')).toEqual(filteredServices);
-    expect(pureComponent.prop('initialService')).toEqual(filteredServices[serviceKeys[0]]);
+    expect(pureComponent.prop('initialService')).toEqual(serviceKeys[0]);
     expect(pureComponent.prop('isContextVisible')).toEqual(storeState.hookState.isContextVisible);
     expect(pureComponent.prop('selectedService')).toEqual(storeState.serviceExchangeState.selectedService);
     expect(pureComponent.prop('exchanges')).toEqual(storeState.serviceExchangeState.exchanges);
@@ -123,7 +123,7 @@ describe('ServiceContextView component', () => {
     });
 
     it('ensures the panel text contains an appropriate message if service exchange has not been stored', () => {
-      storeState.serviceExchangeState.selectedService = '';
+      storeState.serviceExchangeState.selectedService = 'http://xyz-123.com/cds-services/id-1';
       mockStore = mockStoreWrapper(storeState);
       let component = <ConnectedView store={mockStore}/>;
       wrapper = mount(component);

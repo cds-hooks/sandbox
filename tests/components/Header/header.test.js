@@ -1,7 +1,3 @@
-jest.mock('../../../src/retrieve-data-helpers/discovery-services-retrieval', () => {return jest.fn();});
-jest.mock('../../../src/retrieve-data-helpers/fhir-metadata-retrieval', () => {return jest.fn();});
-jest.mock('../../../src/retrieve-data-helpers/patient-retrieval', () => {return jest.fn();});
-
 import React from 'react';
 import { shallow, mount } from 'enzyme';
 import { Provider } from 'react-redux';
@@ -10,7 +6,6 @@ import configureStore from 'redux-mock-store';
 import * as types from '../../../src/actions/action-types';
 
 import { setHook } from '../../../src/actions/hook-actions';
-import ConnectedView, { Header } from '../../../src/components/Header/header';
 
 describe('Header component', () => {
   let storeState;
@@ -21,7 +16,31 @@ describe('Header component', () => {
   let mockStore;
   let mockStoreWrapper = configureStore([]);
 
+  let mockPatientService;
+  let mockMedService;
+  let mockExchange;
+
+  let ConnectedView;
+
+  function setup(store) {
+    mockStore = mockStoreWrapper(storeState);
+    mockExchange = jest.fn();
+    jest.setMock('../../../src/retrieve-data-helpers/discovery-services-retrieval', () => {return jest.fn();});
+    jest.setMock('../../../src/retrieve-data-helpers/fhir-metadata-retrieval', () => {return jest.fn();});
+    jest.setMock('../../../src/retrieve-data-helpers/patient-retrieval', () => {return jest.fn();});
+    jest.setMock('../../../src/retrieve-data-helpers/service-exchange', mockExchange);
+    jest.setMock('../../../src/store/store', mockStore);
+    ConnectedView = require('../../../src/components/Header/header').default;
+    let component = <ConnectedView store={mockStore} />;
+    wrapper = shallow(component);
+    mountedWrapper = mount(component);
+    pureComponent = wrapper.find('Header');
+    shallowedComponent = pureComponent.shallow();
+  }
+
   beforeEach(() => {
+    mockPatientService = 'http://example.com/cds-services/id-1';
+    mockMedService = 'http://example-med.com/cds-services/id-1';
     storeState = { 
       hookState: { currentHook: 'patient-view' },
       patientState: { currentPatient: { id: 'patient-123' } },
@@ -31,35 +50,77 @@ describe('Header component', () => {
       fhirServerState: {
         accessToken: null,
       },
+      cdsServicesState: {
+        configuredServices: {
+          [`${mockPatientService}`]: {
+            hook: 'patient-view',
+            enabled: true,
+          },
+          [`${mockMedService}`]: {
+            hook: 'medication-prescribe',
+            enabled: true,
+          },
+        },
+      },
+      medicationState: {
+        decisions: {
+          prescribable: null,
+        },
+        medListPhase: 'begin',
+      }
     };
-    mockStore = mockStoreWrapper(storeState);
-    let component = <ConnectedView store={mockStore} />;
-    wrapper = shallow(component);
-    mountedWrapper = mount(component);
-    pureComponent = wrapper.find(Header);
-    shallowedComponent = pureComponent.shallow();
+  });
+
+  afterEach(() => {
+    mockStore.clearActions();
+    jest.resetModules();
   });
 
   it('matches props passed down from Redux decorator', () => {
+    setup(storeState);
     expect(pureComponent.prop('hook')).toEqual(storeState.hookState.currentHook);
     expect(pureComponent.prop('setHook')).toBeDefined();
   });
 
-  it('should only contain active links on the current hook/view', () => {
-    expect(shallowedComponent.childAt(0).dive().find('.active-link').text()).toEqual('Patient View');
-    expect(shallowedComponent.childAt(0).dive().find('.nav-links').not('.active-link').text()).toEqual('Rx View');
-  });
+  describe('View tabs', () => {
+    it('should only contain active links on the current hook/view', () => {
+      setup(storeState);
+      expect(shallowedComponent.childAt(0).dive().find('.active-link').text()).toEqual('Patient View');
+      expect(shallowedComponent.childAt(0).dive().find('.nav-links').not('.active-link').text()).toEqual('Rx View');
+    });
 
-  it('dispatches to switch hooks in app state if another view tab is clicked', () => {
-    shallowedComponent.childAt(0).dive().find('.nav-links').not('.active-link').simulate('click');
-    const medHookAction = { type: types.SET_HOOK, hook: 'medication-prescribe' };
-    expect(mockStore.getActions()).toEqual([medHookAction]);
-    shallowedComponent.childAt(0).dive().find('.active-link').simulate('click');
-    const patientHookAction = { type: types.SET_HOOK, hook: 'patient-view' };
-    expect(mockStore.getActions()).toEqual([medHookAction, patientHookAction]);
+    it('dispatches to switch hooks in app state if another view tab is clicked', () => {
+      setup(storeState);
+      shallowedComponent.childAt(0).dive().find('.nav-links').not('.active-link').simulate('click');
+      const medHookAction = { type: types.SET_HOOK, hook: 'medication-prescribe' };
+      expect(mockStore.getActions()).toEqual([medHookAction]);
+    });
+  
+    it('calls services if current hook is being invoked again on patient-view', () => {
+      setup(storeState);
+      shallowedComponent.childAt(0).dive().find('.active-link').simulate('click');
+      expect(mockExchange).toHaveBeenCalledWith(mockPatientService);
+    });
+  
+    it('does not call services on medication-prescribe if no medication is chosen yet', () => {
+      storeState.hookState.currentHook = 'medication-prescribe';
+      setup(storeState);
+      shallowedComponent.childAt(0).dive().find('.active-link').simulate('click');
+      expect(mockExchange).not.toHaveBeenCalled();
+    });
+
+    it('does call services on medication-prescribe if a medication has been chosen', () => {
+      storeState.hookState.currentHook = 'medication-prescribe';
+      storeState.medicationState.decisions.prescribable = 'foo-medicine';
+      storeState.medicationState.medListPhase = 'done';
+      setup(storeState);
+      shallowedComponent.childAt(0).dive().find('.active-link').simulate('click');
+      expect(mockExchange).toHaveBeenCalledWith(mockMedService);
+    });
   });
 
   it('should set open status for settings menu accordingly', async () => {
+    setup(storeState);
     expect(shallowedComponent.state('settingsOpen')).toBeFalsy();
     shallowedComponent.childAt(0).dive().find('.icon').first().simulate('click');
     expect(shallowedComponent.state('settingsOpen')).toBeTruthy();
@@ -68,11 +129,13 @@ describe('Header component', () => {
   });
 
   it('should display option to change FHIR server if no access token is configured for the application', () => {
+    setup(storeState);
     shallowedComponent.childAt(0).dive().find('.icon').first().simulate('click');
     expect(shallowedComponent.find('Menu').find('.change-fhir-server').key()).toEqual('change-fhir-server');
   });
 
   it('should not display option to change FHIR server if an access token is configured for the application', () => {
+    setup(storeState);
     storeState = Object.assign({}, storeState, {
       ...storeState,
       fhirServerState: {
@@ -83,7 +146,7 @@ describe('Header component', () => {
     });
     mockStore = mockStoreWrapper(storeState);
     let component = <ConnectedView store={mockStore} />;
-    shallowedComponent = shallow(component).find(Header).shallow();
+    shallowedComponent = shallow(component).find('Header').shallow();
 
     shallowedComponent.childAt(0).dive().find('.icon').first().simulate('click');
     expect(shallowedComponent.find('Menu').find('.change-fhir-server').length).toEqual(0);
@@ -91,6 +154,7 @@ describe('Header component', () => {
 
   describe('Change Patient', () => {
     beforeEach(() => {
+      setup(storeState);
       shallowedComponent.childAt(0).dive().find('.icon').first().simulate('click');
     });
 
@@ -104,6 +168,7 @@ describe('Header component', () => {
 
   describe('Change FHIR Server', () => {
     beforeEach(() => {
+      setup(storeState);
       shallowedComponent.childAt(0).dive().find('.icon').first().simulate('click');
     });
 
@@ -117,6 +182,7 @@ describe('Header component', () => {
 
   describe('Add Services', () => {
     beforeEach(() => {
+      setup(storeState);
       shallowedComponent.childAt(0).dive().find('.icon').first().simulate('click');
     });
 
@@ -130,6 +196,7 @@ describe('Header component', () => {
 
   describe('Configure CDS Services', () => {
     beforeEach(() => {
+      setup(storeState);
       shallowedComponent.childAt(0).dive().find('.icon').first().simulate('click');
     });
 
@@ -143,6 +210,7 @@ describe('Header component', () => {
 
   describe('Reset Configuration', () => {
     beforeEach(() => {
+      setup(storeState);
       shallowedComponent.childAt(0).dive().find('.icon').first().simulate('click');
     });
 
