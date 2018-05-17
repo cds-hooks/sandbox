@@ -11,7 +11,7 @@ import ErrorView from 'terra-clinical-error-view';
 
 import { storeCardDemoJson } from '../../actions/card-demo-actions';
 import styles from './card-demo.css';
-import { Card } from '../Card/card';
+import { CardList } from '../CardList/card-list';
 
 export class CardDemo extends Component {
   constructor(props) {
@@ -139,7 +139,7 @@ export class CardDemo extends Component {
     };
 
     const cardDisplay = (!this.state.displayJSONError && this.props.tempUserJson) ?
-      (<Card
+      (<CardList
         isDemoCard
         cardResponses={constructedCardFormat}
       />) : null;

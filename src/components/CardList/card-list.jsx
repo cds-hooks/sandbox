@@ -9,7 +9,7 @@ import TerraCard from 'terra-card';
 import Text from 'terra-text';
 import Button from 'terra-button';
 
-import styles from './card.css';
+import styles from './card-list.css';
 import retrieveLaunchContext from '../../retrieve-data-helpers/launch-context-retrieval';
 import { getServicesByHook, getCardsFromServices } from '../../reducers/helpers/services-filter';
 import { takeSuggestion } from '../../actions/medication-select-actions';
@@ -18,7 +18,7 @@ const propTypes = {
   isDemoCard: PropTypes.bool,
 };
 
-export class Card extends Component {
+export class CardList extends Component {
   constructor(props) {
     super(props);
     this.launchLink = this.launchLink.bind(this);
@@ -214,7 +214,7 @@ export class Card extends Component {
   }
 }
 
-Card.propTypes = propTypes;
+CardList.propTypes = propTypes;
 
 const mapStateToProps = store => ({
   cardResponses: getCardsFromServices(Object.keys(getServicesByHook(store.hookState.currentHook, store.cdsServicesState.configuredServices))),
@@ -229,4 +229,4 @@ const mapDispatchToProps = dispatch => ({
   },
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Card);
+export default connect(mapStateToProps, mapDispatchToProps)(CardList);
