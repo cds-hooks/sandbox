@@ -16,7 +16,7 @@ import List from 'terra-list';
 
 import debounce from 'debounce';
 
-import Card from '../Card/card';
+import CardList from '../CardList/card-list';
 import styles from './rx-view.css';
 import callServices from '../../retrieve-data-helpers/service-exchange';
 import { storeUserMedInput, storeUserChosenMedication,
@@ -274,7 +274,7 @@ export class RxView extends Component {
             </Field>
           </div>
         </form>
-        {Object.keys(this.props.services).length ? <Card /> : ''}
+        {Object.keys(this.props.services).length ? <CardList /> : ''}
       </div>
     );
   }

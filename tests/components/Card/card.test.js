@@ -9,7 +9,7 @@ describe('Card component', () => {
   let mockAxios;
   let axios;
 
-  let Card;
+  let CardList;
   let shallowedComponent;
   let mockSpy;
 
@@ -28,12 +28,12 @@ describe('Card component', () => {
 
   function setup(state) {
     jest.setMock('../../../src/retrieve-data-helpers/launch-context-retrieval', mockSpy);
-    Card = require('../../../src/components/Card/card')['Card'];
-    let component = <Card fhirServerUrl={fhirBaseUrl} 
-                          fhirAccessToken={accessToken} 
-                          patientId={patientId} 
-                          cardResponses={cardResponses}
-                          takeSuggestion={takeSuggestion} />;
+    CardList = require('../../../src/components/CardList/card-list')['CardList'];
+    let component = <CardList fhirServerUrl={fhirBaseUrl} 
+                              fhirAccessToken={accessToken} 
+                              patientId={patientId} 
+                              cardResponses={cardResponses}
+                              takeSuggestion={takeSuggestion} />;
     shallowedComponent = shallow(component);
   }
 
