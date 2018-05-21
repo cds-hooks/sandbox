@@ -7,7 +7,8 @@ describe('Patient Reducers', () => {
   beforeEach(() => {
     state = {
       defaultPatientId: 'SMART-1288992',
-      defaultUserId: 'Practitioner/COREPRACTITIONER1',
+      defaultUser: 'Practitioner/COREPRACTITIONER1',
+      currentUser: '',
       currentPatient: {
         id: 'SMART-1288992',
         name: 'Daniel X. Adams',
@@ -82,6 +83,38 @@ describe('Patient Reducers', () => {
       });
 
       expect(reducer(state, action)).toEqual(newState);
+    });
+  });
+
+  describe('SMART_AUTH_SUCCESS', () => {
+    it('updates the current user if a user is supplied in the SMART auth response', () => {
+      const authResponseMock = {
+        userId: 'Practitioner/some-user',
+      };
+      const metadataMock = { fhirVersion: '1.0.2' };
+      const action = {
+        type: types.SMART_AUTH_SUCCESS,
+        authResponse: authResponseMock,
+        metadata: metadataMock,
+      };
+
+      const newState = Object.assign({}, state, {
+        currentUser: authResponseMock.userId,
+      });
+
+      expect(reducer(state, action)).toEqual(newState);
+    });
+
+    it('returns state if a user is not supplied in the SMART auth response', () => {
+      const authResponseMock = {};
+      const metadataMock = { fhirVersion: '1.0.2' };
+      const action = {
+        type: types.SMART_AUTH_SUCCESS,
+        authResponse: authResponseMock,
+        metadata: metadataMock,
+      };
+
+      expect(reducer(state, action)).toEqual(state);
     });
   });
 

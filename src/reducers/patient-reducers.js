@@ -2,7 +2,8 @@ import * as types from '../actions/action-types';
 
 const initialState = {
   defaultPatientId: 'SMART-1288992',
-  defaultUserId: 'Practitioner/COREPRACTITIONER1',
+  defaultUser: 'Practitioner/COREPRACTITIONER1',
+  currentUser: '',
   currentPatient: {
     id: 'SMART-1288992',
     name: 'Daniel X. Adams',
@@ -53,6 +54,15 @@ const patientReducers = (state = initialState, action) => {
         newPatient.conditionsResources = filteredEntries;
         return Object.assign({}, state, { currentPatient: newPatient });
       }
+
+      case types.SMART_AUTH_SUCCESS: {
+        const { authResponse } = action;
+        if (authResponse && authResponse.userId) {
+          return Object.assign({}, state, { currentUser: authResponse.userId });
+        }
+        return state;
+      }
+
       default: {
         return state;
       }

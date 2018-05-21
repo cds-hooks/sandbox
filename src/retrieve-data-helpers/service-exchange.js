@@ -34,7 +34,7 @@ function encodeUriParameters(template) {
 function completePrefetchTemplate(prefetch) {
   const state = store.getState();
   const patient = state.patientState.currentPatient.id;
-  const user = state.patientState.defaultUserId;
+  const user = state.patientState.currentUser || state.patientState.defaultUser;
   const prefetchRequests = Object.assign({}, prefetch);
   Object.keys(prefetchRequests).forEach((prefetchKey) => {
     let prefetchTemplate = prefetchRequests[prefetchKey];
@@ -95,7 +95,7 @@ function callServices(url, context) {
   const state = store.getState();
   const hook = state.hookState.currentHook;
   const fhirServer = state.fhirServerState.currentFhirServer;
-  const user = state.patientState.defaultUserId;
+  const user = state.patientState.currentUser || state.patientState.defaultUser;
 
   const patient = state.patientState.currentPatient.id;
   const activityContext = {};

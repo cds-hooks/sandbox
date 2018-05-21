@@ -64,7 +64,7 @@ describe('Service Exchange', () => {
       hookInstance: mockHookInstance,
       hook: 'patient-view',
       fhirServer: mockFhirServer,
-      user: 'Practitioner/example',
+      user: 'Practitioner/specified-1',
       patient: mockPatient,
       context: { patientId: mockPatient }
     };
@@ -89,7 +89,8 @@ describe('Service Exchange', () => {
     defaultStore = {
       hookState: { currentHook: 'patient-view' },
       patientState: {
-        defaultUserId: 'Practitioner/example',
+        defaultUser: 'Practitioner/default',
+        currentUser: 'Practitioner/specified-1',
         currentPatient: {
           id: mockPatient
         }
@@ -199,6 +200,16 @@ describe('Service Exchange', () => {
     });
 
     it('resolves and dispatches data from a successful CDS service call', () => {
+      const serviceResultStatus = 200;
+      mockAxios.onPost(mockServiceWithoutPrefetch).reply(serviceResultStatus, mockServiceResult);
+      return callServices(mockServiceWithoutPrefetch).then(() => {
+        expect(spy).toHaveBeenCalledWith(mockServiceWithoutPrefetch, mockRequest, mockServiceResult, serviceResultStatus);
+      });
+    });
+
+    it('resolves and dispatches data from a successful CDS Service call with default user', () => {
+      defaultStore.patientState.currentUser = '';
+      mockRequest.user = 'Practitioner/default';
       const serviceResultStatus = 200;
       mockAxios.onPost(mockServiceWithoutPrefetch).reply(serviceResultStatus, mockServiceResult);
       return callServices(mockServiceWithoutPrefetch).then(() => {
