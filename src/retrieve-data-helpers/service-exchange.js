@@ -61,24 +61,32 @@ function prefetchDataPromises(baseUrl, prefetch) {
     if (accessTokenProperty && accessTokenProperty.access_token) {
       headers.Authorization = `Bearer ${accessTokenProperty.access_token}`;
     }
+    // Keep count of resolved promises and invoke final resolve when we have them all. NOTE: This can also be
+    // implemented with Promise.all(), but since we wan't to swallow errors, using Promise.all() ends up being
+    // more complicated.
+    let numDone = 0;
+    const resolveWhenDone = () => {
+      numDone += 1;
+      if (numDone === prefetchKeys.length) {
+        resolve(resultingPrefetch);
+      }
+    };
     for (let i = 0; i < prefetchKeys.length; i += 1) {
-      const prefetchValue = prefetchRequests[prefetchKeys[i]];
+      const key = prefetchKeys[i];
+      const prefetchValue = prefetchRequests[key];
       axios({
         method: 'get',
         url: `${baseUrl}/${prefetchValue}`,
         headers,
       }).then((result) => {
         if (result.data && Object.keys(result.data).length) {
-          resultingPrefetch[prefetchKeys[i]] = result.data;
+          resultingPrefetch[key] = result.data;
         }
-        if (i === prefetchKeys.length - 1) {
-          resolve(resultingPrefetch);
-        }
+        resolveWhenDone();
       }).catch((err) => {
-        if (i === prefetchKeys.length - 1) {
-          resolve(resultingPrefetch);
-        }
+        // Since prefetch is best-effort, don't throw; just log it and continue
         console.log(`Unable to prefetch data for ${baseUrl}/${prefetchValue}`, err);
+        resolveWhenDone();
       });
     }
   });
