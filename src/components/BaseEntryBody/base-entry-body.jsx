@@ -1,10 +1,52 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Text from 'terra-text';
 import Field from 'terra-form-field';
 import Input from 'terra-form-input';
 
 import styles from './base-entry-body.css';
 
+const propTypes = {
+  /**
+   * If the modal needs to present the current FHIR server at the top, pass this prop in
+   */
+  currentFhirServer: PropTypes.string,
+  /**
+   * The field label for the Field component (i.e. "Change Patient")
+   */
+  formFieldLabel: PropTypes.string.isRequired,
+  /**
+   * A boolean flag to display an error if needed on the Field component
+   */
+  shouldDisplayError: PropTypes.bool.isRequired,
+  /**
+   * If a error needs to be displayed in the Field component, accompany it with a message
+   */
+  errorMessage: PropTypes.string,
+  /**
+   * If the Input component needs placeholder text (usually to help the user with example values), pass this prop in
+   */
+  placeholderText: PropTypes.string,
+  /**
+   * If the value in the Input component changes (i.e user adds text), pass in a function callback to handle the text
+   */
+  inputOnChange: PropTypes.func.isRequired,
+  /**
+   * The name attribute for the Input component
+   */
+  inputName: PropTypes.string,
+};
+
+/**
+ * BaseEntryBody (functional component) serves as the base UI inside modal interactions like "Change FHIR Server" or "Change Patient".
+ * It contains a Field for displaying any field text for an associated input (i.e. "Enter a Patient ID), and an Input for
+ * allowing users to input text below its associated Field. Additionally, if relevant, the modal may present Text at the top which
+ * displays the current FHIR server in context (useful for "Change Patient" and "Change FHIR Server" modals).
+ *
+ * How to use: Use this component if a modal needs to have some base UI for allowing a user to input text in an Input field, given some
+ * Field text (i.e. "Enter a FHIR Server URL")
+ *
+ */
 const BaseEntryBody = ({
   currentFhirServer, formFieldLabel, shouldDisplayError,
   errorMessage, placeholderText, inputOnChange, inputName,
@@ -40,5 +82,7 @@ const BaseEntryBody = ({
     </div>
   );
 };
+
+BaseEntryBody.propTypes = propTypes;
 
 export default BaseEntryBody;

@@ -30,6 +30,7 @@ const serviceExchangeReducers = (state = initialState, action) => {
         break;
       }
 
+      // Remove any CDS Service exchanges from the store
       case types.RESET_SERVICES: {
         return Object.assign({}, state, {
           selectedService: '',
@@ -37,12 +38,14 @@ const serviceExchangeReducers = (state = initialState, action) => {
         });
       }
 
+      // If the selected service in the CDS developer panel is toggled under the Configure CDS Services modal, then clear that selected service
       case types.TOGGLE_SERVICE: {
         return Object.assign({}, state, {
           selectedService: state.selectedService === action.service ? '' : state.selectedService,
         });
       }
 
+      // Delete any CDS service exchanges if a service is deleted from the Configure CDS Services modal
       case types.DELETE_SERVICE: {
         if (state.exchanges[action.service]) {
           const exchangesCopy = JSON.parse(JSON.stringify(state.exchanges));

@@ -4,8 +4,9 @@ import store from '../store/store';
 import { signalSuccessPatientRetrieval, signalFailurePatientRetrieval } from '../actions/patient-actions';
 
 /**
- * Retrieve Patient resource from the FHIR server in context with the patient id stored in Redux store or access token
- * and dispatch successful or failed connection to the endpoint on the FHIR server.
+ * Retrieve Patient resource from the FHIR server in context with the patient id retrieved from the Redux store or access token (if applicable)
+ * and dispatch successful or failed connection to the endpoint on the FHIR server. Additionally, grab Conditions data too, since a list of conditions
+ * need to be displayed under the Rx View (medication-prescribe workflow).
  * @returns {Promise} - Promise to resolve elsewhere
  */
 function retrievePatient(testPatient) {
@@ -18,7 +19,7 @@ function retrievePatient(testPatient) {
     };
 
     // Grab patient ID from access token (if Sandbox launched securely)
-    // Otherwise grab patient ID from query parameters OR default patient ID in store
+    // Otherwise grab patient ID from query parameters, or localStorage cache, or default patient ID in store
     if (accessToken) {
       if (!patient) {
         ({ patient } = accessToken);

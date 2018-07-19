@@ -11,6 +11,10 @@ import store from '../store/store';
 function retrieveFhirMetadata(testUrl) {
   return new Promise((resolve, reject) => {
     let testFhirServer = testUrl;
+    // First, check if a passed in "testUrl" FHIR server is to be checked and set that as the current FHIR server
+    // Second, check if a FHIR server URL is located in the user's browser URL as a query string parameter
+    // Third, check if a FHIR server URL is located within localStorage (cached)
+    // Lastly, use the default FHIR server URL and set that as the current FHIR server
     if (!testFhirServer) {
       const parsed = queryString.parse(window.location.search);
       testFhirServer = parsed.fhirServiceUrl ||

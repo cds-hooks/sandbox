@@ -1,4 +1,7 @@
+/* eslint-disable react/forbid-prop-types */
+
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import cx from 'classnames';
 import forIn from 'lodash/forIn';
@@ -12,6 +15,43 @@ import { selectService } from '../../actions/service-exchange-actions';
 import { setContextVisibility } from '../../actions/ui-actions';
 import { getServicesByHook } from '../../reducers/helpers/services-filter';
 
+const propTypes = {
+  /**
+   * Callback function that sets the user-selected CDS service from the dropdown of available services to display
+   * a request and response for
+   */
+  selectService: PropTypes.func.isRequired,
+  /**
+   * Function to toggle the context view visibility (hide/show button)
+   */
+  toggleContext: PropTypes.func.isRequired,
+  /**
+   * Hash of available CDS services configured in the Sandbox
+   */
+  services: PropTypes.object,
+  /**
+   * User-selected CDS service to display a request/response for in the context view
+   */
+  selectedService: PropTypes.string,
+  /**
+   * Default CDS service to display a request/response for in the context view
+   */
+  initialService: PropTypes.string,
+  /**
+   * Hash containing the service exchanges per service (request and response)
+   */
+  exchanges: PropTypes.object,
+  /**
+   * Flag to determine if the context view will be visible or not (via the slide out button)
+   */
+  isContextVisible: PropTypes.bool.isRequired,
+};
+
+/**
+ * The right hand side of the Sandbox that displays the CDS Developer Panel. It encompasses
+ * ExchangePanel components that display the request/response. This view may be toggled by the user
+ * to hide/show this view.
+ */
 export class ContextView extends Component {
   constructor(props) {
     super(props);
@@ -91,6 +131,8 @@ export class ContextView extends Component {
     );
   }
 }
+
+ContextView.propTypes = propTypes;
 
 const mapStateToProps = (store) => {
   function getFirstServiceForHook(services) {

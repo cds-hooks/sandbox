@@ -4,6 +4,13 @@ import { productionClientId } from '../config/fhir-config';
 const JWT = require('jsrsasign');
 const uuid = require('uuid/v4');
 
+/**
+ * Generates a JWT for a CDS service call, given the audience (the URL endpoint). The JWT is signed using a private key stored on the repository.
+ *
+ * Note: In production environments, the JWT should be signed on a secured server for best practice. The private key is exposed on the repository
+ * as it is an open source client-side project and tool.
+ * @param {*} audience - URL endpoint acting as the audience
+ */
 function generateJWT(audience) {
   const jwtPayload = JSON.stringify({
     iss: 'https://sandbox.cds-hooks.org',

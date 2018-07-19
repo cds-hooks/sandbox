@@ -107,6 +107,10 @@ npm run test
 
 Note: This command will be run on each pull request to this repository, and any added code MUST pass at least the existing tests before being merged in.
 
+## Project Flow
+
+For more details on how this project is structured, and how to effectively make changes, [see these wiki pages](https://github.com/cds-hooks/sandbox/wiki).
+
 ## Contributing
 
 We welcome any contributions to help further enhance this tool for the CDS Hooks community! To contribute to this project, please see instructions above for running the application locally and testing the app to make sure the tool works as expected with your incorporated changes. Follow the steps below to get started.

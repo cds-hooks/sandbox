@@ -1,4 +1,7 @@
+/* eslint-disable react/forbid-prop-types */
+
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import cx from 'classnames';
 import pickBy from 'lodash/pickBy';
@@ -9,6 +12,28 @@ import CardList from '../CardList/card-list';
 import styles from './patient-view.css';
 import callServices from '../../retrieve-data-helpers/service-exchange';
 
+const propTypes = {
+  /**
+   * The Patient resource in context
+   */
+  patient: PropTypes.object,
+  /**
+   * The URL of the FHIR server in context
+   */
+  fhirServer: PropTypes.string,
+  /**
+   * A hash of the CDS services and their definitions
+   */
+  services: PropTypes.object,
+  /**
+   * Flag to determine if the CDS Developer Panel is displayed or not
+   */
+  isContextVisible: PropTypes.bool.isRequired,
+};
+
+/**
+ * Left-hand side on the mock-EHR view that displays the cards and relevant UI for the patient-view hook
+ */
 export class PatientView extends Component {
   constructor(props) {
     super(props);
@@ -56,6 +81,8 @@ export class PatientView extends Component {
     );
   }
 }
+
+PatientView.propTypes = propTypes;
 
 const mapStateToProps = (store) => {
   function isValidService(service) {

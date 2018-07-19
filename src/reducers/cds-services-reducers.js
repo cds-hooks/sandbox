@@ -3,6 +3,9 @@ import uniq from 'lodash/uniq';
 import * as types from '../actions/action-types';
 import store from '../store/store';
 
+/**
+ * Return a list of persisted CDS services from localStorage cache
+ */
 const getPersistedServices = () => {
   const persistedServices = localStorage.getItem('PERSISTED_cdsServices');
   if (persistedServices) {
@@ -81,6 +84,7 @@ const cdsServicesReducers = (state = initialState, action) => {
         break;
       }
 
+      // Reset list of CDS services to default services, and remove any added services from the cache
       case types.RESET_SERVICES: {
         localStorage.removeItem('PERSISTED_cdsServices');
         return Object.assign({}, state, {
@@ -90,6 +94,7 @@ const cdsServicesReducers = (state = initialState, action) => {
         });
       }
 
+      // When configuring services on the Sandbox, toggle the availability to invoke the service
       case types.TOGGLE_SERVICE: {
         if (state.configuredServices[action.service]) {
           const servicesCopy = JSON.parse(JSON.stringify(state.configuredServices));
@@ -101,6 +106,7 @@ const cdsServicesReducers = (state = initialState, action) => {
         return state;
       }
 
+      // When configuring services on the Sandbox, delete a specified CDS service that has been configured already
       case types.DELETE_SERVICE: {
         if (state.configuredServices[action.service]) {
           const servicesCopy = JSON.parse(JSON.stringify(state.configuredServices));

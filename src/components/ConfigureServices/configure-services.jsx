@@ -1,3 +1,5 @@
+/* eslint-disable react/forbid-prop-types */
+
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -12,8 +14,18 @@ import styles from './configure-services.css';
 import ServiceDisplay from './ServiceDisplay/service-display';
 
 const propTypes = {
+  /**
+   * Callback function to close the modal prompt
+   */
   closePrompt: PropTypes.func,
+  /**
+   * Flag to see if the modal is open or not initially
+   */
   isOpen: PropTypes.bool,
+  /**
+   * Services configured on the Sandbox
+   */
+  services: PropTypes.object,
 };
 
 export class ConfigureServices extends Component {

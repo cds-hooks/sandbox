@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import cx from 'classnames';
 
 import Card from 'terra-card';
@@ -9,7 +10,28 @@ import IconChevronDown from 'terra-icon/lib/icon/IconChevronDown';
 
 import styles from './exchange-panel.css';
 
-export default class ExchangePanel extends Component {
+const propTypes = {
+  /**
+   * Flag to determine if the exchange panel is collapsed or expanded
+   */
+  isExpanded: PropTypes.bool.isRequired,
+  /**
+   * Text to display in the exchange panel body (i.e. JSON-stringified request or response from CDS service)
+   */
+  panelText: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.object,
+  ]),
+  /**
+   * Text to display in the exchange panel header
+   */
+  panelHeader: PropTypes.string.isRequired,
+};
+
+/**
+ * Component representing a single CDS Developer panel
+ */
+class ExchangePanel extends Component {
   constructor(props) {
     super(props);
 
@@ -20,6 +42,9 @@ export default class ExchangePanel extends Component {
     this.toggleExpansion = this.toggleExpansion.bind(this);
   }
 
+  /**
+   * Toggles the body display of a single context view panel (i.e. shows/hides the request panel)
+   */
   toggleExpansion() {
     this.setState({ isExpanded: !this.state.isExpanded });
   }
@@ -57,3 +82,7 @@ export default class ExchangePanel extends Component {
     );
   }
 }
+
+ExchangePanel.propTypes = propTypes;
+
+export default ExchangePanel;

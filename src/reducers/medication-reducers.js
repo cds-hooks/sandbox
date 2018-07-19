@@ -44,9 +44,13 @@ const createFhirResource = (fhirVersion, patientId, state) => {
   };
   if (state.decisions.prescribable && state.medListPhase === 'done') {
     const freqs = {
+      // Daily
       daily: 1,
+      // Bi-Daily
       bid: 2,
+      // Three times daily
       tid: 3,
+      // Four times daily
       qid: 4,
     };
 
@@ -242,6 +246,7 @@ const getMedicationPrescribableList = input => (
 const medicationReducers = (state = initialState, action) => {
   if (action.type) {
     switch (action.type) {
+      // Store users input for a medication in store
       case types.STORE_USER_MED_INPUT: {
         return Object.assign({}, state, {
           medListPhase: 'ingredient',
@@ -259,6 +264,7 @@ const medicationReducers = (state = initialState, action) => {
         });
       }
 
+      // Store the medication choice the user settled on in Rx View
       case types.STORE_USER_CHOSEN_MEDICATION: {
         if (state.medListPhase === 'ingredient') {
           return Object.assign({}, state, {
@@ -297,18 +303,21 @@ const medicationReducers = (state = initialState, action) => {
         return state;
       }
 
+      // Update the FHIR medication order resource being built for the medications property in the context field of a CDS service request
       case types.UPDATE_FHIR_MEDICATION_ORDER: {
         return Object.assign({}, state, {
           fhirResource: createFhirResource(action.fhirVersion, action.patientId, state),
         });
       }
 
+      // Stores the user-chosen condition from the list of conditions for the current patient
       case types.STORE_USER_CONDITION: {
         return Object.assign({}, state, {
           selectedConditionCode: action.condition,
         });
       }
 
+      // Stores the user-defined dosage amount and frequency
       case types.STORE_MED_DOSAGE_AMOUNT: {
         return Object.assign({}, state, {
           medicationInstructions: {
@@ -318,6 +327,7 @@ const medicationReducers = (state = initialState, action) => {
         });
       }
 
+      // Stores the user-defined dates for the prescription (start and end)
       case types.STORE_DATE: {
         return Object.assign({}, state, {
           prescriptionDates: {
@@ -330,6 +340,7 @@ const medicationReducers = (state = initialState, action) => {
         });
       }
 
+      // Toggles the date feature (start and/or end) for the prescription
       case types.TOGGLE_DATE: {
         return Object.assign({}, state, {
           prescriptionDates: {
@@ -342,6 +353,7 @@ const medicationReducers = (state = initialState, action) => {
         });
       }
 
+      // Updates the dynamically built FHIR Medication Order resource with a suggestion the user takes from a response card
       case types.TAKE_SUGGESTION: {
         if (action.suggestion && action.suggestion.actions) {
           const { actions } = action.suggestion;

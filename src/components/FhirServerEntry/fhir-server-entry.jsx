@@ -13,21 +13,61 @@ import BaseEntryBody from '../BaseEntryBody/base-entry-body';
 import retrieveFhirMetadata from '../../retrieve-data-helpers/fhir-metadata-retrieval';
 
 const propTypes = {
+  /**
+   * The FHIR server URL in context
+   */
   currentFhirServer: PropTypes.string.isRequired,
+  /**
+   * The FHIR server URL for default cases
+   */
   defaultFhirServer: PropTypes.string.isRequired,
+  /**
+   * Flag to determine if user input is required to input a FHIR server. This is set to true if upon Sandbox
+   * startup, the default FHIR server errors out and is unable to be used. This is set to false if after startup of the Sandbox,
+   * the user decides to "Change FHIR Server" for their own preferences. The flag is used to determine whether or not a user
+   * can "cancel" or exit out of the FHIR server modal
+   */
   isEntryRequired: PropTypes.bool,
+  /**
+   * Flag to determine if the modal is open or not
+   */
   isOpen: PropTypes.bool,
+  /**
+   * Callback function that gets invoked once setting the FHIR server to a user-submitted FHIR server URL is successful.
+   * This is only used when on Sandbox startup, the default FHIR server fails to load and the user must enter a valid
+   * FHIR server to proceed within the tool.
+   */
   resolve: PropTypes.func,
+  /**
+   * Callback function to close the FHIR server entry modal once either a valid FHIR server has been stored, or when
+   * the user cancels out of the modal
+   */
+  closePrompt: PropTypes.func,
 };
 
+/**
+ * User entry modal component specifically for entering a FHIR server URL to switch FHIR servers
+ */
 export class FhirServerEntry extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
+      /**
+       * Flag to determine if the component is open or closed
+       */
       isOpen: this.props.isOpen,
+      /**
+       * User input text tracked inside the input box for FHIR server URL entry
+       */
       userInput: '',
+      /**
+       * Flag to determine if the modal must display an error due to user input
+       */
       shouldDisplayError: Boolean(props.initialError),
+      /**
+       * Message to display in an error field on the input
+       */
       errorMessage: props.initialError || '',
     };
 
@@ -52,6 +92,11 @@ export class FhirServerEntry extends Component {
     this.setState({ userInput: e.target.value });
   }
 
+  /**
+   * Sanitize user input before pinging the FHIR server to see if it is valid. Once tested, the retrieveFhirMetadata function
+   * will set state with the new FHIR server in context and closes the modal. If an error occurs when checking the FHIR server
+   * entered by the user, an appropriate error message will be displayed
+   */
   async handleSubmit() {
     if (this.state.userInput === '' || !this.state.userInput || !this.state.userInput.trim()) {
       this.setState({ shouldDisplayError: true, errorMessage: 'Enter a valid FHIR server base url' });
@@ -84,6 +129,9 @@ export class FhirServerEntry extends Component {
     }
   }
 
+  /**
+   * Reset the FHIR server in context to that of the default FHIR server and close the modal
+   */
   async handleResetDefaultServer() {
     await retrieveFhirMetadata(this.props.defaultFhirServer);
     if (this.props.resolve) { this.props.resolve(); }
