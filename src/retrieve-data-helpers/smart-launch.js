@@ -15,6 +15,12 @@ function smartLaunchPromise() {
       return reject();
     };
 
+    /**
+     * If a SMART app launch is successful and redirected, check the conformance statement of the FHIR server to see if it is available to use.
+     * If a CDS service discovery URL endpoint is included in the access token (as passed in context), the function grabs and stores available
+     * CDS services to use later on.
+     * @param {*} smart - Object passed by fhir-client.js library, containing the access token among other context data
+     */
     const onAuthSuccess = (smart) => {
       console.log('Launched as a SMART app');
       if (smart.tokenResponse) {

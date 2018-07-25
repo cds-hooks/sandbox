@@ -24,6 +24,7 @@ const fhirServerReducers = (state = initialState, action) => {
         newState.isDefaultFhirServer = action.baseUrl === state.defaultFhirServer;
         return newState;
       }
+      // Store SMART authorization response in store from successful SMART workflow
       case types.SMART_AUTH_SUCCESS: {
         const newState = Object.assign({}, state, {
           accessToken: action.authResponse.tokenResponse,
@@ -34,6 +35,7 @@ const fhirServerReducers = (state = initialState, action) => {
         newState.isDefaultFhirServer = newState.currentFhirServer === state.defaultFhirServer;
         return newState;
       }
+      // Sets the FHIR server a user enters to change the current FHIR server, before testing it is a valid endpoint
       case types.SET_TEST_FHIR_SERVER: {
         return Object.assign({}, state, {
           testFhirServer: action.fhirServer,

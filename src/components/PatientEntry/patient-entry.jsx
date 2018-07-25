@@ -13,22 +13,55 @@ import BaseEntryBody from '../BaseEntryBody/base-entry-body';
 import retrievePatient from '../../retrieve-data-helpers/patient-retrieval';
 
 const propTypes = {
+  /**
+   * Callback function to close the PatientEntry prompt
+   */
   closePrompt: PropTypes.func,
+  /**
+   * The URL of the current FHIR server in context
+   */
   currentFhirServer: PropTypes.string.isRequired,
+  /**
+   * The identifier of the current Patient resource in context
+   */
   currentPatientId: PropTypes.string.isRequired,
+  /**
+   * Flag to determine if the PatientEntry modal can be closed, or must have valid input from the user to continue
+   */
   isEntryRequired: PropTypes.bool,
+  /**
+   * Flag to determine if the modal is open
+   */
   isOpen: PropTypes.bool,
+  /**
+   * Function to resolve data after grabbing a patient resource from the current FHIR server
+   */
   resolve: PropTypes.func,
 };
 
+/**
+ * User entry modal component specifically for entering a patient ID to switch the patient in context
+ */
 export class PatientEntry extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
+      /**
+       * Flag to determine if the modal is open
+       */
       isOpen: this.props.isOpen,
+      /**
+       * String to keep track of user input for the patient ID
+       */
       userInput: '',
+      /**
+       * Flag to determine if an error needs to be displayed on the Field
+       */
       shouldDisplayError: false,
+      /**
+       * Error message to display on the Field
+       */
       errorMessage: '',
     };
 

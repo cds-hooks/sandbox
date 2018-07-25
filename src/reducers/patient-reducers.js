@@ -55,6 +55,7 @@ const patientReducers = (state = initialState, action) => {
         return Object.assign({}, state, { currentPatient: newPatient });
       }
 
+      // Stores the current user ID in store if specified in an access token returned to the Sandbox (on SMART launched Sandbox)
       case types.SMART_AUTH_SUCCESS: {
         const { authResponse } = action;
         if (authResponse && authResponse.userId) {

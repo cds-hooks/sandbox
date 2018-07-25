@@ -1,6 +1,16 @@
 /* eslint no-param-reassign: 0 */
 import axios from 'axios';
 
+/**
+ * Retrieves a SMART launch context from an endpoint to append as a "launch" query parameter to a SMART app launch URL (see SMART docs for more about launch context).
+ * This applies mainly if a SMART app link on a card is to be launched. The link needs a "launch" query param with some opaque value from the SMART server entity.
+ * This function generates the launch context (for HSPC Sandboxes only) for a SMART application by pinging a specific endpoint on the FHIR base URL and returns
+ * a Promise to resolve the newly modified link.
+ * @param {*} link - The SMART app launch URL
+ * @param {*} accessToken - The access token provided to the CDS Hooks Sandbox by the FHIR server
+ * @param {*} patientId - The identifier of the patient in context
+ * @param {*} fhirBaseUrl - The base URL of the FHIR server in context
+ */
 function retrieveLaunchContext(link, accessToken, patientId, fhirBaseUrl) {
   return new Promise((resolve, reject) => {
     const headers = {

@@ -12,9 +12,21 @@ import styles from './service-display.css';
 import { toggleService, deleteService } from '../../../actions/cds-services-actions';
 
 const propTypes = {
+  /**
+   * CDS service definition returned for a particular service at the discovery endpoint
+   */
   definition: PropTypes.object,
+  /**
+   * The CDS service endpoint URL
+   */
   serviceUrl: PropTypes.string,
+  /**
+   * Callback function to toggle the service in the Sandbox (inactivate, not remove)
+   */
   toggle: PropTypes.func,
+  /**
+   * Callback function to remove the service from the Sandbox
+   */
   remove: PropTypes.func,
 };
 

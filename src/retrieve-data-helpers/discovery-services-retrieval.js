@@ -14,7 +14,6 @@ import { signalSuccessServicesRetrieval,
 function retrieveDiscoveryServices(testUrl) {
   return new Promise((resolve, reject) => {
     const discoveryUrl = testUrl || store.getState().cdsServicesState.defaultUrl;
-    // TODO: Check if existing loading spinner exists before signaling to display another one
     store.dispatch(signalRetrievingServices(discoveryUrl));
 
     const signedPrivateJWT = generateJWT(discoveryUrl);

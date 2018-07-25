@@ -1,6 +1,7 @@
-/* eslint-disable jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions, react/forbid-prop-types */
 
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import cx from 'classnames';
 import ApplicationHeaderLayout from 'terra-application-header-layout';
@@ -30,15 +31,66 @@ import styles from './header.css';
 
 import store from '../../store/store';
 
+const propTypes = {
+  /**
+   * The identifier of the Patient resource in context
+   */
+  patientId: PropTypes.string.isRequired,
+  /**
+   * The name of the hook in context
+   */
+  hook: PropTypes.string.isRequired,
+  /**
+   * Function to set a hook in the store (i.e. 'patient-view' to 'medication-prescribe')
+   */
+  setHook: PropTypes.func.isRequired,
+  /**
+   * Function to reset all CDS service configuration in the Sandbox (remove any added services, and keep default services)
+   */
+  resetServices: PropTypes.func.isRequired,
+  /**
+   * Flag to determine if the Sandbox in session is using a secured FHIR server (i.e. the Sandbox was launched as a SMART application)
+   */
+  isSecuredSandbox: PropTypes.object,
+  /**
+   * Flag to determine if the current view is the Card Demo view or the mock-EHR view
+   */
+  isCardDemoView: PropTypes.bool.isRequired,
+  /**
+   * Function to toggle the state of the Card Demo view or mock-EHR view
+   */
+  toggleCardDemoView: PropTypes.func.isRequired,
+};
+
+/**
+ * This component represents the Header for the application, which encompasses the title, logo, and several configuration options. The header allows the user
+ * to select between different hook views (i.e. patient-view and medication-prescribe), and presents options to change the FHIR server and/or the patient in 
+ * context, add CDS services, among other options.
+ */
 export class Header extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
+      /**
+       * Flag to determine if the settings menu is open
+       */
       settingsOpen: false,
+      /**
+       * Flag to determine if the Change Patient modal is open
+       */
       isChangePatientOpen: false,
+      /**
+       * Flag to determine if the Change FHIR Server modal is open
+       */
       isChangeFhirServerOpen: false,
+      /**
+       * Flag to determine if the Add CDS Services modal is open
+       */
       isAddServicesOpen: false,
+      /**
+       * Flag to determine if the Configure Services modal is open
+       */
       isConfigureServicesOpen: false,
     };
 
@@ -69,6 +121,10 @@ export class Header extends Component {
   setSettingsNode(node) { this.settingsNode = node; }
   getSettingsNode() { return this.settingsNode; }
 
+  /**
+   * Determine how to make a hook tab display as the current or "active" tab or another tab
+   * @param {*} hook - the name of the hook 
+   */
   getNavClasses(hook) {
     return this.props.hook === hook ? cx(styles['nav-links'], styles['active-link']) : styles['nav-links'];
   }
@@ -76,6 +132,11 @@ export class Header extends Component {
   closeSettingsMenu() { this.setState({ settingsOpen: false }); }
   openSettingsMenu() { this.setState({ settingsOpen: true }); }
 
+  /**
+   * Once a new tab (hook) is chosen, the Sandbox must grab the applicable services for that hook and invoke them.
+   * In a special consideration for the Rx View (medication-prescribe), we see if a medication has already been chosen
+   * from a previous selection, and if so, call the services immediately with that previously chosen medication in context
+   */
   switchHook(hook) {
     const state = store.getState();
     const filterService = service => service.hook === hook && service.enabled;
@@ -105,6 +166,11 @@ export class Header extends Component {
     }
   }
 
+  /**
+   * Clear all cached configuration by the user on the Sandbox, including any added CDS services,
+   * changed FHIR servers, the current hook the user is on, and any changed patients in context.
+   * Resets to default state and calls CDS services accordingly
+   */
   async resetConfiguration() {
     // Temporary removal until all persisted values are refactored into one localStorage property
     this.closeSettingsMenu();
@@ -135,6 +201,21 @@ export class Header extends Component {
   }
   closeAddServices() { this.setState({ isAddServicesOpen: false }); }
 
+  /**
+   * Open the Change Patient modal to allow for changing the patient ID in context.
+   *
+   * Note: If the current FHIR server has been changed, the testCurrentPatient parameter flag will be set to true,
+   * and the current patient in context will be checked to see if it exists in the newly configured FHIR server.
+   *
+   * If the current patient DOES NOT align with the newly configured FHIR server, we open the Change Patient modal automatically
+   * after the FHIR server has been entered, and allow the user to define a new patient ID in context that is associated with
+   * the new FHIR server.
+   *
+   * If the current patient DOES align with the newly configured FHIR server, we allow the Change FHIR Server modal to close automatically,
+   * and the Sandbox does not prompt the user to enter a new patient ID
+   * @param {*} e - Event object from the onClick callback
+   * @param {*} testCurrentPatient - Boolean flag to determine if the current patient ID should be checked against the current FHIR server
+   */
   async openChangePatient(e, testCurrentPatient) {
     if (testCurrentPatient) {
       try {
@@ -157,7 +238,10 @@ export class Header extends Component {
   closeChangeFhirServer() { this.setState({ isChangeFhirServerOpen: false }); }
 
   render() {
+    // Title and Logo
     const logo = <div><span><img src={cdsHooksLogo} alt="" height="30" width="30" /></span><b className={styles['logo-title']}>CDS Hooks Sandbox</b></div>;
+
+    // Gear settings menu item options
     let menuItems = [
       <Menu.Item className={styles['add-services']} text="Add CDS Services" key="add-services" onClick={this.openAddServices} />,
       <Menu.Item className={styles['configure-services']} text="Configure CDS Services" key="configure-services" onClick={this.openConfigureServices} />,
@@ -171,6 +255,8 @@ export class Header extends Component {
       <Menu.Divider className={styles['divider-2']} key="Divider2" />,
       <Menu.Item className={styles['reset-configuration']} text="Reset Configuration" key="reset-configuration" onClick={this.resetConfiguration} />,
     ]);
+
+    // Gear settings menu
     const gearMenu = (
       <Menu
         isOpen={this.state.settingsOpen}
@@ -181,6 +267,7 @@ export class Header extends Component {
         {menuItems}
       </Menu>);
 
+    // Navigation tabs (the hook views)
     const navigation = (
       <div className={styles['nav-tabs']}>
         <div className={styles['nav-container']}>
@@ -188,6 +275,8 @@ export class Header extends Component {
           <button className={this.getNavClasses('medication-prescribe')} onClick={() => this.switchHook('medication-prescribe')}>Rx View</button>
         </div>
       </div>);
+
+    // Extension tabs (Card Demo view)
     const extensions = (
       <div className={styles.extensions}>
         <Button
@@ -199,6 +288,8 @@ export class Header extends Component {
         />
       </div>
     );
+
+    // The actual gear icon for the settings menu
     const utilities = (
       <div className={styles.icon} onClick={this.openSettingsMenu}>
         <span className={styles['padding-right']}><IconSettings height="1.2em" width="1.2em" /></span>
@@ -237,6 +328,8 @@ export class Header extends Component {
     );
   }
 }
+
+Header.propTypes = propTypes;
 
 const mapStateToProps = appStore => ({
   hook: appStore.hookState.currentHook,

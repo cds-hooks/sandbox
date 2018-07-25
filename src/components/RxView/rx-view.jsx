@@ -1,4 +1,7 @@
+/* eslint-disable react/forbid-prop-types */
+
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import cx from 'classnames';
 import pickBy from 'lodash/pickBy';
@@ -23,19 +26,116 @@ import { storeUserMedInput, storeUserChosenMedication,
   updateFhirMedicationOrder, storeUserCondition,
   storeMedDosageAmount, storeDate, toggleDate } from '../../actions/medication-select-actions';
 
+const propTypes = {
+  /**
+   * Flag to determine if the CDS Developer Panel view is visible
+   */
+  isContextVisible: PropTypes.bool.isRequired,
+  /**
+   * Patient resource in context
+   */
+  patient: PropTypes.object,
+  /**
+   * URL of the FHIR server in context
+   */
+  fhirServer: PropTypes.string.isRequired,
+  /**
+   * FHIR version in context based on the FHIR server
+   */
+  fhirVersion: PropTypes.string.isRequired,
+  /**
+   * Hash containing a list of CDS services applicable to this hook
+   */
+  services: PropTypes.object,
+  /**
+   * Array of medications a user may choose from at a given moment
+   */
+  medications: PropTypes.arrayOf(PropTypes.object),
+  /**
+   * Prescribed medicine chosen by the user for the patient
+   */
+  prescription: PropTypes.object,
+  /**
+   * Hash detailing the dosage and frequency of the prescribed medicine
+   */
+  medicationInstructions: PropTypes.object,
+  /**
+   * Hash detailing the start/end dates of the prescribed medication
+   */
+  prescriptionDates: PropTypes.object,
+  /**
+   * Coding code from the selected Condition resource in context
+   */
+  selectedConditionCode: PropTypes.string,
+  /**
+   * FHIR resource of the built-up medication order JSON to put in the context of the request to CDS services
+   */
+  medicationOrder: PropTypes.object,
+  /**
+   * Function for storing user input when the medication field changes
+   */
+  onMedicationChangeInput: PropTypes.func.isRequired,
+  /**
+   * Function to signal a chosen medication
+   */
+  chooseMedication: PropTypes.func.isRequired,
+  /**
+   * Function to signal a chosen condition
+   */
+  chooseCondition: PropTypes.func.isRequired,
+  /**
+   * Function to signal a change in the dosage instructions (amount or frequency)
+   */
+  updateDosageInstructions: PropTypes.func.isRequired,
+  /**
+   * Function to signal a change in a date (start or end)
+   */
+  updateDate: PropTypes.func.isRequired,
+  /**
+   * Function to signal a change in the toggled status of the date (start or end)
+   */
+  toggleEnabledDate: PropTypes.func.isRequired,
+  /**
+   * Function to update the FHIR resource for the medications field of the context in a CDS service request
+   */
+  updateFhirResource: PropTypes.func.isRequired,
+};
+
+/**
+ * Left-hand side on the mock-EHR view that displays the cards and relevant UI for the medication-prescribe hook.
+ * The services are not called until a medication is chosen, or a change in prescription is made
+ */
 export class RxView extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
+      /**
+       * Value of the input box for medication
+       */
       value: '',
+      /**
+       * Coding code of the Condition chosen from a dropdown list for the patient
+       */
       conditionCode: '',
+      /**
+       * Tracks the dosage amount chosen from the form field
+       */
       dosageAmount: 1,
+      /**
+       * Tracks the dosage frequency chosen from the form field
+       */
       dosageFrequency: 'daily',
+      /**
+       * Tracks the start date value and toggle of the prescription
+       */
       startRange: {
         enabled: true,
         value: undefined,
       },
+      /**
+       * Tracks the end date value and toggle of the prescription
+       */
       endRange: {
         enabled: true,
         value: undefined,
@@ -52,6 +152,10 @@ export class RxView extends Component {
     this.toggleEnabledDate = this.toggleEnabledDate.bind(this);
   }
 
+  /**
+   * If there is a prescription already chosen (through a value in the query params), update the context in the request
+   * and call CDS services
+   */
   async componentDidMount() {
     if (this.props.prescription) {
       if (!this.props.medicationOrder) {
@@ -61,6 +165,9 @@ export class RxView extends Component {
     }
   }
 
+  /**
+   * Update any incoming values that change for state
+   */
   componentWillReceiveProps(nextProps) {
     if (nextProps.medicationInstructions.number !== this.state.dosageAmount ||
       nextProps.medicationInstructions.frequency !== this.state.dosageFrequency ||
@@ -83,6 +190,9 @@ export class RxView extends Component {
     }
   }
 
+  /**
+   * If any prop values have changed, update the context data in the request, and call the CDS services
+   */
   async componentDidUpdate(prevProps) {
     if (!isEqual(prevProps.prescription, this.props.prescription) ||
         prevProps.patient !== this.props.patient ||
@@ -110,6 +220,7 @@ export class RxView extends Component {
     debounce(this.props.onMedicationChangeInput(event.target.value), 50);
   }
 
+  // Note: Bound the dosage amount to a value between 1 and 5
   changeDosageAmount(event) {
     let transformedNumber = Number(event.target.value) || 1;
     if (transformedNumber > 5) { transformedNumber = 5; }
@@ -153,6 +264,9 @@ export class RxView extends Component {
     this.props.toggleEnabledDate(range);
   }
 
+  /**
+   * Create the context property that goes in a CDS service request before calling out to the CDS servies
+   */
   executeRequests() {
     if (Object.keys(this.props.services).length) {
       // For each service, call service for request/response exchange
@@ -280,6 +394,8 @@ export class RxView extends Component {
   }
 }
 
+RxView.propTypes = propTypes;
+
 const mapStateToProps = (store) => {
   function isValidService(service) {
     return service.hook === 'medication-prescribe' && service.enabled;
@@ -291,8 +407,6 @@ const mapStateToProps = (store) => {
     fhirServer: store.fhirServerState.currentFhirServer,
     fhirVersion: store.fhirServerState.fhirVersion,
     services: pickBy(store.cdsServicesState.configuredServices, isValidService),
-    hook: store.hookState.currentHook,
-    medListPhase: store.medicationState.medListPhase,
     medications: store.medicationState.options[store.medicationState.medListPhase] || [],
     prescription: store.medicationState.decisions.prescribable,
     medicationInstructions: store.medicationState.medicationInstructions,

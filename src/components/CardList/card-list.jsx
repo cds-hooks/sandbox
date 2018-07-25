@@ -1,3 +1,5 @@
+/* eslint-disable react/forbid-prop-types */
+
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -15,9 +17,37 @@ import { getServicesByHook, getCardsFromServices } from '../../reducers/helpers/
 import { takeSuggestion } from '../../actions/medication-select-actions';
 
 const propTypes = {
+  /**
+   * A boolean to determine if the context of this component is under the Demo Card feature of the Sandbox, or in the actual
+   * hook views that render cards themselves. This flag is necessary to make links and suggestions unactionable in the Card Demo view.
+   */
   isDemoCard: PropTypes.bool,
+  /**
+   * The FHIR access token retrieved from the authorization server. Used to retrieve a launch context for a SMART app
+   */
+  fhirAccessToken: PropTypes.object,
+  /**
+   * Function callback to take a specific suggestion from a card
+   */
+  takeSuggestion: PropTypes.func.isRequired,
+  /**
+   * Identifier of the Patient resource for the patient in context
+   */
+  patientId: PropTypes.string,
+  /**
+   * The FHIR server URL in context
+   */
+  fhirServerUrl: PropTypes.string,
+  /**
+   * JSON response from a CDS service containing potential cards to display
+   */
+  cardResponses: PropTypes.object,
 };
 
+/**
+ * Component that displays a list of cards (if any) on the UI, usually given some CDS service response of
+ * JSON data.
+ */
 export class CardList extends Component {
   constructor(props) {
     super(props);
@@ -27,6 +57,12 @@ export class CardList extends Component {
     this.modifySmartLaunchUrls = this.modifySmartLaunchUrls.bind(this);
   }
 
+  /**
+   * Take a suggestion from a CDS service based on action on from a card. Also pings the analytics endpoint (if any) of the
+   * CDS service to notify that a suggestion was taken
+   * @param {*} suggestion - CDS service-defined suggestion to take based on CDS Hooks specification
+   * @param {*} url - CDS service endpoint URL
+   */
   takeSuggestion(suggestion, url) {
     if (!this.props.isDemoCard) {
       if (suggestion.label) {
@@ -162,7 +198,7 @@ export class CardList extends Component {
         // -- Source --
         const sourceSection = card.source && Object.keys(card.source).length ? this.renderSource(card.source) : '';
 
-        // -- Detail --
+        // -- Detail (ReactMarkdown supports Github-flavored markdown) --
         const detailSection = card.detail ? <ReactMarkdown escapeHtml={false} softBreak="br" source={card.detail} /> : '';
 
         // -- Suggestions --

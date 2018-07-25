@@ -98,6 +98,7 @@ function prefetchDataPromises(baseUrl, prefetch) {
  * request and response accordingly.
  * @param url - CDS Service Endpoint to construct request payload for
  * @param context - Any context to relay to the CDS Service in the request via the context parameter
+ * @returns {Promise} - Promise object to eventually return service response data
  */
 function callServices(url, context) {
   const state = store.getState();
@@ -142,6 +143,7 @@ function callServices(url, context) {
   const serviceDefinition = state.cdsServicesState.configuredServices[url];
 
   if (serviceDefinition.prefetch && Object.keys(serviceDefinition.prefetch).length) {
+    // Wait for prefetch to be fulfilled before making a request to the CDS service, if the service has prefetch expectations
     const fulFilled = prefetchDataPromises(fhirServer, serviceDefinition.prefetch);
     return fulFilled.then((prefetch) => {
       if (prefetch && Object.keys(prefetch).length) {
