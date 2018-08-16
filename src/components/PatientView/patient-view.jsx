@@ -48,6 +48,7 @@ export class PatientView extends Component {
   componentDidUpdate(prevProps) {
     if (this.props.patient !== prevProps.patient ||
         this.props.fhirServer !== prevProps.fhirServer ||
+        this.props.user !== prevProps.user ||
         !isEqual(this.props.services, prevProps.services)) {
       this.executeRequests();
     }
@@ -95,6 +96,7 @@ const mapStateToProps = (store) => {
     fhirServer: store.fhirServerState.currentFhirServer,
     services: pickBy(store.cdsServicesState.configuredServices, isValidService),
     hook: store.hookState.currentHook,
+    user: store.patientState.currentUser,
   };
 };
 

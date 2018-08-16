@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Text from 'terra-text';
 import Field from 'terra-form-field';
 import Input from 'terra-form-input';
+import SelectField from 'terra-form/lib/SelectField';
 
 import styles from './base-entry-body.css';
 
@@ -24,17 +25,25 @@ const propTypes = {
    */
   errorMessage: PropTypes.string,
   /**
-   * If the Input component needs placeholder text (usually to help the user with example values), pass this prop in
+   * If the Input component needs placeholder text or the defaultValue of Select component (usually to help the user with example values), pass this prop in
    */
   placeholderText: PropTypes.string,
   /**
-   * If the value in the Input component changes (i.e user adds text), pass in a function callback to handle the text
+   * If the value in the Input/Select component changes (i.e user adds text or changes the selection), pass in a function callback to handle the text
    */
   inputOnChange: PropTypes.func.isRequired,
   /**
-   * The name attribute for the Input component
+   * The name attribute for the Input/Select component
    */
   inputName: PropTypes.string,
+  /**
+   * Array of options to be displayed for selection. If this prop is not provided, a textfield input is displayed instead of a select component
+   */
+  selectOptions: PropTypes.arrayOf(PropTypes.shape({
+    display: PropTypes.string.isRequired,
+    key: PropTypes.string.isRequired,
+    value: PropTypes.string.isRequired,
+  })),
 };
 
 /**
@@ -49,7 +58,7 @@ const propTypes = {
  */
 const BaseEntryBody = ({
   currentFhirServer, formFieldLabel, shouldDisplayError,
-  errorMessage, placeholderText, inputOnChange, inputName,
+  errorMessage, placeholderText, inputOnChange, inputName, selectOptions,
 }) => {
   let fhirServerDisplay;
   if (currentFhirServer) {
@@ -70,13 +79,21 @@ const BaseEntryBody = ({
           isInvalid={shouldDisplayError}
           error={errorMessage}
           required
-        >
-          <Input
-            name={inputName}
-            placeholder={placeholderText}
-            onChange={inputOnChange}
-            required
-          />
+        > {selectOptions ?
+            (<SelectField
+              name={inputName}
+              defaultValue={placeholderText}
+              onChange={inputOnChange}
+              options={selectOptions}
+              required
+            />) :
+            (<Input
+              name={inputName}
+              placeholder={placeholderText}
+              onChange={inputOnChange}
+              required
+            />)
+        }
         </Field>
       </div>
     </div>

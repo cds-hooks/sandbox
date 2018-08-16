@@ -16,6 +16,7 @@ import forIn from 'lodash/forIn';
 
 import ConfigureServices from '../ConfigureServices/configure-services';
 import ServicesEntry from '../ServicesEntry/services-entry';
+import UserEntry from '../UserEntry/user-entry';
 import PatientEntry from '../PatientEntry/patient-entry';
 import FhirServerEntry from '../FhirServerEntry/fhir-server-entry';
 
@@ -64,7 +65,7 @@ const propTypes = {
 
 /**
  * This component represents the Header for the application, which encompasses the title, logo, and several configuration options. The header allows the user
- * to select between different hook views (i.e. patient-view and medication-prescribe), and presents options to change the FHIR server and/or the patient in 
+ * to select between different hook views (i.e. patient-view and medication-prescribe), and presents options to change the FHIR server and/or the patient in
  * context, add CDS services, among other options.
  */
 export class Header extends Component {
@@ -76,6 +77,10 @@ export class Header extends Component {
        * Flag to determine if the settings menu is open
        */
       settingsOpen: false,
+      /**
+       * Flag to determine if the Change User modal is open
+       */
+      isChangeUserOpen: false,
       /**
        * Flag to determine if the Change Patient modal is open
        */
@@ -103,6 +108,8 @@ export class Header extends Component {
     this.closeSettingsMenu = this.closeSettingsMenu.bind(this);
     this.openAddServices = this.openAddServices.bind(this);
     this.closeAddServices = this.closeAddServices.bind(this);
+    this.openChangeUser = this.openChangeUser.bind(this);
+    this.closeChangeUser = this.closeChangeUser.bind(this);
     this.openChangePatient = this.openChangePatient.bind(this);
     this.closeChangePatient = this.closeChangePatient.bind(this);
     this.openChangeFhirServer = this.openChangeFhirServer.bind(this);
@@ -123,7 +130,7 @@ export class Header extends Component {
 
   /**
    * Determine how to make a hook tab display as the current or "active" tab or another tab
-   * @param {*} hook - the name of the hook 
+   * @param {*} hook - the name of the hook
    */
   getNavClasses(hook) {
     return this.props.hook === hook ? cx(styles['nav-links'], styles['active-link']) : styles['nav-links'];
@@ -201,6 +208,12 @@ export class Header extends Component {
   }
   closeAddServices() { this.setState({ isAddServicesOpen: false }); }
 
+  async openChangeUser() {
+    this.setState({ isChangeUserOpen: true });
+    if (this.state.settingsOpen) { this.closeSettingsMenu(); }
+  }
+  closeChangeUser() { this.setState({ isChangeUserOpen: false }); }
+
   /**
    * Open the Change Patient modal to allow for changing the patient ID in context.
    *
@@ -246,13 +259,15 @@ export class Header extends Component {
       <Menu.Item className={styles['add-services']} text="Add CDS Services" key="add-services" onClick={this.openAddServices} />,
       <Menu.Item className={styles['configure-services']} text="Configure CDS Services" key="configure-services" onClick={this.openConfigureServices} />,
       <Menu.Divider className={styles['divider-1']} key="Divider1" />,
+      <Menu.Item className={styles['change-user']} text="Change User" key="change-user" onClick={this.openChangeUser} />,
+      <Menu.Divider className={styles['divider-2']} key="Divider2" />,
       <Menu.Item className={styles['change-patient']} text="Change Patient" key="change-patient" onClick={this.openChangePatient} />,
     ];
     if (!this.props.isSecuredSandbox) {
       menuItems.push(<Menu.Item className={styles['change-fhir-server']} text="Change FHIR Server" key="change-fhir-server" onClick={this.openChangeFhirServer} />);
     }
     menuItems = menuItems.concat([
-      <Menu.Divider className={styles['divider-2']} key="Divider2" />,
+      <Menu.Divider className={styles['divider-3']} key="Divider3" />,
       <Menu.Item className={styles['reset-configuration']} text="Reset Configuration" key="reset-configuration" onClick={this.resetConfiguration} />,
     ]);
 
@@ -313,6 +328,10 @@ export class Header extends Component {
         {this.state.isConfigureServicesOpen ? <ConfigureServices
           isOpen={this.state.isConfigureServicesOpen}
           closePrompt={this.closeConfigureServices}
+        /> : null}
+        {this.state.isChangeUserOpen ? <UserEntry
+          isOpen={this.state.isChangeUserOpen}
+          closePrompt={this.closeChangeUser}
         /> : null}
         {this.state.isChangePatientOpen ? <PatientEntry
           isOpen={this.state.isChangePatientOpen}

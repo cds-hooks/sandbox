@@ -1,0 +1,14 @@
+.right-align {
+  text-align: right;
+}
+
+.left-aligned-text {
+  float: left;
+}
+
+@media screen and (min-width: 48em) {
+  .fixed-size {
+    height: 75%;
+    width: 100%;
+  }
+}

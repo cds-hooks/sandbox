@@ -9,14 +9,14 @@ import Dialog from 'terra-dialog';
 import Spacer from 'terra-spacer';
 import Text from 'terra-text';
 
-import styles from './patient-entry.css';
+import styles from './user-entry.css';
+import switchUser from '../../actions/user-actions';
 import BaseEntryBody from '../BaseEntryBody/base-entry-body';
-import retrievePatient from '../../retrieve-data-helpers/patient-retrieval';
-import retrievePatientList from '../../retrieve-data-helpers/patientlist-retrieval';
+import retrievePractitionerList from '../../retrieve-data-helpers/userlist-retrieval';
 
 const propTypes = {
   /**
-   * Callback function to close the PatientEntry prompt
+   * Callback function to close the UserEntry prompt
    */
   closePrompt: PropTypes.func,
   /**
@@ -24,11 +24,11 @@ const propTypes = {
    */
   currentFhirServer: PropTypes.string.isRequired,
   /**
-   * The identifier of the current Patient resource in context
+   * The identifier of the current User resource
    */
-  currentPatientId: PropTypes.string.isRequired,
+  currentUser: PropTypes.string.isRequired,
   /**
-   * Flag to determine if the PatientEntry modal can be closed, or must have valid input from the user to continue
+   * Flag to determine if the UserEntry modal can be closed, or must have valid input from the user to continue
    */
   isEntryRequired: PropTypes.bool,
   /**
@@ -36,15 +36,15 @@ const propTypes = {
    */
   isOpen: PropTypes.bool,
   /**
-   * Function to resolve data after grabbing a patient resource from the current FHIR server
+   * Function to switch current user
    */
-  resolve: PropTypes.func,
+  switchUser: PropTypes.func,
 };
 
 /**
  * User entry modal component specifically for entering a patient ID to switch the patient in context
  */
-export class PatientEntry extends Component {
+export class UserEntry extends Component {
   constructor(props) {
     super(props);
 
@@ -54,9 +54,9 @@ export class PatientEntry extends Component {
        */
       isOpen: this.props.isOpen,
       /**
-       * String to keep track of user input for the patient ID
+       * String to keep track of user input for the user ID
        */
-      userInput: '',
+      selectedUser: this.props.currentUser,
       /**
        * Flag to determine if an error needs to be displayed on the Field
        */
@@ -65,7 +65,7 @@ export class PatientEntry extends Component {
        * Error message to display on the Field
        */
       errorMessage: '',
-      patientList: [],
+      userList: [],
       isLoading: true,
     };
 
@@ -75,19 +75,14 @@ export class PatientEntry extends Component {
   }
 
   async componentDidMount() {
-    try {
-      await retrievePatientList().then((entries) => {
-        const selectFieldOptions = map(entries, ({ resource: { id, name } }) => Object.assign({}, {
-          display: name[0].given.toString(),
-          key: id,
-          value: id,
-        }));
-        this.setState({ patientList: selectFieldOptions, isLoading: false });
-      }).catch(error => console.log('Error occured while trying to get the Patients list', error));
-    } catch (e) {
-      console.log('Error occured while trying to get the Patients list', e);
-      this.setState({ patientList: null, isLoading: false });
-    }
+    await retrievePractitionerList().then((entries) => {
+      const selectFieldOptions = map(entries, ({ resource: { resourceType, id, name } }) => Object.assign({}, {
+        display: `${name.family.toString()}, ${name.given.toString()}`,
+        key: `${resourceType}/${id}`,
+        value: `${resourceType}/${id}`,
+      }));
+      this.setState({ userList: selectFieldOptions, isLoading: false });
+    }).catch(error => console.log('Error occured while trying to get the Practitioners list', error));
   }
 
   componentWillReceiveProps(nextProps) {
@@ -102,31 +97,21 @@ export class PatientEntry extends Component {
   }
 
   handleChange(e) {
-    this.setState({ userInput: e.target.value });
+    this.setState({ selectedUser: e.target.value });
   }
 
   async handleSubmit() {
-    if (this.state.userInput === '' || !this.state.userInput || !this.state.userInput.trim()) {
+    if (this.state.selectedUser === '' || !this.state.selectedUser || !this.state.selectedUser.trim()) {
       this.setState({ shouldDisplayError: true, errorMessage: 'Enter a valid patient ID' });
       return;
     }
-
-    try {
-      await retrievePatient(this.state.userInput).then(() => {
-        if (this.props.resolve) { this.props.resolve(); }
-        this.handleCloseModal();
-      });
-    } catch (e) {
-      this.setState({
-        shouldDisplayError: true,
-        errorMessage: 'Failed to retrieve patient from FHIR server. See console for details.',
-      });
-    }
+    this.props.switchUser(this.state.selectedUser);
+    this.handleCloseModal();
   }
 
   render() {
     const headerContainer = (
-      <Text weight={700} fontSize={20}>Change Patient</Text>
+      <Text weight={700} fontSize={20}>Change User</Text>
     );
 
     const footerContainer = (
@@ -142,7 +127,7 @@ export class PatientEntry extends Component {
       <div>
         {!this.state.isLoading &&
         <Modal
-          ariaLabel="Patient"
+          ariaLabel="User"
           isOpen={this.state.isOpen}
           closeOnEsc={!this.props.isEntryRequired}
           closeOnOutsideClick={!this.props.isEntryRequired}
@@ -156,13 +141,13 @@ export class PatientEntry extends Component {
           >
             <BaseEntryBody
               currentFhirServer={this.props.currentFhirServer}
-              formFieldLabel="Enter a Patient ID"
+              formFieldLabel="Select a User"
               shouldDisplayError={this.state.shouldDisplayError}
               errorMessage={this.state.errorMessage}
-              placeholderText={this.props.currentPatientId}
+              placeholderText={this.props.currentUser}
               inputOnChange={this.handleChange}
-              inputName="patient-input"
-              selectOptions={this.state.patientList}
+              inputName="user-input"
+              selectOptions={this.state.userList}
             />
           </Dialog>
         </Modal>
@@ -173,11 +158,17 @@ export class PatientEntry extends Component {
   }
 }
 
-PatientEntry.propTypes = propTypes;
+UserEntry.propTypes = propTypes;
 
 const mapStateToProps = store => ({
   currentFhirServer: store.fhirServerState.currentFhirServer,
-  currentPatientId: store.patientState.currentPatient.id,
+  currentUser: store.patientState.currentUser || store.patientState.defaultUser,
 });
 
-export default connect(mapStateToProps)(PatientEntry);
+const mapDispatchToProps = dispatch => ({
+  switchUser: (user) => {
+    dispatch(switchUser(user));
+  },
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(UserEntry);

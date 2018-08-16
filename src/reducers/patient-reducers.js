@@ -64,6 +64,10 @@ const patientReducers = (state = initialState, action) => {
         return state;
       }
 
+      case types.SWITCH_USER: {
+        return Object.assign({}, state, { currentUser: action.userId });
+      }
+
       default: {
         return state;
       }
