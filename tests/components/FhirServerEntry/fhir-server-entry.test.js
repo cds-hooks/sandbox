@@ -1,6 +1,5 @@
 import React from 'react';
 import { mount, shallow } from 'enzyme';
-import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 
 describe('FhirServerEntry component', () => {
@@ -67,19 +66,23 @@ describe('FhirServerEntry component', () => {
   it('changes isOpen state property if props changes for the property', () => {
     setup(storeState);
     let component = mount(<FhirServerEntryView isOpen={false} />);
-    expect(component.prop('isOpen')).toEqual(false);
-    component.setProps({ isOpen: true });
-    expect(component.prop('isOpen')).toEqual(true);
+    Promise.resolve(component).then(() => {
+      expect(component.prop('isOpen')).toEqual(false);
+      component.setProps({ isOpen: true });
+      expect(component.prop('isOpen')).toEqual(true);
+    });
   });
 
   it('handles resetting the fhir server and closes the modal', async () => {
     isEntryRequired = false;
     setup(storeState);
     let shallowedComponent = pureComponent.shallow();
-    await shallowedComponent.find('Dialog').dive().find('ContentContainer').dive().find('.right-align').find('Button').at(0).simulate('click');
-    expect(shallowedComponent.state('isOpen')).toEqual(false);
-    expect(mockResolve).toHaveBeenCalled();
-    expect(mockSpy).toHaveBeenCalled();
+    Promise.resolve(shallowedComponent).then(() => {
+      shallowedComponent.find('Dialog').dive().find('ContentContainer').dive().find('.right-align').find('Button').at(0).simulate('click');
+      expect(shallowedComponent.state('isOpen')).toEqual(false);
+      expect(mockResolve).toHaveBeenCalled();
+      expect(mockSpy).toHaveBeenCalled();
+    });
   });
 
   it('handles closing the modal in the component', async () => {
@@ -87,8 +90,10 @@ describe('FhirServerEntry component', () => {
     mockClosePrompt = null;
     setup(storeState);
     let shallowedComponent = pureComponent.shallow();
-    await shallowedComponent.find('Dialog').dive().find('ContentContainer').dive().find('.right-align').find('Button').at(2).simulate('click');
-    expect(shallowedComponent.state('isOpen')).toEqual(false);
+    Promise.resolve(shallowedComponent).then(() => {
+      shallowedComponent.find('Dialog').dive().find('ContentContainer').dive().find('.right-align').find('Button').at(2).simulate('click');
+      expect(shallowedComponent.state('isOpen')).toEqual(false);
+    });
   });
 
   describe('User input', () => {
@@ -101,18 +106,22 @@ describe('FhirServerEntry component', () => {
       mockSpy = jest.fn(() => { Promise.resolve(1) });
       setup(storeState);
       let shallowedComponent = pureComponent.shallow();
-      enterInputAndSave(shallowedComponent, '');
-      expect(shallowedComponent.state('shouldDisplayError')).toEqual(true);
-      expect(shallowedComponent.state('errorMessage')).not.toEqual('');
+      Promise.resolve(shallowedComponent).then(() => {
+        enterInputAndSave(shallowedComponent, '');
+        expect(shallowedComponent.state('shouldDisplayError')).toEqual(true);
+        expect(shallowedComponent.state('errorMessage')).not.toEqual('');
+      });
     });
 
     it('displays an error message if retrieving fhir server metadata fails', () => {
       mockSpy = jest.fn(() => { throw new Error(1); });
       setup(storeState);
       let shallowedComponent = pureComponent.shallow();
-      enterInputAndSave(shallowedComponent, 'test');
-      expect(shallowedComponent.state('shouldDisplayError')).toEqual(true);
-      expect(shallowedComponent.state('errorMessage')).not.toEqual('');
+      Promise.resolve(shallowedComponent).then(() => {
+        enterInputAndSave(shallowedComponent, 'test');
+        expect(shallowedComponent.state('shouldDisplayError')).toEqual(true);
+        expect(shallowedComponent.state('errorMessage')).not.toEqual('');
+      });
     });
 
     it('displays an error message if input resolves to a 401 error', () => {
@@ -123,20 +132,24 @@ describe('FhirServerEntry component', () => {
       });
       setup(storeState);
       let shallowedComponent = pureComponent.shallow();
-      enterInputAndSave(shallowedComponent, 'http://secured-fhir-endpoint.com');
-      expect(shallowedComponent.state('shouldDisplayError')).toEqual(true);
-      expect(shallowedComponent.state('errorMessage')).not.toEqual('');
+      Promise.resolve(shallowedComponent).then(() => {
+        enterInputAndSave(shallowedComponent, 'http://secured-fhir-endpoint.com');
+        expect(shallowedComponent.state('shouldDisplayError')).toEqual(true);
+        expect(shallowedComponent.state('errorMessage')).not.toEqual('');
+      });
     });
 
-    it('closes the modal, resolves passed in prop promise if applicable, and closes prompt if possible', async () => {
+    it('closes the modal, resolves passed in prop promise if applicable, and closes prompt if possible', () => {
       mockSpy = jest.fn(() => { return Promise.resolve(1)} );
       setup(storeState);
       let shallowedComponent = pureComponent.shallow();
-      await enterInputAndSave(shallowedComponent, 'test');
-      expect(shallowedComponent.state('shouldDisplayError')).toEqual(false);
-      expect(shallowedComponent.state('isOpen')).toEqual(false);
-      expect(mockResolve).toHaveBeenCalled();
-      expect(mockClosePrompt).toHaveBeenCalled();
+      Promise.resolve(shallowedComponent).then(() => {
+        enterInputAndSave(shallowedComponent, 'test');
+        expect(shallowedComponent.state('shouldDisplayError')).toEqual(false);
+        expect(shallowedComponent.state('isOpen')).toEqual(false);
+        expect(mockResolve).toHaveBeenCalled();
+        expect(mockClosePrompt).toHaveBeenCalled();
+      });
     });
   });
 });

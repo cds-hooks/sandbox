@@ -1,6 +1,5 @@
 import React from 'react';
 import { mount, shallow } from 'enzyme';
-import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 
 import ConnectedView, {ConfigureServices} from '../../../src/components/ConfigureServices/configure-services';
@@ -38,17 +37,21 @@ describe('ConfigureServices component', () => {
   it('changes isOpen state property if props changes for the property', () => {
     let component = mount(<ConfigureServices store={mockStore} isOpen={false} />);
     expect(component.prop('isOpen')).toEqual(false);
-    component.setProps({ isOpen: true });
-    expect(component.prop('isOpen')).toEqual(true);
+    Promise.resolve(component).then(() => {
+      component.setProps({ isOpen: true });
+      expect(component.prop('isOpen')).toEqual(true);
+    });
   });
 
-  it('handles closing the modal in the component', async () => {
+  it('handles closing the modal in the component', () => {
     let component = shallow(<ConnectedView store={mockStore} 
                                            isOpen={true} 
                                            closePrompt={mockClosePrompt} /> );
     let childComponent = component.find('ConfigureServices'); 
-    let shallowedComponent = childComponent.shallow();                         
-    await shallowedComponent.find('Dialog').dive().find('ContentContainer').dive().find('.right-align').find('Button').at(0).simulate('click');
-    expect(shallowedComponent.state('isOpen')).toEqual(false);
+    let shallowedComponent = childComponent.shallow();
+    Promise.resolve(shallowedComponent).then(() => {                  
+      shallowedComponent.find('Dialog').dive().find('ContentContainer').dive().find('.right-align').find('Button').at(0).simulate('click');
+      expect(shallowedComponent.state('isOpen')).toEqual(false);
+    });
   });
 });

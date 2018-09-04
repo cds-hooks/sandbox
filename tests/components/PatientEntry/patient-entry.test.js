@@ -1,6 +1,5 @@
 import React from 'react';
 import { mount, shallow } from 'enzyme';
-import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 
 describe('PatientEntry component', () => {
@@ -21,6 +20,7 @@ describe('PatientEntry component', () => {
   function setup(state) {
     mockStore = mockStoreWrapper(state);
     jest.setMock('../../../src/retrieve-data-helpers/patient-retrieval', mockSpy);
+    jest.setMock('../../../src/retrieve-data-helpers/patientlist-retrieval', jest.fn(() => { return Promise.resolve([])} ));
     ConnectedView = require('../../../src/components/PatientEntry/patient-entry').default;
     PatientEntryView = require('../../../src/components/PatientEntry/patient-entry')['PatientEntry'];
     let component;
@@ -68,20 +68,24 @@ describe('PatientEntry component', () => {
     expect(component.prop('isOpen')).toEqual(true);
   });
 
-  it('handles closing the modal in the component', async () => {
+  it('handles closing the modal in the component', () => {
     mockResolve = null;
     mockClosePrompt = null;
     setup(storeState);
     let shallowedComponent = pureComponent.shallow();
-    await shallowedComponent.find('Dialog').dive().find('ContentContainer').dive().find('.right-align').find('Button').at(1).simulate('click');
-    expect(shallowedComponent.state('isOpen')).toEqual(false);
+    Promise.resolve(shallowedComponent).then(() => {
+      shallowedComponent.find('Dialog').dive().find('ContentContainer').dive().find('.right-align').find('Button').at(1).simulate('click');
+      expect(shallowedComponent.state('isOpen')).toEqual(false);
+    });
   });
 
-  it('does not have cancel options on the modal if a patient is required', async () => {
+  it('does not have cancel options on the modal if a patient is required', () => {
     isEntryRequired = false;
     setup(storeState);
     let shallowedComponent = pureComponent.shallow();
-    expect(await shallowedComponent.find('Dialog').dive().find('ContentContainer').dive().find('.right-align').find('Button').length).toEqual(2);
+    Promise.resolve(shallowedComponent).then(() => {
+      expect(shallowedComponent.find('Dialog').dive().find('ContentContainer').dive().find('.right-align').find('Button').length).toEqual(2);
+    });
   });
 
   describe('User input', () => {
@@ -93,29 +97,36 @@ describe('PatientEntry component', () => {
     it('displays an error if input is empty', () => {
       setup(storeState);
       let shallowedComponent = pureComponent.shallow();
-      enterInputAndSave(shallowedComponent, '');
-      expect(shallowedComponent.state('shouldDisplayError')).toEqual(true);
-      expect(shallowedComponent.state('errorMessage')).not.toEqual('');
+      Promise.resolve(shallowedComponent).then(() => {
+        enterInputAndSave(shallowedComponent, '').then(() => {
+          expect(shallowedComponent.state('shouldDisplayError')).toEqual(true);
+          expect(shallowedComponent.state('errorMessage')).not.toEqual('');
+        });
+      });
     });
 
     it('displays an error message if retrieving patient fails', () => {
       mockSpy = jest.fn(() => { throw new Error(1); });
       setup(storeState);
       let shallowedComponent = pureComponent.shallow();
-      enterInputAndSave(shallowedComponent, 'test');
-      expect(shallowedComponent.state('shouldDisplayError')).toEqual(true);
-      expect(shallowedComponent.state('errorMessage')).not.toEqual('');
+      Promise.resolve(shallowedComponent).then(() => {
+        enterInputAndSave(shallowedComponent, 'test');
+        expect(shallowedComponent.state('shouldDisplayError')).toEqual(true);
+        expect(shallowedComponent.state('errorMessage')).not.toEqual('');
+      });
     });
 
-    it('closes the modal, resolves passed in prop promise if applicable, and closes prompt if possible', async () => {
+    it('closes the modal, resolves passed in prop promise if applicable, and closes prompt if possible', () => {
       mockSpy = jest.fn(() => { return Promise.resolve(1)} );
       setup(storeState);
       let shallowedComponent = pureComponent.shallow();
-      await enterInputAndSave(shallowedComponent, 'test');
-      expect(shallowedComponent.state('shouldDisplayError')).toEqual(false);
-      expect(shallowedComponent.state('isOpen')).toEqual(false);
-      expect(mockResolve).toHaveBeenCalled();
-      expect(mockClosePrompt).toHaveBeenCalled();
+      Promise.resolve(shallowedComponent).then(() => {
+        enterInputAndSave(shallowedComponent, 'test');
+        expect(shallowedComponent.state('shouldDisplayError')).toEqual(false);
+        expect(shallowedComponent.state('isOpen')).toEqual(false);
+        expect(mockResolve).toHaveBeenCalled();
+        expect(mockClosePrompt).toHaveBeenCalled();
+      });
     });
   });
 });
