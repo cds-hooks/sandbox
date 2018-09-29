@@ -133,6 +133,7 @@ function callServices(url, context) {
     hookInstance,
     hook,
     fhirServer,
+    user,
     patient,
     context: activityContext,
   };
