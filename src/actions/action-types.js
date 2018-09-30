@@ -58,3 +58,6 @@ export const UPDATE_FHIR_MEDICATION_ORDER = 'UPDATE_FHIR_MEDICATION_ORDER';
 
 // Suggestions
 export const TAKE_SUGGESTION = 'TAKE_SUGGESTION';
+
+// User
+export const SWITCH_USER = 'SWITCH_USER';
