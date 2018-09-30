@@ -109,6 +109,8 @@ function callServices(url, context) {
   const patient = state.patientState.currentPatient.id;
   const activityContext = {};
   activityContext.patientId = patient;
+  activityContext.user = user;
+
   if (context && context.length) {
     context.forEach((contextKey) => {
       activityContext[contextKey.key] = contextKey.value;
