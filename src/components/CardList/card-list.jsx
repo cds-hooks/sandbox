@@ -175,14 +175,14 @@ export class CardList extends Component {
     const indicators = {
       info: 0,
       warning: 1,
-      'critical': 2,
+      critical: 2,
       error: 3,
     };
 
     const summaryColors = {
       info: '#0079be',
       warning: '#ffae42',
-      'critical': '#c00',
+      critical: '#c00',
       error: '#333',
     };
     const renderedCards = [];
