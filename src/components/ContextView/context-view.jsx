@@ -8,6 +8,7 @@ import forIn from 'lodash/forIn';
 
 import SelectField from 'terra-form/lib/SelectField';
 import ExchangePanel from '../ExchangePanel/exchange-panel';
+import MessagePanel from '../MessagePanel/message-panel';
 
 import styles from './context-view.css';
 
@@ -121,6 +122,11 @@ export class ContextView extends Component {
           <ExchangePanel
             panelHeader=" Response"
             panelText={serviceExchange ? serviceExchange.response : 'No response made to CDS Service'}
+            isExpanded
+          />
+          <hr />
+          <MessagePanel
+            panelHeader=" Messages"
             isExpanded
           />
         </div>

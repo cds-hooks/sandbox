@@ -112,6 +112,7 @@
     "webpack-merge": "^4.1.2"
   },
   "jest": {
+    "testURL": "https://cds-client.org",
     "setupFiles": [
       "./tests/jest-setup.js"
     ],

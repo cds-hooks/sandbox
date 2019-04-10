@@ -108,7 +108,7 @@ export class CardList extends Component {
   /**
    * For SMART links, modify the link URLs as this component processes them according to two scenarios:
    * 1 - Secured: Retrieve a launch context for the link and append a launch and iss parameter for use against secured endpoints
-   * 2 - Open: Append a fhirServiceUrl and patientId parameter to the link for use against open endpoints
+   * 2 - Open: Append a fhirServiceUrl, patientId, and smart_messaging_origin parameter to the link for use against open endpoints
    * @param {*} card - Card object to process the links for
    */
   modifySmartLaunchUrls(card) {
@@ -131,6 +131,7 @@ export class CardList extends Component {
           }
           linkCopy.url += `fhirServiceUrl=${this.props.fhirServerUrl}`;
           linkCopy.url += `&patientId=${this.props.patientId}`;
+          linkCopy.url += `&smart_messaging_origin=${window.location.origin}`;
         }
         return linkCopy;
       });
