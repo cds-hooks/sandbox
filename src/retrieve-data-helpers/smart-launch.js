@@ -33,10 +33,14 @@ function smartLaunchPromise() {
             // custom property in the access token response called "serviceDiscoveryURL"
             if (smart.tokenResponse.serviceDiscoveryURL) {
               let discoveryURL = smart.tokenResponse.serviceDiscoveryURL;
-              if (!/^(https?:)?\/\//i.test(discoveryURL)) {
-                discoveryURL = `http://${discoveryURL}`;
+              const discoveryUrls = discoveryURL.split(',');
+              for (let i = 0; i < discoveryUrls.length; i += 1) {
+                discoveryURL = discoveryUrls[i];
+                if (!/^(https?:)?\/\//i.test(discoveryURL)) {
+                  discoveryURL = `http://${discoveryURL}`;
+                }
+                retrieveDiscoveryServices(discoveryURL);
               }
-              retrieveDiscoveryServices(discoveryURL);
             }
             return resolve(result.data);
           }).catch((err) => {
