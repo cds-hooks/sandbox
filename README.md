@@ -14,7 +14,7 @@ The Sandbox can act as a demo tool to simulate CDS Hooks and visualize the workf
 The Sandbox supports the following CDS Hooks Workflows:
 
 - `patient-view`: On initial load, the Sandbox displays what looks like the opening of a patient's chart. A default CDS Service displays a card pertaining to the `patient-view` hook invoked on this view. On the toolbar in the header, the Patient View tab should be highlighted to indicate this default view. When navigated to this view, the Sandbox will invoke configured CDS Services listening on the `patient-view` hook.
-- `medication-prescribe`: Invoked by the Rx View tab on the header, the Sandbox displays an EHR-like view of a form a care provider would use to author a medication for a specific condition. With the patient in context, you can drill down into the specific (if any) conditions the patient has. Additionally, you can choose from an extensive list of medications to prescribe, and adjust dosage instructions accordingly. Any action taken on this view once a medication is prescribed will invoke the configured CDS Services on this tool listening on the `medication-prescribe` hook.
+- `order-select`: Invoked by the Rx View tab on the header, the Sandbox displays an EHR-like view of a form a care provider would use to author a medication for a specific condition. With the patient in context, you can drill down into the specific (if any) conditions the patient has. Additionally, you can choose from an extensive list of medications to prescribe, and adjust dosage instructions accordingly. Any action taken on this view once a medication is prescribed will invoke the configured CDS Services on this tool listening on the `order-select` hook.
    
 ### Tools
 
@@ -40,7 +40,7 @@ The tool also allows for testing against different patients and FHIR servers (se
 While users have the option to configure properties of the Sandbox in-app like the FHIR server, the patient in context, the medication details on Rx View, etc., they also have the option to configure these values on launch via URL query parameters. The Sandbox supports the following query parameters.
   - `fhirServiceUrl` - FHIR server base URL that MUST be URL encoded (i.e. `fhirServiceUrl=https%3A%2F%2Fapi.hspconsortium.org%2Fcdshooksdstu2%2Fopen`)
   - `patientId` - The ID of the Patient in context as it relates to the associated FHIR server (i.e. `patientId=SMART-1288992`)
-  - `hook` - The view/associated hook of the Sandbox (i.e. `hook=medication-prescribe`)
+  - `hook` - The view/associated hook of the Sandbox (i.e. `hook=order-select`)
   - `serviceDiscoveryURL` - A comma-separated list of URL encoded CDS service discovery endpoints (i.e. `serviceDiscoveryURL=http%3A%2F%2Flocalhost%3A3000%2Fcds-services,https%3A%2F%2Ffhir-org-cds-services.appspot.com%2Fcds-services`)
   - `prescribedMedication` - Coding code of a medication from the system, `http://www.nlm.nih.gov/research/umls/rxnorm` (i.e. `prescribedMedication=731370`)
   - `prescribedInstructionNumber` - Dosage number of medication to take (i.e. `prescribedInstructionNumber=2`)
@@ -51,7 +51,7 @@ While users have the option to configure properties of the Sandbox in-app like t
 
 Now, users can construct a link that has their preferred properties configured on launch instead of manually inputting them in-app, and can use the link every time to launch their configured Sandbox (does not include SMART-launched Sandbox method). See below for an example URL.
 
-> https://sandbox.cds-hooks.org/?hook=medication-prescribe&prescribedMedication=731370&prescribedReason=1201005&prescribedInstructionNumber=2&prescribedInstructionFrequency=daily
+> https://sandbox.cds-hooks.org/?hook=order-select&prescribedMedication=731370&prescribedReason=1201005&prescribedInstructionNumber=2&prescribedInstructionFrequency=daily
 
 
 ## Testing w/ Secured FHIR Servers

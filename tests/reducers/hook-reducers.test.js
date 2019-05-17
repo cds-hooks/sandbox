@@ -44,7 +44,7 @@ describe('Hook Reducer', () => {
     it('should handle the SET_HOOK action accordingly', () => {
       const action = {
         type: types.SET_HOOK,
-        hook: 'medication-prescribe',
+        hook: 'order-select',
       };
 
       const newState = Object.assign({}, state, { currentHook: action.hook });

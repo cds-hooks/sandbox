@@ -127,10 +127,10 @@ describe('MainView component', () => {
 
   describe('Persisted State Values', () => {
     it('calls a function to set the hook status on state on mount from a persisted value on localStorage', () => {
-      localStorage.setItem('PERSISTED_hook', 'medication-prescribe');
+      localStorage.setItem('PERSISTED_hook', 'order-select');
       setup(storeState);
       const shallowedComponent = pureComponent.shallow();
-      expect(mockStore.getActions()[1]).toEqual(setHook('medication-prescribe'));
+      expect(mockStore.getActions()[1]).toEqual(setHook('order-select'));
     });
 
     it('calls a function to set the hook status on state on mount to patient-view if no persisted hook value present on localStorage', () => {
@@ -155,21 +155,21 @@ describe('MainView component', () => {
   describe('URL Parameter Values', () => {
     it('grabs the hook from the hook URL query parameter and sets it if its a known hook', async () => {
       jsdom.reconfigure({
-        url: 'http://example.com/?hook=medication-prescribe',
+        url: 'http://example.com/?hook=order-select',
       });
       setup(storeState);
       const shallowedComponent = await pureComponent.shallow();
-      expect(mockStore.getActions()[1]).toEqual(setHook('medication-prescribe'));
+      expect(mockStore.getActions()[1]).toEqual(setHook('order-select'));
     });
 
     it('sets stored local storage hook for unsupported hooks in the URL param', async () => {
-      localStorage.setItem('PERSISTED_hook', 'medication-prescribe');
+      localStorage.setItem('PERSISTED_hook', 'order-select');
       jsdom.reconfigure({
         url: 'http://example.com/?hook=abc-123',
       });
       setup(storeState);
       const shallowedComponent = await pureComponent.shallow();
-      expect(mockStore.getActions()[1]).toEqual(setHook('medication-prescribe'));
+      expect(mockStore.getActions()[1]).toEqual(setHook('order-select'));
     });
 
     it('calls the discovery endpoints of service discovery URLs in query parameters', async (done) => {

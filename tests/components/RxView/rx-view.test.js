@@ -48,7 +48,7 @@ describe('RxView component', () => {
       medications = [];
     }
     component = <RxView isContextVisible patient={patient} fhirServer={fhirServer} fhirVersion={'3.0.1'} 
-        services={services} hook={'medication-prescribe'} medListPhase={medListPhase} 
+        services={services} hook={'order-select'} medListPhase={medListPhase} 
         medications={medications} prescription={prescription} onMedicationChangeInput={onMedicationChangeInput} 
         chooseMedication={chooseMedication} chooseCondition={chooseCondition} updateDosageInstructions={updateDosageInstructions} 
         updateDate={updateDate} toggleEnabledDate={toggleEnabledDate} updateFhirResource={updateFhirResource}
@@ -79,7 +79,7 @@ describe('RxView component', () => {
       'http://example.com/cds-services/id-1': {
         url: 'http://example.com/cds-services/id-1',
         id: 'id-1',
-        hook: 'medication-prescribe',
+        hook: 'order-select',
         enabled: true,
       },
     };
@@ -102,7 +102,7 @@ describe('RxView component', () => {
       },
     };
     medListPhase = 'begin';
-    medicationOrder = { foo: 'foo' };
+    medicationOrder = { resourceType: 'MedicationRequest', id: '123' };
     mockSpy = jest.fn();
     chooseCondition = jest.fn();
     onMedicationChangeInput = jest.fn(); 
@@ -182,7 +182,13 @@ describe('RxView component', () => {
     Promise.resolve(newComponent).then(() => {
       expect(mockSpy).toHaveBeenCalledTimes(2);
       expect(mockSpy).toHaveBeenCalledWith('http://example.com/cds-services/id-1', [{
-        key: 'medications',
+        key: 'selections',
+        value: [
+          'MedicationRequest/123'
+        ],
+      },
+      {
+        key: 'draftOrders',
         value: {
           resourceType: 'Bundle',
           entry: [{

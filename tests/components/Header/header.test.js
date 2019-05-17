@@ -57,7 +57,7 @@ describe('Header component', () => {
             enabled: true,
           },
           [`${mockMedService}`]: {
-            hook: 'medication-prescribe',
+            hook: 'order-select',
             enabled: true,
           },
         },
@@ -92,7 +92,7 @@ describe('Header component', () => {
     it('dispatches to switch hooks in app state if another view tab is clicked', () => {
       setup(storeState);
       shallowedComponent.childAt(0).dive().find('.nav-links').not('.active-link').simulate('click');
-      const medHookAction = { type: types.SET_HOOK, hook: 'medication-prescribe' };
+      const medHookAction = { type: types.SET_HOOK, hook: 'order-select' };
       expect(mockStore.getActions()).toEqual([medHookAction]);
     });
   
@@ -102,15 +102,15 @@ describe('Header component', () => {
       expect(mockExchange).toHaveBeenCalledWith(mockPatientService);
     });
   
-    it('does not call services on medication-prescribe if no medication is chosen yet', () => {
-      storeState.hookState.currentHook = 'medication-prescribe';
+    it('does not call services on order-select if no medication is chosen yet', () => {
+      storeState.hookState.currentHook = 'order-select';
       setup(storeState);
       shallowedComponent.childAt(0).dive().find('.active-link').simulate('click');
       expect(mockExchange).not.toHaveBeenCalled();
     });
 
-    it('does call services on medication-prescribe if a medication has been chosen', () => {
-      storeState.hookState.currentHook = 'medication-prescribe';
+    it('does call services on order-select if a medication has been chosen', () => {
+      storeState.hookState.currentHook = 'order-select';
       storeState.medicationState.decisions.prescribable = 'foo-medicine';
       storeState.medicationState.medListPhase = 'done';
       setup(storeState);

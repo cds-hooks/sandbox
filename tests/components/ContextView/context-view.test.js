@@ -36,7 +36,7 @@ describe('ServiceContextView component', () => {
             enabled: true,
           },
           [medServiceUrl]: {
-            hook: 'medication-prescribe',
+            hook: 'order-select',
             url: medServiceUrl,
             enabled: true,
           },

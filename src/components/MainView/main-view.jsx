@@ -110,7 +110,7 @@ export class MainView extends Component {
   async componentDidMount() {
     // Set the loading spinner face-up
     this.props.setLoadingStatus(true);
-    const validHooks = ['patient-view', 'medication-prescribe'];
+    const validHooks = ['patient-view', 'order-select'];
     let parsedHook = this.getQueryParam('hook');
     if (validHooks.indexOf(parsedHook) < 0) {
       parsedHook = null;
