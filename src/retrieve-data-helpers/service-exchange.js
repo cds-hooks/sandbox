@@ -109,7 +109,7 @@ function callServices(url, context) {
   const patient = state.patientState.currentPatient.id;
   const activityContext = {};
   activityContext.patientId = patient;
-  activityContext.user = user;
+  activityContext.userId = user;
 
   if (context && context.length) {
     context.forEach((contextKey) => {
