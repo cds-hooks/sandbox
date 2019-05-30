@@ -71,7 +71,8 @@ describe('Service Exchange', () => {
     mockRequestWithContext = Object.assign({}, mockRequest, {
       context: {
         ...mockRequest.context,
-        medications: [{
+        selections: ['selection/id'],
+        draftOrders: [{
           foo: 'foo',
         }],
       },
@@ -245,7 +246,11 @@ describe('Service Exchange', () => {
       mockAxios.onPost(mockServiceWithoutPrefetch).reply(serviceResultStatus, mockServiceResult);
       const context = [
         {
-          key: 'medications',
+          key: 'selections',
+          value: ['selection/id'],
+        },
+        {
+          key: 'draftOrders',
           value: [{ foo: 'foo' }],
         },
       ];

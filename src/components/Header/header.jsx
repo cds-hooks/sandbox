@@ -41,7 +41,7 @@ const propTypes = {
    */
   hook: PropTypes.string.isRequired,
   /**
-   * Function to set a hook in the store (i.e. 'patient-view' to 'medication-prescribe')
+   * Function to set a hook in the store (i.e. 'patient-view' to 'order-select')
    */
   setHook: PropTypes.func.isRequired,
   /**
@@ -64,7 +64,7 @@ const propTypes = {
 
 /**
  * This component represents the Header for the application, which encompasses the title, logo, and several configuration options. The header allows the user
- * to select between different hook views (i.e. patient-view and medication-prescribe), and presents options to change the FHIR server and/or the patient in 
+ * to select between different hook views (i.e. patient-view and order-select), and presents options to change the FHIR server and/or the patient in 
  * context, add CDS services, among other options.
  */
 export class Header extends Component {
@@ -134,7 +134,7 @@ export class Header extends Component {
 
   /**
    * Once a new tab (hook) is chosen, the Sandbox must grab the applicable services for that hook and invoke them.
-   * In a special consideration for the Rx View (medication-prescribe), we see if a medication has already been chosen
+   * In a special consideration for the Rx View (order-select), we see if a medication has already been chosen
    * from a previous selection, and if so, call the services immediately with that previously chosen medication in context
    */
   switchHook(hook) {
@@ -150,7 +150,7 @@ export class Header extends Component {
           // If the tab is clicked again, make sure the Sandbox is qualified to call out to EHR's based
           // on current context (i.e. for the Rx View, ensure a medication has been prescribed before
           // re-invoking the services on that hook if the Rx View tab is clicked multiple times)
-          if (hook === 'medication-prescribe') {
+          if (hook === 'order-select') {
             const medicationPrescribed = state.medicationState.decisions.prescribable &&
               state.medicationState.medListPhase === 'done';
             if (medicationPrescribed) {
@@ -272,7 +272,7 @@ export class Header extends Component {
       <div className={styles['nav-tabs']}>
         <div className={styles['nav-container']}>
           <button className={this.getNavClasses('patient-view')} onClick={() => this.switchHook('patient-view')}>Patient View</button>
-          <button className={this.getNavClasses('medication-prescribe')} onClick={() => this.switchHook('medication-prescribe')}>Rx View</button>
+          <button className={this.getNavClasses('order-select')} onClick={() => this.switchHook('order-select')}>Rx View</button>
         </div>
       </div>);
 

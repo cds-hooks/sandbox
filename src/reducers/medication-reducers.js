@@ -27,6 +27,7 @@ const createFhirResource = (fhirVersion, patientId, state) => {
   const isSTU3 = fhirVersion === '3.0.1';
   const resource = {
     resourceType: isSTU3 ? 'MedicationRequest' : 'MedicationOrder',
+    id: isSTU3 ? 'request-123' : 'order-123',
   };
   resource[`${isSTU3 ? 'authoredOn' : 'dateWritten'}`] = moment().format('YYYY-MM-DD');
   let startDate;

@@ -174,6 +174,7 @@ describe('Medication Reducers', () => {
 
       const fhirResource = {
         resourceType: 'MedicationRequest',
+        id: 'request-123',
         authoredOn: moment().format('YYYY-MM-DD'),
         status: 'draft',
         subject: {

@@ -115,16 +115,16 @@ describe('Persist Data Middleware', () => {
       const { next, invoke } = createMock();
       const action = {
         type: 'SET_HOOK',
-        hook: 'medication-prescribe',
+        hook: 'order-select',
       };
 
       invoke(action);
-      expect(localStorage.getItem('PERSISTED_hook')).toEqual('medication-prescribe');
+      expect(localStorage.getItem('PERSISTED_hook')).toEqual('order-select');
       expect(next).toHaveBeenCalledWith(action);
     });
 
     it('ignores setting localStorage for actions whose type is not SET_HOOK', () => {
-      const hook = 'medication-prescribe';
+      const hook = 'order-select';
       localStorage.setItem('PERSISTED_hook', hook);
       const { next, invoke } = createMock();
       const action = {

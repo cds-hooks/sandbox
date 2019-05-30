@@ -6,7 +6,7 @@ import { signalSuccessPatientRetrieval, signalFailurePatientRetrieval } from '..
 /**
  * Retrieve Patient resource from the FHIR server in context with the patient id retrieved from the Redux store or access token (if applicable)
  * and dispatch successful or failed connection to the endpoint on the FHIR server. Additionally, grab Conditions data too, since a list of conditions
- * need to be displayed under the Rx View (medication-prescribe workflow).
+ * need to be displayed under the Rx View (order-select workflow).
  * @returns {Promise} - Promise to resolve elsewhere
  */
 function retrievePatient(testPatient) {

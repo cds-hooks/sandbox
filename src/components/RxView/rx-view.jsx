@@ -102,7 +102,7 @@ const propTypes = {
 };
 
 /**
- * Left-hand side on the mock-EHR view that displays the cards and relevant UI for the medication-prescribe hook.
+ * Left-hand side on the mock-EHR view that displays the cards and relevant UI for the order-select hook.
  * The services are not called until a medication is chosen, or a change in prescription is made
  */
 export class RxView extends Component {
@@ -269,14 +269,23 @@ export class RxView extends Component {
    */
   executeRequests() {
     if (Object.keys(this.props.services).length) {
+
+      const resource = this.props.medicationOrder;
+      const selection = resource.resourceType + '/' + resource.id;
+
       // For each service, call service for request/response exchange
       forIn(this.props.services, (val, key) => {
-        const context = [{
-          key: 'medications',
+        const context = [
+          {
+            key: 'selections',
+            value: [selection]
+          },
+          {
+          key: 'draftOrders',
           value: {
             resourceType: 'Bundle',
             entry: [{
-              resource: this.props.medicationOrder,
+              resource: resource,
             }],
           },
         }];
@@ -398,7 +407,7 @@ RxView.propTypes = propTypes;
 
 const mapStateToProps = (store) => {
   function isValidService(service) {
-    return service.hook === 'medication-prescribe' && service.enabled;
+    return service.hook === 'order-select' && service.enabled;
   }
 
   return {

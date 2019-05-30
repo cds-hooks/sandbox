@@ -3,7 +3,7 @@ import * as actions from '../../src/actions/hook-actions';
 
 describe('Hook Actions', () => {
   it('creates action to set a current hook for the application', () => {
-    const hook = 'medication-prescribe';
+    const hook = 'order-select';
     const expectedAction = {
       type: types.SET_HOOK,
       hook,
