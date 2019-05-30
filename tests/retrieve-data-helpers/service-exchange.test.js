@@ -64,8 +64,6 @@ describe('Service Exchange', () => {
       hookInstance: mockHookInstance,
       hook: 'patient-view',
       fhirServer: mockFhirServer,
-      user: 'Practitioner/specified-1',
-      patient: mockPatient,
       context: { patientId: mockPatient, userId: 'Practitioner/specified-1' }
     };
     mockRequestWithContext = Object.assign({}, mockRequest, {
@@ -210,7 +208,6 @@ describe('Service Exchange', () => {
     it('resolves and dispatches data from a successful CDS Service call with default user', () => {
       defaultStore.patientState.currentUser = '';
       mockRequest.context.userId = 'Practitioner/default';
-      mockRequest.user = 'Practitioner/default';
       const serviceResultStatus = 200;
       mockAxios.onPost(mockServiceWithoutPrefetch).reply(serviceResultStatus, mockServiceResult);
       return callServices(mockServiceWithoutPrefetch).then(() => {

@@ -104,12 +104,10 @@ function callServices(url, context) {
   const state = store.getState();
   const hook = state.hookState.currentHook;
   const fhirServer = state.fhirServerState.currentFhirServer;
-  const user = state.patientState.currentUser || state.patientState.defaultUser;
 
-  const patient = state.patientState.currentPatient.id;
   const activityContext = {};
-  activityContext.patientId = patient;
-  activityContext.userId = user;
+  activityContext.patientId = state.patientState.currentPatient.id;
+  activityContext.userId = state.patientState.currentUser || state.patientState.defaultUser;
 
   if (context && context.length) {
     context.forEach((contextKey) => {
@@ -133,8 +131,6 @@ function callServices(url, context) {
     hookInstance,
     hook,
     fhirServer,
-    user,
-    patient,
     context: activityContext,
   };
 
