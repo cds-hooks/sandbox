@@ -13,7 +13,7 @@ describe('Hook Reducer', () => {
   });
 
   it('should return the initial state without action', () => {
-    expect(reducer(undefined, {})).toEqual(state);
+    expect(reducer(undefined, {})).toMatchObject(state);
   });
 
   describe('SET_LOADING_STATUS', () => {
@@ -48,7 +48,7 @@ describe('Hook Reducer', () => {
       };
 
       const newState = Object.assign({}, state, { currentHook: action.hook });
-      expect(reducer(state, action)).toEqual(newState);
+      expect(reducer(state, action)).toMatchObject(newState);
     });
 
     it('should keep the current hook if the incoming hook is not valid', () => {
@@ -57,7 +57,7 @@ describe('Hook Reducer', () => {
         hook: '',
       };
 
-      expect(reducer(state, action)).toEqual(state);
+      expect(reducer(state, action)).toMatchObject(state);
     });
   });
 

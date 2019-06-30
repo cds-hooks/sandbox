@@ -64,7 +64,7 @@ const propTypes = {
 
 /**
  * This component represents the Header for the application, which encompasses the title, logo, and several configuration options. The header allows the user
- * to select between different hook views (i.e. patient-view and order-select), and presents options to change the FHIR server and/or the patient in 
+ * to select between different hook views (i.e. patient-view and order-select), and presents options to change the FHIR server and/or the patient in
  * context, add CDS services, among other options.
  */
 export class Header extends Component {
@@ -123,10 +123,10 @@ export class Header extends Component {
 
   /**
    * Determine how to make a hook tab display as the current or "active" tab or another tab
-   * @param {*} hook - the name of the hook 
+   * @param {*} hook - the name of the hook
    */
-  getNavClasses(hook) {
-    return this.props.hook === hook ? cx(styles['nav-links'], styles['active-link']) : styles['nav-links'];
+  getNavClasses(screen) {
+    return this.props.screen === screen ? cx(styles['nav-links'], styles['active-link']) : styles['nav-links'];
   }
 
   closeSettingsMenu() { this.setState({ settingsOpen: false }); }
@@ -137,14 +137,17 @@ export class Header extends Component {
    * In a special consideration for the Rx View (order-select), we see if a medication has already been chosen
    * from a previous selection, and if so, call the services immediately with that previously chosen medication in context
    */
-  switchHook(hook) {
+  switchHook(hook, screen = hook) {
     const state = store.getState();
     const filterService = service => service.hook === hook && service.enabled;
     const services = pickBy(state.cdsServicesState.configuredServices, filterService);
 
     // If the current view tab is being clicked, re-invoke the configured services on this hook.
     // Otherwise, set the new hook/view.
-    if (this.props.hook === hook) {
+    if (this.props.hook === hook && this.props.screen === screen) {
+      this.props.dispatch({ type: 'EXPLICIT_HOOK_TRIGGER' });
+
+      // TODO cut this logic out and use generic handers as for pama
       if (services && Object.keys(services).length) {
         forIn(services, (val, key) => {
           // If the tab is clicked again, make sure the Sandbox is qualified to call out to EHR's based
@@ -154,15 +157,15 @@ export class Header extends Component {
             const medicationPrescribed = state.medicationState.decisions.prescribable &&
               state.medicationState.medListPhase === 'done';
             if (medicationPrescribed) {
-              callServices(key);
+              callServices(this.props.dispatch, state, key);
             }
           } else {
-            callServices(key);
+            callServices(this.props.dispatch, state, key);
           }
         });
       }
     } else {
-      this.props.setHook(hook);
+      this.props.setHook(hook, screen);
     }
   }
 
@@ -182,6 +185,7 @@ export class Header extends Component {
     await retrieveFhirMetadata();
 
     localStorage.removeItem('PERSISTED_hook');
+    localStorage.removeItem('PERSISTED_screen');
 
     localStorage.removeItem('PERSISTED_patientId');
     await retrievePatient();
@@ -272,7 +276,8 @@ export class Header extends Component {
       <div className={styles['nav-tabs']}>
         <div className={styles['nav-container']}>
           <button className={this.getNavClasses('patient-view')} onClick={() => this.switchHook('patient-view')}>Patient View</button>
-          <button className={this.getNavClasses('order-select')} onClick={() => this.switchHook('order-select')}>Rx View</button>
+          <button className={this.getNavClasses('rx-view')} onClick={() => this.switchHook('order-select', 'rx-view')}>Rx View</button>
+          <button className={this.getNavClasses('pama')} onClick={() => this.switchHook('order-select', 'pama')}>PAMA Imaging</button>
         </div>
       </div>);
 
@@ -333,14 +338,15 @@ Header.propTypes = propTypes;
 
 const mapStateToProps = appStore => ({
   hook: appStore.hookState.currentHook,
+  screen: appStore.hookState.currentScreen,
   patientId: appStore.patientState.currentPatient.id,
   isCardDemoView: appStore.cardDemoState.isCardDemoView,
   isSecuredSandbox: appStore.fhirServerState.accessToken,
 });
 
 const mapDispatchToProps = dispatch => ({
-  setHook: (hook) => {
-    dispatch(setHook(hook));
+  setHook: (hook, screen) => {
+    dispatch(setHook(hook, screen));
   },
   toggleCardDemoView: () => {
     dispatch(toggleDemoView());
@@ -348,6 +354,7 @@ const mapDispatchToProps = dispatch => ({
   resetServices: () => {
     dispatch(resetServices());
   },
+  dispatch,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Header);

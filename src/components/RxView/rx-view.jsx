@@ -26,6 +26,9 @@ import { storeUserMedInput, storeUserChosenMedication,
   updateFhirMedicationOrder, storeUserCondition,
   storeMedDosageAmount, storeDate, toggleDate } from '../../actions/medication-select-actions';
 
+// TODO Remove
+import store from '../../store/store';
+
 const propTypes = {
   /**
    * Flag to determine if the CDS Developer Panel view is visible
@@ -269,27 +272,26 @@ export class RxView extends Component {
    */
   executeRequests() {
     if (Object.keys(this.props.services).length) {
-
       const resource = this.props.medicationOrder;
-      const selection = resource.resourceType + '/' + resource.id;
+      const selection = `${resource.resourceType}/${resource.id}`;
 
       // For each service, call service for request/response exchange
       forIn(this.props.services, (val, key) => {
         const context = [
           {
             key: 'selections',
-            value: [selection]
+            value: [selection],
           },
           {
-          key: 'draftOrders',
-          value: {
-            resourceType: 'Bundle',
-            entry: [{
-              resource: resource,
-            }],
-          },
-        }];
-        callServices(key, context);
+            key: 'draftOrders',
+            value: {
+              resourceType: 'Bundle',
+              entry: [{
+                resource,
+              }],
+            },
+          }];
+        callServices(store.dispatch, store.getState(), key, context);
       });
     }
   }
@@ -405,23 +407,23 @@ export class RxView extends Component {
 
 RxView.propTypes = propTypes;
 
-const mapStateToProps = (store) => {
+const mapStateToProps = (state) => {
   function isValidService(service) {
     return service.hook === 'order-select' && service.enabled;
   }
 
   return {
-    isContextVisible: store.hookState.isContextVisible,
-    patient: store.patientState.currentPatient,
-    fhirServer: store.fhirServerState.currentFhirServer,
-    fhirVersion: store.fhirServerState.fhirVersion,
-    services: pickBy(store.cdsServicesState.configuredServices, isValidService),
-    medications: store.medicationState.options[store.medicationState.medListPhase] || [],
-    prescription: store.medicationState.decisions.prescribable,
-    medicationInstructions: store.medicationState.medicationInstructions,
-    prescriptionDates: store.medicationState.prescriptionDates,
-    selectedConditionCode: store.medicationState.selectedConditionCode,
-    medicationOrder: store.medicationState.fhirResource,
+    isContextVisible: state.hookState.isContextVisible,
+    patient: state.patientState.currentPatient,
+    fhirServer: state.fhirServerState.currentFhirServer,
+    fhirVersion: state.fhirServerState.fhirVersion,
+    services: pickBy(state.cdsServicesState.configuredServices, isValidService),
+    medications: state.medicationState.options[state.medicationState.medListPhase] || [],
+    prescription: state.medicationState.decisions.prescribable,
+    medicationInstructions: state.medicationState.medicationInstructions,
+    prescriptionDates: state.medicationState.prescriptionDates,
+    selectedConditionCode: state.medicationState.selectedConditionCode,
+    medicationOrder: state.medicationState.fhirResource,
   };
 };
 

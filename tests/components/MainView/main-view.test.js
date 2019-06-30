@@ -38,6 +38,7 @@ describe('MainView component', () => {
     storeState = {
       hookState: {
         currentHook: 'patient-view',
+        currentScreen: 'patient-view',
         isLoadingData: false,
       },
       cardDemoState: {
@@ -67,7 +68,7 @@ describe('MainView component', () => {
 
   it('matches props passed down from Redux decorator', () => {
     setup(storeState);
-    expect(pureComponent.prop('hook')).toEqual(storeState.hookState.currentHook);
+    expect(pureComponent.prop('screen')).toEqual(storeState.hookState.currentScreen);
     expect(pureComponent.prop('isLoadingData')).toEqual(storeState.hookState.isLoadingData);
   });
 
@@ -105,7 +106,7 @@ describe('MainView component', () => {
   });
 
   it('renders the med prescribe view if hook is not patient view', () => {
-    const newStore = Object.assign({}, storeState, { hookState: { currentHook: 'med-prescribe' } });
+    const newStore = Object.assign({}, storeState, { hookState: { currentHook: 'order-select', currentScreen: 'rx-view' } });
     setup(newStore);
     const shallowedComponent = pureComponent.shallow();
     expect(shallowedComponent.find('Connect(RxView)')).toHaveLength(1);
@@ -128,16 +129,18 @@ describe('MainView component', () => {
   describe('Persisted State Values', () => {
     it('calls a function to set the hook status on state on mount from a persisted value on localStorage', () => {
       localStorage.setItem('PERSISTED_hook', 'order-select');
+      localStorage.setItem('PERSISTED_screen', 'rx-view');
       setup(storeState);
       const shallowedComponent = pureComponent.shallow();
-      expect(mockStore.getActions()[1]).toEqual(setHook('order-select'));
+      expect(mockStore.getActions()[1]).toEqual(setHook('order-select', 'rx-view'));
     });
 
     it('calls a function to set the hook status on state on mount to patient-view if no persisted hook value present on localStorage', () => {
-      localStorage.setItem('PERSISTED_hook', null);
+      localStorage.removeItem('PERSISTED_hook');
+      localStorage.removeItem('PERSISTED_screen');
       setup(storeState);
       const shallowedComponent = pureComponent.shallow();
-      expect(mockStore.getActions()[1]).toEqual(setHook('patient-view'));
+      expect(mockStore.getActions()[1]).toEqual(setHook('patient-view', 'patient-view'));
     });
 
     it('tries to discover any CDS Services from local storage', async (done) => {
@@ -155,21 +158,22 @@ describe('MainView component', () => {
   describe('URL Parameter Values', () => {
     it('grabs the hook from the hook URL query parameter and sets it if its a known hook', async () => {
       jsdom.reconfigure({
-        url: 'http://example.com/?hook=order-select',
+        url: 'http://example.com/?hook=order-select&screen=rx-view',
       });
       setup(storeState);
       const shallowedComponent = await pureComponent.shallow();
-      expect(mockStore.getActions()[1]).toEqual(setHook('order-select'));
+      expect(mockStore.getActions()[1]).toEqual(setHook('order-select', 'rx-view'));
     });
 
     it('sets stored local storage hook for unsupported hooks in the URL param', async () => {
       localStorage.setItem('PERSISTED_hook', 'order-select');
+      localStorage.setItem('PERSISTED_screen', 'rx-view');
       jsdom.reconfigure({
         url: 'http://example.com/?hook=abc-123',
       });
       setup(storeState);
       const shallowedComponent = await pureComponent.shallow();
-      expect(mockStore.getActions()[1]).toEqual(setHook('order-select'));
+      expect(mockStore.getActions()[1]).toEqual(setHook('order-select', 'rx-view'));
     });
 
     it('calls the discovery endpoints of service discovery URLs in query parameters', async (done) => {

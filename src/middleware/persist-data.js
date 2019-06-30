@@ -27,6 +27,9 @@ export const persistPatient = store => next => (action) => {
 export const persistHook = store => next => (action) => {
   if (action.type === 'SET_HOOK') {
     localStorage.setItem('PERSISTED_hook', action.hook);
+    if (action.screen) {
+      localStorage.setItem('PERSISTED_screen', action.screen);
+    }
   }
   return next(action);
 };

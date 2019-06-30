@@ -5,6 +5,7 @@ import { createLogger } from 'redux-logger';
 import immutableStateWatcher from 'redux-immutable-state-invariant';
 import reducers from '../reducers/index';
 import { persistFhirServer, persistPatient, persistHook } from '../middleware/persist-data';
+import cds from '../middleware/cds-execution';
 
 const logger = createLogger({
   collapsed: true,
@@ -18,6 +19,9 @@ const store = createStore(reducers, applyMiddleware(
   persistFhirServer,
   persistPatient,
   persistHook,
+  cds.middlewareFor(cds.evaluateCdsTriggers),
+  cds.middlewareFor(cds.onSystemActions),
+  cds.webMessageMiddleware,
   ...loggerMiddleware,
 ));
 export default store;

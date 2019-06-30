@@ -1,6 +1,5 @@
 import axios from 'axios';
 import queryString from 'query-string';
-import store from '../store/store';
 import { storeExchange } from '../actions/service-exchange-actions';
 import { productionClientId, allScopes } from '../config/fhir-config';
 import generateJWT from './jwt-generator';
@@ -31,8 +30,7 @@ function encodeUriParameters(template) {
  * @param prefetch - Prefetch key/value pair from a CDS Service definition
  * @returns {*} - New prefetch key/value pair Object with prefetch template filled out
  */
-function completePrefetchTemplate(prefetch) {
-  const state = store.getState();
+function completePrefetchTemplate(state, prefetch) {
   const patient = state.patientState.currentPatient.id;
   const user = state.patientState.currentUser || state.patientState.defaultUser;
   const prefetchRequests = Object.assign({}, prefetch);
@@ -51,13 +49,13 @@ function completePrefetchTemplate(prefetch) {
  * @param prefetch - Prefetch templates from a CDS Service definition filled out
  * @returns {Promise} - Promise object to eventually fetch data
  */
-function prefetchDataPromises(baseUrl, prefetch) {
+function prefetchDataPromises(state, baseUrl, prefetch) {
   const resultingPrefetch = {};
-  const prefetchRequests = Object.assign({}, completePrefetchTemplate(prefetch));
+  const prefetchRequests = Object.assign({}, completePrefetchTemplate(state, prefetch));
   return new Promise((resolve) => {
     const prefetchKeys = Object.keys(prefetchRequests);
     const headers = { Accept: 'application/json+fhir' };
-    const accessTokenProperty = store.getState().fhirServerState.accessToken;
+    const accessTokenProperty = state.fhirServerState.accessToken;
     if (accessTokenProperty && accessTokenProperty.access_token) {
       headers.Authorization = `Bearer ${accessTokenProperty.access_token}`;
     }
@@ -100,8 +98,7 @@ function prefetchDataPromises(baseUrl, prefetch) {
  * @param context - Any context to relay to the CDS Service in the request via the context parameter
  * @returns {Promise} - Promise object to eventually return service response data
  */
-function callServices(url, context) {
-  const state = store.getState();
+function callServices(dispatch, state, url, context, exchangeRound = 0) {
   const hook = state.hookState.currentHook;
   const fhirServer = state.fhirServerState.currentFhirServer;
   const user = state.patientState.currentUser || state.patientState.defaultUser;
@@ -118,7 +115,7 @@ function callServices(url, context) {
   }
 
   const hookInstance = uuidv4();
-  const accessTokenProperty = store.getState().fhirServerState.accessToken;
+  const accessTokenProperty = state.fhirServerState.accessToken;
   let fhirAuthorization;
   if (accessTokenProperty) {
     fhirAuthorization = {
@@ -146,7 +143,7 @@ function callServices(url, context) {
 
   if (serviceDefinition.prefetch && Object.keys(serviceDefinition.prefetch).length) {
     // Wait for prefetch to be fulfilled before making a request to the CDS service, if the service has prefetch expectations
-    const fulFilled = prefetchDataPromises(fhirServer, serviceDefinition.prefetch);
+    const fulFilled = prefetchDataPromises(state, fhirServer, serviceDefinition.prefetch);
     return fulFilled.then((prefetch) => {
       if (prefetch && Object.keys(prefetch).length) {
         request.prefetch = prefetch;
@@ -162,14 +159,14 @@ function callServices(url, context) {
         },
       }).then((result) => {
         if (result.data && Object.keys(result.data).length) {
-          store.dispatch(storeExchange(url, request, result.data, result.status));
+          dispatch(storeExchange(url, request, result.data, result.status));
           return;
         }
-        store.dispatch(storeExchange(url, request, 'No response returned. ' +
+        dispatch(storeExchange(url, request, 'No response returned. ' +
           'Check developer tools for more details.'));
       }).catch((err) => {
         console.error(`Could not POST data to CDS Service ${url}`, err);
-        store.dispatch(storeExchange(url, request, 'Could not get a response from the CDS Service. ' +
+        dispatch(storeExchange(url, request, 'Could not get a response from the CDS Service. ' +
           'See developer tools for more details'));
       });
     });
@@ -184,14 +181,14 @@ function callServices(url, context) {
     },
   }).then((result) => {
     if (result.data && Object.keys(result.data).length) {
-      store.dispatch(storeExchange(url, request, result.data, result.status));
+      dispatch(storeExchange(url, request, result.data, result.status, exchangeRound));
       return;
     }
-    store.dispatch(storeExchange(url, request, 'No response returned. ' +
+    dispatch(storeExchange(url, request, 'No response returned. ' +
       'Check developer tools for more details.'));
   }).catch((err) => {
     console.error(`Could not POST data to CDS Service ${url}`, err);
-    store.dispatch(storeExchange(url, request, 'Could not get a response from the CDS Service. ' +
+    dispatch(storeExchange(url, request, 'Could not get a response from the CDS Service. ' +
       'See developer tools for more details'));
   });
 }

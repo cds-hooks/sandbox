@@ -180,8 +180,7 @@ describe('RxView component', () => {
     };
     let newComponent = await renderedComponent.setProps({ prescription: prescription });
     Promise.resolve(newComponent).then(() => {
-      expect(mockSpy).toHaveBeenCalledTimes(2);
-      expect(mockSpy).toHaveBeenCalledWith('http://example.com/cds-services/id-1', [{
+      expect(mockSpy).toHaveBeenCalledWith(expect.anything(), expect.anything(), 'http://example.com/cds-services/id-1', [{
         key: 'selections',
         value: [
           'MedicationRequest/123'

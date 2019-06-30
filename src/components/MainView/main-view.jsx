@@ -13,6 +13,7 @@ import styles from './main-view.css';
 import Header from '../Header/header';
 import PatientView from '../PatientView/patient-view';
 import RxView from '../RxView/rx-view';
+import Pama from '../Pama/pama';
 import ContextView from '../ContextView/context-view';
 import FhirServerEntry from '../FhirServerEntry/fhir-server-entry';
 import PatientEntry from '../PatientEntry/patient-entry';
@@ -21,10 +22,6 @@ import { setLoadingStatus } from '../../actions/ui-actions';
 import { setHook } from '../../actions/hook-actions';
 
 const propTypes = {
-  /**
-   * Name of the current hook
-   */
-  hook: PropTypes.string.isRequired,
   /**
    * Flag to determine if the view is the Card Demo view or mock-EHR view
    */
@@ -112,11 +109,15 @@ export class MainView extends Component {
     this.props.setLoadingStatus(true);
     const validHooks = ['patient-view', 'order-select'];
     let parsedHook = this.getQueryParam('hook');
+    const parsedScreen = this.getQueryParam('screen');
     if (validHooks.indexOf(parsedHook) < 0) {
       parsedHook = null;
     }
     // Set the hook in context
-    this.props.setHook(parsedHook || localStorage.getItem('PERSISTED_hook') || 'patient-view');
+    this.props.setHook(
+      parsedHook || localStorage.getItem('PERSISTED_hook') || 'patient-view',
+      parsedScreen || localStorage.getItem('PERSISTED_screen') || 'patient-view',
+    );
 
     // Execute the SMART app launch sequence to grab a FHIR access token and SMART context (if applicable)
     await smartLaunchPromise().catch(async () => {
@@ -203,7 +204,13 @@ export class MainView extends Component {
   }
 
   render() {
-    const hookView = this.props.hook === 'patient-view' ? <PatientView /> : <RxView />;
+    const hookView = {
+      // TODO rename screens
+      'patient-view': <PatientView />,
+      'rx-view': <RxView />,
+      pama: <Pama />,
+    }[this.props.screen];
+
     const container = !this.props.isCardDemoView ? (
       <div className={styles.container}>
         {hookView}
@@ -237,7 +244,7 @@ export class MainView extends Component {
 MainView.propTypes = propTypes;
 
 const mapStateToProps = store => ({
-  hook: store.hookState.currentHook,
+  screen: store.hookState.currentScreen,
   isLoadingData: store.hookState.isLoadingData,
   isCardDemoView: store.cardDemoState.isCardDemoView,
 });
@@ -246,8 +253,8 @@ const mapDispatchToProps = dispatch => ({
   setLoadingStatus: (status) => {
     dispatch(setLoadingStatus(status));
   },
-  setHook: (hook) => {
-    dispatch(setHook(hook));
+  setHook: (...args) => {
+    dispatch(setHook(...args));
   },
 });
 

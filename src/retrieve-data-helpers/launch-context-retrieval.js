@@ -13,10 +13,11 @@ import axios from 'axios';
  */
 function retrieveLaunchContext(link, accessToken, patientId, fhirBaseUrl) {
   return new Promise((resolve, reject) => {
-    const headers = {
+    const headers = Object.assign({
       Accept: 'application/json',
+    }, accessToken ? {
       Authorization: `Bearer ${accessToken.access_token}`,
-    };
+    } : {});
 
     const launchParameters = {
       patient: patientId,

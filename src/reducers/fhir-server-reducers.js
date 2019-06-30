@@ -4,7 +4,7 @@ const initialState = {
   testFhirServer: null,
   currentFhirServer: '',
   currentMetadata: null,
-  defaultFhirServer: 'https://api.hspconsortium.org/cdshooksdstu2/open',
+  defaultFhirServer: 'https://launch.smarthealthit.org/v/r2/fhir',
   fhirVersion: '1.0.2',
   isDefaultFhirServer: true,
   accessToken: null,

@@ -13,7 +13,10 @@ import Button from 'terra-button';
 
 import styles from './card-list.css';
 import retrieveLaunchContext from '../../retrieve-data-helpers/launch-context-retrieval';
-import { getServicesByHook, getCardsFromServices } from '../../reducers/helpers/services-filter';
+import {
+  getServicesByHook,
+  getCardsFromServices,
+} from '../../reducers/helpers/services-filter';
 import { takeSuggestion } from '../../actions/medication-select-actions';
 
 const propTypes = {
@@ -26,6 +29,10 @@ const propTypes = {
    * The FHIR access token retrieved from the authorization server. Used to retrieve a launch context for a SMART app
    */
   fhirAccessToken: PropTypes.object,
+  /**
+   * Does the current FHIR server support SMART Launch?
+   */
+  smartLaunchSupported: PropTypes.bool,
   /**
    * Function callback to take a specific suggestion from a card
    */
@@ -42,6 +49,7 @@ const propTypes = {
    * JSON response from a CDS service containing potential cards to display
    */
   cardResponses: PropTypes.object,
+  onAppLaunch: PropTypes.func,
 };
 
 /**
@@ -99,10 +107,11 @@ export class CardList extends Component {
       e.preventDefault();
       if (link.error) {
         // TODO: Create an error modal to display for SMART link that cannot be launched securely
-        return;
+        return null;
       }
-      window.open(link.url, '_blank');
+      return window.open(link.url, '_blank');
     }
+    return null;
   }
 
   /**
@@ -115,10 +124,12 @@ export class CardList extends Component {
     if (!this.props.isDemoCard) {
       return card.links.map((link) => {
         let linkCopy = Object.assign({}, link);
-        if (link.type === 'smart' && this.props.fhirAccessToken) {
+        if (link.type === 'smart' && this.props.smartLaunchSupported) {
           retrieveLaunchContext(
-            linkCopy, this.props.fhirAccessToken,
-            this.props.patientId, this.props.fhirServerUrl,
+            linkCopy,
+            this.props.fhirAccessToken,
+            this.props.patientId,
+            this.props.fhirServerUrl,
           ).then((result) => {
             linkCopy = result;
             return linkCopy;
@@ -144,16 +155,34 @@ export class CardList extends Component {
    * @param {*} source - Object as part of the card to build the UI for
    */
   renderSource(source) {
-    if (!source.label) { return null; }
+    if (!source.label) {
+      return null;
+    }
     let icon;
     if (source.icon) {
-      icon = <img className={styles['card-icon']} src={source.icon} alt="Could not fetch icon" width="100" height="100" />;
+      icon = (
+        <img
+          className={styles['card-icon']}
+          src={source.icon}
+          alt="Could not fetch icon"
+          width="100"
+          height="100"
+        />
+      );
     }
     if (!this.props.isDemoCard) {
       return (
         <div className={styles['card-source']}>
-          Source: <a className={styles['source-link']} href={source.url || '#'} onClick={e => this.launchSource(e)}>{source.label}</a>
-          {icon}
+          Source:{' '}
+          <a
+            className={styles['source-link']}
+            href={source.url || '#'}
+            onClick={e => this.launchSource(e)}
+          >
+            {' '}
+            {source.label}{' '}
+          </a>{' '}
+          {icon}{' '}
         </div>
       );
     }
@@ -165,9 +194,9 @@ export class CardList extends Component {
           href="#"
           onClick={e => this.launchSource(e)}
         >
-          {source.label}
-        </a>
-        {icon}
+          {source.label}{' '}
+        </a>{' '}
+        {icon}{' '}
       </div>
     );
   }
@@ -194,13 +223,33 @@ export class CardList extends Component {
         const card = JSON.parse(JSON.stringify(c));
 
         // -- Summary --
-        const summarySection = <Text fontSize={18} weight={700} color={summaryColors[card.indicator]}>{card.summary}</Text>;
+        const summarySection = (
+          <Text
+            fontSize={18}
+            weight={700}
+            color={summaryColors[card.indicator]}
+          >
+            {' '}
+            {card.summary}{' '}
+          </Text>
+        );
 
         // -- Source --
-        const sourceSection = card.source && Object.keys(card.source).length ? this.renderSource(card.source) : '';
+        const sourceSection =
+          card.source && Object.keys(card.source).length
+            ? this.renderSource(card.source)
+            : '';
 
         // -- Detail (ReactMarkdown supports Github-flavored markdown) --
-        const detailSection = card.detail ? <ReactMarkdown escapeHtml={false} softBreak="br" source={card.detail} /> : '';
+        const detailSection = card.detail ? (
+          <ReactMarkdown
+            escapeHtml={false}
+            softBreak="br"
+            source={card.detail}
+          />
+        ) : (
+          ''
+        );
 
         // -- Suggestions --
         let suggestionsSection;
@@ -222,43 +271,61 @@ export class CardList extends Component {
           linksSection = card.links.map((link, ind) => (
             <Button
               key={ind}
-              onClick={e => this.launchLink(e, link)}
+              onClick={(e) => {
+                const launchedWindow = this.launchLink(e, link);
+                if (this.props.onAppLaunch) {
+                  this.props.onAppLaunch(link, launchedWindow);
+                }
+              }}
               text={link.label}
               variant={Button.Opts.Variants['DE-EMPHASIS']}
             />
           ));
         }
 
-        const classes = cx(styles['decision-card'], styles.alert, styles[`alert-${card.indicator}`]);
+        const classes = cx(
+          styles['decision-card'],
+          styles.alert,
+          styles[`alert-${card.indicator}`],
+        );
 
         const builtCard = (
           <TerraCard key={cardInd} className={classes}>
-            {summarySection}
-            {sourceSection}
-            {detailSection}
+            {' '}
+            {summarySection} {sourceSection} {detailSection}{' '}
             <div className={styles['suggestions-section']}>
-              {suggestionsSection}
-            </div>
-            <div className={styles['links-section']}>
-              {linksSection}
-            </div>
-          </TerraCard>);
+              {' '}
+              {suggestionsSection}{' '}
+            </div>{' '}
+            <div className={styles['links-section']}> {linksSection} </div>{' '}
+          </TerraCard>
+        );
 
         renderedCards.push(builtCard);
       });
-    if (renderedCards.length === 0) { return <div>No Cards</div>; }
-    return <div>{renderedCards}</div>;
+    if (renderedCards.length === 0) {
+      return <div> No Cards </div>;
+    }
+    return <div> {renderedCards} </div>;
   }
 }
 
 CardList.propTypes = propTypes;
 
-const mapStateToProps = store => ({
-  cardResponses: getCardsFromServices(Object.keys(getServicesByHook(store.hookState.currentHook, store.cdsServicesState.configuredServices))),
-  fhirServerUrl: store.fhirServerState.currentFhirServer,
-  fhirAccessToken: store.fhirServerState.accessToken,
-  patientId: store.patientState.currentPatient.id,
-});
+const mapStateToProps = (store, ownProps) => {
+  console.log('clmstp', store, ownProps);
+  return {
+    ...ownProps,
+    cardResponses: getCardsFromServices(Object.keys(getServicesByHook(
+      store.hookState.currentHook,
+      store.cdsServicesState.configuredServices,
+    ))),
+    fhirServerUrl: store.fhirServerState.currentFhirServer,
+    smartLaunchSupported: true, // TODO: grab real state
+    fhirAccessToken: store.fhirServerState.accessToken,
+    patientId: store.patientState.currentPatient.id,
+  };
+};
 
 const mapDispatchToProps = dispatch => ({
   takeSuggestion: (suggestion) => {
@@ -266,4 +333,7 @@ const mapDispatchToProps = dispatch => ({
   },
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(CardList);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(CardList);

@@ -8,13 +8,14 @@ import * as types from './action-types';
  * @param {*} response - Object (if any) representing the response sent to the Sandbox from the CDS service
  * @param {*} responseStatus - Number representing the response status
  */
-export function storeExchange(url, request, response, responseStatus) {
+export function storeExchange(url, request, response, responseStatus, exchangeRound = 0) {
   return {
     type: types.STORE_SERVICE_EXCHANGE,
     url,
     request,
     response,
     responseStatus,
+    exchangeRound,
   };
 }
 

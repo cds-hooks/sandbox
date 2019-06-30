@@ -12,6 +12,9 @@ import CardList from '../CardList/card-list';
 import styles from './patient-view.css';
 import callServices from '../../retrieve-data-helpers/service-exchange';
 
+// TODO remove
+import store from '../../store/store';
+
 const propTypes = {
   /**
    * The Patient resource in context
@@ -57,7 +60,8 @@ export class PatientView extends Component {
     if (Object.keys(this.props.services).length) {
       // For each service, call service for request/response exchange
       forIn(this.props.services, (val, key) => {
-        callServices(key);
+        console.log('PV', store, store.dispatch, store.getState(), key);
+        callServices(store.dispatch, store.getState(), key);
       });
     }
   }
@@ -84,17 +88,17 @@ export class PatientView extends Component {
 
 PatientView.propTypes = propTypes;
 
-const mapStateToProps = (store) => {
+const mapStateToProps = (state) => {
   function isValidService(service) {
     return service.hook === 'patient-view' && service.enabled;
   }
 
   return {
-    isContextVisible: store.hookState.isContextVisible,
-    patient: store.patientState.currentPatient,
-    fhirServer: store.fhirServerState.currentFhirServer,
-    services: pickBy(store.cdsServicesState.configuredServices, isValidService),
-    hook: store.hookState.currentHook,
+    isContextVisible: state.hookState.isContextVisible,
+    patient: state.patientState.currentPatient,
+    fhirServer: state.fhirServerState.currentFhirServer,
+    services: pickBy(state.cdsServicesState.configuredServices, isValidService),
+    hook: state.hookState.currentHook,
   };
 };
 
