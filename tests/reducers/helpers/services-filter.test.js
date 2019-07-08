@@ -127,7 +127,7 @@ describe('Services Filters', () => {
       getConditionCodingFromCode = filters.getConditionCodingFromCode;
     });
     it('filters conditions based on passed in code', () => {
-      expect(getConditionCodingFromCode(mockStore.getState(), 'valid-code')).toEqual(testValidCondition);
+      expect(getConditionCodingFromCode(mockStore.getState().patientState.currentPatient.conditionsResources, 'valid-code')).toEqual(testValidCondition);
     });
   });
 });

@@ -1,4 +1,4 @@
-import * as types from "./action-types";
+import * as types from './action-types';
 
 /**
  * Stores the entire CDS service exchange between Sandbox and the service endpoint from the request to response in the Redux store
@@ -13,7 +13,7 @@ export function storeExchange(
   request,
   response,
   responseStatus,
-  exchangeRound = 0
+  exchangeRound = 0,
 ) {
   return {
     type: types.STORE_SERVICE_EXCHANGE,
@@ -21,7 +21,7 @@ export function storeExchange(
     request,
     response,
     responseStatus,
-    exchangeRound
+    exchangeRound,
   };
 }
 
@@ -30,19 +30,19 @@ export function storeLaunchContext({ url, appContext, remappedUrl }) {
     type: types.STORE_LAUNCH_LINK,
     url,
     appContext,
-    remappedUrl
+    remappedUrl,
   };
 }
 
 export const createExchangeRound = (
   exchangeRound,
   currentScreen,
-  triggerPoint
+  triggerPoint,
 ) => ({
   type: types.CREATE_EXCHANGE_ROUND,
   id: exchangeRound,
   screen: currentScreen,
-  triggerPoint
+  triggerPoint,
 });
 
 /**
@@ -53,6 +53,6 @@ export const createExchangeRound = (
 export function selectService(service) {
   return {
     type: types.SELECT_SERVICE_CONTEXT,
-    service
+    service,
   };
 }

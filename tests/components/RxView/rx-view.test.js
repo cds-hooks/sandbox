@@ -172,39 +172,6 @@ describe('RxView component', () => {
     expect(updateDate).toHaveBeenCalled();
   });
 
-  it('updates the FHIR resource and calls CDS Services if a prescription is selected', async (done) => {
-    setup(patient, medListPhase, medications, prescription);
-    prescription = {
-      name: 'another prescribable med',
-      id: '456',
-    };
-    let newComponent = await renderedComponent.setProps({ prescription: prescription });
-    Promise.resolve(newComponent).then(() => {
-      expect(mockSpy).toHaveBeenCalledWith(expect.anything(), expect.anything(), 'http://example.com/cds-services/id-1', [{
-        key: 'selections',
-        value: [
-          'MedicationRequest/123'
-        ],
-      },
-      {
-        key: 'draftOrders',
-        value: {
-          resourceType: 'Bundle',
-          entry: [{
-            resource: medicationOrder,
-          }],
-        },
-      }]);
-      done();
-    });
-  });
-
-  it('updates medication order FHIR resource if a medication was chosen but the FHIR resource was not updated', () => {
-    medicationOrder = null;
-    setup(patient, medListPhase, medications, prescription);
-    expect(updateFhirResource).toHaveBeenCalled();
-  });
-
   it('updates the form fields in the UI if incoming props for those values differ', async () => {
     setup(patient, medListPhase, medications, prescription);
     let newComponent = await renderedComponent.setProps({ 

@@ -43,8 +43,8 @@ export function getCardsFromServices(state, serviceUrls) {
  * that matches that of the coding code
  * @param {*} code - Condition coding code to filter the patient conditions by
  */
-export function getConditionCodingFromCode(state, code) {
-  const conditions = Object.assign([], state.patientState.currentPatient.conditionsResources);
+export function getConditionCodingFromCode(patientConditions, code) {
+  const conditions = Object.assign([], patientConditions);
   const filteredConditions = conditions.filter(condition => (
     condition.resource.code.coding[0].code === code
   ));

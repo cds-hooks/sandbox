@@ -1,9 +1,9 @@
-import _ from "lodash";
-import deepEqual from "fast-deep-equal";
+import _ from 'lodash';
+import deepEqual from 'fast-deep-equal';
 
-import * as types from "../actions/action-types";
-import callServices from "../retrieve-data-helpers/service-exchange";
-import { createExchangeRound } from "../actions/service-exchange-actions";
+import * as types from '../actions/action-types';
+import callServices from '../retrieve-data-helpers/service-exchange';
+import { createExchangeRound } from '../actions/service-exchange-actions';
 
 // Maintain an increasing trigger count, for each time we do a round
 // of CDS service invocations ("exchanges"). If we call 3 services
@@ -38,7 +38,7 @@ const registerWindow = (triggerPoint, origin, sourceWindow) => {
   windowsRegistered[windowId] = {
     origin,
     triggerPoint,
-    sourceWindow
+    sourceWindow,
   };
   return windowId;
 };
@@ -50,7 +50,7 @@ const externalHookContext = state => [
   state.hookState.currentScreen,
   state.hookState.currentHook,
   state.fhirServerState.currentFhirServer,
-  state.patientState
+  state.patientState,
 ];
 
 const anyChange = (a, b) => !deepEqual(a, b);
@@ -60,12 +60,14 @@ const anyChange = (a, b) => !deepEqual(a, b);
 // * External triggers are global page context: server, patient, etc
 // * Internal triggers can be implicit (anything that would change the request context)
 // * Internal triggers can also be explicit (like a "user clicked sign button")
-const shouldCallCds = ({ action, pre, post, handler }) => {
+const shouldCallCds = ({
+  action, pre, post, handler,
+}) => {
   const contextPre = handler.generateContext(pre);
   const contextPost = handler.generateContext(post);
   const externalTrigger = anyChange(
     externalHookContext(pre),
-    externalHookContext(post)
+    externalHookContext(post),
   );
   const implicitTrigger = anyChange(contextPre, contextPost);
   const explicitTrigger = action.type === handler.needExplicitTrigger;
@@ -79,7 +81,9 @@ const shouldCallCds = ({ action, pre, post, handler }) => {
 };
 
 // Given an action, determine which trigger points require a CDS invocation
-const activeTriggers = ({ action, triggerPoints, pre, post }) =>
+const activeTriggers = ({
+  action, triggerPoints, pre, post,
+}) =>
   Object.entries(triggerPoints || {})
     .map(([triggerPoint, triggerDetails]) => ({
       action,
@@ -87,7 +91,7 @@ const activeTriggers = ({ action, triggerPoints, pre, post }) =>
       pre,
       post,
       handler: triggerHandlers[triggerPoint],
-      hook: triggerDetails.hook
+      hook: triggerDetails.hook,
     }))
     .filter(({ handler }) => handler)
     .filter(shouldCallCds);
@@ -96,13 +100,11 @@ const activeTriggers = ({ action, triggerPoints, pre, post }) =>
 const explode = context =>
   Object.entries(context).map(([key, value]) => ({
     key,
-    value
+    value,
   }));
 
 const activeServicesFor = (hook, allServices) =>
-  Object.entries(allServices || {}).filter(
-    ([, details]) => details.hook === hook && details.enabled
-  );
+  Object.entries(allServices || {}).filter(([, details]) => details.hook === hook && details.enabled);
 
 const evaluateCdsTriggers = (action, next, pre, post) => {
   const { currentScreen } = post.hookState;
@@ -112,16 +114,14 @@ const evaluateCdsTriggers = (action, next, pre, post) => {
     action,
     pre,
     post,
-    triggerPoints
+    triggerPoints,
   }).forEach(({ triggerPoint, hook, handler }) => {
     const exchangeRound = incrementExchangeRound();
     next(createExchangeRound(exchangeRound, currentScreen, triggerPoint));
     const context = handler.generateContext(post);
 
-    activeServicesFor(hook, post.cdsServicesState.configuredServices).forEach(
-      ([serviceUrl]) =>
-        callServices(next, post, serviceUrl, explode(context), exchangeRound)
-    );
+    activeServicesFor(hook, post.cdsServicesState.configuredServices).forEach(([serviceUrl]) =>
+      callServices(next, post, serviceUrl, explode(context), exchangeRound));
   });
 };
 
@@ -131,15 +131,13 @@ const onSystemActions = (action, next, pre, post) => {
     const exchange = post.serviceExchangeState.exchanges[action.url];
     if (exchange.responseStatus === 200) {
       Object.entries(post.hookState.screens[currentScreen].triggerPoints)
-        .filter(
-          ([, details]) => details.lastExchangeRound === action.exchangeRound
-        )
+        .filter(([, details]) => details.lastExchangeRound === action.exchangeRound)
         .forEach(([triggerPoint]) => {
           const handler = triggerHandlers[triggerPoint];
           const systemActions = _.get(exchange, [
-            "response",
-            "extension",
-            "systemActions"
+            'response',
+            'extension',
+            'systemActions',
           ]);
           if (systemActions && handler && handler.onSystemActions) {
             handler.onSystemActions(systemActions, post, next);
@@ -150,15 +148,15 @@ const onSystemActions = (action, next, pre, post) => {
 };
 
 /* eslint-disable no-unused-vars */
-const webMessageMiddleware = store => next => {
-  window.addEventListener("message", ({ data, origin, source }) => {
+const webMessageMiddleware = store => (next) => {
+  window.addEventListener('message', ({ data, origin, source }) => {
     console.log(
-      "Received window messaage",
+      'Received window messaage',
       data,
       origin,
       source,
       windowsRegistered,
-      triggerHandlers
+      triggerHandlers,
     );
     Object.entries(windowsRegistered)
       .filter(([windowId, w]) => w.sourceWindow === source)
@@ -169,9 +167,8 @@ const webMessageMiddleware = store => next => {
           data,
           origin,
           source,
-          dispatch: next
-        })
-      );
+          dispatch: next,
+        }));
   });
   return next;
 };
@@ -179,7 +176,7 @@ const webMessageMiddleware = store => next => {
 
 // wrapper to expose the redux middleware signature from a function
 // that expects to receive: action, dispatch fn, previous state, current state
-const middlewareFor = fn => store => next => action => {
+const middlewareFor = fn => store => next => (action) => {
   const pre = store.getState();
   next(action);
   const post = store.getState();
@@ -194,5 +191,5 @@ export default {
   webMessageMiddleware,
   registerTriggerHandler,
   registerWindow,
-  getRegisteredWindow
+  getRegisteredWindow,
 };

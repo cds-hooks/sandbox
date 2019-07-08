@@ -1,4 +1,4 @@
-import produce from "immer"
+import produce from 'immer';
 import * as types from '../actions/action-types';
 import cdsExecution from '../middleware/cds-execution';
 
@@ -65,9 +65,10 @@ const hookReducers = (state = initialState, action) => {
       }
 
       case 'CREATE_EXCHANGE_ROUND': {
-        return produce(state, draftState => {
+        return produce(state, (draftState) => {
+          // eslint-disable-next-line no-param-reassign
           draftState.screens[action.screen].triggerPoints[action.triggerPoint].lastExchangeRound = action.id;
-        })
+        });
       }
 
       // Set status for slideout context view visibility
