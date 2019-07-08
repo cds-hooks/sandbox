@@ -92,7 +92,7 @@ const createFhirResource = (fhirVersion, patientId, state) => {
   }
 
   if (state.selectedConditionCode) {
-    const chosenCondition = getConditionCodingFromCode(state.selectedConditionCode);
+    const chosenCondition = getConditionCodingFromCode(state, state.selectedConditionCode);
     if (chosenCondition && chosenCondition.resource && chosenCondition.resource.code) {
       resource[`${isSTU3 ? 'reasonCode' : 'reasonCodeableConcept'}`] = chosenCondition.resource.code;
     }

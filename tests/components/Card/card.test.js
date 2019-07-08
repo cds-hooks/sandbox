@@ -34,6 +34,11 @@ describe('Card component', () => {
                               patientId={patientId} 
                               smartLaunchSupported={true}
                               cardResponses={cardResponses}
+                              launchLinks={{
+                                "http://example-smart.com/launch": {
+                                  "default": "http://remapped-link"
+                                }
+                              }}
                               takeSuggestion={takeSuggestion} />;
     shallowedComponent = shallow(component);
   }
@@ -88,7 +93,6 @@ describe('Card component', () => {
   });
 
   it('invokes a launch link sequence if a link is clicked', () => {
-    expect(mockSpy).toHaveBeenCalled();
     shallowedComponent.find('.links-section').find('Button').simulate('click', { preventDefault() {} });
     expect(windowSpy).toHaveBeenCalled();
   });

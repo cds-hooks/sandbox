@@ -54,7 +54,7 @@ describe('Launch Context Retrieval', () => {
       it('resolves the Promise with a new link object and appended parameters', () => {
         link.appContext = 'app-context';
         return retrieveLaunchContext(link, accessToken, patientId, defaultFhirServer).then((result) => {
-          expect(result.url).toEqual(newUrl);
+          expect(result.remappedUrl).toEqual(newUrl);
         });
       });
 
@@ -62,7 +62,7 @@ describe('Launch Context Retrieval', () => {
         link.url += '?stuff=stuff';
         newUrl = `${link.url}&launch=123&iss=${defaultFhirServer}`;
         return retrieveLaunchContext(link, accessToken, patientId, defaultFhirServer).then((result) => {
-          expect(result.url).toEqual(newUrl);
+          expect(result.remappedUrl).toEqual(newUrl);
         });
       });
     });

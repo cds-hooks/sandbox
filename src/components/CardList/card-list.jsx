@@ -12,7 +12,6 @@ import Text from 'terra-text';
 import Button from 'terra-button';
 
 import styles from './card-list.css';
-import retrieveLaunchContext from '../../retrieve-data-helpers/launch-context-retrieval';
 import {
   getServicesByHook,
   getCardsFromServices,
@@ -26,25 +25,9 @@ const propTypes = {
    */
   isDemoCard: PropTypes.bool,
   /**
-   * The FHIR access token retrieved from the authorization server. Used to retrieve a launch context for a SMART app
-   */
-  fhirAccessToken: PropTypes.object,
-  /**
-   * Does the current FHIR server support SMART Launch?
-   */
-  smartLaunchSupported: PropTypes.bool,
-  /**
    * Function callback to take a specific suggestion from a card
    */
   takeSuggestion: PropTypes.func.isRequired,
-  /**
-   * Identifier of the Patient resource for the patient in context
-   */
-  patientId: PropTypes.string,
-  /**
-   * The FHIR server URL in context
-   */
-  fhirServerUrl: PropTypes.string,
   /**
    * JSON response from a CDS service containing potential cards to display
    */
@@ -62,7 +45,6 @@ export class CardList extends Component {
     this.launchLink = this.launchLink.bind(this);
     this.launchSource = this.launchSource.bind(this);
     this.renderSource = this.renderSource.bind(this);
-    this.modifySmartLaunchUrls = this.modifySmartLaunchUrls.bind(this);
   }
 
   /**
@@ -109,45 +91,17 @@ export class CardList extends Component {
         // TODO: Create an error modal to display for SMART link that cannot be launched securely
         return null;
       }
-      return window.open(link.url, '_blank');
+
+      const links = this.props.launchLinks;
+
+      let { url } = link;
+      if (links[link.url] && links[link.url][link.appContext || 'default']) {
+        url = links[link.url][link.appContext || 'default'];
+      }
+
+      return window.open(url, '_blank');
     }
     return null;
-  }
-
-  /**
-   * For SMART links, modify the link URLs as this component processes them according to two scenarios:
-   * 1 - Secured: Retrieve a launch context for the link and append a launch and iss parameter for use against secured endpoints
-   * 2 - Open: Append a fhirServiceUrl, patientId, and smart_messaging_origin parameter to the link for use against open endpoints
-   * @param {*} card - Card object to process the links for
-   */
-  modifySmartLaunchUrls(card) {
-    if (!this.props.isDemoCard) {
-      return card.links.map((link) => {
-        let linkCopy = Object.assign({}, link);
-        if (link.type === 'smart' && this.props.smartLaunchSupported) {
-          retrieveLaunchContext(
-            linkCopy,
-            this.props.fhirAccessToken,
-            this.props.patientId,
-            this.props.fhirServerUrl,
-          ).then((result) => {
-            linkCopy = result;
-            return linkCopy;
-          });
-        } else if (link.type === 'smart') {
-          if (link.url.indexOf('?') < 0) {
-            linkCopy.url += '?';
-          } else {
-            linkCopy.url += '&';
-          }
-          linkCopy.url += `fhirServiceUrl=${this.props.fhirServerUrl}`;
-          linkCopy.url += `&patientId=${this.props.patientId}`;
-          linkCopy.url += `&smart_messaging_origin=${window.location.origin}`;
-        }
-        return linkCopy;
-      });
-    }
-    return undefined;
   }
 
   /**
@@ -267,7 +221,7 @@ export class CardList extends Component {
         // -- Links --
         let linksSection;
         if (card.links) {
-          card.links = this.modifySmartLaunchUrls(card) || card.links;
+          // TODO move this into an on-click handler
           linksSection = card.links.map((link, ind) => (
             <Button
               key={ind}
@@ -312,20 +266,17 @@ export class CardList extends Component {
 
 CardList.propTypes = propTypes;
 
-const mapStateToProps = (store, ownProps) => {
-  console.log('clmstp', store, ownProps);
-  return {
-    ...ownProps,
-    cardResponses: getCardsFromServices(Object.keys(getServicesByHook(
-      store.hookState.currentHook,
-      store.cdsServicesState.configuredServices,
-    ))),
-    fhirServerUrl: store.fhirServerState.currentFhirServer,
-    smartLaunchSupported: true, // TODO: grab real state
-    fhirAccessToken: store.fhirServerState.accessToken,
-    patientId: store.patientState.currentPatient.id,
-  };
-};
+const mapStateToProps = (state, ownProps) => ({
+  ...ownProps,
+  cardResponses: getCardsFromServices(
+    state,
+    Object.keys(getServicesByHook(
+      state.hookState.currentHook,
+      state.cdsServicesState.configuredServices,
+    )),
+  ),
+  launchLinks: state.serviceExchangeState.launchLinks,
+});
 
 const mapDispatchToProps = dispatch => ({
   takeSuggestion: (suggestion) => {

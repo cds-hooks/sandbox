@@ -1,5 +1,6 @@
 import * as types from './action-types';
 
+
 /**
  * Stores the entire CDS service exchange between Sandbox and the service endpoint from the request to response in the Redux store
  *
@@ -18,6 +19,16 @@ export function storeExchange(url, request, response, responseStatus, exchangeRo
     exchangeRound,
   };
 }
+
+export function storeLaunchContext({ url, appContext, remappedUrl }) {
+  return {
+    type: types.STORE_LAUNCH_LINK,
+    url,
+    appContext,
+    remappedUrl,
+  };
+}
+
 
 /**
  * Stores the selected service to display a CDS service exchange for (the dropdown on the CDS Developer Panel)

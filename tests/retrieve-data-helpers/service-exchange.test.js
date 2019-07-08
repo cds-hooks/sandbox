@@ -1,5 +1,7 @@
 import configureStore from 'redux-mock-store';
 import MockAdapter from 'axios-mock-adapter';
+import 'core-js/fn/array/flat-map';
+
 
 describe('Service Exchange', () => {
   console.error = jest.fn();
@@ -155,7 +157,7 @@ describe('Service Exchange', () => {
           })
           .onPost(mockServiceWithPrefetch).reply(serviceResultStatus, mockServiceResult);
         return callServices(mockStore.dispatch, mockStore.getState(), mockServiceWithPrefetch).then(() => {
-          expect(spy).toHaveBeenCalledWith(mockServiceWithPrefetch, mockRequestWithFhirAuthorization, mockServiceResult, serviceResultStatus);
+          expect(spy).toHaveBeenCalledWith(mockServiceWithPrefetch, mockRequestWithFhirAuthorization, mockServiceResult, serviceResultStatus, 0);
         });
       });
 
@@ -187,7 +189,7 @@ describe('Service Exchange', () => {
           .reply(404)
           .onPost(mockServiceWithPrefetch).reply(serviceResultStatus, mockServiceResult);
         return callServices(mockStore.dispatch, mockStore.getState(), mockServiceWithPrefetch).then(() => {
-          expect(spy).toHaveBeenCalledWith(mockServiceWithPrefetch, mockRequest, mockServiceResult, serviceResultStatus);
+          expect(spy).toHaveBeenCalledWith(mockServiceWithPrefetch, mockRequest, mockServiceResult, serviceResultStatus, 0);
         });
       });
     });

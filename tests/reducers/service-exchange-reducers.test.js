@@ -9,7 +9,8 @@ describe('Services Exchange Reducers', () => {
   beforeEach(() => {
     state = {
       selectedService: '',
-      exchanges: {}
+      exchanges: {},
+      launchLinks: {}
     };
     storedExchange = {
       request: 'request',
@@ -19,7 +20,7 @@ describe('Services Exchange Reducers', () => {
   });
 
   it('should return the initial state without action', () => {
-    expect(reducer(undefined, {})).toEqual(state);
+    expect(reducer(undefined, {})).toMatchObject(state);
   });
 
   describe('STORE_SERVICE_EXCHANGE', () => {

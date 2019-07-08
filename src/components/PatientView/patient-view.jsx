@@ -60,7 +60,6 @@ export class PatientView extends Component {
     if (Object.keys(this.props.services).length) {
       // For each service, call service for request/response exchange
       forIn(this.props.services, (val, key) => {
-        console.log('PV', store, store.dispatch, store.getState(), key);
         callServices(store.dispatch, store.getState(), key);
       });
     }

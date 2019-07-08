@@ -3,6 +3,7 @@ import * as types from '../actions/action-types';
 const initialState = {
   selectedService: '',
   exchanges: {},
+  launchLinks: {},
 };
 
 const serviceExchangeReducers = (state = initialState, action) => {
@@ -25,6 +26,19 @@ const serviceExchangeReducers = (state = initialState, action) => {
           };
         }
         break;
+      }
+
+      case types.STORE_LAUNCH_LINK: {
+        return {
+          ...state,
+          launchLinks: {
+            ...state.launchLinks,
+            [action.url]: {
+              ...(state.launchLinks[action.url] || {}),
+              [action.appContext || 'default']: action.remappedUrl,
+            },
+          },
+        };
       }
 
       // Select a CDS Service to display exchange context for
