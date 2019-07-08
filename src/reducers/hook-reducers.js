@@ -1,3 +1,4 @@
+import produce from "immer"
 import * as types from '../actions/action-types';
 import cdsExecution from '../middleware/cds-execution';
 
@@ -9,7 +10,7 @@ const initialState = {
   triggerCount: 0,
   apps: [],
   screens: {
-    'patient-view': { // TODO rename this to face-sheet
+    'patient-view': {
       triggerPoints: {
         'face-sheet/patient-view': {
           hook: 'patient-view',
@@ -40,8 +41,6 @@ const initialState = {
   },
 };
 
-const deepCopy = x => JSON.parse(JSON.stringify(x));
-
 const hookReducers = (state = initialState, action) => {
   if (action.type) {
     switch (action.type) {
@@ -66,10 +65,9 @@ const hookReducers = (state = initialState, action) => {
       }
 
       case 'CREATE_EXCHANGE_ROUND': {
-        // TODO use immer or something to make this nice
-        const newState = deepCopy(state);
-        newState.screens[action.screen].triggerPoints[action.triggerPoint].lastExchangeRound = action.id;
-        return newState;
+        return produce(state, draftState => {
+          draftState.screens[action.screen].triggerPoints[action.triggerPoint].lastExchangeRound = action.id;
+        })
       }
 
       // Set status for slideout context view visibility

@@ -29,6 +29,24 @@ import { storeUserMedInput, storeUserChosenMedication,
 // TODO Remove
 import store from '../../store/store';
 
+cdsExecution.registerTriggerHandler('rx-view/order-select', {
+  needExplicitTrigger: false,
+  onSystemActions: () => { },
+  onMessage: () => { },
+  generateContext: state =>{
+    const resource = state.medicationState.fhirResource
+    const selection = `${resource.resourceType}/${resource.id}`;
+
+    return {
+      selections: [selection],
+      draftOrders: {
+        resourceType: 'Bundle',
+        entry: [{resource}]
+      }
+    }
+  }
+});
+
 const propTypes = {
   /**
    * Flag to determine if the CDS Developer Panel view is visible

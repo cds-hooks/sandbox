@@ -8,6 +8,7 @@ import Button from 'terra-button';
 
 import CardList from '../CardList/card-list';
 import cdsExecution from '../../middleware/cds-execution';
+import * as types from '../../actions/action-types';
 
 const actionToRating = (action) => {
   const resourceId = action.resource.id;
@@ -19,27 +20,26 @@ const actionToRating = (action) => {
         .map(rating => ({ rating, resourceId })));
 };
 
+const dispatchUpdates = (dispatch, updates) =>
+  updates
+    .flatMap(actionToRating)
+    .slice(0, 1)
+    .forEach(({ rating, resourceId }) =>
+      dispatch({
+        type: types.APPLY_PAMA_RATING,
+        resourceId,
+        rating,
+      }));
+
 const pamaTriggerHandler = {
   needExplicitTrigger: false,
   onSystemActions: (systemActions, state, dispatch) => {
-    systemActions
-      .filter(({ type }) => type === 'update')
-      .flatMap(actionToRating)
-      .slice(0, 1)
-      .forEach(({ rating, resourceId }) =>
-        dispatch({
-          type: 'APPLY_PAMA_RATING',
-          resourceId,
-          rating,
-        }));
+    const updates = systemActions.filter(({ type }) => type === 'update');
+    dispatchUpdates(dispatch, updates);
   },
   onMessage: ({ data, dispatch }) => {
-    console.log('Pama screen received in trigger handler', data);
-    dispatch({
-      type: 'APPLY_PAMA_RATING',
-      resourceId: 'fake',
-      rating: 'appropriate',
-    });
+    const updates = [data].filter(({ messageType }) => messageType === 'scratchpad.update');
+    dispatchUpdates(dispatch, updates);
   },
   generateContext: state => ({
     draftOrders: {
@@ -126,7 +126,11 @@ export class OrderImaging extends Component {
           onChange={this.updateField('code')}
         >
           {studyCodes.map(coding => (
-            <Select.Option key={coding.code} value={coding.code} display={coding.display} />
+            <Select.Option
+              key={coding.code}
+              value={coding.code}
+              display={coding.display}
+            />
           ))}
         </Select>
         <Select
@@ -135,7 +139,11 @@ export class OrderImaging extends Component {
           onChange={this.updateField('reasonCode')}
         >
           {reasonCodes.map(coding => (
-            <Select.Option key={coding.code} value={coding.code} display={coding.display} />
+            <Select.Option
+              key={coding.code}
+              value={coding.code}
+              display={coding.display}
+            />
           ))}
         </Select>
 
@@ -151,22 +159,20 @@ export class OrderImaging extends Component {
   }
 }
 
-// TODO define types formally
 const mapDispatchToProps = dispatch => ({
   launchApp(link, sourceWindow) {
-    console.log('Launched', link, sourceWindow);
     dispatch({
-      type: 'LAUNCH_SMART_APP',
+      type: types.LAUNCH_SMART_APP,
       triggerPoint: 'pama/order-select',
       link,
       sourceWindow,
     });
   },
   updateServiceRequest(field, val) {
-    dispatch({ type: 'UPDATE_SERVICE_REQUEST', field, val });
+    dispatch({ type: types.UPDATE_SERVICE_REQUEST, field, val });
   },
   signOrder() {
-    dispatch({ type: 'TRIGGER_ORDER_SIGN' });
+    dispatch({ type: types.TRIGGER_ORDER_SIGN });
   },
 });
 

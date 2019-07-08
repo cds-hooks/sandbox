@@ -11,6 +11,7 @@ import isEqual from 'lodash/isEqual';
 import CardList from '../CardList/card-list';
 import styles from './patient-view.css';
 import callServices from '../../retrieve-data-helpers/service-exchange';
+import cdsExecution from '../../middleware/cds-execution';
 
 // TODO remove
 import store from '../../store/store';
@@ -21,49 +22,23 @@ const propTypes = {
    */
   patient: PropTypes.object,
   /**
-   * The URL of the FHIR server in context
-   */
-  fhirServer: PropTypes.string,
-  /**
-   * A hash of the CDS services and their definitions
-   */
-  services: PropTypes.object,
-  /**
    * Flag to determine if the CDS Developer Panel is displayed or not
    */
   isContextVisible: PropTypes.bool.isRequired,
 };
 
+cdsExecution.registerTriggerHandler('face-sheet/patient-view', {
+  needExplicitTrigger: false,
+  onSystemActions: () => { },
+  onMessage: () => { },
+  generateContext: state => ({ }), // no special context
+});
+
 /**
  * Left-hand side on the mock-EHR view that displays the cards and relevant UI for the patient-view hook
  */
 export class PatientView extends Component {
-  constructor(props) {
-    super(props);
-    this.executeRequests = this.executeRequests.bind(this);
-  }
 
-  // When patient view mounts, execute CDS Service requests configured for this hook
-  componentDidMount() {
-    this.executeRequests();
-  }
-
-  componentDidUpdate(prevProps) {
-    if (this.props.patient !== prevProps.patient ||
-        this.props.fhirServer !== prevProps.fhirServer ||
-        !isEqual(this.props.services, prevProps.services)) {
-      this.executeRequests();
-    }
-  }
-
-  executeRequests() {
-    if (Object.keys(this.props.services).length) {
-      // For each service, call service for request/response exchange
-      forIn(this.props.services, (val, key) => {
-        callServices(store.dispatch, store.getState(), key);
-      });
-    }
-  }
 
   render() {
     const name = this.props.patient.name || 'Missing Name';
@@ -79,7 +54,7 @@ export class PatientView extends Component {
         <div className={styles['patient-data-text']}>
           <p><strong>ID: </strong> {pid} <strong>Birthdate: </strong> {dob}</p>
         </div>
-        {Object.keys(this.props.services).length ? <CardList /> : ''}
+        <CardList />
       </div>
     );
   }
@@ -87,18 +62,9 @@ export class PatientView extends Component {
 
 PatientView.propTypes = propTypes;
 
-const mapStateToProps = (state) => {
-  function isValidService(service) {
-    return service.hook === 'patient-view' && service.enabled;
-  }
-
-  return {
+const mapStateToProps = (state) => ({
     isContextVisible: state.hookState.isContextVisible,
     patient: state.patientState.currentPatient,
-    fhirServer: state.fhirServerState.currentFhirServer,
-    services: pickBy(state.cdsServicesState.configuredServices, isValidService),
-    hook: state.hookState.currentHook,
-  };
-};
+});
 
 export default connect(mapStateToProps)(PatientView);

@@ -1,22 +1,22 @@
 /* eslint-disable react/forbid-prop-types */
 
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
-import ReactMarkdown from 'react-markdown';
-import cx from 'classnames';
-import axios from 'axios';
+import React, { Component } from "react";
+import { connect } from "react-redux";
+import PropTypes from "prop-types";
+import ReactMarkdown from "react-markdown";
+import cx from "classnames";
+import axios from "axios";
 
-import TerraCard from 'terra-card';
-import Text from 'terra-text';
-import Button from 'terra-button';
+import TerraCard from "terra-card";
+import Text from "terra-text";
+import Button from "terra-button";
 
-import styles from './card-list.css';
+import styles from "./card-list.css";
 import {
   getServicesByHook,
-  getCardsFromServices,
-} from '../../reducers/helpers/services-filter';
-import { takeSuggestion } from '../../actions/medication-select-actions';
+  getCardsFromServices
+} from "../../reducers/helpers/services-filter";
+import { takeSuggestion } from "../../actions/medication-select-actions";
 
 const propTypes = {
   /**
@@ -32,7 +32,7 @@ const propTypes = {
    * JSON response from a CDS service containing potential cards to display
    */
   cardResponses: PropTypes.object,
-  onAppLaunch: PropTypes.func,
+  onAppLaunch: PropTypes.func
 };
 
 /**
@@ -58,14 +58,14 @@ export class CardList extends Component {
       if (suggestion.label) {
         if (suggestion.uuid) {
           axios({
-            method: 'POST',
+            method: "POST",
             url: `${url}/analytics/${suggestion.uuid}`,
-            data: {},
+            data: {}
           });
         }
         this.props.takeSuggestion(suggestion);
       } else {
-        console.error('There was no label on this suggestion', suggestion);
+        console.error("There was no label on this suggestion", suggestion);
       }
     }
   }
@@ -95,11 +95,11 @@ export class CardList extends Component {
       const links = this.props.launchLinks;
 
       let { url } = link;
-      if (links[link.url] && links[link.url][link.appContext || 'default']) {
-        url = links[link.url][link.appContext || 'default'];
+      if (links[link.url] && links[link.url][link.appContext || "default"]) {
+        url = links[link.url][link.appContext || "default"];
       }
 
-      return window.open(url, '_blank');
+      return window.open(url, "_blank");
     }
     return null;
   }
@@ -116,7 +116,7 @@ export class CardList extends Component {
     if (source.icon) {
       icon = (
         <img
-          className={styles['card-icon']}
+          className={styles["card-icon"]}
           src={source.icon}
           alt="Could not fetch icon"
           width="100"
@@ -126,31 +126,29 @@ export class CardList extends Component {
     }
     if (!this.props.isDemoCard) {
       return (
-        <div className={styles['card-source']}>
-          Source:{' '}
+        <div className={styles["card-source"]}>
+          Source:{" "}
           <a
-            className={styles['source-link']}
-            href={source.url || '#'}
-            onClick={e => this.launchSource(e)}
-          >
-            {' '}
-            {source.label}{' '}
-          </a>{' '}
-          {icon}{' '}
+            className={styles["source-link"]}
+            href={source.url || "#"}
+            onClick={e => this.launchSource(e)}>
+            {" "}
+            {source.label}{" "}
+          </a>{" "}
+          {icon}{" "}
         </div>
       );
     }
     return (
-      <div className={styles['card-source']}>
+      <div className={styles["card-source"]}>
         Source:
         <a // eslint-disable-line jsx-a11y/anchor-is-valid
-          className={styles['source-link']}
+          className={styles["source-link"]}
           href="#"
-          onClick={e => this.launchSource(e)}
-        >
-          {source.label}{' '}
-        </a>{' '}
-        {icon}{' '}
+          onClick={e => this.launchSource(e)}>
+          {source.label}{" "}
+        </a>{" "}
+        {icon}{" "}
       </div>
     );
   }
@@ -160,14 +158,14 @@ export class CardList extends Component {
       info: 0,
       warning: 1,
       critical: 2,
-      error: 3,
+      error: 3
     };
 
     const summaryColors = {
-      info: '#0079be',
-      warning: '#ffae42',
-      critical: '#c00',
-      error: '#333',
+      info: "#0079be",
+      warning: "#ffae42",
+      critical: "#c00",
+      error: "#333"
     };
     const renderedCards = [];
     // Iterate over each card in the cards array
@@ -181,10 +179,9 @@ export class CardList extends Component {
           <Text
             fontSize={18}
             weight={700}
-            color={summaryColors[card.indicator]}
-          >
-            {' '}
-            {card.summary}{' '}
+            color={summaryColors[card.indicator]}>
+            {" "}
+            {card.summary}{" "}
           </Text>
         );
 
@@ -192,7 +189,7 @@ export class CardList extends Component {
         const sourceSection =
           card.source && Object.keys(card.source).length
             ? this.renderSource(card.source)
-            : '';
+            : "";
 
         // -- Detail (ReactMarkdown supports Github-flavored markdown) --
         const detailSection = card.detail ? (
@@ -202,7 +199,7 @@ export class CardList extends Component {
             source={card.detail}
           />
         ) : (
-          ''
+          ""
         );
 
         // -- Suggestions --
@@ -221,37 +218,36 @@ export class CardList extends Component {
         // -- Links --
         let linksSection;
         if (card.links) {
-          // TODO move this into an on-click handler
           linksSection = card.links.map((link, ind) => (
             <Button
               key={ind}
-              onClick={(e) => {
+              onClick={e => {
                 const launchedWindow = this.launchLink(e, link);
                 if (this.props.onAppLaunch) {
                   this.props.onAppLaunch(link, launchedWindow);
                 }
               }}
               text={link.label}
-              variant={Button.Opts.Variants['DE-EMPHASIS']}
+              variant={Button.Opts.Variants["DE-EMPHASIS"]}
             />
           ));
         }
 
         const classes = cx(
-          styles['decision-card'],
+          styles["decision-card"],
           styles.alert,
-          styles[`alert-${card.indicator}`],
+          styles[`alert-${card.indicator}`]
         );
 
         const builtCard = (
           <TerraCard key={cardInd} className={classes}>
-            {' '}
-            {summarySection} {sourceSection} {detailSection}{' '}
-            <div className={styles['suggestions-section']}>
-              {' '}
-              {suggestionsSection}{' '}
-            </div>{' '}
-            <div className={styles['links-section']}> {linksSection} </div>{' '}
+            {" "}
+            {summarySection} {sourceSection} {detailSection}{" "}
+            <div className={styles["suggestions-section"]}>
+              {" "}
+              {suggestionsSection}{" "}
+            </div>{" "}
+            <div className={styles["links-section"]}> {linksSection} </div>{" "}
           </TerraCard>
         );
 
@@ -270,21 +266,23 @@ const mapStateToProps = (state, ownProps) => ({
   ...ownProps,
   cardResponses: getCardsFromServices(
     state,
-    Object.keys(getServicesByHook(
-      state.hookState.currentHook,
-      state.cdsServicesState.configuredServices,
-    )),
+    Object.keys(
+      getServicesByHook(
+        state.hookState.currentHook,
+        state.cdsServicesState.configuredServices
+      )
+    )
   ),
-  launchLinks: state.serviceExchangeState.launchLinks,
+  launchLinks: state.serviceExchangeState.launchLinks
 });
 
 const mapDispatchToProps = dispatch => ({
-  takeSuggestion: (suggestion) => {
+  takeSuggestion: suggestion => {
     dispatch(takeSuggestion(suggestion));
-  },
+  }
 });
 
 export default connect(
   mapStateToProps,
-  mapDispatchToProps,
+  mapDispatchToProps
 )(CardList);
