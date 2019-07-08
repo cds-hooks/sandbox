@@ -19,6 +19,5 @@ module.exports = {
     "react/require-default-props": 0,
     "class-methods-use-this": 0,
     "curly": [2, "all"],
-    "no-unused-vars": ["error", { "args": "none" }]
   }
 };

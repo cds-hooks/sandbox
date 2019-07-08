@@ -154,6 +154,7 @@ const onSystemActions = (action, next, pre, post) => {
   }
 };
 
+/* eslint-disable no-unused-vars */
 const webMessageMiddleware = store => (next) => {
   window.addEventListener('message', ({ data, origin, source }) => {
     console.log(
@@ -178,6 +179,7 @@ const webMessageMiddleware = store => (next) => {
   });
   return next;
 };
+/* eslint-enable no-unused-vars */
 
 // wrapper to expose the redux middleware signature from a function
 // that expects to receive: action, dispatch fn, previous state, current state
