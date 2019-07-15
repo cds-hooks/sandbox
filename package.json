@@ -69,7 +69,8 @@
     "terra-spacer": "^2.1.0",
     "terra-text": "^2.1.0",
     "terra-toggle": "^2.1.0",
-    "uuid": "^3.2.1"
+    "uuid": "^3.2.1",
+    "compare-versions": "^3.5.0"
   },
   "devDependencies": {
     "autoprefixer": "^8.0.0",
