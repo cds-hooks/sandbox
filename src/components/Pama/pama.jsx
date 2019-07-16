@@ -107,7 +107,7 @@ const reasonCodes = [
   },
 ];
 
-export class OrderImaging extends Component {
+export class Pama extends Component {
   updateField(field) {
     return (e, v) => this.props.updateServiceRequest(field, v);
   }
@@ -181,4 +181,4 @@ const mapStateToProps = store => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps,
-)(OrderImaging);
+)(Pama);
