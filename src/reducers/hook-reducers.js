@@ -48,26 +48,35 @@ const hookReducers = (state = initialState, action) => {
       case types.SET_LOADING_STATUS: {
         return Object.assign({}, state, { isLoadingData: action.isLoaderOn });
       }
-      case 'LAUNCH_SMART_APP': {
-        const windowId = cdsExecution.registerWindow('pama/order-select', action.link, action.sourceWindow);
+      case types.LAUNCH_SMART_APP: {
+        const { windowId } = cdsExecution.registerWindow(
+          action.triggerPoint,
+          action.link,
+          action.sourceWindow,
+        );
         return {
           ...state,
-          apps: [...state.apps, {
-            triggerPoint: action.triggerPoint,
-            link: action.link,
-            windowId,
-          }],
+          apps: [
+            ...state.apps,
+            {
+              triggerPoint: action.triggerPoint,
+              link: action.link,
+              windowId,
+            },
+          ],
         };
       }
 
-      case 'EXPLICIT_HOOK_TRIGGER': {
+      case types.EXPLICIT_HOOK_TRIGGER: {
         return { ...state, triggerCount: state.triggerCount + 1 };
       }
 
-      case 'CREATE_EXCHANGE_ROUND': {
+      case types.CREATE_EXCHANGE_ROUND: {
         return produce(state, (draftState) => {
           // eslint-disable-next-line no-param-reassign
-          draftState.screens[action.screen].triggerPoints[action.triggerPoint].lastExchangeRound = action.id;
+          draftState.screens[action.screen].triggerPoints[
+            action.triggerPoint
+          ].lastExchangeRound = action.id;
         });
       }
 
@@ -80,16 +89,6 @@ const hookReducers = (state = initialState, action) => {
 
       // Set hook for the application
       case types.SET_HOOK: {
-        const currentHook = action.hook || state.currentHook;
-        const currentScreen = action.screen || currentHook;
-
-        return Object.assign({}, state, {
-          currentHook,
-          currentScreen,
-        });
-      }
-
-      case types.ADD_HOOK_TRIGGER: {
         const currentHook = action.hook || state.currentHook;
         const currentScreen = action.screen || currentHook;
 

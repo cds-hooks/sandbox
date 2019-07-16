@@ -23,6 +23,10 @@ import { setHook } from '../../actions/hook-actions';
 
 const propTypes = {
   /**
+   * The name of the screen in context
+   */
+  screen: PropTypes.string.isRequired,
+  /**
    * Flag to determine if the view is the Card Demo view or mock-EHR view
    */
   isCardDemoView: PropTypes.bool.isRequired,

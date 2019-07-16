@@ -37,6 +37,10 @@ const propTypes = {
    */
   patientId: PropTypes.string.isRequired,
   /**
+   * The name of the screen in context
+   */
+  screen: PropTypes.string.isRequired,
+  /**
    * The name of the hook in context
    */
   hook: PropTypes.string.isRequired,

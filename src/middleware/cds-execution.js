@@ -20,10 +20,10 @@ const incrementExchangeRound = () => {
 // hook type, and is responsible for maintaining its own handlers,
 // which include the following:
 // * generateContext: a function to generate the `context` for a hook invocation
-// * onSystemActions: a function to handle systemActions from a CDS respons
+// * onSystemActions: a function to handle systemActions from a CDS response
 //      (e.g., extracting data or updating an order entry screen)
-// * onWebMessagd: a function to handle Web messages
-const triggerHandlers = [];
+// * onWebMessage: a function to handle Web messages
+const triggerHandlers = {};
 const registerTriggerHandler = (triggerPoint, handler) => {
   triggerHandlers[triggerPoint] = handler;
   return () => {
@@ -40,13 +40,18 @@ const registerWindow = (triggerPoint, origin, sourceWindow) => {
     triggerPoint,
     sourceWindow,
   };
-  return windowId;
+  return {
+    windowId,
+    unregister: () => {
+      delete windowsRegistered[windowId];
+    },
+  };
 };
 
 // external hook context is universal: we'll need to re-trigger any
 // service invocations whenever any of these properties changes
 const externalHookContext = state => [
-  state.hookState.configuredServices,
+  state.cdsServicesState.configuredServices,
   state.hookState.currentScreen,
   state.hookState.currentHook,
   state.fhirServerState.currentFhirServer,
@@ -192,4 +197,8 @@ export default {
   registerTriggerHandler,
   registerWindow,
   getRegisteredWindow,
+  debug: {
+    triggerHandlers,
+    windowsRegistered,
+  },
 };

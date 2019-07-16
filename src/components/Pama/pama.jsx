@@ -1,12 +1,11 @@
-/* eslint-disable react/forbid-prop-types */
-
+import cx from 'classnames';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
 import Select from 'terra-form-select';
-import Button from 'terra-button';
 
 import CardList from '../CardList/card-list';
+import styles from './pama.css';
 import cdsExecution from '../../middleware/cds-execution';
 import * as types from '../../actions/action-types';
 
@@ -58,7 +57,6 @@ const pamaTriggerHandler = {
                   code: state.pama.serviceRequest.code,
                 },
               ],
-              text: 'Lumbar spine CT',
             },
             subject: {
               reference: `Patient/${state.patientState.currentPatient.id}`,
@@ -119,7 +117,7 @@ export class OrderImaging extends Component {
     const { code, reasonCode } = this.props.serviceRequest;
 
     return (
-      <div>
+      <div className={cx(styles.pama)}>
         <Select
           name="study-select"
           value={code}
@@ -152,7 +150,6 @@ export class OrderImaging extends Component {
           {{ appropriate: '✓', 'not-appropriate': '⚠' }[pamaRating] || '?'}
         </span>
         <br />
-        <Button text="Sign Order" onClick={this.props.signOrder} />
         <CardList onAppLaunch={this.props.launchApp} />
       </div>
     );

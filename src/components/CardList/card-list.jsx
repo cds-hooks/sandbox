@@ -33,6 +33,7 @@ const propTypes = {
    */
   cardResponses: PropTypes.object,
   onAppLaunch: PropTypes.func,
+  launchLinks: PropTypes.object,
 };
 
 /**

@@ -5,6 +5,7 @@ import * as types from './action-types';
 /**
  * Sets the current hook for the application when a view is switched
  * @param {*} hook - Hook to switch to
+ * @param {*} screen - Screen to switch to
  */
 export function setHook(hook, screen) {
   return {
