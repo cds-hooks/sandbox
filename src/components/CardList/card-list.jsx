@@ -80,6 +80,28 @@ export class CardList extends Component {
   }
 
   /**
+   * Remap a link if needed, to embed a SMART launch parameter
+   * @param {*} link - Link object that contains the URL and any error state to catch
+   */
+  remapUrl(link) {
+    const { type } = link;
+    let { url, appContext } = link;
+    appContext = appContext || 'default';
+
+    const links = this.props.launchLinks;
+
+    if (type === 'smart') {
+      if (links[url] && links[url][appContext]) {
+        url = links[url][appContext];
+      } else {
+        url = null;
+      }
+    }
+
+    return url;
+  }
+
+  /**
    * Open the absolute or SMART link in a new tab and display an error if a SMART link does not have
    * appropriate launch context if used against a secured FHIR endpoint.
    * @param {*} e - Event emitted when link is clicked
@@ -93,15 +115,9 @@ export class CardList extends Component {
         return null;
       }
 
-      const links = this.props.launchLinks;
-
-      let { url } = link;
-      if (links[link.url] && links[link.url][link.appContext || 'default']) {
-        url = links[link.url][link.appContext || 'default'];
-      }
-
-      return window.open(url, '_blank');
+      return window.open(this.remapUrl(link), '_blank');
     }
+
     return null;
   }
 
@@ -222,19 +238,34 @@ export class CardList extends Component {
         // -- Links --
         let linksSection;
         if (card.links) {
-          linksSection = card.links.map((link, ind) => (
-            <Button
-              key={ind}
-              onClick={(e) => {
-                const launchedWindow = this.launchLink(e, link);
-                if (this.props.onAppLaunch) {
-                  this.props.onAppLaunch(link, launchedWindow);
-                }
-              }}
-              text={link.label}
-              variant={Button.Opts.Variants['DE-EMPHASIS']}
-            />
-          ));
+          linksSection = card.links.map((link, ind) => {
+            const isSmart = link.type === 'smart';
+            const remappedUrl = this.remapUrl(link);
+
+            const unlaunchable = isSmart && !remappedUrl;
+            const unlaunchableNotice = unlaunchable
+              ? 'Cannot launch SMART link without a SMART-enabled FHIR server'
+              : '';
+
+            return (
+              <div>
+                <Button
+                  isDisabled={unlaunchable}
+                  title={unlaunchableNotice}
+                  key={ind}
+                  onClick={(e) => {
+                  const launchedWindow = this.launchLink(e, link);
+                  if (this.props.onAppLaunch) {
+                    this.props.onAppLaunch(link, launchedWindow);
+                  }
+                }}
+                  variant="action"
+                  text={link.label}
+                />
+                <div className={styles.unlaunchable}>{unlaunchableNotice}</div>
+              </div>
+            );
+          });
         }
 
         const classes = cx(

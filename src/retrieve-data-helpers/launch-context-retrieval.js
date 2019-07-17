@@ -50,10 +50,12 @@ function retrieveLaunchContext(originalLink, accessToken, patientId, fhirBaseUrl
         return resolve(link);
       }
       console.error('FHIR server endpoint did not return a launch_id to launch the SMART app. See network calls to the Launch endpoint for more details');
+      link.remappedUrl = null;
       link.error = true;
       return reject(link);
     }).catch((err) => {
       console.error('Cannot grab launch context from the FHIR server endpoint to launch the SMART app. See network calls to the Launch endpoint for more details', err);
+      link.remappedUrl = null;
       link.error = true;
       return reject(link);
     });

@@ -26,7 +26,7 @@ const remapSmartLinks = ({
         fhirAccessToken,
         patientId,
         fhirServerUrl,
-      ).then(newLink => dispatch(storeLaunchContext(newLink))));
+      ).catch(e => e).then(newLink => dispatch(storeLaunchContext(newLink))));
 };
 
 /**
