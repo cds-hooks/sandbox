@@ -11,12 +11,15 @@ import axios from 'axios';
  * @param {*} patientId - The identifier of the patient in context
  * @param {*} fhirBaseUrl - The base URL of the FHIR server in context
  */
-function retrieveLaunchContext(link, accessToken, patientId, fhirBaseUrl) {
+function retrieveLaunchContext(originalLink, accessToken, patientId, fhirBaseUrl) {
+  const link = { ...originalLink, remappedUrl: originalLink.url };
+
   return new Promise((resolve, reject) => {
-    const headers = {
+    const headers = Object.assign({
       Accept: 'application/json',
+    }, accessToken ? {
       Authorization: `Bearer ${accessToken.access_token}`,
-    };
+    } : {});
 
     const launchParameters = {
       patient: patientId,
@@ -38,19 +41,21 @@ function retrieveLaunchContext(link, accessToken, patientId, fhirBaseUrl) {
     }).then((result) => {
       if (result.data && Object.prototype.hasOwnProperty.call(result.data, 'launch_id')) {
         if (link.url.indexOf('?') < 0) {
-          link.url += '?';
+          link.remappedUrl += '?';
         } else {
-          link.url += '&';
+          link.remappedUrl += '&';
         }
-        link.url += `launch=${result.data.launch_id}`;
-        link.url += `&iss=${fhirBaseUrl}`;
+        link.remappedUrl += `launch=${result.data.launch_id}`;
+        link.remappedUrl += `&iss=${fhirBaseUrl}`;
         return resolve(link);
       }
       console.error('FHIR server endpoint did not return a launch_id to launch the SMART app. See network calls to the Launch endpoint for more details');
+      link.remappedUrl = null;
       link.error = true;
       return reject(link);
     }).catch((err) => {
       console.error('Cannot grab launch context from the FHIR server endpoint to launch the SMART app. See network calls to the Launch endpoint for more details', err);
+      link.remappedUrl = null;
       link.error = true;
       return reject(link);
     });

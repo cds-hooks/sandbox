@@ -13,6 +13,7 @@ import styles from './main-view.css';
 import Header from '../Header/header';
 import PatientView from '../PatientView/patient-view';
 import RxView from '../RxView/rx-view';
+import Pama from '../Pama/pama';
 import ContextView from '../ContextView/context-view';
 import FhirServerEntry from '../FhirServerEntry/fhir-server-entry';
 import PatientEntry from '../PatientEntry/patient-entry';
@@ -22,9 +23,9 @@ import { setHook } from '../../actions/hook-actions';
 
 const propTypes = {
   /**
-   * Name of the current hook
+   * The name of the screen in context
    */
-  hook: PropTypes.string.isRequired,
+  screen: PropTypes.string.isRequired,
   /**
    * Flag to determine if the view is the Card Demo view or mock-EHR view
    */
@@ -112,39 +113,50 @@ export class MainView extends Component {
     this.props.setLoadingStatus(true);
     const validHooks = ['patient-view', 'order-select'];
     let parsedHook = this.getQueryParam('hook');
+    const parsedScreen = this.getQueryParam('screen');
     if (validHooks.indexOf(parsedHook) < 0) {
       parsedHook = null;
     }
     // Set the hook in context
-    this.props.setHook(parsedHook || localStorage.getItem('PERSISTED_hook') || 'patient-view');
+    this.props.setHook(
+      parsedHook || localStorage.getItem('PERSISTED_hook') || 'patient-view',
+      parsedScreen || localStorage.getItem('PERSISTED_screen') || 'patient-view',
+    );
 
     // Execute the SMART app launch sequence to grab a FHIR access token and SMART context (if applicable)
     await smartLaunchPromise().catch(async () => {
       // SMART app launch not needed: Grab the default FHIR server
-      await retrieveFhirMetadata().catch(err => new Promise((resolve) => {
-        let fhirErrorResponse = this.state.fhirServerInitialError;
-        if (err && err.response && err.response.status === 401) {
-          fhirErrorResponse = 'Cannot configure secured FHIR endpoints. Please use an open (unsecured) FHIR endpoint.';
-        }
-        // Open a Change FHIR Server modal for manual input if default FHIR server fails
-        this.setState({
-          fhirServerPrompt: true,
-          fhirServerPromptHold: resolve,
-          fhirServerInitialError: fhirErrorResponse,
-        });
-      }));
+      await retrieveFhirMetadata().catch(err =>
+        new Promise((resolve) => {
+          let fhirErrorResponse = this.state.fhirServerInitialError;
+          if (err && err.response && err.response.status === 401) {
+            fhirErrorResponse =
+                'Cannot configure secured FHIR endpoints. Please use an open (unsecured) FHIR endpoint.';
+          }
+          // Open a Change FHIR Server modal for manual input if default FHIR server fails
+          this.setState({
+            fhirServerPrompt: true,
+            fhirServerPromptHold: resolve,
+            fhirServerInitialError: fhirErrorResponse,
+          });
+        }));
     });
-    if (this.state.fhirServerPrompt) { this.setState({ fhirServerPrompt: false }); }
+    if (this.state.fhirServerPrompt) {
+      this.setState({ fhirServerPrompt: false });
+    }
 
     // Retrieve the patient in context
-    await retrievePatient().catch(() => new Promise((resolve) => {
-      // Open a Change Patient modal for manual input if default patient ID fails against configured FHIR server
-      this.setState({
-        patientPrompt: true,
-        patientPromptHold: resolve,
-      });
-    }));
-    if (this.state.patientPrompt) { this.setState({ patientPrompt: false }); }
+    await retrievePatient().catch(() =>
+      new Promise((resolve) => {
+        // Open a Change Patient modal for manual input if default patient ID fails against configured FHIR server
+        this.setState({
+          patientPrompt: true,
+          patientPromptHold: resolve,
+        });
+      }));
+    if (this.state.patientPrompt) {
+      this.setState({ patientPrompt: false });
+    }
     // Grab any potential CDS services from the URL at the query param: serviceDiscoveryURL
     const parsedDiscoveryEndpoints = this.getQueryParam('serviceDiscoveryURL');
     if (parsedDiscoveryEndpoints) {
@@ -203,31 +215,46 @@ export class MainView extends Component {
   }
 
   render() {
-    const hookView = this.props.hook === 'patient-view' ? <PatientView /> : <RxView />;
+    const hookView = {
+      'patient-view': <PatientView />,
+      'rx-view': <RxView />,
+      pama: <Pama />,
+    }[this.props.screen];
+
     const container = !this.props.isCardDemoView ? (
       <div className={styles.container}>
         {hookView}
         <ContextView />
       </div>
-    ) : <div className={styles.container}><CardDemo /></div>;
+    ) : (
+      <div className={styles.container}>
+        <CardDemo />
+      </div>
+    );
 
     return (
       <div>
         <LoadingOverlay isOpen={this.props.isLoadingData} isAnimated />
-        {this.state.fhirServerPrompt ? <FhirServerEntry
-          isOpen={this.state.fhirServerPrompt}
-          isEntryRequired
-          closePrompt={this.closeFhirServerPrompt}
-          resolve={this.state.fhirServerPromptHold}
-          initialError={this.state.fhirServerInitialError}
-        /> : null}
-        {this.state.patientPrompt ? <PatientEntry
-          isOpen={this.state.patientPrompt}
-          isEntryRequired
-          closePrompt={this.closePatientPrompt}
-          resolve={this.state.patientPromptHold}
-        /> : null}
-        <div className={styles.pin}><Header /></div>
+        {this.state.fhirServerPrompt ? (
+          <FhirServerEntry
+            isOpen={this.state.fhirServerPrompt}
+            isEntryRequired
+            closePrompt={this.closeFhirServerPrompt}
+            resolve={this.state.fhirServerPromptHold}
+            initialError={this.state.fhirServerInitialError}
+          />
+        ) : null}
+        {this.state.patientPrompt ? (
+          <PatientEntry
+            isOpen={this.state.patientPrompt}
+            isEntryRequired
+            closePrompt={this.closePatientPrompt}
+            resolve={this.state.patientPromptHold}
+          />
+        ) : null}
+        <div className={styles.pin}>
+          <Header />
+        </div>
         {this.props.isLoadingData ? '' : container}
       </div>
     );
@@ -237,7 +264,7 @@ export class MainView extends Component {
 MainView.propTypes = propTypes;
 
 const mapStateToProps = store => ({
-  hook: store.hookState.currentHook,
+  screen: store.hookState.currentScreen,
   isLoadingData: store.hookState.isLoadingData,
   isCardDemoView: store.cardDemoState.isCardDemoView,
 });
@@ -246,9 +273,12 @@ const mapDispatchToProps = dispatch => ({
   setLoadingStatus: (status) => {
     dispatch(setLoadingStatus(status));
   },
-  setHook: (hook) => {
-    dispatch(setHook(hook));
+  setHook: (...args) => {
+    dispatch(setHook(...args));
   },
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(MainView);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(MainView);

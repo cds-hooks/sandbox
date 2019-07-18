@@ -25,19 +25,6 @@ export function storeUserChosenMedication(medication) {
 }
 
 /**
- * Update the current FHIR MedicationOrder resource being built out based on the current FHIR version and patient ID
- * @param {*} fhirVersion - String of the FHIR version used in the context of the Sandbox
- * @param {*} patientId - String of the ID of the Patient resource in context
- */
-export function updateFhirMedicationOrder(fhirVersion, patientId) {
-  return {
-    type: types.UPDATE_FHIR_MEDICATION_ORDER,
-    fhirVersion,
-    patientId,
-  };
-}
-
-/**
  * Sets the specific condition code from the condition select input box
  * @param {*} condition - code value of the Condition coding part of the resource
  */

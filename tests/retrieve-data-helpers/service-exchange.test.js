@@ -1,5 +1,7 @@
 import configureStore from 'redux-mock-store';
 import MockAdapter from 'axios-mock-adapter';
+import 'core-js/fn/array/flat-map';
+
 
 describe('Service Exchange', () => {
   console.error = jest.fn();
@@ -88,7 +90,7 @@ describe('Service Exchange', () => {
     });
 
     defaultStore = {
-      hookState: { currentHook: 'patient-view' },
+      hookState: { currentHook: 'patient-view', currentScreen: 'patient-view'},
       patientState: {
         defaultUser: 'Practitioner/default',
         currentUser: 'Practitioner/specified-1',
@@ -154,8 +156,8 @@ describe('Service Exchange', () => {
             return [200, prefetchedData];
           })
           .onPost(mockServiceWithPrefetch).reply(serviceResultStatus, mockServiceResult);
-        return callServices(mockServiceWithPrefetch).then(() => {
-          expect(spy).toHaveBeenCalledWith(mockServiceWithPrefetch, mockRequestWithFhirAuthorization, mockServiceResult, serviceResultStatus);
+        return callServices(mockStore.dispatch, mockStore.getState(), mockServiceWithPrefetch).then(() => {
+          expect(spy).toHaveBeenCalledWith(mockServiceWithPrefetch, mockRequestWithFhirAuthorization, mockServiceResult, serviceResultStatus, 0);
         });
       });
 
@@ -163,7 +165,7 @@ describe('Service Exchange', () => {
         mockAxios.onGet(`${mockFhirServer}/Patient/${mockPatient}`)
           .reply(200, prefetchedData)
           .onPost(mockServiceNoEncoding).reply(200, {});
-        return callServices(mockServiceNoEncoding).then(() => {
+        return callServices(mockStore.dispatch, mockStore.getState(), mockServiceNoEncoding).then(() => {
           expect(spy).toHaveBeenCalledWith(mockServiceNoEncoding, mockRequest, noDataMessage);
         });
       });
@@ -174,7 +176,7 @@ describe('Service Exchange', () => {
           .onGet(`${mockFhirServer}/Conditions?patient=${mockPatient}`).reply(500)
           .onGet(`${mockFhirServer}/Patient/${mockPatient}`).reply(200, {})
           .onPost(mockServiceWithPrefetchEncoded).reply(500);
-        return callServices(mockServiceWithPrefetchEncoded).then(() => {
+        return callServices(mockStore.dispatch, mockStore.getState(), mockServiceWithPrefetchEncoded).then(() => {
           expect(spy).toHaveBeenCalledWith(mockServiceWithPrefetchEncoded, mockRequest, failedServiceCallMessage);
         });
       });
@@ -186,8 +188,8 @@ describe('Service Exchange', () => {
         mockAxios.onGet(`${mockFhirServer}/Observation?code=${encodeURIComponent('http://loinc.org|2857-1')}&patient=${mockPatient}`)
           .reply(404)
           .onPost(mockServiceWithPrefetch).reply(serviceResultStatus, mockServiceResult);
-        return callServices(mockServiceWithPrefetch).then(() => {
-          expect(spy).toHaveBeenCalledWith(mockServiceWithPrefetch, mockRequest, mockServiceResult, serviceResultStatus);
+        return callServices(mockStore.dispatch, mockStore.getState(), mockServiceWithPrefetch).then(() => {
+          expect(spy).toHaveBeenCalledWith(mockServiceWithPrefetch, mockRequest, mockServiceResult, serviceResultStatus, 0);
         });
       });
     });
@@ -203,8 +205,8 @@ describe('Service Exchange', () => {
     it('resolves and dispatches data from a successful CDS service call', () => {
       const serviceResultStatus = 200;
       mockAxios.onPost(mockServiceWithoutPrefetch).reply(serviceResultStatus, mockServiceResult);
-      return callServices(mockServiceWithoutPrefetch).then(() => {
-        expect(spy).toHaveBeenCalledWith(mockServiceWithoutPrefetch, mockRequest, mockServiceResult, serviceResultStatus);
+      return callServices(mockStore.dispatch, mockStore.getState(), mockServiceWithoutPrefetch).then(() => {
+        expect(spy).toHaveBeenCalledWith(mockServiceWithoutPrefetch, mockRequest, mockServiceResult, serviceResultStatus, 0);
       });
     });
 
@@ -214,29 +216,29 @@ describe('Service Exchange', () => {
       mockRequest.user = 'Practitioner/default';
       const serviceResultStatus = 200;
       mockAxios.onPost(mockServiceWithoutPrefetch).reply(serviceResultStatus, mockServiceResult);
-      return callServices(mockServiceWithoutPrefetch).then(() => {
-        expect(spy).toHaveBeenCalledWith(mockServiceWithoutPrefetch, mockRequest, mockServiceResult, serviceResultStatus);
+      return callServices(mockStore.dispatch, mockStore.getState(), mockServiceWithoutPrefetch).then(() => {
+        expect(spy).toHaveBeenCalledWith(mockServiceWithoutPrefetch, mockRequest, mockServiceResult, serviceResultStatus, 0);
       });
     });
 
     it('resolves and dispatches data from a successful CDS Service call with empty an prefetch object', () => {
       const serviceResultStatus = 200;
       mockAxios.onPost(mockServiceWithEmptyPrefetch).reply(serviceResultStatus, mockServiceResult);
-      return callServices(mockServiceWithEmptyPrefetch).then(() => {
-        expect(spy).toHaveBeenCalledWith(mockServiceWithEmptyPrefetch, mockRequest, mockServiceResult, serviceResultStatus);
+      return callServices(mockStore.dispatch, mockStore.getState(), mockServiceWithEmptyPrefetch).then(() => {
+        expect(spy).toHaveBeenCalledWith(mockServiceWithEmptyPrefetch, mockRequest, mockServiceResult, serviceResultStatus, 0);
       });
     });
 
     it('resolves and dispatches an appropriate message if no data is returned from service', () => {
       mockAxios.onPost(mockServiceWithoutPrefetch).reply(200, {});
-      return callServices(mockServiceWithoutPrefetch).then(() => {
+      return callServices(mockStore.dispatch, mockStore.getState(), mockServiceWithoutPrefetch).then(() => {
         expect(spy).toHaveBeenCalledWith(mockServiceWithoutPrefetch, mockRequest, noDataMessage);
       });
     });
 
     it('resolves and dispatches an appropriate message when service call fails', () => {
       mockAxios.onPost(mockServiceWithoutPrefetch).reply(500);
-      return callServices(mockServiceWithoutPrefetch).then(() => {
+      return callServices(mockStore.dispatch, mockStore.getState(), mockServiceWithoutPrefetch).then(() => {
         expect(spy).toHaveBeenCalledWith(mockServiceWithoutPrefetch, mockRequest, failedServiceCallMessage);
       });
     });
@@ -254,8 +256,8 @@ describe('Service Exchange', () => {
           value: [{ foo: 'foo' }],
         },
       ];
-      return callServices(mockServiceWithoutPrefetch, context).then(() => {
-        expect(spy).toHaveBeenCalledWith(mockServiceWithoutPrefetch, mockRequestWithContext, mockServiceResult, serviceResultStatus)
+      return callServices(mockStore.dispatch, mockStore.getState(), mockServiceWithoutPrefetch, context).then(() => {
+        expect(spy).toHaveBeenCalledWith(mockServiceWithoutPrefetch, mockRequestWithContext, mockServiceResult, serviceResultStatus, 0)
       });
     });
   });

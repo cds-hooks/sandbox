@@ -8,7 +8,6 @@ describe('FHIR Server Reducers', () => {
     state = {
       currentFhirServer: '',
       currentMetadata: null,
-      defaultFhirServer: 'https://api.hspconsortium.org/cdshooksdstu2/open',
       fhirVersion: '1.0.2',
       isDefaultFhirServer: true,
       accessToken: null,
@@ -17,7 +16,7 @@ describe('FHIR Server Reducers', () => {
   });
 
   it('returns the initial state without action', () => {
-    expect(reducer(undefined, {})).toEqual(state);
+    expect(reducer(undefined, {})).toMatchObject(state);
   });
 
   describe('GET_FHIR_SERVER_SUCCESS', () => {

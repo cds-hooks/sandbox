@@ -3,6 +3,7 @@ import * as types from '../actions/action-types';
 const initialState = {
   selectedService: '',
   exchanges: {},
+  launchLinks: {},
 };
 
 const serviceExchangeReducers = (state = initialState, action) => {
@@ -11,15 +12,33 @@ const serviceExchangeReducers = (state = initialState, action) => {
       // Successful call to CDS Service, store the data request and response in-app
       case types.STORE_SERVICE_EXCHANGE: {
         if (action.url && action.request && action.response) {
-          const service = {};
-          service.request = action.request;
-          service.response = action.response;
-          service.responseStatus = action.responseStatus;
-          const exchanges = Object.assign({}, state.exchanges);
-          exchanges[action.url] = service;
-          return Object.assign({}, state, { exchanges });
+          return {
+            ...state,
+            exchanges: {
+              ...state.exchanges,
+              [action.url]: {
+                request: action.request,
+                response: action.response,
+                responseStatus: action.responseStatus,
+                exchangeRound: action.exchangeRound,
+              },
+            },
+          };
         }
         break;
+      }
+
+      case types.STORE_LAUNCH_LINK: {
+        return {
+          ...state,
+          launchLinks: {
+            ...state.launchLinks,
+            [action.url]: {
+              ...(state.launchLinks[action.url] || {}),
+              [action.appContext || 'default']: action.remappedUrl,
+            },
+          },
+        };
       }
 
       // Select a CDS Service to display exchange context for

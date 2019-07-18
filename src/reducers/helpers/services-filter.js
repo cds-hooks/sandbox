@@ -1,5 +1,4 @@
 import pickBy from 'lodash/pickBy';
-import store from '../../store/store';
 
 /**
  * Get an Object of service IDs and their definitions back that correlate to the hook passed in
@@ -18,9 +17,9 @@ export function getServicesByHook(hook, services) {
  * Create one cards array that holds all card responses from the passed in service URLs
  * @param {*} serviceUrls - Services to retrieve valid cards from
  */
-export function getCardsFromServices(serviceUrls) {
+export function getCardsFromServices(state, serviceUrls) {
   const totalCards = { cards: [] };
-  const { exchanges } = store.getState().serviceExchangeState;
+  const { exchanges } = state.serviceExchangeState;
   serviceUrls.forEach((url) => {
     // Check if there is a service exchange (request and response) for this service ID url
     if (exchanges[url]) {
@@ -44,8 +43,8 @@ export function getCardsFromServices(serviceUrls) {
  * that matches that of the coding code
  * @param {*} code - Condition coding code to filter the patient conditions by
  */
-export function getConditionCodingFromCode(code) {
-  const conditions = Object.assign([], store.getState().patientState.currentPatient.conditionsResources);
+export function getConditionCodingFromCode(patientConditions, code) {
+  const conditions = Object.assign([], patientConditions);
   const filteredConditions = conditions.filter(condition => (
     condition.resource.code.coding[0].code === code
   ));

@@ -32,7 +32,13 @@ describe('Card component', () => {
     let component = <CardList fhirServerUrl={fhirBaseUrl} 
                               fhirAccessToken={accessToken} 
                               patientId={patientId} 
+                              smartLaunchSupported={true}
                               cardResponses={cardResponses}
+                              launchLinks={{
+                                "http://example-smart.com/launch": {
+                                  "default": "http://remapped-link"
+                                }
+                              }}
                               takeSuggestion={takeSuggestion} />;
     shallowedComponent = shallow(component);
   }
@@ -87,7 +93,6 @@ describe('Card component', () => {
   });
 
   it('invokes a launch link sequence if a link is clicked', () => {
-    expect(mockSpy).toHaveBeenCalled();
     shallowedComponent.find('.links-section').find('Button').simulate('click', { preventDefault() {} });
     expect(windowSpy).toHaveBeenCalled();
   });
@@ -96,24 +101,6 @@ describe('Card component', () => {
     let eventWatch = jest.fn();
     shallowedComponent.find('.card-source').first().find('a').simulate('click', { preventDefault() { return eventWatch(); }});
     expect(eventWatch).toHaveBeenCalled();
-  });
-
-  it('adds fhirServiceUrl, patientId, and smart_messaging_origin params to the smart link if launched openly', () => {
-    shallowedComponent.setProps({
-      fhirAccessToken: null
-    });
-    expect(mockSpy).toHaveBeenCalled();
-    shallowedComponent.find('.links-section').find('Button').simulate('click', { preventDefault() {} });
-    expect(windowSpy).toHaveBeenCalledWith(`${smartLink}?fhirServiceUrl=${fhirBaseUrl}&patientId=${patientId}&smart_messaging_origin=https://cds-client.org`, '_blank');
-    shallowedComponent.setProps({
-      cardResponses: {
-        cards: [{
-          links: [{ type: 'smart', url: `${smartLink}?foo=boo` }],
-        }]
-      },
-    });
-    shallowedComponent.find('.links-section').find('Button').simulate('click', { preventDefault() {} });
-    expect(windowSpy).toHaveBeenCalledWith(`${smartLink}?foo=boo&fhirServiceUrl=${fhirBaseUrl}&patientId=${patientId}&smart_messaging_origin=https://cds-client.org`, '_blank');
   });
 
   it('does not launch a link if the link has an error', () => {

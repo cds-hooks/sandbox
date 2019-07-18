@@ -42,7 +42,7 @@ describe('Header component', () => {
     mockPatientService = 'http://example.com/cds-services/id-1';
     mockMedService = 'http://example-med.com/cds-services/id-1';
     storeState = { 
-      hookState: { currentHook: 'patient-view' },
+      hookState: { currentHook: 'patient-view', currentScreen: 'patient-view' },
       patientState: { currentPatient: { id: 'patient-123' } },
       cardDemoState: {
         isCardDemoView: false,
@@ -86,20 +86,20 @@ describe('Header component', () => {
     it('should only contain active links on the current hook/view', () => {
       setup(storeState);
       expect(shallowedComponent.childAt(0).dive().find('.active-link').text()).toEqual('Patient View');
-      expect(shallowedComponent.childAt(0).dive().find('.nav-links').not('.active-link').text()).toEqual('Rx View');
+      expect(shallowedComponent.childAt(0).dive().find('.nav-links').not('.active-link').first().text()).toEqual('Rx View');
     });
 
     it('dispatches to switch hooks in app state if another view tab is clicked', () => {
       setup(storeState);
-      shallowedComponent.childAt(0).dive().find('.nav-links').not('.active-link').simulate('click');
-      const medHookAction = { type: types.SET_HOOK, hook: 'order-select' };
+      shallowedComponent.childAt(0).dive().find('.nav-links').not('.active-link').first().simulate('click');
+      const medHookAction = { type: types.SET_HOOK, hook: 'order-select', screen: 'rx-view'};
       expect(mockStore.getActions()).toEqual([medHookAction]);
     });
   
     it('calls services if current hook is being invoked again on patient-view', () => {
       setup(storeState);
       shallowedComponent.childAt(0).dive().find('.active-link').simulate('click');
-      expect(mockExchange).toHaveBeenCalledWith(mockPatientService);
+      expect(mockExchange).toHaveBeenCalledWith(expect.anything(), expect.anything(), mockPatientService);
     });
   
     it('does not call services on order-select if no medication is chosen yet', () => {
@@ -111,11 +111,12 @@ describe('Header component', () => {
 
     it('does call services on order-select if a medication has been chosen', () => {
       storeState.hookState.currentHook = 'order-select';
+      storeState.hookState.currentScreen = 'rx-view';
       storeState.medicationState.decisions.prescribable = 'foo-medicine';
       storeState.medicationState.medListPhase = 'done';
       setup(storeState);
       shallowedComponent.childAt(0).dive().find('.active-link').simulate('click');
-      expect(mockExchange).toHaveBeenCalledWith(mockMedService);
+      expect(mockExchange).toHaveBeenCalledWith(expect.anything(), expect.anything(), mockMedService);
     });
   });
 

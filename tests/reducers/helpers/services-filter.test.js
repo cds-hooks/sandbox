@@ -11,6 +11,7 @@ describe('Services Filters', () => {
   let testStore;
   let testValidCondition;
   let testInvalidCondition;
+  let mockStore;
 
   beforeEach(() => {
     completeServiceExchange = 'http://complete-exchange.com/id';
@@ -67,8 +68,7 @@ describe('Services Filters', () => {
         },
       },
     };
-    const mockStoreWrapper = configureStore([]);
-    const mockStore = mockStoreWrapper(testStore);
+    mockStore = configureStore([])(testStore);
     jest.setMock('../../../src/store/store', mockStore);
     filters = require('../../../src/reducers/helpers/services-filter');
   });
@@ -95,7 +95,6 @@ describe('Services Filters', () => {
       expect(getServicesByHook('patient-view', configuredServices)).toEqual({[matchUrl]: serviceMatchesHook});
     });
 
-
   });
 
   describe('getCardsFromServices', () => {
@@ -109,7 +108,7 @@ describe('Services Filters', () => {
     });
 
     it('gathers all cards into one cards array from passed in services', () => {
-      expect(getCardsFromServices(arrayOfServices)).toEqual({
+      expect(getCardsFromServices(mockStore.getState(), arrayOfServices)).toEqual({
         cards: [
           Object.assign({}, testStore.serviceExchangeState.exchanges[completeServiceExchange].response.cards[0], {
             serviceUrl: completeServiceExchange,
@@ -128,7 +127,7 @@ describe('Services Filters', () => {
       getConditionCodingFromCode = filters.getConditionCodingFromCode;
     });
     it('filters conditions based on passed in code', () => {
-      expect(getConditionCodingFromCode('valid-code')).toEqual(testValidCondition);
+      expect(getConditionCodingFromCode(mockStore.getState().patientState.currentPatient.conditionsResources, 'valid-code')).toEqual(testValidCondition);
     });
   });
 });

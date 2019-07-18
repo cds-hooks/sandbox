@@ -141,6 +141,7 @@ export class CardDemo extends Component {
     const cardDisplay = (!this.state.displayJSONError && this.props.tempUserJson) ?
       (<CardList
         isDemoCard
+        takeSuggestion={() => { console.log('Take suggestion'); }}
         cardResponses={constructedCardFormat}
       />) : null;
 

@@ -43,7 +43,6 @@ describe('Medication Reducers', () => {
         },
       },
       selectedConditionCode: '',
-      fhirResource: null,
     };
   });
 
@@ -155,35 +154,6 @@ describe('Medication Reducers', () => {
           ...state.decisions,
           prescribable: action.medication,
         },
-      });
-
-      expect(reducer(state, action)).toEqual(newState);
-    });
-  });
-
-  describe('UPDATE_FHIR_MEDICATION_ORDER', () => {
-    it('handles the UPDATE_FHIR_MEDICATION_ORDER action for STU3', () => {
-      const patientId = 'patient-123';
-      const fhirVersion = '3.0.1';
-      const action = {
-        type: types.UPDATE_FHIR_MEDICATION_ORDER,
-        fhirVersion,
-        patientId,
-        state
-      };
-
-      const fhirResource = {
-        resourceType: 'MedicationRequest',
-        id: 'request-123',
-        authoredOn: moment().format('YYYY-MM-DD'),
-        status: 'draft',
-        subject: {
-          reference: `Patient/${patientId}`,
-        },
-      };
-
-      const newState = Object.assign({}, state, {
-        fhirResource,
       });
 
       expect(reducer(state, action)).toEqual(newState);
@@ -348,7 +318,6 @@ describe('Medication Reducers', () => {
           components: null,
           prescribable: null,
         },
-        fhirResource: null,
       });
 
       expect(reducer(state, action)).toEqual(newState);

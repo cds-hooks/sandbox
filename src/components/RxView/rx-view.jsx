@@ -4,10 +4,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import cx from 'classnames';
-import pickBy from 'lodash/pickBy';
-import forIn from 'lodash/forIn';
-import isEqual from 'lodash/isEqual';
-
 import Field from 'terra-form-field';
 import Checkbox from 'terra-form-checkbox';
 import Select from 'terra-form-select';
@@ -19,12 +15,33 @@ import List from 'terra-list';
 
 import debounce from 'debounce';
 
+import cdsExecution from '../../middleware/cds-execution';
 import CardList from '../CardList/card-list';
 import styles from './rx-view.css';
-import callServices from '../../retrieve-data-helpers/service-exchange';
+import { createFhirResource } from '../../reducers/medication-reducers';
+
 import { storeUserMedInput, storeUserChosenMedication,
-  updateFhirMedicationOrder, storeUserCondition,
+  storeUserCondition,
   storeMedDosageAmount, storeDate, toggleDate } from '../../actions/medication-select-actions';
+
+cdsExecution.registerTriggerHandler('rx-view/order-select', {
+  needExplicitTrigger: false,
+  onSystemActions: () => { },
+  onMessage: () => { },
+  generateContext: (state) => {
+    const { fhirVersion } = state.fhirServerState;
+    const resource = createFhirResource(fhirVersion, state.patientState.currentPatient.id, state.medicationState, state.patientState.currentPatient.conditionsResources);
+    const selection = `${resource.resourceType}/${resource.id}`;
+
+    return {
+      selections: [selection],
+      draftOrders: {
+        resourceType: 'Bundle',
+        entry: [{ resource }],
+      },
+    };
+  },
+});
 
 const propTypes = {
   /**
@@ -35,18 +52,6 @@ const propTypes = {
    * Patient resource in context
    */
   patient: PropTypes.object,
-  /**
-   * URL of the FHIR server in context
-   */
-  fhirServer: PropTypes.string.isRequired,
-  /**
-   * FHIR version in context based on the FHIR server
-   */
-  fhirVersion: PropTypes.string.isRequired,
-  /**
-   * Hash containing a list of CDS services applicable to this hook
-   */
-  services: PropTypes.object,
   /**
    * Array of medications a user may choose from at a given moment
    */
@@ -67,10 +72,6 @@ const propTypes = {
    * Coding code from the selected Condition resource in context
    */
   selectedConditionCode: PropTypes.string,
-  /**
-   * FHIR resource of the built-up medication order JSON to put in the context of the request to CDS services
-   */
-  medicationOrder: PropTypes.object,
   /**
    * Function for storing user input when the medication field changes
    */
@@ -95,10 +96,6 @@ const propTypes = {
    * Function to signal a change in the toggled status of the date (start or end)
    */
   toggleEnabledDate: PropTypes.func.isRequired,
-  /**
-   * Function to update the FHIR resource for the medications field of the context in a CDS service request
-   */
-  updateFhirResource: PropTypes.func.isRequired,
 };
 
 /**
@@ -142,7 +139,6 @@ export class RxView extends Component {
       },
     };
 
-    this.executeRequests = this.executeRequests.bind(this);
     this.changeMedicationInput = this.changeMedicationInput.bind(this);
     this.selectCondition = this.selectCondition.bind(this);
     this.changeDosageAmount = this.changeDosageAmount.bind(this);
@@ -150,19 +146,6 @@ export class RxView extends Component {
     this.selectStartDate = this.selectStartDate.bind(this);
     this.selectEndDate = this.selectEndDate.bind(this);
     this.toggleEnabledDate = this.toggleEnabledDate.bind(this);
-  }
-
-  /**
-   * If there is a prescription already chosen (through a value in the query params), update the context in the request
-   * and call CDS services
-   */
-  async componentDidMount() {
-    if (this.props.prescription) {
-      if (!this.props.medicationOrder) {
-        await this.props.updateFhirResource(this.props.fhirVersion, this.props.patient.id);
-      }
-      this.executeRequests();
-    }
   }
 
   /**
@@ -190,24 +173,6 @@ export class RxView extends Component {
     }
   }
 
-  /**
-   * If any prop values have changed, update the context data in the request, and call the CDS services
-   */
-  async componentDidUpdate(prevProps) {
-    if (!isEqual(prevProps.prescription, this.props.prescription) ||
-        prevProps.patient !== this.props.patient ||
-        prevProps.fhirServer !== this.props.fhirServer ||
-        !isEqual(prevProps.services, this.props.services) ||
-        !isEqual(prevProps.medicationInstructions, this.props.medicationInstructions) ||
-        !isEqual(prevProps.prescriptionDates, this.props.prescriptionDates) ||
-        prevProps.selectedConditionCode !== this.props.selectedConditionCode) {
-      await this.props.updateFhirResource(this.props.fhirVersion, this.props.patient.id);
-      if (this.props.prescription) {
-        this.executeRequests();
-      }
-    }
-    return null;
-  }
 
   // Note: A second parameter (selected value) is supplied automatically by the Terra onChange function for the Form Select component
   selectCondition(event, value) {
@@ -262,36 +227,6 @@ export class RxView extends Component {
   toggleEnabledDate(event, range) {
     this.setState({ [`${range}Range`]: event.target.value });
     this.props.toggleEnabledDate(range);
-  }
-
-  /**
-   * Create the context property that goes in a CDS service request before calling out to the CDS servies
-   */
-  executeRequests() {
-    if (Object.keys(this.props.services).length) {
-
-      const resource = this.props.medicationOrder;
-      const selection = resource.resourceType + '/' + resource.id;
-
-      // For each service, call service for request/response exchange
-      forIn(this.props.services, (val, key) => {
-        const context = [
-          {
-            key: 'selections',
-            value: [selection]
-          },
-          {
-          key: 'draftOrders',
-          value: {
-            resourceType: 'Bundle',
-            entry: [{
-              resource: resource,
-            }],
-          },
-        }];
-        callServices(key, context);
-      });
-    }
   }
 
   render() {
@@ -397,7 +332,7 @@ export class RxView extends Component {
             </Field>
           </div>
         </form>
-        {Object.keys(this.props.services).length ? <CardList /> : ''}
+        <CardList />
       </div>
     );
   }
@@ -405,25 +340,15 @@ export class RxView extends Component {
 
 RxView.propTypes = propTypes;
 
-const mapStateToProps = (store) => {
-  function isValidService(service) {
-    return service.hook === 'order-select' && service.enabled;
-  }
-
-  return {
-    isContextVisible: store.hookState.isContextVisible,
-    patient: store.patientState.currentPatient,
-    fhirServer: store.fhirServerState.currentFhirServer,
-    fhirVersion: store.fhirServerState.fhirVersion,
-    services: pickBy(store.cdsServicesState.configuredServices, isValidService),
-    medications: store.medicationState.options[store.medicationState.medListPhase] || [],
-    prescription: store.medicationState.decisions.prescribable,
-    medicationInstructions: store.medicationState.medicationInstructions,
-    prescriptionDates: store.medicationState.prescriptionDates,
-    selectedConditionCode: store.medicationState.selectedConditionCode,
-    medicationOrder: store.medicationState.fhirResource,
-  };
-};
+const mapStateToProps = state => ({
+  isContextVisible: state.hookState.isContextVisible,
+  patient: state.patientState.currentPatient,
+  medications: state.medicationState.options[state.medicationState.medListPhase] || [],
+  prescription: state.medicationState.decisions.prescribable,
+  medicationInstructions: state.medicationState.medicationInstructions,
+  prescriptionDates: state.medicationState.prescriptionDates,
+  selectedConditionCode: state.medicationState.selectedConditionCode,
+});
 
 const mapDispatchToProps = dispatch => (
   {
@@ -444,9 +369,6 @@ const mapDispatchToProps = dispatch => (
     },
     toggleEnabledDate: (range) => {
       dispatch(toggleDate(range));
-    },
-    updateFhirResource: (fhirVersion, patientId) => {
-      dispatch(updateFhirMedicationOrder(fhirVersion, patientId));
     },
   }
 );

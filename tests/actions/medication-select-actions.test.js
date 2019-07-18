@@ -24,19 +24,6 @@ describe('Medication Select Actions', () => {
       .toEqual(expectedAction);
   });
 
-  it('creates action to update the FHIR Medication Order resource', () => {
-    const fhirVersion = '1.3.0';
-    const patientId = '123';
-    const expectedAction = {
-      type: types.UPDATE_FHIR_MEDICATION_ORDER,
-      fhirVersion,
-      patientId,
-    };
-
-    expect(actions.updateFhirMedicationOrder(fhirVersion, patientId))
-      .toEqual(expectedAction);
-  });
-
   it('creates action to store user selected condition', () => {
     const condition = 'condition';
     const expectedAction = {

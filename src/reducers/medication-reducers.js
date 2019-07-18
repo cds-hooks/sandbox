@@ -1,5 +1,4 @@
 import moment from 'moment';
-import isEqual from 'lodash/isEqual';
 import queryString from 'query-string';
 import * as types from '../actions/action-types';
 import rxnorm from '../assets/medication-list';
@@ -23,7 +22,7 @@ const getQueryParam = (param) => {
 };
 
 // Construct the FHIR resource for MedicationRequest/Order from a chosen condition and/or medication
-const createFhirResource = (fhirVersion, patientId, state) => {
+export const createFhirResource = (fhirVersion, patientId, state, patientConditions) => {
   const isSTU3 = fhirVersion === '3.0.1';
   const resource = {
     resourceType: isSTU3 ? 'MedicationRequest' : 'MedicationOrder',
@@ -92,7 +91,7 @@ const createFhirResource = (fhirVersion, patientId, state) => {
   }
 
   if (state.selectedConditionCode) {
-    const chosenCondition = getConditionCodingFromCode(state.selectedConditionCode);
+    const chosenCondition = getConditionCodingFromCode(patientConditions, state.selectedConditionCode);
     if (chosenCondition && chosenCondition.resource && chosenCondition.resource.code) {
       resource[`${isSTU3 ? 'reasonCode' : 'reasonCodeableConcept'}`] = chosenCondition.resource.code;
     }
@@ -166,10 +165,6 @@ const initialState = {
    * The code of the Condition the user selects associated with the Patient in context
    */
   selectedConditionCode: getQueryParam('prescribedReason') || '',
-  /**
-   * The FHIR Medication Order that gets built out for the 'medications' context property in a request
-   */
-  fhirResource: null,
 };
 
 const filterSearch = (input) => {
@@ -304,13 +299,6 @@ const medicationReducers = (state = initialState, action) => {
         return state;
       }
 
-      // Update the FHIR medication order resource being built for the medications property in the context field of a CDS service request
-      case types.UPDATE_FHIR_MEDICATION_ORDER: {
-        return Object.assign({}, state, {
-          fhirResource: createFhirResource(action.fhirVersion, action.patientId, state),
-        });
-      }
-
       // Stores the user-chosen condition from the list of conditions for the current patient
       case types.STORE_USER_CONDITION: {
         return Object.assign({}, state, {
@@ -365,8 +353,7 @@ const medicationReducers = (state = initialState, action) => {
               }
               if (actions[i].type === 'create' || actions[i].type === 'update') {
                 // Updating internal medication if new medication comes through suggestion
-                if (actions[i].resource && actions[i].resource.medicationCodeableConcept && state.fhirResource &&
-                  !isEqual(actions[i].resource.medicationCodeableConcept, state.fhirResource.medicationCodeableConcept)) {
+                if (actions[i].resource && actions[i].resource.medicationCodeableConcept) {
                   const newMedication = actions[i].resource.medicationCodeableConcept;
                   if (newMedication.text && newMedication.coding && newMedication.coding[0] && newMedication.coding[0].code) {
                     return Object.assign({}, state, {
@@ -399,7 +386,6 @@ const medicationReducers = (state = initialState, action) => {
                     components: null,
                     prescribable: null,
                   },
-                  fhirResource: null,
                 });
               }
             } else {

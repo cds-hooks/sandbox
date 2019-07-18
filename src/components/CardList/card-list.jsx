@@ -12,8 +12,10 @@ import Text from 'terra-text';
 import Button from 'terra-button';
 
 import styles from './card-list.css';
-import retrieveLaunchContext from '../../retrieve-data-helpers/launch-context-retrieval';
-import { getServicesByHook, getCardsFromServices } from '../../reducers/helpers/services-filter';
+import {
+  getServicesByHook,
+  getCardsFromServices,
+} from '../../reducers/helpers/services-filter';
 import { takeSuggestion } from '../../actions/medication-select-actions';
 
 const propTypes = {
@@ -23,25 +25,15 @@ const propTypes = {
    */
   isDemoCard: PropTypes.bool,
   /**
-   * The FHIR access token retrieved from the authorization server. Used to retrieve a launch context for a SMART app
-   */
-  fhirAccessToken: PropTypes.object,
-  /**
    * Function callback to take a specific suggestion from a card
    */
   takeSuggestion: PropTypes.func.isRequired,
   /**
-   * Identifier of the Patient resource for the patient in context
-   */
-  patientId: PropTypes.string,
-  /**
-   * The FHIR server URL in context
-   */
-  fhirServerUrl: PropTypes.string,
-  /**
    * JSON response from a CDS service containing potential cards to display
    */
   cardResponses: PropTypes.object,
+  onAppLaunch: PropTypes.func,
+  launchLinks: PropTypes.object,
 };
 
 /**
@@ -54,7 +46,6 @@ export class CardList extends Component {
     this.launchLink = this.launchLink.bind(this);
     this.launchSource = this.launchSource.bind(this);
     this.renderSource = this.renderSource.bind(this);
-    this.modifySmartLaunchUrls = this.modifySmartLaunchUrls.bind(this);
   }
 
   /**
@@ -89,6 +80,28 @@ export class CardList extends Component {
   }
 
   /**
+   * Remap a link if needed, to embed a SMART launch parameter
+   * @param {*} link - Link object that contains the URL and any error state to catch
+   */
+  remapUrl(link) {
+    const { type } = link;
+    let { url, appContext } = link;
+    appContext = appContext || 'default';
+
+    const links = this.props.launchLinks;
+
+    if (type === 'smart') {
+      if (links[url] && links[url][appContext]) {
+        url = links[url][appContext];
+      } else {
+        url = null;
+      }
+    }
+
+    return url;
+  }
+
+  /**
    * Open the absolute or SMART link in a new tab and display an error if a SMART link does not have
    * appropriate launch context if used against a secured FHIR endpoint.
    * @param {*} e - Event emitted when link is clicked
@@ -99,44 +112,13 @@ export class CardList extends Component {
       e.preventDefault();
       if (link.error) {
         // TODO: Create an error modal to display for SMART link that cannot be launched securely
-        return;
+        return null;
       }
-      window.open(link.url, '_blank');
-    }
-  }
 
-  /**
-   * For SMART links, modify the link URLs as this component processes them according to two scenarios:
-   * 1 - Secured: Retrieve a launch context for the link and append a launch and iss parameter for use against secured endpoints
-   * 2 - Open: Append a fhirServiceUrl, patientId, and smart_messaging_origin parameter to the link for use against open endpoints
-   * @param {*} card - Card object to process the links for
-   */
-  modifySmartLaunchUrls(card) {
-    if (!this.props.isDemoCard) {
-      return card.links.map((link) => {
-        let linkCopy = Object.assign({}, link);
-        if (link.type === 'smart' && this.props.fhirAccessToken) {
-          retrieveLaunchContext(
-            linkCopy, this.props.fhirAccessToken,
-            this.props.patientId, this.props.fhirServerUrl,
-          ).then((result) => {
-            linkCopy = result;
-            return linkCopy;
-          });
-        } else if (link.type === 'smart') {
-          if (link.url.indexOf('?') < 0) {
-            linkCopy.url += '?';
-          } else {
-            linkCopy.url += '&';
-          }
-          linkCopy.url += `fhirServiceUrl=${this.props.fhirServerUrl}`;
-          linkCopy.url += `&patientId=${this.props.patientId}`;
-          linkCopy.url += `&smart_messaging_origin=${window.location.origin}`;
-        }
-        return linkCopy;
-      });
+      return window.open(this.remapUrl(link), '_blank');
     }
-    return undefined;
+
+    return null;
   }
 
   /**
@@ -144,16 +126,34 @@ export class CardList extends Component {
    * @param {*} source - Object as part of the card to build the UI for
    */
   renderSource(source) {
-    if (!source.label) { return null; }
+    if (!source.label) {
+      return null;
+    }
     let icon;
     if (source.icon) {
-      icon = <img className={styles['card-icon']} src={source.icon} alt="Could not fetch icon" width="100" height="100" />;
+      icon = (
+        <img
+          className={styles['card-icon']}
+          src={source.icon}
+          alt="Could not fetch icon"
+          width="100"
+          height="100"
+        />
+      );
     }
     if (!this.props.isDemoCard) {
       return (
         <div className={styles['card-source']}>
-          Source: <a className={styles['source-link']} href={source.url || '#'} onClick={e => this.launchSource(e)}>{source.label}</a>
-          {icon}
+          Source:{' '}
+          <a
+            className={styles['source-link']}
+            href={source.url || '#'}
+            onClick={e => this.launchSource(e)}
+          >
+            {' '}
+            {source.label}{' '}
+          </a>{' '}
+          {icon}{' '}
         </div>
       );
     }
@@ -165,9 +165,9 @@ export class CardList extends Component {
           href="#"
           onClick={e => this.launchSource(e)}
         >
-          {source.label}
-        </a>
-        {icon}
+          {source.label}{' '}
+        </a>{' '}
+        {icon}{' '}
       </div>
     );
   }
@@ -194,13 +194,33 @@ export class CardList extends Component {
         const card = JSON.parse(JSON.stringify(c));
 
         // -- Summary --
-        const summarySection = <Text fontSize={18} weight={700} color={summaryColors[card.indicator]}>{card.summary}</Text>;
+        const summarySection = (
+          <Text
+            fontSize={18}
+            weight={700}
+            color={summaryColors[card.indicator]}
+          >
+            {' '}
+            {card.summary}{' '}
+          </Text>
+        );
 
         // -- Source --
-        const sourceSection = card.source && Object.keys(card.source).length ? this.renderSource(card.source) : '';
+        const sourceSection =
+          card.source && Object.keys(card.source).length
+            ? this.renderSource(card.source)
+            : '';
 
         // -- Detail (ReactMarkdown supports Github-flavored markdown) --
-        const detailSection = card.detail ? <ReactMarkdown escapeHtml={false} softBreak="br" source={card.detail} /> : '';
+        const detailSection = card.detail ? (
+          <ReactMarkdown
+            escapeHtml={false}
+            softBreak="br"
+            source={card.detail}
+          />
+        ) : (
+          ''
+        );
 
         // -- Suggestions --
         let suggestionsSection;
@@ -218,46 +238,75 @@ export class CardList extends Component {
         // -- Links --
         let linksSection;
         if (card.links) {
-          card.links = this.modifySmartLaunchUrls(card) || card.links;
-          linksSection = card.links.map((link, ind) => (
-            <Button
-              key={ind}
-              onClick={e => this.launchLink(e, link)}
-              text={link.label}
-              variant={Button.Opts.Variants['DE-EMPHASIS']}
-            />
-          ));
+          linksSection = card.links.map((link, ind) => {
+            const isSmart = link.type === 'smart';
+            const remappedUrl = this.remapUrl(link);
+
+            const unlaunchable = isSmart && !remappedUrl;
+            const unlaunchableNotice = unlaunchable
+              ? 'Cannot launch SMART link without a SMART-enabled FHIR server'
+              : '';
+
+            return (
+              <div>
+                <Button
+                  isDisabled={unlaunchable}
+                  title={unlaunchableNotice}
+                  key={ind}
+                  onClick={(e) => {
+                  const launchedWindow = this.launchLink(e, link);
+                  if (this.props.onAppLaunch) {
+                    this.props.onAppLaunch(link, launchedWindow);
+                  }
+                }}
+                  variant="action"
+                  text={link.label}
+                />
+                <div className={styles.unlaunchable}>{unlaunchableNotice}</div>
+              </div>
+            );
+          });
         }
 
-        const classes = cx(styles['decision-card'], styles.alert, styles[`alert-${card.indicator}`]);
+        const classes = cx(
+          styles['decision-card'],
+          styles.alert,
+          styles[`alert-${card.indicator}`],
+        );
 
         const builtCard = (
           <TerraCard key={cardInd} className={classes}>
-            {summarySection}
-            {sourceSection}
-            {detailSection}
+            {' '}
+            {summarySection} {sourceSection} {detailSection}{' '}
             <div className={styles['suggestions-section']}>
-              {suggestionsSection}
-            </div>
-            <div className={styles['links-section']}>
-              {linksSection}
-            </div>
-          </TerraCard>);
+              {' '}
+              {suggestionsSection}{' '}
+            </div>{' '}
+            <div className={styles['links-section']}> {linksSection} </div>{' '}
+          </TerraCard>
+        );
 
         renderedCards.push(builtCard);
       });
-    if (renderedCards.length === 0) { return <div>No Cards</div>; }
-    return <div>{renderedCards}</div>;
+    if (renderedCards.length === 0) {
+      return <div> No Cards </div>;
+    }
+    return <div> {renderedCards} </div>;
   }
 }
 
 CardList.propTypes = propTypes;
 
-const mapStateToProps = store => ({
-  cardResponses: getCardsFromServices(Object.keys(getServicesByHook(store.hookState.currentHook, store.cdsServicesState.configuredServices))),
-  fhirServerUrl: store.fhirServerState.currentFhirServer,
-  fhirAccessToken: store.fhirServerState.accessToken,
-  patientId: store.patientState.currentPatient.id,
+const mapStateToProps = (state, ownProps) => ({
+  ...ownProps,
+  cardResponses: getCardsFromServices(
+    state,
+    Object.keys(getServicesByHook(
+      state.hookState.currentHook,
+      state.cdsServicesState.configuredServices,
+    )),
+  ),
+  launchLinks: state.serviceExchangeState.launchLinks,
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -266,4 +315,7 @@ const mapDispatchToProps = dispatch => ({
   },
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(CardList);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(CardList);

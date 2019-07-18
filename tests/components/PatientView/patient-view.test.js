@@ -58,14 +58,6 @@ describe('PatientView component', () => {
     expect(pureComponent.prop('patient')).toEqual(storeState.patientState.currentPatient);
   });
 
-  it('contains relevant patient information if patient is in context', () => {
-    const shallowedComponent = pureComponent.shallow();
-    expect(shallowedComponent.text()).toContain(storeState.patientState.currentPatient.name);
-    expect(shallowedComponent.text()).toContain(storeState.patientState.currentPatient.birthDate);
-    expect(shallowedComponent.text()).toContain(storeState.patientState.currentPatient.id);
-    expect(mockSpy).toHaveBeenCalledTimes(1);
-  });
-
   it('contains relevant messages for missing patient in context', () => {
     storeState = {
       hookState: { 
@@ -92,7 +84,6 @@ describe('PatientView component', () => {
     expect(shallowedComponent.text()).toContain('Missing Name');
     expect(shallowedComponent.text()).toContain('Missing DOB');
     expect(shallowedComponent.text()).toContain('Missing Patient ID');
-    expect(mockSpy).toHaveBeenCalledTimes(1);
   });
 
   it('hides the view beyond the context toggle if context view status is set to false', () => {

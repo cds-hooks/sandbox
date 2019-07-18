@@ -1,0 +1,26 @@
+
+.pama {
+  height: auto;
+  display: inline-block;
+  padding: 30px;
+  margin: 0 0 20px;
+  vertical-align: top;
+  width: 100%;
+}
+
+.half-view {
+  width: 50%;
+}
+
+@media (max-width: 975px) {
+  .pama {
+    padding: 10px;
+    display: inline-block;
+    position: relative;
+  }
+
+  .half-view {
+    width: 100%;
+    display: inline-block;
+  }
+}

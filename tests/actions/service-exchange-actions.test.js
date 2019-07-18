@@ -15,7 +15,7 @@ describe('Service Exchange Actions', () => {
       responseStatus,
     };
 
-    expect(actions.storeExchange(url, request, response, responseStatus)).toEqual(expectedAction);
+    expect(actions.storeExchange(url, request, response, responseStatus)).toMatchObject(expectedAction);
   });
 
   it('creates action to set the CDS Service to display a request and response for', () => {
@@ -25,6 +25,6 @@ describe('Service Exchange Actions', () => {
       service,
     };
 
-    expect(actions.selectService(service)).toEqual(expectedAction);
+    expect(actions.selectService(service)).toMatchObject(expectedAction);
   });
 });
