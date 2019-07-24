@@ -30,14 +30,17 @@ const dispatchUpdates = (dispatch, updates) =>
         rating,
       }));
 
-const pamaTriggerHandler = {
+export const pamaTriggerHandler = {
   needExplicitTrigger: false,
   onSystemActions: (systemActions, state, dispatch) => {
     const updates = systemActions.filter(({ type }) => type === 'update');
     dispatchUpdates(dispatch, updates);
   },
   onMessage: ({ data, dispatch }) => {
-    const updates = [data].filter(({ messageType }) => messageType === 'scratchpad.update');
+    const updates = [data]
+    .filter(({ messageType }) => messageType === 'scratchpad.update')
+    .map(m => m.payload || {});
+
     dispatchUpdates(dispatch, updates);
   },
   generateContext: state => ({
