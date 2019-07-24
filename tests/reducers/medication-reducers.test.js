@@ -334,7 +334,7 @@ describe('Medication Reducers', () => {
   describe('createFhirResource', () => {
     it('creates MedicationOrder for DSTU2', () => {
       const patientId = 'patient-123';
-      const fhirVersion = '1.0.3';
+      const fhirVersion = '1.0.2';
 
       const fhirResource = {
         resourceType: 'MedicationOrder',

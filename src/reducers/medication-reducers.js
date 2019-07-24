@@ -1,9 +1,9 @@
 import moment from 'moment';
 import queryString from 'query-string';
+import compareVersions from 'compare-versions';
 import * as types from '../actions/action-types';
 import rxnorm from '../assets/medication-list';
 import { getConditionCodingFromCode } from './helpers/services-filter';
-import compareVersions from 'compare-versions';
 
 // Check if there is an associated name with the passed in drug ID to potentially create a prescribable object
 const getPrescribableFromID = (id) => {
