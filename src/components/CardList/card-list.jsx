@@ -91,7 +91,7 @@ export class CardList extends Component {
     const links = this.props.launchLinks;
 
     if (type === 'smart') {
-      if (links[url] && links[url][appContext]) {
+      if (links && links[url] && links[url][appContext]) {
         url = links[url][appContext];
       } else {
         url = null;
@@ -248,11 +248,10 @@ export class CardList extends Component {
               : '';
 
             return (
-              <div>
+              <div key={ind}>
                 <Button
                   isDisabled={unlaunchable}
                   title={unlaunchableNotice}
-                  key={ind}
                   onClick={(e) => {
                   const launchedWindow = this.launchLink(e, link);
                   if (this.props.onAppLaunch) {
