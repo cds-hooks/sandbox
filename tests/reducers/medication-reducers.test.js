@@ -1,5 +1,5 @@
 import moment from 'moment';
-import reducer from '../../src/reducers/medication-reducers';
+import { createFhirResource, medicationReducers as reducer} from '../../src/reducers/medication-reducers';
 import * as types from '../../src/actions/action-types';
 import rxnorm from '../../src/assets/medication-list';
 import { getConditionCodingFromCode } from '../../src/reducers/helpers/services-filter';
@@ -328,6 +328,59 @@ describe('Medication Reducers', () => {
     it('should return state if an action should pass through this reducer without change to state', () => {
       const action = { type: 'SOME_OTHER_ACTION' };
       expect(reducer(state, action)).toEqual(state);
+    });
+  });
+
+  describe('createFhirResource', () => {
+    it('creates MedicationOrder for DSTU2', () => {
+      const patientId = 'patient-123';
+      const fhirVersion = '1.0.2';
+
+      const fhirResource = {
+        resourceType: 'MedicationOrder',
+        id: 'order-123',
+        dateWritten: moment().format('YYYY-MM-DD'),
+        status: 'draft',
+        patient: {
+          reference: `Patient/${patientId}`,
+        },
+      };
+
+      expect(createFhirResource(fhirVersion, patientId, state)).toEqual(fhirResource);
+    });
+
+    it('creates MedicationRequest for STU3', () => {
+      const patientId = 'patient-123';
+      const fhirVersion = '3.0.1';
+
+      const fhirResource = {
+        resourceType: 'MedicationRequest',
+        id: 'request-123',
+        authoredOn: moment().format('YYYY-MM-DD'),
+        status: 'draft',
+        subject: {
+          reference: `Patient/${patientId}`,
+        },
+      };
+
+      expect(createFhirResource(fhirVersion, patientId, state)).toEqual(fhirResource);
+    });
+
+    it('creates MedicationRequest for R4', () => {
+      const patientId = 'patient-123';
+      const fhirVersion = '4.0.0';
+
+      const fhirResource = {
+        resourceType: 'MedicationRequest',
+        id: 'request-123',
+        authoredOn: moment().format('YYYY-MM-DD'),
+        status: 'draft',
+        subject: {
+          reference: `Patient/${patientId}`,
+        },
+      };
+
+      expect(createFhirResource(fhirVersion, patientId, state)).toEqual(fhirResource);
     });
   });
 });

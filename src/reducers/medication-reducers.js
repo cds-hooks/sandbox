@@ -1,5 +1,6 @@
 import moment from 'moment';
 import queryString from 'query-string';
+import compareVersions from 'compare-versions';
 import * as types from '../actions/action-types';
 import rxnorm from '../assets/medication-list';
 import { getConditionCodingFromCode } from './helpers/services-filter';
@@ -23,12 +24,12 @@ const getQueryParam = (param) => {
 
 // Construct the FHIR resource for MedicationRequest/Order from a chosen condition and/or medication
 export const createFhirResource = (fhirVersion, patientId, state, patientConditions) => {
-  const isSTU3 = fhirVersion === '3.0.1';
+  const isSTU3OrHigher = compareVersions(fhirVersion, '3.0.1') >= 0;
   const resource = {
-    resourceType: isSTU3 ? 'MedicationRequest' : 'MedicationOrder',
-    id: isSTU3 ? 'request-123' : 'order-123',
+    resourceType: isSTU3OrHigher ? 'MedicationRequest' : 'MedicationOrder',
+    id: isSTU3OrHigher ? 'request-123' : 'order-123',
   };
-  resource[`${isSTU3 ? 'authoredOn' : 'dateWritten'}`] = moment().format('YYYY-MM-DD');
+  resource[`${isSTU3OrHigher ? 'authoredOn' : 'dateWritten'}`] = moment().format('YYYY-MM-DD');
   let startDate;
   let endDate;
   if (state.prescriptionDates.start.value && state.prescriptionDates.start.enabled) {
@@ -39,7 +40,7 @@ export const createFhirResource = (fhirVersion, patientId, state, patientConditi
   }
 
   resource.status = 'draft';
-  resource[`${isSTU3 ? 'subject' : 'patient'}`] = {
+  resource[`${isSTU3OrHigher ? 'subject' : 'patient'}`] = {
     reference: `Patient/${patientId}`,
   };
   if (state.decisions.prescribable && state.medListPhase === 'done') {
@@ -69,7 +70,7 @@ export const createFhirResource = (fhirVersion, patientId, state, patientConditi
           },
         },
       }];
-      resource.dosageInstruction[0].timing.repeat[`${isSTU3 ? 'periodUnit' : 'periodUnits'}`] = 'd';
+      resource.dosageInstruction[0].timing.repeat[`${isSTU3OrHigher ? 'periodUnit' : 'periodUnits'}`] = 'd';
       if (startDate || endDate) {
         resource.dosageInstruction[0].timing.repeat.boundsPeriod = {
           start: startDate,
@@ -93,7 +94,7 @@ export const createFhirResource = (fhirVersion, patientId, state, patientConditi
   if (state.selectedConditionCode) {
     const chosenCondition = getConditionCodingFromCode(patientConditions, state.selectedConditionCode);
     if (chosenCondition && chosenCondition.resource && chosenCondition.resource.code) {
-      resource[`${isSTU3 ? 'reasonCode' : 'reasonCodeableConcept'}`] = chosenCondition.resource.code;
+      resource[`${isSTU3OrHigher ? 'reasonCode' : 'reasonCodeableConcept'}`] = chosenCondition.resource.code;
     }
   }
   return resource;
@@ -406,4 +407,4 @@ const medicationReducers = (state = initialState, action) => {
   return state;
 };
 
-export default medicationReducers;
+export { medicationReducers };
