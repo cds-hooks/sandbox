@@ -99,21 +99,41 @@ describe('SMART Launch', () => {
           });
         });
 
-        it('calls to retrieve discovery services if there is a serviceDiscoveryURL parameter in the access token', () => {
-          const actions = mockStore.getActions();
-          const expectedActions = [{
-              type: 'SMART_AUTH_SUCCESS',
-              authResponse: smartResponse
-            }, {
-              type: 'GET_FHIR_SERVER_SUCCESS',
-              baseUrl: securedFhirServer,
-              metadata: expectedMetadata
-            }
-          ];
-          return smartLaunchPromise().then(() => {
-            expect(retrieveDiscoveryServices).toHaveBeenCalledWith(tokenDiscoveryUrl);
+          it('calls to retrieve discovery services if there is a serviceDiscoveryURL parameter in the access token', () => {
+              const actions = mockStore.getActions();
+              const expectedActions = [{
+                  type: 'SMART_AUTH_SUCCESS',
+                  authResponse: smartResponse,
+                  metadata: expectedMetadata,
+              }
+              ];
+              return smartLaunchPromise().then(() => {
+                  expect(actions).toEqual(expectedActions);
+                  expect(retrieveDiscoveryServices).toHaveBeenCalledWith(tokenDiscoveryUrl);
+              });
           });
-        });
+
+          it('calls to retrieve discovery services if there is a multi-valued serviceDiscoveryURL parameter in the access token', () => {
+              const firstDiscoveryUrl = 'http://first-discovery-url.com/cds-services';
+              const secondDiscoveryUrl = 'http://second-discovery-url.com/cds-services';
+              smartResponse.tokenResponse = {
+                  foo: 'foo',
+                  serviceDiscoveryURL: firstDiscoveryUrl + ',' + secondDiscoveryUrl,
+              };
+
+              const actions = mockStore.getActions();
+              const expectedActions = [{
+                  type: 'SMART_AUTH_SUCCESS',
+                  authResponse: smartResponse,
+                  metadata: expectedMetadata,
+              }
+              ];
+              return smartLaunchPromise().then(() => {
+                  expect(actions).toEqual(expectedActions);
+                  expect(retrieveDiscoveryServices).toHaveBeenCalledWith(firstDiscoveryUrl);
+                  expect(retrieveDiscoveryServices).toHaveBeenCalledWith(secondDiscoveryUrl);
+              });
+          });
       });
 
       describe('and the conformance call to the secured FHIR server fails', () => {
