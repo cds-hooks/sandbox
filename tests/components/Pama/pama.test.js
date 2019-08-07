@@ -31,10 +31,11 @@ describe("Pama component", () => {
 
   beforeEach(() => {
     storeState = {
+      patientState: { currentPatient: { id: 'patient-123' } },
       pama: {
         serviceRequest: {
-          code: 1,
-          reasonCode: 2
+          code: "1",
+          reasonCode: "2"
         },
         pamaRating: "appropriate"
       }
@@ -54,6 +55,49 @@ describe("Pama component", () => {
     expect(pureComponent.prop("serviceRequest")).toEqual(
       storeState.pama.serviceRequest
     );
+  });
+
+  it("creates hook context correctly", () => {
+    const generateContext = require("../../../src/components/Pama/pama").pamaTriggerHandler.generateContext
+    const context = generateContext(storeState);
+    expect(context.selections).toEqual(['ServiceRequest/example-request-id']);
+
+    const expectedDraftOrders = {
+      resourceType: 'Bundle',
+      entry: [
+        {
+          resource: {
+            resourceType: 'ServiceRequest',
+            id: 'example-request-id',
+            status: 'draft',
+            intent: 'plan',
+            code: {
+              coding: [
+                {
+                  system: 'http://www.ama-assn.org/go/cpt',
+                  code: '1',
+                },
+              ],
+            },
+            subject: {
+              reference: 'Patient/patient-123',
+            },
+            reasonCode: [
+              {
+                coding: [
+                  {
+                    system: 'http://snomed.info/sct',
+                    code: '2',
+                  },
+                ],
+              },
+            ],
+          },
+        },
+      ],
+    }
+
+    expect(context.draftOrders).toEqual(expectedDraftOrders);
   });
 
   it("Handles onMessage payloads correctly", () => {
