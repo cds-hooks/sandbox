@@ -25,11 +25,18 @@ const getQueryParam = (param) => {
 // Construct the FHIR resource for MedicationRequest/Order from a chosen condition and/or medication
 export const createFhirResource = (fhirVersion, patientId, state, patientConditions) => {
   const isSTU3OrHigher = compareVersions(fhirVersion, '3.0.1') >= 0;
+
   const resource = {
     resourceType: isSTU3OrHigher ? 'MedicationRequest' : 'MedicationOrder',
     id: isSTU3OrHigher ? 'request-123' : 'order-123',
+    status: 'draft',
+  };
+
+  resource[`${isSTU3OrHigher ? 'subject' : 'patient'}`] = {
+    reference: `Patient/${patientId}`,
   };
   resource[`${isSTU3OrHigher ? 'authoredOn' : 'dateWritten'}`] = moment().format('YYYY-MM-DD');
+
   let startDate;
   let endDate;
   if (state.prescriptionDates.start.value && state.prescriptionDates.start.enabled) {
@@ -39,10 +46,6 @@ export const createFhirResource = (fhirVersion, patientId, state, patientConditi
     endDate = moment(state.prescriptionDates.end.value).format('YYYY-MM-DD');
   }
 
-  resource.status = 'draft';
-  resource[`${isSTU3OrHigher ? 'subject' : 'patient'}`] = {
-    reference: `Patient/${patientId}`,
-  };
   if (state.decisions.prescribable && state.medListPhase === 'done') {
     const freqs = {
       // Daily
@@ -57,22 +60,36 @@ export const createFhirResource = (fhirVersion, patientId, state, patientConditi
 
     if (state.medicationInstructions) {
       const { medicationInstructions } = state;
-      resource.dosageInstruction = [{
-        doseQuantity: {
-          value: medicationInstructions.number,
-          system: 'http://unitsofmeasure.org',
-          code: '{pill}',
-        },
+
+      const dosage = {
         timing: {
           repeat: {
             frequency: freqs[medicationInstructions.frequency],
             period: 1,
           },
         },
-      }];
-      resource.dosageInstruction[0].timing.repeat[`${isSTU3OrHigher ? 'periodUnit' : 'periodUnits'}`] = 'd';
+      };
+
+      resource.dosageInstruction = [dosage];
+
+      const doseQuantity = {
+        value: medicationInstructions.number,
+        system: 'http://unitsofmeasure.org',
+        code: '{pill}',
+      };
+
+      const isR4OrHigher = compareVersions(fhirVersion, '4.0.0') >= 0;
+      if (isR4OrHigher) {
+        dosage.doseAndRate = [
+          { doseQuantity },
+        ];
+      } else {
+        dosage.doseQuantity = doseQuantity;
+      }
+
+      dosage.timing.repeat[`${isSTU3OrHigher ? 'periodUnit' : 'periodUnits'}`] = 'd';
       if (startDate || endDate) {
-        resource.dosageInstruction[0].timing.repeat.boundsPeriod = {
+        dosage.timing.repeat.boundsPeriod = {
           start: startDate,
           end: endDate,
         };

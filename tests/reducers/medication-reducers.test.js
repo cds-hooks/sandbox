@@ -332,6 +332,18 @@ describe('Medication Reducers', () => {
   });
 
   describe('createFhirResource', () => {
+    beforeEach(() => {
+      state.medListPhase = 'done';
+      state.decisions = {
+        ...state.decisions,
+        prescribable: {
+          name: 'Carisoprodol 250 MG Oral Tablet [Soma]',
+          id: '730918',
+        },
+      };
+    });
+
+
     it('creates MedicationOrder for DSTU2', () => {
       const patientId = 'patient-123';
       const fhirVersion = '1.0.2';
@@ -344,6 +356,32 @@ describe('Medication Reducers', () => {
         patient: {
           reference: `Patient/${patientId}`,
         },
+        medicationCodeableConcept: {
+          coding: [
+            {
+              system: 'http://www.nlm.nih.gov/research/umls/rxnorm',
+              code: '730918',
+              display: 'Carisoprodol 250 MG Oral Tablet [Soma]'
+            }
+          ],
+          text: 'Carisoprodol 250 MG Oral Tablet [Soma]'
+        },
+        dosageInstruction: [
+          {
+            doseQuantity: {
+              value: 1,
+              system: 'http://unitsofmeasure.org',
+              code: '{pill}'
+            },
+            timing: {
+              repeat: {
+                frequency: 1,
+                period: 1,
+                periodUnits: 'd',
+              }
+            }
+          }
+        ],
       };
 
       expect(createFhirResource(fhirVersion, patientId, state)).toEqual(fhirResource);
@@ -361,6 +399,32 @@ describe('Medication Reducers', () => {
         subject: {
           reference: `Patient/${patientId}`,
         },
+        medicationCodeableConcept: {
+          coding: [
+            {
+              system: 'http://www.nlm.nih.gov/research/umls/rxnorm',
+              code: '730918',
+              display: 'Carisoprodol 250 MG Oral Tablet [Soma]'
+            }
+          ],
+          text: 'Carisoprodol 250 MG Oral Tablet [Soma]'
+        },
+        dosageInstruction: [
+          {
+            doseQuantity: {
+              value: 1,
+              system: 'http://unitsofmeasure.org',
+              code: '{pill}'
+            },
+            timing: {
+              repeat: {
+                frequency: 1,
+                period: 1,
+                periodUnit: 'd',
+              }
+            }
+          }
+        ],
       };
 
       expect(createFhirResource(fhirVersion, patientId, state)).toEqual(fhirResource);
@@ -378,6 +442,36 @@ describe('Medication Reducers', () => {
         subject: {
           reference: `Patient/${patientId}`,
         },
+        medicationCodeableConcept: {
+          coding: [
+            {
+              system: 'http://www.nlm.nih.gov/research/umls/rxnorm',
+              code: '730918',
+              display: 'Carisoprodol 250 MG Oral Tablet [Soma]'
+            }
+          ],
+          text: 'Carisoprodol 250 MG Oral Tablet [Soma]'
+        },
+        dosageInstruction: [
+          {
+            doseAndRate: [
+              {
+                doseQuantity: {
+                  value: 1,
+                  system: 'http://unitsofmeasure.org',
+                  code: '{pill}'
+                }
+              }
+            ],
+            timing: {
+              repeat: {
+                frequency: 1,
+                period: 1,
+                periodUnit: 'd',
+              }
+            }
+          }
+        ],
       };
 
       expect(createFhirResource(fhirVersion, patientId, state)).toEqual(fhirResource);
