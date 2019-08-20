@@ -1,1 +1,1242 @@
-{"resourceType":"ValueSet","expansion":[{"system":"http://www.ama-assn.org/go/cpt","code":"76390","display":"Magnetic resonance spectroscopy"},{"system":"http://www.ama-assn.org/go/cpt","code":"78270","display":"Vitamin B-12 absorption study (eg, Schilling test); without intrinsic factor"},{"system":"http://www.ama-assn.org/go/cpt","code":"76380","display":"Computed tomography, limited or localized follow-up study"},{"system":"http://www.ama-assn.org/go/cpt","code":"70450","display":"Computed tomography, head or brain; without contrast material"},{"system":"http://www.ama-assn.org/go/cpt","code":"70470","display":"Computed tomography, head or brain; without contrast material, followed by contrast material(s) and further sections"},{"system":"http://www.ama-assn.org/go/cpt","code":"70551","display":"Magnetic resonance (eg, proton) imaging, brain (including brain stem); without contrast material"},{"system":"http://www.ama-assn.org/go/cpt","code":"70552","display":"Magnetic resonance (eg, proton) imaging, brain (including brain stem); with contrast material(s)"},{"system":"http://www.ama-assn.org/go/cpt","code":"70486","display":"Computed tomography, maxillofacial area; without contrast material"},{"system":"http://www.ama-assn.org/go/cpt","code":"70487","display":"Computed tomography, maxillofacial area; with contrast material(s)"},{"system":"http://www.ama-assn.org/go/cpt","code":"70488","display":"Computed tomography, maxillofacial area; without contrast material, followed by contrast material(s) and further sections"},{"system":"http://www.ama-assn.org/go/cpt","code":"70336","display":"Magnetic resonance (eg, proton) imaging, temporomandibular joint(s)"},{"system":"http://www.ama-assn.org/go/cpt","code":"70490","display":"Computed tomography, soft tissue neck; without contrast material"},{"system":"http://www.ama-assn.org/go/cpt","code":"70491","display":"Computed tomography, soft tissue neck; with contrast material(s)"},{"system":"http://www.ama-assn.org/go/cpt","code":"70492","display":"Computed tomography, soft tissue neck; without contrast material followed by contrast material(s) and further sections"},{"system":"http://www.ama-assn.org/go/cpt","code":"71260","display":"Computed tomography, thorax; with contrast material(s)"},{"system":"http://www.ama-assn.org/go/cpt","code":"71270","display":"Computed tomography, thorax; without contrast material, followed by contrast material(s) and further sections"},{"system":"http://www.ama-assn.org/go/cpt","code":"71550","display":"Magnetic resonance (eg, proton) imaging, chest (eg, for evaluation of hilar and mediastinal lymphadenopathy); without contrast material(s)"},{"system":"http://www.ama-assn.org/go/cpt","code":"74150","display":"Computed tomography, abdomen; without contrast material"},{"system":"http://www.ama-assn.org/go/cpt","code":"74160","display":"Computed tomography, abdomen; with contrast material(s)"},{"system":"http://www.ama-assn.org/go/cpt","code":"74170","display":"Computed tomography, abdomen; without contrast material, followed by contrast material(s) and further sections"},{"system":"http://www.ama-assn.org/go/cpt","code":"78264","display":"Gastric emptying imaging study (eg, solid, liquid, or both)"},{"system":"http://www.ama-assn.org/go/cpt","code":"72125","display":"Computed tomography, cervical spine; without contrast material"},{"system":"http://www.ama-assn.org/go/cpt","code":"72126","display":"Computed tomography, cervical spine; with contrast material"},{"system":"http://www.ama-assn.org/go/cpt","code":"72127","display":"Computed tomography, cervical spine; without contrast material, followed by contrast material(s) and further sections"},{"system":"http://www.ama-assn.org/go/cpt","code":"72128","display":"Computed tomography, thoracic spine; without contrast material"},{"system":"http://www.ama-assn.org/go/cpt","code":"72129","display":"Computed tomography, thoracic spine; with contrast material"},{"system":"http://www.ama-assn.org/go/cpt","code":"72130","display":"Computed tomography, thoracic spine; without contrast material, followed by contrast material(s) and further sections"},{"system":"http://www.ama-assn.org/go/cpt","code":"72131","display":"Computed tomography, lumbar spine; without contrast material"},{"system":"http://www.ama-assn.org/go/cpt","code":"72132","display":"Computed tomography, lumbar spine; with contrast material"},{"system":"http://www.ama-assn.org/go/cpt","code":"72133","display":"Computed tomography, lumbar spine; without contrast material, followed by contrast material(s) and further sections"},{"system":"http://www.ama-assn.org/go/cpt","code":"72192","display":"Computed tomography, pelvis; without contrast material"},{"system":"http://www.ama-assn.org/go/cpt","code":"72193","display":"Computed tomography, pelvis; with contrast material(s)"},{"system":"http://www.ama-assn.org/go/cpt","code":"72194","display":"Computed tomography, pelvis; without contrast material, followed by contrast material(s) and further sections"},{"system":"http://www.ama-assn.org/go/cpt","code":"72196","display":"Magnetic resonance (eg, proton) imaging, pelvis; with contrast material(s)"},{"system":"http://www.ama-assn.org/go/cpt","code":"73200","display":"Computed tomography, upper extremity; without contrast material"},{"system":"http://www.ama-assn.org/go/cpt","code":"73201","display":"Computed tomography, upper extremity; with contrast material(s)"},{"system":"http://www.ama-assn.org/go/cpt","code":"73202","display":"Computed tomography, upper extremity; without contrast material, followed by contrast material(s) and further sections"},{"system":"http://www.ama-assn.org/go/cpt","code":"73220","display":"Magnetic resonance (eg, proton) imaging, upper extremity, other than joint; without contrast material(s), followed by contrast material(s) and further sequences"},{"system":"http://www.ama-assn.org/go/cpt","code":"73700","display":"Computed tomography, lower extremity; without contrast material"},{"system":"http://www.ama-assn.org/go/cpt","code":"73702","display":"Computed tomography, lower extremity; without contrast material, followed by contrast material(s) and further sections"},{"system":"http://www.ama-assn.org/go/cpt","code":"73720","display":"Magnetic resonance (eg, proton) imaging, lower extremity other than joint; without contrast material(s), followed by contrast material(s) and further sequences"},{"system":"http://www.ama-assn.org/go/cpt","code":"78800","display":"Radiopharmaceutical localization of tumor or distribution of radiopharmaceutical agent(s); limited area"},{"system":"http://www.ama-assn.org/go/cpt","code":"78801","display":"Radiopharmaceutical localization of tumor or distribution of radiopharmaceutical agent(s); multiple areas"},{"system":"http://www.ama-assn.org/go/cpt","code":"78802","display":"Radiopharmaceutical localization of tumor or distribution of radiopharmaceutical agent(s); whole body, single day imaging"},{"system":"http://www.ama-assn.org/go/cpt","code":"78580","display":"Pulmonary perfusion imaging (eg, particulate)"},{"system":"http://www.ama-assn.org/go/cpt","code":"78457","display":"Venous thrombosis imaging, venogram; unilateral"},{"system":"http://www.ama-assn.org/go/cpt","code":"78458","display":"Venous thrombosis imaging, venogram; bilateral"},{"system":"http://www.ama-assn.org/go/cpt","code":"78428","display":"Cardiac shunt detection"},{"system":"http://www.ama-assn.org/go/cpt","code":"78261","display":"Gastric mucosa imaging"},{"system":"http://www.ama-assn.org/go/cpt","code":"78278","display":"Acute gastrointestinal blood loss imaging"},{"system":"http://www.ama-assn.org/go/cpt","code":"78201","display":"Liver imaging; static only"},{"system":"http://www.ama-assn.org/go/cpt","code":"78202","display":"Liver imaging; with vascular flow"},{"system":"http://www.ama-assn.org/go/cpt","code":"78215","display":"Liver and spleen imaging; static only"},{"system":"http://www.ama-assn.org/go/cpt","code":"78216","display":"Liver and spleen imaging; with vascular flow"},{"system":"http://www.ama-assn.org/go/cpt","code":"78232","display":"Salivary gland function study"},{"system":"http://www.ama-assn.org/go/cpt","code":"78271","display":"Vitamin B-12 absorption study (eg, Schilling test); with intrinsic factor"},{"system":"http://www.ama-assn.org/go/cpt","code":"78272","display":"Vitamin B-12 absorption studies combined, with and without intrinsic factor"},{"system":"http://www.ama-assn.org/go/cpt","code":"78013","display":"Thyroid imaging (including vascular flow, when performed)"},{"system":"http://www.ama-assn.org/go/cpt","code":"78015","display":"Thyroid carcinoma metastases imaging; limited area (eg, neck and chest only)"},{"system":"http://www.ama-assn.org/go/cpt","code":"78018","display":"Thyroid carcinoma metastases imaging; whole body"},{"system":"http://www.ama-assn.org/go/cpt","code":"78016","display":"Thyroid carcinoma metastases imaging; with additional studies (eg, urinary recovery)"},{"system":"http://www.ama-assn.org/go/cpt","code":"78102","display":"Bone marrow imaging; limited area"},{"system":"http://www.ama-assn.org/go/cpt","code":"78103","display":"Bone marrow imaging; multiple areas"},{"system":"http://www.ama-assn.org/go/cpt","code":"78104","display":"Bone marrow imaging; whole body"},{"system":"http://www.ama-assn.org/go/cpt","code":"78122","display":"Whole blood volume determination, including separate measurement of plasma volume and red cell volume (radiopharmaceutical volume-dilution technique)"},{"system":"http://www.ama-assn.org/go/cpt","code":"78120","display":"Red cell volume determination (separate procedure); single sampling"},{"system":"http://www.ama-assn.org/go/cpt","code":"78121","display":"Red cell volume determination (separate procedure); multiple samplings"},{"system":"http://www.ama-assn.org/go/cpt","code":"78195","display":"Lymphatics and lymph nodes imaging"},{"system":"http://www.ama-assn.org/go/cpt","code":"78701","display":"Kidney imaging morphology; with vascular flow"},{"system":"http://www.ama-assn.org/go/cpt","code":"78730","display":"Urinary bladder residual study (List separately in addition to code for primary procedure)"},{"system":"http://www.ama-assn.org/go/cpt","code":"78740","display":"Ureteral reflux study (radiopharmaceutical voiding cystogram)"},{"system":"http://www.ama-assn.org/go/cpt","code":"78761","display":"Testicular imaging with vascular flow"},{"system":"http://www.ama-assn.org/go/cpt","code":"78600","display":"Brain imaging, less than 4 static views"},{"system":"http://www.ama-assn.org/go/cpt","code":"78605","display":"Brain imaging, minimum 4 static views"},{"system":"http://www.ama-assn.org/go/cpt","code":"78601","display":"Brain imaging, less than 4 static views; with vascular flow"},{"system":"http://www.ama-assn.org/go/cpt","code":"78606","display":"Brain imaging, minimum 4 static views; with vascular flow"},{"system":"http://www.ama-assn.org/go/cpt","code":"78607","display":"Brain imaging, tomographic (SPECT)"},{"system":"http://www.ama-assn.org/go/cpt","code":"78291","display":"Peritoneal-venous shunt patency test (eg, for LeVeen, Denver shunt)"},{"system":"http://www.ama-assn.org/go/cpt","code":"78650","display":"Cerebrospinal fluid leakage detection and localization"},{"system":"http://www.ama-assn.org/go/cpt","code":"70480","display":"Computed tomography, orbit, sella, or posterior fossa or outer, middle, or inner ear; without contrast material"},{"system":"http://www.ama-assn.org/go/cpt","code":"70481","display":"Computed tomography, orbit, sella, or posterior fossa or outer, middle, or inner ear; with contrast material(s)"},{"system":"http://www.ama-assn.org/go/cpt","code":"70482","display":"Computed tomography, orbit, sella, or posterior fossa or outer, middle, or inner ear; without contrast material, followed by contrast material(s) and further sections"},{"system":"http://www.ama-assn.org/go/cpt","code":"70553","display":"Magnetic resonance (eg, proton) imaging, brain (including brain stem); without contrast material, followed by contrast material(s) and further sequences"},{"system":"http://www.ama-assn.org/go/cpt","code":"71555","display":"Magnetic resonance angiography, chest (excluding myocardium), with or without contrast material(s)"},{"system":"http://www.ama-assn.org/go/cpt","code":"72141","display":"Magnetic resonance (eg, proton) imaging, spinal canal and contents, cervical; without contrast material"},{"system":"http://www.ama-assn.org/go/cpt","code":"72142","display":"Magnetic resonance (eg, proton) imaging, spinal canal and contents, cervical; with contrast material(s)"},{"system":"http://www.ama-assn.org/go/cpt","code":"72146","display":"Magnetic resonance (eg, proton) imaging, spinal canal and contents, thoracic; without contrast material"},{"system":"http://www.ama-assn.org/go/cpt","code":"72147","display":"Magnetic resonance (eg, proton) imaging, spinal canal and contents, thoracic; with contrast material(s)"},{"system":"http://www.ama-assn.org/go/cpt","code":"72148","display":"Magnetic resonance (eg, proton) imaging, spinal canal and contents, lumbar; without contrast material"},{"system":"http://www.ama-assn.org/go/cpt","code":"72149","display":"Magnetic resonance (eg, proton) imaging, spinal canal and contents, lumbar; with contrast material(s)"},{"system":"http://www.ama-assn.org/go/cpt","code":"72156","display":"Magnetic resonance (eg, proton) imaging, spinal canal and contents, without contrast material, followed by contrast material(s) and further sequences; cervical"},{"system":"http://www.ama-assn.org/go/cpt","code":"72157","display":"Magnetic resonance (eg, proton) imaging, spinal canal and contents, without contrast material, followed by contrast material(s) and further sequences; thoracic"},{"system":"http://www.ama-assn.org/go/cpt","code":"72158","display":"Magnetic resonance (eg, proton) imaging, spinal canal and contents, without contrast material, followed by contrast material(s) and further sequences; lumbar"},{"system":"http://www.ama-assn.org/go/cpt","code":"72159","display":"Magnetic resonance angiography, spinal canal and contents, with or without contrast material(s)"},{"system":"http://www.ama-assn.org/go/cpt","code":"72198","display":"Magnetic resonance angiography, pelvis, with or without contrast material(s)"},{"system":"http://www.ama-assn.org/go/cpt","code":"73225","display":"Magnetic resonance angiography, upper extremity, with or without contrast material(s)"},{"system":"http://www.ama-assn.org/go/cpt","code":"73721","display":"Magnetic resonance (eg, proton) imaging, any joint of lower extremity; without contrast material"},{"system":"http://www.ama-assn.org/go/cpt","code":"73725","display":"Magnetic resonance angiography, lower extremity, with or without contrast material(s)"},{"system":"http://www.ama-assn.org/go/cpt","code":"74185","display":"Magnetic resonance angiography, abdomen, with or without contrast material(s)"},{"system":"http://www.ama-assn.org/go/cpt","code":"78075","display":"Adrenal imaging, cortex and/or medulla"},{"system":"http://www.ama-assn.org/go/cpt","code":"78099","display":"Unlisted endocrine procedure, diagnostic nuclear medicine"},{"system":"http://www.ama-assn.org/go/cpt","code":"78110","display":"Plasma volume, radiopharmaceutical volume-dilution technique (separate procedure); single sampling"},{"system":"http://www.ama-assn.org/go/cpt","code":"78111","display":"Plasma volume, radiopharmaceutical volume-dilution technique (separate procedure); multiple samplings"},{"system":"http://www.ama-assn.org/go/cpt","code":"78135","display":"Red cell survival study; differential organ/tissue kinetics (eg, splenic and/or hepatic sequestration)"},{"system":"http://www.ama-assn.org/go/cpt","code":"78140","display":"Labeled red cell sequestration, differential organ/tissue (eg, splenic and/or hepatic)"},{"system":"http://www.ama-assn.org/go/cpt","code":"78185","display":"Spleen imaging only, with or without vascular flow"},{"system":"http://www.ama-assn.org/go/cpt","code":"78199","display":"Unlisted hematopoietic, reticuloendothelial and lymphatic procedure, diagnostic nuclear medicine"},{"system":"http://www.ama-assn.org/go/cpt","code":"78231","display":"Salivary gland imaging; with serial images"},{"system":"http://www.ama-assn.org/go/cpt","code":"78299","display":"Unlisted gastrointestinal procedure, diagnostic nuclear medicine"},{"system":"http://www.ama-assn.org/go/cpt","code":"78300","display":"Bone and/or joint imaging; limited area"},{"system":"http://www.ama-assn.org/go/cpt","code":"78305","display":"Bone and/or joint imaging; multiple areas"},{"system":"http://www.ama-assn.org/go/cpt","code":"78306","display":"Bone and/or joint imaging; whole body"},{"system":"http://www.ama-assn.org/go/cpt","code":"78315","display":"Bone and/or joint imaging; 3 phase study"},{"system":"http://www.ama-assn.org/go/cpt","code":"78320","display":"Bone and/or joint imaging; tomographic (SPECT)"},{"system":"http://www.ama-assn.org/go/cpt","code":"78399","display":"Unlisted musculoskeletal procedure, diagnostic nuclear medicine"},{"system":"http://www.ama-assn.org/go/cpt","code":"78414","display":"Determination of central c-v hemodynamics (non-imaging) (eg, ejection fraction with probe technique) with or without pharmacologic intervention or exercise, single or multiple determinations"},{"system":"http://www.ama-assn.org/go/cpt","code":"78459","display":"Myocardial imaging, positron emission tomography (PET), metabolic evaluation"},{"system":"http://www.ama-assn.org/go/cpt","code":"78466","display":"Myocardial imaging, infarct avid, planar; qualitative or quantitative"},{"system":"http://www.ama-assn.org/go/cpt","code":"78468","display":"Myocardial imaging, infarct avid, planar; with ejection fraction by first pass technique"},{"system":"http://www.ama-assn.org/go/cpt","code":"78469","display":"Myocardial imaging, infarct avid, planar; tomographic SPECT with or without quantification"},{"system":"http://www.ama-assn.org/go/cpt","code":"78472","display":"Cardiac blood pool imaging, gated equilibrium; planar, single study at rest or stress (exercise and/or pharmacologic), wall motion study plus ejection fraction, with or without additional quantitative processing"},{"system":"http://www.ama-assn.org/go/cpt","code":"78473","display":"Cardiac blood pool imaging, gated equilibrium; multiple studies, wall motion study plus ejection fraction, at rest and stress (exercise and/or pharmacologic), with or without additional quantification"},{"system":"http://www.ama-assn.org/go/cpt","code":"78499","display":"Unlisted cardiovascular procedure, diagnostic nuclear medicine"},{"system":"http://www.ama-assn.org/go/cpt","code":"78599","display":"Unlisted respiratory procedure, diagnostic nuclear medicine"},{"system":"http://www.ama-assn.org/go/cpt","code":"78608","display":"Brain imaging, positron emission tomography (PET); metabolic evaluation"},{"system":"http://www.ama-assn.org/go/cpt","code":"78609","display":"Brain imaging, positron emission tomography (PET); perfusion evaluation"},{"system":"http://www.ama-assn.org/go/cpt","code":"78610","display":"Brain imaging, vascular flow only"},{"system":"http://www.ama-assn.org/go/cpt","code":"78630","display":"Cerebrospinal fluid flow, imaging (not including introduction of material); cisternography"},{"system":"http://www.ama-assn.org/go/cpt","code":"78635","display":"Cerebrospinal fluid flow, imaging (not including introduction of material); ventriculography"},{"system":"http://www.ama-assn.org/go/cpt","code":"78645","display":"Cerebrospinal fluid flow, imaging (not including introduction of material); shunt evaluation"},{"system":"http://www.ama-assn.org/go/cpt","code":"78647","display":"Cerebrospinal fluid flow, imaging (not including introduction of material); tomographic (SPECT)"},{"system":"http://www.ama-assn.org/go/cpt","code":"78699","display":"Unlisted nervous system procedure, diagnostic nuclear medicine"},{"system":"http://www.ama-assn.org/go/cpt","code":"78710","display":"Kidney imaging morphology; tomographic (SPECT)"},{"system":"http://www.ama-assn.org/go/cpt","code":"78725","display":"Kidney function study, non-imaging radioisotopic study"},{"system":"http://www.ama-assn.org/go/cpt","code":"78799","display":"Unlisted genitourinary procedure, diagnostic nuclear medicine"},{"system":"http://www.ama-assn.org/go/cpt","code":"78803","display":"Radiopharmaceutical localization of tumor or distribution of radiopharmaceutical agent(s); tomographic (SPECT)"},{"system":"http://www.ama-assn.org/go/cpt","code":"78805","display":"Radiopharmaceutical localization of inflammatory process; limited area"},{"system":"http://www.ama-assn.org/go/cpt","code":"78806","display":"Radiopharmaceutical localization of inflammatory process; whole body"},{"system":"http://www.ama-assn.org/go/cpt","code":"78807","display":"Radiopharmaceutical localization of inflammatory process; tomographic (SPECT)"},{"system":"http://www.ama-assn.org/go/cpt","code":"78999","display":"Unlisted miscellaneous procedure, diagnostic nuclear medicine"},{"system":"http://www.ama-assn.org/go/cpt","code":"78660","display":"Radiopharmaceutical dacryocystography"},{"system":"http://www.ama-assn.org/go/cpt","code":"78130","display":"Red cell survival study"},{"system":"http://www.ama-assn.org/go/cpt","code":"78191","display":"Platelet survival study"},{"system":"http://www.ama-assn.org/go/cpt","code":"74181","display":"Magnetic resonance (eg, proton) imaging, abdomen; without contrast material(s)"},{"system":"http://www.ama-assn.org/go/cpt","code":"78262","display":"Gastroesophageal reflux study"},{"system":"http://www.ama-assn.org/go/cpt","code":"78282","display":"Gastrointestinal protein loss"},{"system":"http://www.ama-assn.org/go/cpt","code":"78350","display":"Bone density (bone mineral content) study, 1 or more sites; single photon absorptiometry"},{"system":"http://www.ama-assn.org/go/cpt","code":"78445","display":"Non-cardiac vascular flow imaging (ie, angiography, venography)"},{"system":"http://www.ama-assn.org/go/cpt","code":"78481","display":"Cardiac blood pool imaging (planar), first pass technique; single study, at rest or with stress (exercise and/or pharmacologic), wall motion study plus ejection fraction, with or without quantification"},{"system":"http://www.ama-assn.org/go/cpt","code":"78483","display":"Cardiac blood pool imaging (planar), first pass technique; multiple studies, at rest and with stress (exercise and/or pharmacologic), wall motion study plus ejection fraction, with or without quantification"},{"system":"http://www.ama-assn.org/go/cpt","code":"78491","display":"Myocardial imaging, positron emission tomography (PET), perfusion; single study at rest or stress"},{"system":"http://www.ama-assn.org/go/cpt","code":"78492","display":"Myocardial imaging, positron emission tomography (PET), perfusion; multiple studies at rest and/or stress"},{"system":"http://www.ama-assn.org/go/cpt","code":"78707","display":"Kidney imaging morphology; with vascular flow and function, single study without pharmacological intervention"},{"system":"http://www.ama-assn.org/go/cpt","code":"78351","display":"Bone density (bone mineral content) study, 1 or more sites; dual photon absorptiometry, 1 or more sites"},{"system":"http://www.ama-assn.org/go/cpt","code":"78708","display":"Kidney imaging morphology; with vascular flow and function, single study, with pharmacological intervention (eg, angiotensin converting enzyme inhibitor and/or diuretic)"},{"system":"http://www.ama-assn.org/go/cpt","code":"78709","display":"Kidney imaging morphology; with vascular flow and function, multiple studies, with and without pharmacological intervention (eg, angiotensin converting enzyme inhibitor and/or diuretic)"},{"system":"http://www.ama-assn.org/go/cpt","code":"78020","display":"Thyroid carcinoma metastases uptake (List separately in addition to code for primary procedure)"},{"system":"http://www.ama-assn.org/go/cpt","code":"78206","display":"Liver imaging (SPECT); with vascular flow"},{"system":"http://www.ama-assn.org/go/cpt","code":"78494","display":"Cardiac blood pool imaging, gated equilibrium, SPECT, at rest, wall motion study plus ejection fraction, with or without quantitative processing"},{"system":"http://www.ama-assn.org/go/cpt","code":"78496","display":"Cardiac blood pool imaging, gated equilibrium, single study, at rest, with right ventricular ejection fraction by first pass technique (List separately in addition to code for primary procedure)"},{"system":"http://www.ama-assn.org/go/cpt","code":"78258","display":"Esophageal motility"},{"system":"http://www.ama-assn.org/go/cpt","code":"78267","display":"Urea breath test, C-14 (isotopic); acquisition for analysis"},{"system":"http://www.ama-assn.org/go/cpt","code":"78268","display":"Urea breath test, C-14 (isotopic); analysis"},{"system":"http://www.ama-assn.org/go/cpt","code":"78456","display":"Acute venous thrombosis imaging, peptide"},{"system":"http://www.ama-assn.org/go/cpt","code":"70496","display":"Computed tomographic angiography, head, with contrast material(s), including noncontrast images, if performed, and image postprocessing"},{"system":"http://www.ama-assn.org/go/cpt","code":"70498","display":"Computed tomographic angiography, neck, with contrast material(s), including noncontrast images, if performed, and image postprocessing"},{"system":"http://www.ama-assn.org/go/cpt","code":"70542","display":"Magnetic resonance (eg, proton) imaging, orbit, face, and/or neck; with contrast material(s)"},{"system":"http://www.ama-assn.org/go/cpt","code":"70543","display":"Magnetic resonance (eg, proton) imaging, orbit, face, and/or neck; without contrast material(s), followed by contrast material(s) and further sequences"},{"system":"http://www.ama-assn.org/go/cpt","code":"70544","display":"Magnetic resonance angiography, head; without contrast material(s)"},{"system":"http://www.ama-assn.org/go/cpt","code":"70545","display":"Magnetic resonance angiography, head; with contrast material(s)"},{"system":"http://www.ama-assn.org/go/cpt","code":"70546","display":"Magnetic resonance angiography, head; without contrast material(s), followed by contrast material(s) and further sequences"},{"system":"http://www.ama-assn.org/go/cpt","code":"70547","display":"Magnetic resonance angiography, neck; without contrast material(s)"},{"system":"http://www.ama-assn.org/go/cpt","code":"70548","display":"Magnetic resonance angiography, neck; with contrast material(s)"},{"system":"http://www.ama-assn.org/go/cpt","code":"70549","display":"Magnetic resonance angiography, neck; without contrast material(s), followed by contrast material(s) and further sequences"},{"system":"http://www.ama-assn.org/go/cpt","code":"71275","display":"Computed tomographic angiography, chest (noncoronary), with contrast material(s), including noncontrast images, if performed, and image postprocessing"},{"system":"http://www.ama-assn.org/go/cpt","code":"71551","display":"Magnetic resonance (eg, proton) imaging, chest (eg, for evaluation of hilar and mediastinal lymphadenopathy); with contrast material(s)"},{"system":"http://www.ama-assn.org/go/cpt","code":"71552","display":"Magnetic resonance (eg, proton) imaging, chest (eg, for evaluation of hilar and mediastinal lymphadenopathy); without contrast material(s), followed by contrast material(s) and further sequences"},{"system":"http://www.ama-assn.org/go/cpt","code":"72191","display":"Computed tomographic angiography, pelvis, with contrast material(s), including noncontrast images, if performed, and image postprocessing"},{"system":"http://www.ama-assn.org/go/cpt","code":"72195","display":"Magnetic resonance (eg, proton) imaging, pelvis; without contrast material(s)"},{"system":"http://www.ama-assn.org/go/cpt","code":"72197","display":"Magnetic resonance (eg, proton) imaging, pelvis; without contrast material(s), followed by contrast material(s) and further sequences"},{"system":"http://www.ama-assn.org/go/cpt","code":"73206","display":"Computed tomographic angiography, upper extremity, with contrast material(s), including noncontrast images, if performed, and image postprocessing"},{"system":"http://www.ama-assn.org/go/cpt","code":"73218","display":"Magnetic resonance (eg, proton) imaging, upper extremity, other than joint; without contrast material(s)"},{"system":"http://www.ama-assn.org/go/cpt","code":"73219","display":"Magnetic resonance (eg, proton) imaging, upper extremity, other than joint; with contrast material(s)"},{"system":"http://www.ama-assn.org/go/cpt","code":"73222","display":"Magnetic resonance (eg, proton) imaging, any joint of upper extremity; with contrast material(s)"},{"system":"http://www.ama-assn.org/go/cpt","code":"73223","display":"Magnetic resonance (eg, proton) imaging, any joint of upper extremity; without contrast material(s), followed by contrast material(s) and further sequences"},{"system":"http://www.ama-assn.org/go/cpt","code":"73706","display":"Computed tomographic angiography, lower extremity, with contrast material(s), including noncontrast images, if performed, and image postprocessing"},{"system":"http://www.ama-assn.org/go/cpt","code":"73718","display":"Magnetic resonance (eg, proton) imaging, lower extremity other than joint; without contrast material(s)"},{"system":"http://www.ama-assn.org/go/cpt","code":"73719","display":"Magnetic resonance (eg, proton) imaging, lower extremity other than joint; with contrast material(s)"},{"system":"http://www.ama-assn.org/go/cpt","code":"73722","display":"Magnetic resonance (eg, proton) imaging, any joint of lower extremity; with contrast material(s)"},{"system":"http://www.ama-assn.org/go/cpt","code":"73723","display":"Magnetic resonance (eg, proton) imaging, any joint of lower extremity; without contrast material(s), followed by contrast material(s) and further sequences"},{"system":"http://www.ama-assn.org/go/cpt","code":"74175","display":"Computed tomographic angiography, abdomen, with contrast material(s), including noncontrast images, if performed, and image postprocessing"},{"system":"http://www.ama-assn.org/go/cpt","code":"74183","display":"Magnetic resonance (eg, proton) imaging, abdomen; without contrast material(s), followed by with contrast material(s) and further sequences"},{"system":"http://www.ama-assn.org/go/cpt","code":"75635","display":"Computed tomographic angiography, abdominal aorta and bilateral iliofemoral lower extremity runoff, with contrast material(s), including noncontrast images, if performed, and image postprocessing"},{"system":"http://www.ama-assn.org/go/cpt","code":"76497","display":"Unlisted computed tomography procedure (eg, diagnostic, interventional)"},{"system":"http://www.ama-assn.org/go/cpt","code":"76498","display":"Unlisted magnetic resonance procedure (eg, diagnostic, interventional)"},{"system":"http://www.ama-assn.org/go/cpt","code":"70460","display":"Computed tomography, head or brain; with contrast material(s)"},{"system":"http://www.ama-assn.org/go/cpt","code":"78290","display":"Intestine imaging (eg, ectopic gastric mucosa, Meckel's localization, volvulus)"},{"system":"http://www.ama-assn.org/go/cpt","code":"78804","display":"Radiopharmaceutical localization of tumor or distribution of radiopharmaceutical agent(s); whole body, requiring 2 or more days imaging"},{"system":"http://www.ama-assn.org/go/cpt","code":"78811","display":"Positron emission tomography (PET) imaging; limited area (eg, chest, head/neck)"},{"system":"http://www.ama-assn.org/go/cpt","code":"78812","display":"Positron emission tomography (PET) imaging; skull base to mid-thigh"},{"system":"http://www.ama-assn.org/go/cpt","code":"78813","display":"Positron emission tomography (PET) imaging; whole body"},{"system":"http://www.ama-assn.org/go/cpt","code":"78814","display":"Positron emission tomography (PET) with concurrently acquired computed tomography (CT) for attenuation correction and anatomical localization imaging; limited area (eg, chest, head/neck)"},{"system":"http://www.ama-assn.org/go/cpt","code":"78816","display":"Positron emission tomography (PET) with concurrently acquired computed tomography (CT) for attenuation correction and anatomical localization imaging; whole body"},{"system":"http://www.ama-assn.org/go/cpt","code":"70555","display":"Magnetic resonance imaging, brain, functional MRI; requiring physician or psychologist administration of entire neurofunctional testing"},{"system":"http://www.ama-assn.org/go/cpt","code":"70554","display":"Magnetic resonance imaging, brain, functional MRI; including test selection and administration of repetitive body part movement and/or visual stimulation, not requiring physician or psychologist administration"},{"system":"http://www.ama-assn.org/go/cpt","code":"71250","display":"Computed tomography, thorax; without contrast material"},{"system":"http://www.ama-assn.org/go/cpt","code":"75557","display":"Cardiac magnetic resonance imaging for morphology and function without contrast material"},{"system":"http://www.ama-assn.org/go/cpt","code":"75559","display":"Cardiac magnetic resonance imaging for morphology and function without contrast material; with stress imaging"},{"system":"http://www.ama-assn.org/go/cpt","code":"75561","display":"Cardiac magnetic resonance imaging for morphology and function without contrast material(s), followed by contrast material(s) and further sequences"},{"system":"http://www.ama-assn.org/go/cpt","code":"75563","display":"Cardiac magnetic resonance imaging for morphology and function without contrast material(s), followed by contrast material(s) and further sequences; with stress imaging"},{"system":"http://www.ama-assn.org/go/cpt","code":"74182","display":"Magnetic resonance (eg, proton) imaging, abdomen; with contrast material(s)"},{"system":"http://www.ama-assn.org/go/cpt","code":"74177","display":"Computed tomography, abdomen and pelvis; with contrast material(s)"},{"system":"http://www.ama-assn.org/go/cpt","code":"74261","display":"Computed tomographic (CT) colonography, diagnostic, including image postprocessing; without contrast material"},{"system":"http://www.ama-assn.org/go/cpt","code":"74262","display":"Computed tomographic (CT) colonography, diagnostic, including image postprocessing; with contrast material(s) including non-contrast images, if performed"},{"system":"http://www.ama-assn.org/go/cpt","code":"75565","display":"Cardiac magnetic resonance imaging for velocity flow mapping (List separately in addition to code for primary procedure)"},{"system":"http://www.ama-assn.org/go/cpt","code":"75571","display":"Computed tomography, heart, without contrast material, with quantitative evaluation of coronary calcium"},{"system":"http://www.ama-assn.org/go/cpt","code":"75572","display":"Computed tomography, heart, with contrast material, for evaluation of cardiac structure and morphology (including 3D image postprocessing, assessment of cardiac function, and evaluation of venous structures, if performed)"},{"system":"http://www.ama-assn.org/go/cpt","code":"75573","display":"Computed tomography, heart, with contrast material, for evaluation of cardiac structure and morphology in the setting of congenital heart disease (including 3D image postprocessing, assessment of LV cardiac function, RV structure and function and evaluation of venous structures, if performed)"},{"system":"http://www.ama-assn.org/go/cpt","code":"75574","display":"Computed tomographic angiography, heart, coronary arteries and bypass grafts (when present), with contrast material, including 3D image postprocessing (including evaluation of cardiac structure and morphology, assessment of cardiac function, and evaluation of venous structures, if performed)"},{"system":"http://www.ama-assn.org/go/cpt","code":"78451","display":"Myocardial perfusion imaging, tomographic (SPECT) (including attenuation correction, qualitative or quantitative wall motion, ejection fraction by first pass or gated technique, additional quantification, when performed); single study, at rest or stress (exercise or pharmacologic)"},{"system":"http://www.ama-assn.org/go/cpt","code":"78452","display":"Myocardial perfusion imaging, tomographic (SPECT) (including attenuation correction, qualitative or quantitative wall motion, ejection fraction by first pass or gated technique, additional quantification, when performed); multiple studies, at rest and/or stress (exercise or pharmacologic) and/or redistribution and/or rest reinjection"},{"system":"http://www.ama-assn.org/go/cpt","code":"78453","display":"Myocardial perfusion imaging, planar (including qualitative or quantitative wall motion, ejection fraction by first pass or gated technique, additional quantification, when performed); single study, at rest or stress (exercise or pharmacologic)"},{"system":"http://www.ama-assn.org/go/cpt","code":"78454","display":"Myocardial perfusion imaging, planar (including qualitative or quantitative wall motion, ejection fraction by first pass or gated technique, additional quantification, when performed); multiple studies, at rest and/or stress (exercise or pharmacologic) and/or redistribution and/or rest reinjection"},{"system":"http://www.ama-assn.org/go/cpt","code":"74176","display":"Computed tomography, abdomen and pelvis; without contrast material"},{"system":"http://www.ama-assn.org/go/cpt","code":"74178","display":"Computed tomography, abdomen and pelvis; without contrast material in one or both body regions, followed by contrast material(s) and further sections in one or both body regions"},{"system":"http://www.ama-assn.org/go/cpt","code":"74174","display":"Computed tomographic angiography, abdomen and pelvis, with contrast material(s), including noncontrast images, if performed, and image postprocessing"},{"system":"http://www.ama-assn.org/go/cpt","code":"78226","display":"Hepatobiliary system imaging, including gallbladder when present"},{"system":"http://www.ama-assn.org/go/cpt","code":"78227","display":"Hepatobiliary system imaging, including gallbladder when present; with pharmacologic intervention, including quantitative measurement(s) when performed"},{"system":"http://www.ama-assn.org/go/cpt","code":"78579","display":"Pulmonary ventilation imaging (eg, aerosol or gas)"},{"system":"http://www.ama-assn.org/go/cpt","code":"78582","display":"Pulmonary ventilation (eg, aerosol or gas) and perfusion imaging"},{"system":"http://www.ama-assn.org/go/cpt","code":"78597","display":"Quantitative differential pulmonary perfusion, including imaging when performed"},{"system":"http://www.ama-assn.org/go/cpt","code":"78598","display":"Quantitative differential pulmonary perfusion and ventilation (eg, aerosol or gas), including imaging when performed"},{"system":"http://www.ama-assn.org/go/cpt","code":"70540","display":"Magnetic resonance (eg, proton) imaging, orbit, face, and/or neck; without contrast material(s)"},{"system":"http://www.ama-assn.org/go/cpt","code":"78014","display":"Thyroid imaging (including vascular flow, when performed); with single or multiple uptake(s) quantitative measurement(s) (including stimulation, suppression, or discharge, when performed)"},{"system":"http://www.ama-assn.org/go/cpt","code":"78230","display":"Salivary gland imaging"},{"system":"http://www.ama-assn.org/go/cpt","code":"78012","display":"Thyroid uptake, single or multiple quantitative measurement(s) (including stimulation, suppression, or discharge, when performed)"},{"system":"http://www.ama-assn.org/go/cpt","code":"78070","display":"Parathyroid planar imaging (including subtraction, when performed)"},{"system":"http://www.ama-assn.org/go/cpt","code":"78071","display":"Parathyroid planar imaging (including subtraction, when performed); with tomographic (SPECT)"},{"system":"http://www.ama-assn.org/go/cpt","code":"78072","display":"Parathyroid planar imaging (including subtraction, when performed); with tomographic (SPECT), and concurrently acquired computed tomography (CT) for anatomical localization"},{"system":"http://www.ama-assn.org/go/cpt","code":"78700","display":"Kidney imaging morphology"},{"system":"http://www.ama-assn.org/go/cpt","code":"78205","display":"Liver imaging (SPECT)"},{"system":"http://www.ama-assn.org/go/cpt","code":"73701","display":"Computed tomography, lower extremity; with contrast material(s)"},{"system":"http://www.ama-assn.org/go/cpt","code":"73221","display":"Magnetic resonance (eg, proton) imaging, any joint of upper extremity; without contrast material(s)"},{"system":"http://www.ama-assn.org/go/cpt","code":"78265","display":"Gastric emptying imaging study (eg, solid, liquid, or both); with small bowel transit"},{"system":"http://www.ama-assn.org/go/cpt","code":"78266","display":"Gastric emptying imaging study (eg, solid, liquid, or both); with small bowel and colon transit, multiple days"},{"system":"http://www.ama-assn.org/go/cpt","code":"74712","display":"Magnetic resonance (eg, proton) imaging, fetal, including placental and maternal pelvic imaging when performed; single or first gestation"},{"system":"http://www.ama-assn.org/go/cpt","code":"74713","display":"Magnetic resonance (eg, proton) imaging, fetal, including placental and maternal pelvic imaging when performed; each additional gestation (List separately in addition to code for primary procedure)"}]}
+{
+  "resourceType": "ValueSet",
+  "expansion": {
+    "contains": [
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "76390",
+        "display": "Magnetic resonance spectroscopy"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78270",
+        "display": "Vitamin B-12 absorption study (eg, Schilling test); without intrinsic factor"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "76380",
+        "display": "Computed tomography, limited or localized follow-up study"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "70450",
+        "display": "Computed tomography, head or brain; without contrast material"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "70470",
+        "display": "Computed tomography, head or brain; without contrast material, followed by contrast material(s) and further sections"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "70551",
+        "display": "Magnetic resonance (eg, proton) imaging, brain (including brain stem); without contrast material"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "70552",
+        "display": "Magnetic resonance (eg, proton) imaging, brain (including brain stem); with contrast material(s)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "70486",
+        "display": "Computed tomography, maxillofacial area; without contrast material"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "70487",
+        "display": "Computed tomography, maxillofacial area; with contrast material(s)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "70488",
+        "display": "Computed tomography, maxillofacial area; without contrast material, followed by contrast material(s) and further sections"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "70336",
+        "display": "Magnetic resonance (eg, proton) imaging, temporomandibular joint(s)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "70490",
+        "display": "Computed tomography, soft tissue neck; without contrast material"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "70491",
+        "display": "Computed tomography, soft tissue neck; with contrast material(s)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "70492",
+        "display": "Computed tomography, soft tissue neck; without contrast material followed by contrast material(s) and further sections"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "71260",
+        "display": "Computed tomography, thorax; with contrast material(s)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "71270",
+        "display": "Computed tomography, thorax; without contrast material, followed by contrast material(s) and further sections"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "71550",
+        "display": "Magnetic resonance (eg, proton) imaging, chest (eg, for evaluation of hilar and mediastinal lymphadenopathy); without contrast material(s)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "74150",
+        "display": "Computed tomography, abdomen; without contrast material"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "74160",
+        "display": "Computed tomography, abdomen; with contrast material(s)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "74170",
+        "display": "Computed tomography, abdomen; without contrast material, followed by contrast material(s) and further sections"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78264",
+        "display": "Gastric emptying imaging study (eg, solid, liquid, or both)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "72125",
+        "display": "Computed tomography, cervical spine; without contrast material"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "72126",
+        "display": "Computed tomography, cervical spine; with contrast material"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "72127",
+        "display": "Computed tomography, cervical spine; without contrast material, followed by contrast material(s) and further sections"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "72128",
+        "display": "Computed tomography, thoracic spine; without contrast material"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "72129",
+        "display": "Computed tomography, thoracic spine; with contrast material"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "72130",
+        "display": "Computed tomography, thoracic spine; without contrast material, followed by contrast material(s) and further sections"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "72131",
+        "display": "Computed tomography, lumbar spine; without contrast material"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "72132",
+        "display": "Computed tomography, lumbar spine; with contrast material"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "72133",
+        "display": "Computed tomography, lumbar spine; without contrast material, followed by contrast material(s) and further sections"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "72192",
+        "display": "Computed tomography, pelvis; without contrast material"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "72193",
+        "display": "Computed tomography, pelvis; with contrast material(s)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "72194",
+        "display": "Computed tomography, pelvis; without contrast material, followed by contrast material(s) and further sections"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "72196",
+        "display": "Magnetic resonance (eg, proton) imaging, pelvis; with contrast material(s)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "73200",
+        "display": "Computed tomography, upper extremity; without contrast material"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "73201",
+        "display": "Computed tomography, upper extremity; with contrast material(s)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "73202",
+        "display": "Computed tomography, upper extremity; without contrast material, followed by contrast material(s) and further sections"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "73220",
+        "display": "Magnetic resonance (eg, proton) imaging, upper extremity, other than joint; without contrast material(s), followed by contrast material(s) and further sequences"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "73700",
+        "display": "Computed tomography, lower extremity; without contrast material"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "73702",
+        "display": "Computed tomography, lower extremity; without contrast material, followed by contrast material(s) and further sections"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "73720",
+        "display": "Magnetic resonance (eg, proton) imaging, lower extremity other than joint; without contrast material(s), followed by contrast material(s) and further sequences"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78800",
+        "display": "Radiopharmaceutical localization of tumor or distribution of radiopharmaceutical agent(s); limited area"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78801",
+        "display": "Radiopharmaceutical localization of tumor or distribution of radiopharmaceutical agent(s); multiple areas"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78802",
+        "display": "Radiopharmaceutical localization of tumor or distribution of radiopharmaceutical agent(s); whole body, single day imaging"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78580",
+        "display": "Pulmonary perfusion imaging (eg, particulate)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78457",
+        "display": "Venous thrombosis imaging, venogram; unilateral"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78458",
+        "display": "Venous thrombosis imaging, venogram; bilateral"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78428",
+        "display": "Cardiac shunt detection"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78261",
+        "display": "Gastric mucosa imaging"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78278",
+        "display": "Acute gastrointestinal blood loss imaging"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78201",
+        "display": "Liver imaging; static only"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78202",
+        "display": "Liver imaging; with vascular flow"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78215",
+        "display": "Liver and spleen imaging; static only"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78216",
+        "display": "Liver and spleen imaging; with vascular flow"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78232",
+        "display": "Salivary gland function study"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78271",
+        "display": "Vitamin B-12 absorption study (eg, Schilling test); with intrinsic factor"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78272",
+        "display": "Vitamin B-12 absorption studies combined, with and without intrinsic factor"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78013",
+        "display": "Thyroid imaging (including vascular flow, when performed)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78015",
+        "display": "Thyroid carcinoma metastases imaging; limited area (eg, neck and chest only)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78018",
+        "display": "Thyroid carcinoma metastases imaging; whole body"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78016",
+        "display": "Thyroid carcinoma metastases imaging; with additional studies (eg, urinary recovery)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78102",
+        "display": "Bone marrow imaging; limited area"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78103",
+        "display": "Bone marrow imaging; multiple areas"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78104",
+        "display": "Bone marrow imaging; whole body"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78122",
+        "display": "Whole blood volume determination, including separate measurement of plasma volume and red cell volume (radiopharmaceutical volume-dilution technique)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78120",
+        "display": "Red cell volume determination (separate procedure); single sampling"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78121",
+        "display": "Red cell volume determination (separate procedure); multiple samplings"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78195",
+        "display": "Lymphatics and lymph nodes imaging"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78701",
+        "display": "Kidney imaging morphology; with vascular flow"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78730",
+        "display": "Urinary bladder residual study (List separately in addition to code for primary procedure)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78740",
+        "display": "Ureteral reflux study (radiopharmaceutical voiding cystogram)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78761",
+        "display": "Testicular imaging with vascular flow"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78600",
+        "display": "Brain imaging, less than 4 static views"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78605",
+        "display": "Brain imaging, minimum 4 static views"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78601",
+        "display": "Brain imaging, less than 4 static views; with vascular flow"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78606",
+        "display": "Brain imaging, minimum 4 static views; with vascular flow"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78607",
+        "display": "Brain imaging, tomographic (SPECT)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78291",
+        "display": "Peritoneal-venous shunt patency test (eg, for LeVeen, Denver shunt)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78650",
+        "display": "Cerebrospinal fluid leakage detection and localization"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "70480",
+        "display": "Computed tomography, orbit, sella, or posterior fossa or outer, middle, or inner ear; without contrast material"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "70481",
+        "display": "Computed tomography, orbit, sella, or posterior fossa or outer, middle, or inner ear; with contrast material(s)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "70482",
+        "display": "Computed tomography, orbit, sella, or posterior fossa or outer, middle, or inner ear; without contrast material, followed by contrast material(s) and further sections"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "70553",
+        "display": "Magnetic resonance (eg, proton) imaging, brain (including brain stem); without contrast material, followed by contrast material(s) and further sequences"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "71555",
+        "display": "Magnetic resonance angiography, chest (excluding myocardium), with or without contrast material(s)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "72141",
+        "display": "Magnetic resonance (eg, proton) imaging, spinal canal and contents, cervical; without contrast material"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "72142",
+        "display": "Magnetic resonance (eg, proton) imaging, spinal canal and contents, cervical; with contrast material(s)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "72146",
+        "display": "Magnetic resonance (eg, proton) imaging, spinal canal and contents, thoracic; without contrast material"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "72147",
+        "display": "Magnetic resonance (eg, proton) imaging, spinal canal and contents, thoracic; with contrast material(s)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "72148",
+        "display": "Magnetic resonance (eg, proton) imaging, spinal canal and contents, lumbar; without contrast material"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "72149",
+        "display": "Magnetic resonance (eg, proton) imaging, spinal canal and contents, lumbar; with contrast material(s)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "72156",
+        "display": "Magnetic resonance (eg, proton) imaging, spinal canal and contents, without contrast material, followed by contrast material(s) and further sequences; cervical"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "72157",
+        "display": "Magnetic resonance (eg, proton) imaging, spinal canal and contents, without contrast material, followed by contrast material(s) and further sequences; thoracic"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "72158",
+        "display": "Magnetic resonance (eg, proton) imaging, spinal canal and contents, without contrast material, followed by contrast material(s) and further sequences; lumbar"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "72159",
+        "display": "Magnetic resonance angiography, spinal canal and contents, with or without contrast material(s)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "72198",
+        "display": "Magnetic resonance angiography, pelvis, with or without contrast material(s)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "73225",
+        "display": "Magnetic resonance angiography, upper extremity, with or without contrast material(s)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "73721",
+        "display": "Magnetic resonance (eg, proton) imaging, any joint of lower extremity; without contrast material"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "73725",
+        "display": "Magnetic resonance angiography, lower extremity, with or without contrast material(s)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "74185",
+        "display": "Magnetic resonance angiography, abdomen, with or without contrast material(s)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78075",
+        "display": "Adrenal imaging, cortex and/or medulla"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78099",
+        "display": "Unlisted endocrine procedure, diagnostic nuclear medicine"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78110",
+        "display": "Plasma volume, radiopharmaceutical volume-dilution technique (separate procedure); single sampling"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78111",
+        "display": "Plasma volume, radiopharmaceutical volume-dilution technique (separate procedure); multiple samplings"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78135",
+        "display": "Red cell survival study; differential organ/tissue kinetics (eg, splenic and/or hepatic sequestration)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78140",
+        "display": "Labeled red cell sequestration, differential organ/tissue (eg, splenic and/or hepatic)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78185",
+        "display": "Spleen imaging only, with or without vascular flow"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78199",
+        "display": "Unlisted hematopoietic, reticuloendothelial and lymphatic procedure, diagnostic nuclear medicine"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78231",
+        "display": "Salivary gland imaging; with serial images"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78299",
+        "display": "Unlisted gastrointestinal procedure, diagnostic nuclear medicine"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78300",
+        "display": "Bone and/or joint imaging; limited area"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78305",
+        "display": "Bone and/or joint imaging; multiple areas"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78306",
+        "display": "Bone and/or joint imaging; whole body"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78315",
+        "display": "Bone and/or joint imaging; 3 phase study"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78320",
+        "display": "Bone and/or joint imaging; tomographic (SPECT)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78399",
+        "display": "Unlisted musculoskeletal procedure, diagnostic nuclear medicine"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78414",
+        "display": "Determination of central c-v hemodynamics (non-imaging) (eg, ejection fraction with probe technique) with or without pharmacologic intervention or exercise, single or multiple determinations"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78459",
+        "display": "Myocardial imaging, positron emission tomography (PET), metabolic evaluation"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78466",
+        "display": "Myocardial imaging, infarct avid, planar; qualitative or quantitative"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78468",
+        "display": "Myocardial imaging, infarct avid, planar; with ejection fraction by first pass technique"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78469",
+        "display": "Myocardial imaging, infarct avid, planar; tomographic SPECT with or without quantification"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78472",
+        "display": "Cardiac blood pool imaging, gated equilibrium; planar, single study at rest or stress (exercise and/or pharmacologic), wall motion study plus ejection fraction, with or without additional quantitative processing"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78473",
+        "display": "Cardiac blood pool imaging, gated equilibrium; multiple studies, wall motion study plus ejection fraction, at rest and stress (exercise and/or pharmacologic), with or without additional quantification"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78499",
+        "display": "Unlisted cardiovascular procedure, diagnostic nuclear medicine"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78599",
+        "display": "Unlisted respiratory procedure, diagnostic nuclear medicine"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78608",
+        "display": "Brain imaging, positron emission tomography (PET); metabolic evaluation"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78609",
+        "display": "Brain imaging, positron emission tomography (PET); perfusion evaluation"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78610",
+        "display": "Brain imaging, vascular flow only"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78630",
+        "display": "Cerebrospinal fluid flow, imaging (not including introduction of material); cisternography"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78635",
+        "display": "Cerebrospinal fluid flow, imaging (not including introduction of material); ventriculography"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78645",
+        "display": "Cerebrospinal fluid flow, imaging (not including introduction of material); shunt evaluation"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78647",
+        "display": "Cerebrospinal fluid flow, imaging (not including introduction of material); tomographic (SPECT)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78699",
+        "display": "Unlisted nervous system procedure, diagnostic nuclear medicine"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78710",
+        "display": "Kidney imaging morphology; tomographic (SPECT)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78725",
+        "display": "Kidney function study, non-imaging radioisotopic study"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78799",
+        "display": "Unlisted genitourinary procedure, diagnostic nuclear medicine"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78803",
+        "display": "Radiopharmaceutical localization of tumor or distribution of radiopharmaceutical agent(s); tomographic (SPECT)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78805",
+        "display": "Radiopharmaceutical localization of inflammatory process; limited area"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78806",
+        "display": "Radiopharmaceutical localization of inflammatory process; whole body"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78807",
+        "display": "Radiopharmaceutical localization of inflammatory process; tomographic (SPECT)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78999",
+        "display": "Unlisted miscellaneous procedure, diagnostic nuclear medicine"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78660",
+        "display": "Radiopharmaceutical dacryocystography"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78130",
+        "display": "Red cell survival study"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78191",
+        "display": "Platelet survival study"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "74181",
+        "display": "Magnetic resonance (eg, proton) imaging, abdomen; without contrast material(s)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78262",
+        "display": "Gastroesophageal reflux study"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78282",
+        "display": "Gastrointestinal protein loss"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78350",
+        "display": "Bone density (bone mineral content) study, 1 or more sites; single photon absorptiometry"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78445",
+        "display": "Non-cardiac vascular flow imaging (ie, angiography, venography)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78481",
+        "display": "Cardiac blood pool imaging (planar), first pass technique; single study, at rest or with stress (exercise and/or pharmacologic), wall motion study plus ejection fraction, with or without quantification"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78483",
+        "display": "Cardiac blood pool imaging (planar), first pass technique; multiple studies, at rest and with stress (exercise and/or pharmacologic), wall motion study plus ejection fraction, with or without quantification"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78491",
+        "display": "Myocardial imaging, positron emission tomography (PET), perfusion; single study at rest or stress"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78492",
+        "display": "Myocardial imaging, positron emission tomography (PET), perfusion; multiple studies at rest and/or stress"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78707",
+        "display": "Kidney imaging morphology; with vascular flow and function, single study without pharmacological intervention"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78351",
+        "display": "Bone density (bone mineral content) study, 1 or more sites; dual photon absorptiometry, 1 or more sites"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78708",
+        "display": "Kidney imaging morphology; with vascular flow and function, single study, with pharmacological intervention (eg, angiotensin converting enzyme inhibitor and/or diuretic)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78709",
+        "display": "Kidney imaging morphology; with vascular flow and function, multiple studies, with and without pharmacological intervention (eg, angiotensin converting enzyme inhibitor and/or diuretic)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78020",
+        "display": "Thyroid carcinoma metastases uptake (List separately in addition to code for primary procedure)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78206",
+        "display": "Liver imaging (SPECT); with vascular flow"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78494",
+        "display": "Cardiac blood pool imaging, gated equilibrium, SPECT, at rest, wall motion study plus ejection fraction, with or without quantitative processing"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78496",
+        "display": "Cardiac blood pool imaging, gated equilibrium, single study, at rest, with right ventricular ejection fraction by first pass technique (List separately in addition to code for primary procedure)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78258",
+        "display": "Esophageal motility"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78267",
+        "display": "Urea breath test, C-14 (isotopic); acquisition for analysis"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78268",
+        "display": "Urea breath test, C-14 (isotopic); analysis"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78456",
+        "display": "Acute venous thrombosis imaging, peptide"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "70496",
+        "display": "Computed tomographic angiography, head, with contrast material(s), including noncontrast images, if performed, and image postprocessing"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "70498",
+        "display": "Computed tomographic angiography, neck, with contrast material(s), including noncontrast images, if performed, and image postprocessing"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "70542",
+        "display": "Magnetic resonance (eg, proton) imaging, orbit, face, and/or neck; with contrast material(s)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "70543",
+        "display": "Magnetic resonance (eg, proton) imaging, orbit, face, and/or neck; without contrast material(s), followed by contrast material(s) and further sequences"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "70544",
+        "display": "Magnetic resonance angiography, head; without contrast material(s)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "70545",
+        "display": "Magnetic resonance angiography, head; with contrast material(s)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "70546",
+        "display": "Magnetic resonance angiography, head; without contrast material(s), followed by contrast material(s) and further sequences"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "70547",
+        "display": "Magnetic resonance angiography, neck; without contrast material(s)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "70548",
+        "display": "Magnetic resonance angiography, neck; with contrast material(s)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "70549",
+        "display": "Magnetic resonance angiography, neck; without contrast material(s), followed by contrast material(s) and further sequences"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "71275",
+        "display": "Computed tomographic angiography, chest (noncoronary), with contrast material(s), including noncontrast images, if performed, and image postprocessing"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "71551",
+        "display": "Magnetic resonance (eg, proton) imaging, chest (eg, for evaluation of hilar and mediastinal lymphadenopathy); with contrast material(s)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "71552",
+        "display": "Magnetic resonance (eg, proton) imaging, chest (eg, for evaluation of hilar and mediastinal lymphadenopathy); without contrast material(s), followed by contrast material(s) and further sequences"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "72191",
+        "display": "Computed tomographic angiography, pelvis, with contrast material(s), including noncontrast images, if performed, and image postprocessing"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "72195",
+        "display": "Magnetic resonance (eg, proton) imaging, pelvis; without contrast material(s)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "72197",
+        "display": "Magnetic resonance (eg, proton) imaging, pelvis; without contrast material(s), followed by contrast material(s) and further sequences"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "73206",
+        "display": "Computed tomographic angiography, upper extremity, with contrast material(s), including noncontrast images, if performed, and image postprocessing"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "73218",
+        "display": "Magnetic resonance (eg, proton) imaging, upper extremity, other than joint; without contrast material(s)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "73219",
+        "display": "Magnetic resonance (eg, proton) imaging, upper extremity, other than joint; with contrast material(s)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "73222",
+        "display": "Magnetic resonance (eg, proton) imaging, any joint of upper extremity; with contrast material(s)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "73223",
+        "display": "Magnetic resonance (eg, proton) imaging, any joint of upper extremity; without contrast material(s), followed by contrast material(s) and further sequences"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "73706",
+        "display": "Computed tomographic angiography, lower extremity, with contrast material(s), including noncontrast images, if performed, and image postprocessing"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "73718",
+        "display": "Magnetic resonance (eg, proton) imaging, lower extremity other than joint; without contrast material(s)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "73719",
+        "display": "Magnetic resonance (eg, proton) imaging, lower extremity other than joint; with contrast material(s)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "73722",
+        "display": "Magnetic resonance (eg, proton) imaging, any joint of lower extremity; with contrast material(s)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "73723",
+        "display": "Magnetic resonance (eg, proton) imaging, any joint of lower extremity; without contrast material(s), followed by contrast material(s) and further sequences"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "74175",
+        "display": "Computed tomographic angiography, abdomen, with contrast material(s), including noncontrast images, if performed, and image postprocessing"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "74183",
+        "display": "Magnetic resonance (eg, proton) imaging, abdomen; without contrast material(s), followed by with contrast material(s) and further sequences"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "75635",
+        "display": "Computed tomographic angiography, abdominal aorta and bilateral iliofemoral lower extremity runoff, with contrast material(s), including noncontrast images, if performed, and image postprocessing"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "76497",
+        "display": "Unlisted computed tomography procedure (eg, diagnostic, interventional)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "76498",
+        "display": "Unlisted magnetic resonance procedure (eg, diagnostic, interventional)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "70460",
+        "display": "Computed tomography, head or brain; with contrast material(s)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78290",
+        "display": "Intestine imaging (eg, ectopic gastric mucosa, Meckel's localization, volvulus)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78804",
+        "display": "Radiopharmaceutical localization of tumor or distribution of radiopharmaceutical agent(s); whole body, requiring 2 or more days imaging"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78811",
+        "display": "Positron emission tomography (PET) imaging; limited area (eg, chest, head/neck)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78812",
+        "display": "Positron emission tomography (PET) imaging; skull base to mid-thigh"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78813",
+        "display": "Positron emission tomography (PET) imaging; whole body"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78814",
+        "display": "Positron emission tomography (PET) with concurrently acquired computed tomography (CT) for attenuation correction and anatomical localization imaging; limited area (eg, chest, head/neck)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78816",
+        "display": "Positron emission tomography (PET) with concurrently acquired computed tomography (CT) for attenuation correction and anatomical localization imaging; whole body"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "70555",
+        "display": "Magnetic resonance imaging, brain, functional MRI; requiring physician or psychologist administration of entire neurofunctional testing"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "70554",
+        "display": "Magnetic resonance imaging, brain, functional MRI; including test selection and administration of repetitive body part movement and/or visual stimulation, not requiring physician or psychologist administration"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "71250",
+        "display": "Computed tomography, thorax; without contrast material"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "75557",
+        "display": "Cardiac magnetic resonance imaging for morphology and function without contrast material"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "75559",
+        "display": "Cardiac magnetic resonance imaging for morphology and function without contrast material; with stress imaging"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "75561",
+        "display": "Cardiac magnetic resonance imaging for morphology and function without contrast material(s), followed by contrast material(s) and further sequences"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "75563",
+        "display": "Cardiac magnetic resonance imaging for morphology and function without contrast material(s), followed by contrast material(s) and further sequences; with stress imaging"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "74182",
+        "display": "Magnetic resonance (eg, proton) imaging, abdomen; with contrast material(s)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "74177",
+        "display": "Computed tomography, abdomen and pelvis; with contrast material(s)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "74261",
+        "display": "Computed tomographic (CT) colonography, diagnostic, including image postprocessing; without contrast material"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "74262",
+        "display": "Computed tomographic (CT) colonography, diagnostic, including image postprocessing; with contrast material(s) including non-contrast images, if performed"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "75565",
+        "display": "Cardiac magnetic resonance imaging for velocity flow mapping (List separately in addition to code for primary procedure)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "75571",
+        "display": "Computed tomography, heart, without contrast material, with quantitative evaluation of coronary calcium"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "75572",
+        "display": "Computed tomography, heart, with contrast material, for evaluation of cardiac structure and morphology (including 3D image postprocessing, assessment of cardiac function, and evaluation of venous structures, if performed)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "75573",
+        "display": "Computed tomography, heart, with contrast material, for evaluation of cardiac structure and morphology in the setting of congenital heart disease (including 3D image postprocessing, assessment of LV cardiac function, RV structure and function and evaluation of venous structures, if performed)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "75574",
+        "display": "Computed tomographic angiography, heart, coronary arteries and bypass grafts (when present), with contrast material, including 3D image postprocessing (including evaluation of cardiac structure and morphology, assessment of cardiac function, and evaluation of venous structures, if performed)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78451",
+        "display": "Myocardial perfusion imaging, tomographic (SPECT) (including attenuation correction, qualitative or quantitative wall motion, ejection fraction by first pass or gated technique, additional quantification, when performed); single study, at rest or stress (exercise or pharmacologic)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78452",
+        "display": "Myocardial perfusion imaging, tomographic (SPECT) (including attenuation correction, qualitative or quantitative wall motion, ejection fraction by first pass or gated technique, additional quantification, when performed); multiple studies, at rest and/or stress (exercise or pharmacologic) and/or redistribution and/or rest reinjection"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78453",
+        "display": "Myocardial perfusion imaging, planar (including qualitative or quantitative wall motion, ejection fraction by first pass or gated technique, additional quantification, when performed); single study, at rest or stress (exercise or pharmacologic)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78454",
+        "display": "Myocardial perfusion imaging, planar (including qualitative or quantitative wall motion, ejection fraction by first pass or gated technique, additional quantification, when performed); multiple studies, at rest and/or stress (exercise or pharmacologic) and/or redistribution and/or rest reinjection"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "74176",
+        "display": "Computed tomography, abdomen and pelvis; without contrast material"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "74178",
+        "display": "Computed tomography, abdomen and pelvis; without contrast material in one or both body regions, followed by contrast material(s) and further sections in one or both body regions"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "74174",
+        "display": "Computed tomographic angiography, abdomen and pelvis, with contrast material(s), including noncontrast images, if performed, and image postprocessing"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78226",
+        "display": "Hepatobiliary system imaging, including gallbladder when present"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78227",
+        "display": "Hepatobiliary system imaging, including gallbladder when present; with pharmacologic intervention, including quantitative measurement(s) when performed"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78579",
+        "display": "Pulmonary ventilation imaging (eg, aerosol or gas)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78582",
+        "display": "Pulmonary ventilation (eg, aerosol or gas) and perfusion imaging"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78597",
+        "display": "Quantitative differential pulmonary perfusion, including imaging when performed"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78598",
+        "display": "Quantitative differential pulmonary perfusion and ventilation (eg, aerosol or gas), including imaging when performed"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "70540",
+        "display": "Magnetic resonance (eg, proton) imaging, orbit, face, and/or neck; without contrast material(s)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78014",
+        "display": "Thyroid imaging (including vascular flow, when performed); with single or multiple uptake(s) quantitative measurement(s) (including stimulation, suppression, or discharge, when performed)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78230",
+        "display": "Salivary gland imaging"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78012",
+        "display": "Thyroid uptake, single or multiple quantitative measurement(s) (including stimulation, suppression, or discharge, when performed)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78070",
+        "display": "Parathyroid planar imaging (including subtraction, when performed)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78071",
+        "display": "Parathyroid planar imaging (including subtraction, when performed); with tomographic (SPECT)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78072",
+        "display": "Parathyroid planar imaging (including subtraction, when performed); with tomographic (SPECT), and concurrently acquired computed tomography (CT) for anatomical localization"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78700",
+        "display": "Kidney imaging morphology"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78205",
+        "display": "Liver imaging (SPECT)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "73701",
+        "display": "Computed tomography, lower extremity; with contrast material(s)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "73221",
+        "display": "Magnetic resonance (eg, proton) imaging, any joint of upper extremity; without contrast material(s)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78265",
+        "display": "Gastric emptying imaging study (eg, solid, liquid, or both); with small bowel transit"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "78266",
+        "display": "Gastric emptying imaging study (eg, solid, liquid, or both); with small bowel and colon transit, multiple days"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "74712",
+        "display": "Magnetic resonance (eg, proton) imaging, fetal, including placental and maternal pelvic imaging when performed; single or first gestation"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "74713",
+        "display": "Magnetic resonance (eg, proton) imaging, fetal, including placental and maternal pelvic imaging when performed; each additional gestation (List separately in addition to code for primary procedure)"
+      }
+    ]
+  }
+}
