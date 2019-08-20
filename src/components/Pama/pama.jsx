@@ -119,9 +119,14 @@ export class Pama extends Component {
   render() {
     const { pamaRating } = this.props;
     const { code, reasonCode } = this.props.serviceRequest;
+    const name = this.props.patientName || 'Missing Name';
+    const pid = this.props.patientId || 'Missing Patient ID';
 
     return (
       <div className={cx(styles.pama)}>
+        <div className={styles['patient-data-text']}>
+          <p><strong>Patient: </strong> {name} <strong>ID: </strong> {pid}</p>
+        </div>
         <Select
           name="study-select"
           value={code}
@@ -180,6 +185,8 @@ const mapDispatchToProps = dispatch => ({
 const mapStateToProps = store => ({
   serviceRequest: store.pama.serviceRequest,
   pamaRating: store.pama.pamaRating,
+  patientName: store.patientState.currentPatient.name,
+  patientId: store.patientState.currentPatient.id,
 });
 
 export default connect(

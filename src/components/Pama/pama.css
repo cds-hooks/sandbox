@@ -8,6 +8,12 @@
   width: 100%;
 }
 
+.patient-data-text {
+  font-size: 1em;
+  margin: 0 0 20px;
+  color: #888;
+}
+
 .half-view {
   width: 50%;
 }
