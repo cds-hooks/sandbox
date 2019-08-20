@@ -117,12 +117,6 @@ describe('RxView component', () => {
     jest.resetModules();
   });
 
-  it('contains relevant patient information if patient is in context', () => {
-    setup(patient, medListPhase, medications, prescription);
-    expect(renderedComponent.find('.patient-data-text').text()).toContain(patient.name);
-    expect(renderedComponent.find('.patient-data-text').text()).toContain(patient.id);
-  });
-
   it('has default view elements', () => {
     setup(patient, medListPhase, medications, prescription);
     expect(renderedComponent.find('Field').at(0).find('SelectOption').length).toEqual(1);
