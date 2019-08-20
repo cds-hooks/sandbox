@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import Select from 'terra-form-select';
 
 import CardList from '../CardList/card-list';
+import PatientBanner from '../PatientBanner/patient-banner';
 import styles from './pama.css';
 import cdsExecution from '../../middleware/cds-execution';
 import * as types from '../../actions/action-types';
@@ -119,14 +120,9 @@ export class Pama extends Component {
   render() {
     const { pamaRating } = this.props;
     const { code, reasonCode } = this.props.serviceRequest;
-    const name = this.props.patientName || 'Missing Name';
-    const pid = this.props.patientId || 'Missing Patient ID';
-
     return (
       <div className={cx(styles.pama)}>
-        <div className={styles['patient-data-text']}>
-          <p><strong>Patient: </strong> {name} <strong>ID: </strong> {pid}</p>
-        </div>
+        <PatientBanner />
         <Select
           name="study-select"
           value={code}
@@ -185,8 +181,6 @@ const mapDispatchToProps = dispatch => ({
 const mapStateToProps = store => ({
   serviceRequest: store.pama.serviceRequest,
   pamaRating: store.pama.pamaRating,
-  patientName: store.patientState.currentPatient.name,
-  patientId: store.patientState.currentPatient.id,
 });
 
 export default connect(
