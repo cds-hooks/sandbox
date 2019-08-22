@@ -119,6 +119,7 @@ describe('RxView component', () => {
 
   it('has default view elements', () => {
     setup(patient, medListPhase, medications, prescription);
+    expect(renderedComponent.find('Connect(PatientBanner)').length).toEqual(1);
     expect(renderedComponent.find('Field').at(0).find('SelectOption').length).toEqual(1);
     expect(renderedComponent.find('[name="medication-input"]').length).toEqual(1);
     expect(renderedComponent.find('ListItem').length).toEqual(0);
