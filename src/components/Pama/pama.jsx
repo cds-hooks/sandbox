@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import Select from 'terra-form-select';
 
 import CardList from '../CardList/card-list';
+import PatientBanner from '../PatientBanner/patient-banner';
 import styles from './pama.css';
 import cdsExecution from '../../middleware/cds-execution';
 import * as types from '../../actions/action-types';
@@ -119,9 +120,9 @@ export class Pama extends Component {
   render() {
     const { pamaRating } = this.props;
     const { code, reasonCode } = this.props.serviceRequest;
-
     return (
       <div className={cx(styles.pama)}>
+        <PatientBanner />
         <Select
           name="study-select"
           value={code}

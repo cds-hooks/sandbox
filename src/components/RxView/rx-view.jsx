@@ -17,6 +17,7 @@ import debounce from 'debounce';
 
 import cdsExecution from '../../middleware/cds-execution';
 import CardList from '../CardList/card-list';
+import PatientBanner from '../PatientBanner/patient-banner';
 import styles from './rx-view.css';
 import { createFhirResource } from '../../reducers/medication-reducers';
 
@@ -230,18 +231,13 @@ export class RxView extends Component {
   }
 
   render() {
-    const name = this.props.patient.name || 'Missing Name';
-    const pid = this.props.patient.id || 'Missing Patient ID';
-
     const isHalfView = this.props.isContextVisible ? styles['half-view'] : '';
     const medicationArray = this.props.medications;
 
     return (
       <div className={cx(styles['rx-view'], isHalfView)}>
         <h1 className={styles['view-title']}>Rx View</h1>
-        <div className={styles['patient-data-text']}>
-          <p><strong>Patient: </strong> {name} <strong>ID: </strong> {pid}</p>
-        </div>
+        <PatientBanner />
         <form>
           <Field
             label="Treating"
