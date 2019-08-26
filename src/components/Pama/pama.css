@@ -12,6 +12,15 @@
   width: 50%;
 }
 
+.view-title {
+  padding: 0 0 10px;
+  margin: 0 0 10px;
+  font-size: 1.5em;
+  letter-spacing: -0.025em;
+  color: #384E77; /* $color-primary */
+  border-bottom: 2px solid #eee;
+}
+
 @media (max-width: 975px) {
   .pama {
     padding: 10px;
