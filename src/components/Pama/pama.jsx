@@ -122,6 +122,7 @@ export class Pama extends Component {
     const { code, reasonCode } = this.props.serviceRequest;
     return (
       <div className={cx(styles.pama)}>
+        <h1 className={styles['view-title']}>PAMA Imaging</h1>
         <PatientBanner />
         <Select
           name="study-select"
