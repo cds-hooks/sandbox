@@ -1,6 +1,6 @@
 import configureStore from 'redux-mock-store';
 import MockAdapter from 'axios-mock-adapter';
-import 'core-js/fn/array/flat-map';
+import 'core-js/es/array/flat-map';
 
 
 describe('Service Exchange', () => {

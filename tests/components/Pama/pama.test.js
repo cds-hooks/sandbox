@@ -2,7 +2,7 @@ import React from "react";
 import { mount, shallow } from "enzyme";
 import { Provider } from "react-redux";
 import configureStore from "redux-mock-store";
-import 'core-js/fn/array/flat-map';
+import 'core-js/es/array/flat-map';
 
 describe("Pama component", () => {
   let storeState;
