@@ -1,8 +1,6 @@
 const webpack = require('webpack');
 const path = require('path');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
-const I18nAggregatorPlugin = require('terra-i18n-plugin');
-const i18nSupportedLocales = require('terra-i18n/lib/i18nSupportedLocales');
 const Autoprefixer = require('autoprefixer');
 const CustomProperties = require('postcss-custom-properties');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
@@ -43,15 +41,7 @@ const postCssLoader = {
   options: {
     plugins() {
       return [
-        Autoprefixer({
-          browsers: [
-            'ie >= 10',
-            'last 2 versions',
-            'last 2 android versions',
-            'last 2 and_chr versions',
-            'iOS >= 8',
-          ],
-        }),
+        Autoprefixer(),
         CustomProperties(),
       ];
     },
@@ -136,10 +126,6 @@ const config = {
   },
   plugins: [
     new ExtractTextPlugin('styles.css'),
-    new I18nAggregatorPlugin({
-      baseDirectory: __dirname,
-      supportedLocales: i18nSupportedLocales,
-    }),
     new CopyWebpackPlugin([
       {
         from: '*.html',

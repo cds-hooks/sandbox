@@ -63,6 +63,7 @@
     "terra-form-input": "^1.0.0",
     "terra-form-select": "^2.4.0",
     "terra-heading": "^2.1.0",
+    "terra-i18n": "^4.13.0",
     "terra-icon": "^2.4.0",
     "terra-list": "^2.5.0",
     "terra-menu": "^2.3.0",
@@ -130,5 +131,15 @@
       "/store.js"
     ],
     "testEnvironment": "jest-environment-jsdom-global"
+  },
+  "browserslist": {
+    "production": [
+      "> 1%",
+      "ie 10"
+    ],
+    "modern": [
+      "last 1 chrome version",
+      "last 1 firefox version"
+    ]
   }
 }
