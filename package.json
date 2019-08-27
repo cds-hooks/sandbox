@@ -50,7 +50,7 @@
     "react-redux": "^5.0.6",
     "redux": "^3.7.2",
     "terra-application-header-layout": "2.1.0",
-    "terra-base": "^3.4.0",
+    "terra-base": "^3.33.2",
     "terra-button": "^2.5.0",
     "terra-card": "^2.1.0",
     "terra-clinical-error-view": "^1.4.0",
