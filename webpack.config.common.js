@@ -64,8 +64,8 @@ const sassLoader = {
 
 const config = {
   entry: {
-    app: ['babel-polyfill', `${SRC_DIR}/index.jsx`],
-    'smart-launch': ['babel-polyfill', `${SRC_DIR}/retrieve-data-helpers/smart-authorize.js`],
+    app: ['@babel/polyfill', `${SRC_DIR}/index.jsx`],
+    'smart-launch': ['@babel/polyfill', `${SRC_DIR}/retrieve-data-helpers/smart-authorize.js`],
   },
   output: {
     path: BUILD_DIR,
