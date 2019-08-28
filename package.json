@@ -87,6 +87,7 @@
     "redux-mock-store": "^1.4.0",
     "sass-loader": "^6.0.6",
     "style-loader": "^0.19.1",
+    "terra-aggregate-translations": "^1.1.0",
     "terra-application-header-layout": "2.1.0",
     "terra-base": "^3.33.2",
     "terra-button": "^2.5.0",

@@ -8,6 +8,19 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const BUILD_DIR = path.resolve(__dirname, './build');
 const SRC_DIR = path.resolve(__dirname, './src');
 
+const aggregateTranslations = require('terra-aggregate-translations');
+
+const aggregateOptions = {
+    baseDir: __dirname,
+    excludes: [''],
+    locales: ['en', 'en-US'],
+    format: 'es6',
+};
+
+aggregateTranslations(aggregateOptions);
+
+
+
 const globalCss = [
   /node_modules\/terra-icon\/lib\/Icon/,
   /node_modules\/terra-date-picker/,
@@ -103,10 +116,12 @@ const config = {
     ],
   },
   plugins: [
+    /*
     new MiniCssExtractPlugin({
       filename: 'styles.css',
       ignoreOrder: false, // Enable to remove warnings about conflicting order
     }),
+    */
     new CopyWebpackPlugin([
       {
         from: '*.html',
