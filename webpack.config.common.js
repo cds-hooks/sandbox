@@ -18,28 +18,6 @@ const codeMirrorCss = [
   path.resolve(path.resolve(__dirname), 'node_modules/codemirror/addon/lint/'),
 ];
 
-const cssLoaderNoModules = {
-  loader: 'css-loader',
-  options: {
-    sourceMap: true,
-    importLoaders: 2,
-    modules: {
-      localIdentName: '[name]__[local]___[hash:base64:5]',
-    }
-  },
-};
-
-const cssLoaderWithModules = Object.assign({}, cssLoaderNoModules, { 
-  options: {
-    modules: true,
-    sourceMap: true,
-    importLoaders: 2,
-    modules: {
-      localIdentName: '[name]__[local]___[hash:base64:5]',
-    }
-  },
-});
-
 const postCssLoader = {
   loader: 'postcss-loader',
   options: {
@@ -50,10 +28,6 @@ const postCssLoader = {
       ];
     },
   },
-};
-
-const sassLoader = {
-  loader: 'sass-loader',
 };
 
 const config = {
@@ -72,24 +46,34 @@ const config = {
   },
   module: {
     rules: [{
-        test: /\.s[ac]ss$/i,
+        test: /node_modules\/.*\.css$/,
+        use: ['style-loader', 'css-loader'],
+      },
+      {
+        test: /\.s?[ac]ss$/i,
         use: [
-          'style-loader',
-          'css-loader',
+         'style-loader',
+         {
+            loader: 'css-loader',
+            options: {
+              importLoaders: 1,
+              modules:{
+                mode: 'local',
+              localIdentName: "[name]__[local]___[hash:base64:5]",
+              }
+            },
+          },
+          {
+            loader: 'postcss-loader',
+            options: {options: {}}
+          },
           {
             loader: 'sass-loader',
             options: {
               webpackImporter: false,
             },
-          },
-        ],
-      },{
-        test: /node_modules\/.*\.css$/,
-        use: ['style-loader', 'css-loader'],
-      },
-      {
-        test: /\.css$/i,
-        use: ['style-loader', 'css-loader'],
+          }
+          ],
       },
       {
         test: /\.(png|jpg|gif)$/,
