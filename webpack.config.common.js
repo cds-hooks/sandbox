@@ -23,7 +23,9 @@ const cssLoaderNoModules = {
   options: {
     sourceMap: true,
     importLoaders: 2,
-    localIdentName: '[name]__[local]___[hash:base64:5]',
+    modules: {
+      localIdentName: '[name]__[local]___[hash:base64:5]',
+    }
   },
 };
 
@@ -32,7 +34,9 @@ const cssLoaderWithModules = Object.assign({}, cssLoaderNoModules, {
     modules: true,
     sourceMap: true,
     importLoaders: 2,
-    localIdentName: '[name]__[local]___[hash:base64:5]',
+    modules: {
+      localIdentName: '[name]__[local]___[hash:base64:5]',
+    }
   },
 });
 
