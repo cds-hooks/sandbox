@@ -1,7 +1,8 @@
-module.exports = {
+{
   "extends": "airbnb",
+  "parser": "babel-eslint",
   "plugins": [
-    "react",
+    "react"
   ],
   "globals": {
     "window": true,
@@ -19,5 +20,9 @@ module.exports = {
     "react/require-default-props": 0,
     "class-methods-use-this": 0,
     "curly": [2, "all"],
+    "react/destructuring-assignment": 0,
+    "react/button-has-type": 0,
+    "react/no-access-state-in-setstate": 0,
+    "import/no-cycle": 0
   }
-};
+}
