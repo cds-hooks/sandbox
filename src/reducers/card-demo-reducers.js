@@ -10,12 +10,12 @@ const cardDemoReducers = (state = initialState, action) => {
     switch (action.type) {
       // Set user-defined JSON for experimental card in card demo view
       case types.STORE_USER_CARD_JSON: {
-        return Object.assign({}, state, { tempUserJson: action.userJson });
+        return { ...state, tempUserJson: action.userJson };
       }
 
       // Set status for card demo view or ehr view
       case types.TOGGLE_DEMO_VIEW: {
-        return Object.assign({}, state, { isCardDemoView: !state.isCardDemoView });
+        return { ...state, isCardDemoView: !state.isCardDemoView };
       }
 
       default:

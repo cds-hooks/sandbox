@@ -46,7 +46,7 @@ const hookReducers = (state = initialState, action) => {
     switch (action.type) {
       // Set status for data loading in application
       case types.SET_LOADING_STATUS: {
-        return Object.assign({}, state, { isLoadingData: action.isLoaderOn });
+        return { ...state, isLoadingData: action.isLoaderOn };
       }
       case types.LAUNCH_SMART_APP: {
         const { windowId } = cdsExecution.registerWindow(
@@ -82,9 +82,7 @@ const hookReducers = (state = initialState, action) => {
 
       // Set status for slideout context view visibility
       case types.SET_CONTEXT_VISIBILITY: {
-        return Object.assign({}, state, {
-          isContextVisible: !state.isContextVisible,
-        });
+        return { ...state, isContextVisible: !state.isContextVisible };
       }
 
       // Set hook for the application
@@ -92,10 +90,11 @@ const hookReducers = (state = initialState, action) => {
         const currentHook = action.hook || state.currentHook;
         const currentScreen = action.screen || currentHook;
 
-        return Object.assign({}, state, {
+        return {
+          ...state,
           currentHook,
           currentScreen,
-        });
+        };
       }
 
       default:

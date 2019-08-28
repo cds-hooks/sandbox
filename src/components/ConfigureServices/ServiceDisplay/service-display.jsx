@@ -46,12 +46,14 @@ export const ServiceDisplay = ({
       <div className={styles['btn-container']}>
         <Button
           text="Enabled?"
-          icon={<Checkbox
-            checked={definition.enabled}
-            isLabelHidden
-            onChange={() => {}}
-            labelText="Enabled?"
-          />}
+          icon={(
+            <Checkbox
+              checked={definition.enabled}
+              isLabelHidden
+              onChange={() => {}}
+              labelText="Enabled?"
+            />
+)}
           variant="emphasis"
           onClick={() => toggle(serviceUrl)}
         />
@@ -74,7 +76,7 @@ export const ServiceDisplay = ({
 
 ServiceDisplay.propTypes = propTypes;
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
   toggle: (service) => {
     dispatch(toggleService(service));
   },

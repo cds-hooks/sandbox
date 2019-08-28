@@ -130,14 +130,16 @@ export class ServicesEntry extends Component {
               inputOnChange={this.handleChange}
               inputName="discovery-endpoint-input"
             />
-            <Text isItalic>Note: See&nbsp;
+            <Text isItalic>
+Note: See&nbsp;
               <a
                 href="http://cds-hooks.org/specification/1.0/#discovery"
                 rel="noreferrer noopener"
                 target="_blank"
               >
                 documentation
-              </a>&nbsp;for more details regarding the Discovery endpoint.
+              </a>
+&nbsp;for more details regarding the Discovery endpoint.
             </Text>
           </Dialog>
         </Modal>

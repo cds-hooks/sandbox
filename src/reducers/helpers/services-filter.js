@@ -28,9 +28,7 @@ export function getCardsFromServices(state, serviceUrls) {
       if (response && Object.keys(response) && response.cards && response.cards.length) {
         response.cards.forEach((card) => {
           // Adding a serviceUrl property to each card to distinguish which card maps to which CDS Service (for suggestions analytics endpoint)
-          totalCards.cards.push(Object.assign({}, card, {
-            serviceUrl: url,
-          }));
+          totalCards.cards.push({ ...card, serviceUrl: url });
         });
       }
     }
@@ -45,7 +43,7 @@ export function getCardsFromServices(state, serviceUrls) {
  */
 export function getConditionCodingFromCode(patientConditions, code) {
   const conditions = Object.assign([], patientConditions);
-  const filteredConditions = conditions.filter(condition => (
+  const filteredConditions = conditions.filter((condition) => (
     condition.resource.code.coding[0].code === code
   ));
   if (filteredConditions.length) {

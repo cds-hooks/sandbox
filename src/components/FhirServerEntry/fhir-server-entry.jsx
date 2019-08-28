@@ -145,20 +145,25 @@ export class FhirServerEntry extends Component {
 
     const footerContainer = (
       <div className={styles['right-align']}>
-        {this.props.isEntryRequired ? '' :
-        <div className={styles['left-aligned-text']}>
-          <Button
-            text="Reset to default FHIR server"
-            variant="de-emphasis"
-            onClick={this.handleResetDefaultServer}
-          />
-        </div>}
+        {this.props.isEntryRequired ? ''
+          : (
+            <div className={styles['left-aligned-text']}>
+              <Button
+                text="Reset to default FHIR server"
+                variant="de-emphasis"
+                onClick={this.handleResetDefaultServer}
+              />
+            </div>
+          )}
         <Button text="Next" variant="emphasis" onClick={this.handleSubmit} />
-        {this.props.isEntryRequired ? '' :
-        <Spacer marginLeft="small" isInlineBlock>
-          <Button text="Cancel" onClick={this.handleCloseModal} />
-        </Spacer>}
-      </div>);
+        {this.props.isEntryRequired ? ''
+          : (
+            <Spacer marginLeft="small" isInlineBlock>
+              <Button text="Cancel" onClick={this.handleCloseModal} />
+            </Spacer>
+          )}
+      </div>
+    );
 
     return (
       <div>
@@ -193,7 +198,7 @@ export class FhirServerEntry extends Component {
 
 FhirServerEntry.propTypes = propTypes;
 
-const mapStateToProps = store => ({
+const mapStateToProps = (store) => ({
   currentFhirServer: store.fhirServerState.currentFhirServer,
   defaultFhirServer: store.fhirServerState.defaultFhirServer,
 });

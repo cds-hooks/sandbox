@@ -11,8 +11,8 @@ const logger = createLogger({
   collapsed: true,
 });
 
-const loggerMiddleware = process.env.NODE_ENV !== 'production' ?
-  [immutableStateWatcher(), logger] : [];
+const loggerMiddleware = process.env.NODE_ENV !== 'production'
+  ? [immutableStateWatcher(), logger] : [];
 
 // Create the Redux store, and apply logging middleware
 const store = createStore(reducers, applyMiddleware(

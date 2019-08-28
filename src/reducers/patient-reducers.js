@@ -33,8 +33,8 @@ const patientReducers = (state = initialState, action) => {
           const conditionCodes = [];
           filteredEntries = action.conditions.entry.filter((item) => {
             const { resource } = item;
-            const hasAppropriateCode = resource && resource.code && resource.code.coding &&
-              resource.code.coding[0] && resource.code.coding[0].code;
+            const hasAppropriateCode = resource && resource.code && resource.code.coding
+              && resource.code.coding[0] && resource.code.coding[0].code;
             if (hasAppropriateCode) {
               const isDuplicate = conditionCodes.indexOf(resource.code.coding[0].code);
               if (isDuplicate < 0) {
@@ -52,14 +52,14 @@ const patientReducers = (state = initialState, action) => {
           return 0;
         });
         newPatient.conditionsResources = filteredEntries;
-        return Object.assign({}, state, { currentPatient: newPatient });
+        return { ...state, currentPatient: newPatient };
       }
 
       // Stores the current user ID in store if specified in an access token returned to the Sandbox (on SMART launched Sandbox)
       case types.SMART_AUTH_SUCCESS: {
         const { authResponse } = action;
         if (authResponse && authResponse.userId) {
-          return Object.assign({}, state, { currentUser: authResponse.userId });
+          return { ...state, currentUser: authResponse.userId };
         }
         return state;
       }

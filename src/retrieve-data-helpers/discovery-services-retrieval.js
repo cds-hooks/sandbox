@@ -1,9 +1,11 @@
 import axios from 'axios';
 import store from '../store/store';
 import generateJWT from './jwt-generator';
-import { signalSuccessServicesRetrieval,
+import {
+  signalSuccessServicesRetrieval,
   signalFailureServicesRetrieval,
-  signalRetrievingServices } from '../actions/cds-services-actions';
+  signalRetrievingServices,
+} from '../actions/cds-services-actions';
 
 /**
  * Retrieve CDS Services from a discovery endpoint and dispatch a successful or failed connection to services.

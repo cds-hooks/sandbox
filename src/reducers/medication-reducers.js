@@ -121,7 +121,7 @@ const initialState = {
   /**
    * Total list of medications the user may select from
    */
-  medications: Object.keys(rxnorm.pillToComponentSets).map(pill => (
+  medications: Object.keys(rxnorm.pillToComponentSets).map((pill) => (
     {
       id: pill,
       name: rxnorm.cuiToName[pill],
@@ -187,7 +187,7 @@ const initialState = {
 
 const filterSearch = (input) => {
   // Break the user input for medication into an array of strings separated by whitespace and filter out any empty strings
-  const inputParts = input.split(/\s+/).filter(x => x !== '');
+  const inputParts = input.split(/\s+/).filter((x) => x !== '');
 
   let newIngredients;
   if (inputParts.length === 0) {
@@ -196,13 +196,12 @@ const filterSearch = (input) => {
     // For each medication in our "database", filter to get an array of medications (max 30) matching the user-input string
     // and sort the medications accordingly by name
     newIngredients = initialState.medications
-      .filter(med =>
-        inputParts.map(part => med.name
-          .match(RegExp(`(?:^|\\s)${part}`, 'i')))
-          .every(x => x))
+      .filter((med) => inputParts.map((part) => med.name
+        .match(RegExp(`(?:^|\\s)${part}`, 'i')))
+        .every((x) => x))
       .sort((b, a) => b.name.length - a.name.length)
       .slice(0, 30)
-      .map(med => ({
+      .map((med) => ({
         name: med.name.slice(0, -5),
         id: med.id,
       }));
@@ -211,11 +210,11 @@ const filterSearch = (input) => {
 };
 
 // Converts string numbers that contain decimals into Number objects to use for sorting medications
-const toNumbers = medication => (
+const toNumbers = (medication) => (
   medication.name.match(/(\d*\.?\d*)/g)
-    .filter(v => v.length > 0)
-    .map(d => Number(d))
-    .filter(n => !Number.isNaN(n))
+    .filter((v) => v.length > 0)
+    .map((d) => Number(d))
+    .filter((n) => !Number.isNaN(n))
 );
 
 const compareArrays = (a, b) => {
@@ -239,17 +238,17 @@ const compareArrays = (a, b) => {
 
 const compareDrugNames = (a, b) => (compareArrays(toNumbers(a), toNumbers(b)));
 
-const getMedicationComponentsList = input => (
-  rxnorm.pillToComponentSets[input.id].map(medSet => (
+const getMedicationComponentsList = (input) => (
+  rxnorm.pillToComponentSets[input.id].map((medSet) => (
     {
-      name: medSet.map(id => rxnorm.cuiToName[id]).join(' / '),
+      name: medSet.map((id) => rxnorm.cuiToName[id]).join(' / '),
       id: medSet,
     }
   )).sort(compareDrugNames)
 );
 
-const getMedicationPrescribableList = input => (
-  rxnorm.componentSetsToPrescribables[input.id.join(',')].map(medSet => (
+const getMedicationPrescribableList = (input) => (
+  rxnorm.componentSetsToPrescribables[input.id.join(',')].map((medSet) => (
     {
       name: rxnorm.cuiToName[medSet],
       id: medSet,
@@ -262,7 +261,8 @@ const medicationReducers = (state = initialState, action) => {
     switch (action.type) {
       // Store users input for a medication in store
       case types.STORE_USER_MED_INPUT: {
-        return Object.assign({}, state, {
+        return {
+          ...state,
           medListPhase: 'ingredient',
           options: {
             ingredient: filterSearch(action.input),
@@ -275,13 +275,14 @@ const medicationReducers = (state = initialState, action) => {
             prescribable: null,
           },
           userInput: action.input,
-        });
+        };
       }
 
       // Store the medication choice the user settled on in Rx View
       case types.STORE_USER_CHOSEN_MEDICATION: {
         if (state.medListPhase === 'ingredient') {
-          return Object.assign({}, state, {
+          return {
+            ...state,
             medListPhase: 'components',
             decisions: {
               ...state.decisions,
@@ -291,9 +292,10 @@ const medicationReducers = (state = initialState, action) => {
               ...state.options,
               components: getMedicationComponentsList(action.medication),
             },
-          });
-        } else if (state.medListPhase === 'components') {
-          return Object.assign({}, state, {
+          };
+        } if (state.medListPhase === 'components') {
+          return {
+            ...state,
             medListPhase: 'prescribable',
             decisions: {
               ...state.decisions,
@@ -303,40 +305,41 @@ const medicationReducers = (state = initialState, action) => {
               ...state.options,
               prescribable: getMedicationPrescribableList(action.medication),
             },
-          });
-        } else if (state.medListPhase === 'prescribable') {
-          return Object.assign({}, state, {
+          };
+        } if (state.medListPhase === 'prescribable') {
+          return {
+            ...state,
             medListPhase: 'done',
             userInput: '',
             decisions: {
               ...state.decisions,
               prescribable: action.medication,
             },
-          });
+          };
         }
         return state;
       }
 
       // Stores the user-chosen condition from the list of conditions for the current patient
       case types.STORE_USER_CONDITION: {
-        return Object.assign({}, state, {
-          selectedConditionCode: action.condition,
-        });
+        return { ...state, selectedConditionCode: action.condition };
       }
 
       // Stores the user-defined dosage amount and frequency
       case types.STORE_MED_DOSAGE_AMOUNT: {
-        return Object.assign({}, state, {
+        return {
+          ...state,
           medicationInstructions: {
             number: action.amount,
             frequency: action.frequency,
           },
-        });
+        };
       }
 
       // Stores the user-defined dates for the prescription (start and end)
       case types.STORE_DATE: {
-        return Object.assign({}, state, {
+        return {
+          ...state,
           prescriptionDates: {
             ...state.prescriptionDates,
             [`${action.range}`]: {
@@ -344,12 +347,13 @@ const medicationReducers = (state = initialState, action) => {
               value: action.date.value,
             },
           },
-        });
+        };
       }
 
       // Toggles the date feature (start and/or end) for the prescription
       case types.TOGGLE_DATE: {
-        return Object.assign({}, state, {
+        return {
+          ...state,
           prescriptionDates: {
             ...state.prescriptionDates,
             [`${action.range}`]: {
@@ -357,7 +361,7 @@ const medicationReducers = (state = initialState, action) => {
               enabled: !state.prescriptionDates[`${action.range}`].enabled,
             },
           },
-        });
+        };
       }
 
       // Updates the dynamically built FHIR Medication Order resource with a suggestion the user takes from a response card
@@ -374,7 +378,8 @@ const medicationReducers = (state = initialState, action) => {
                 if (actions[i].resource && actions[i].resource.medicationCodeableConcept) {
                   const newMedication = actions[i].resource.medicationCodeableConcept;
                   if (newMedication.text && newMedication.coding && newMedication.coding[0] && newMedication.coding[0].code) {
-                    return Object.assign({}, state, {
+                    return {
+                      ...state,
                       medListPhase: 'done',
                       decisions: {
                         ...state.decisions,
@@ -383,7 +388,7 @@ const medicationReducers = (state = initialState, action) => {
                           id: newMedication.coding[0].code,
                         },
                       },
-                    });
+                    };
                   }
                   console.warn('Suggested resource does not have text and/or coding code in medicationCodeableConcept property', newMedication);
                 } else if (!actions[i].resource) {
@@ -392,7 +397,8 @@ const medicationReducers = (state = initialState, action) => {
                   console.warn('Suggested resource does not have a medicationCodeableConcept', actions[i].resource);
                 }
               } else if (actions[i].type === 'delete') {
-                return Object.assign({}, state, {
+                return {
+                  ...state,
                   medListPhase: 'ingredient',
                   options: {
                     ingredient: [],
@@ -404,7 +410,7 @@ const medicationReducers = (state = initialState, action) => {
                     components: null,
                     prescribable: null,
                   },
-                });
+                };
               }
             } else {
               console.error('Missing required "type" field in suggestion action', actions[i]);

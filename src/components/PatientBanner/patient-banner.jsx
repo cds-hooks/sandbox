@@ -10,12 +10,20 @@ export function PatientBanner(props) {
   const pid = props.patientId || defaultId;
   return (
     <div className={styles['patient-banner-text']}>
-      <p><strong>Patient: </strong> {name} <strong>ID: </strong> {pid}</p>
+      <p>
+        <strong>Patient: </strong>
+        {' '}
+        {name}
+        {' '}
+        <strong>ID: </strong>
+        {' '}
+        {pid}
+      </p>
     </div>
   );
 }
 
-const mapStateToProps = store => ({
+const mapStateToProps = (store) => ({
   patientName: store.patientState.currentPatient.name,
   patientId: store.patientState.currentPatient.id,
 });
