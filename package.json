@@ -112,7 +112,7 @@
     "terra-spacer": "^2.1.0",
     "terra-text": "^2.1.0",
     "terra-toggle": "^2.1.0",
-    "uglifyjs-3-webpack-plugin": "^1.2.4",
+    "terser-webpack-plugin": "^1.4.1",
     "uuid": "^3.3.3",
     "webpack": "^4.39.3",
     "webpack-cli": "^3.3.7",
