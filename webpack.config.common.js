@@ -1,6 +1,6 @@
 const webpack = require('webpack');
 const path = require('path');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const Autoprefixer = require('autoprefixer');
 const CustomProperties = require('postcss-custom-properties');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
@@ -71,34 +71,24 @@ const config = {
     modules: [path.resolve(__dirname, 'aggregated-translations'), 'node_modules'],
   },
   module: {
-    rules: [
-      {
-        test: /\.(scss|css)$/,
-        include: globalCss,
-        exclude: codeMirrorCss,
-        use: ExtractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: [
-            cssLoaderNoModules,
-            postCssLoader,
-            sassLoader,
-          ],
-        }),
-      },
-      {
-        test: /\.(scss|css)$/,
-        exclude: globalCss.concat(codeMirrorCss),
-        use: ExtractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: [
-            cssLoaderWithModules,
-            postCssLoader,
-            sassLoader,
-          ],
-        }),
-      },
-      {
+    rules: [{
+        test: /\.s[ac]ss$/i,
+        use: [
+          'style-loader',
+          'css-loader',
+          {
+            loader: 'sass-loader',
+            options: {
+              webpackImporter: false,
+            },
+          },
+        ],
+      },{
         test: /node_modules\/.*\.css$/,
+        use: ['style-loader', 'css-loader'],
+      },
+      {
+        test: /\.css$/i,
         use: ['style-loader', 'css-loader'],
       },
       {
@@ -129,7 +119,10 @@ const config = {
     ],
   },
   plugins: [
-    new ExtractTextPlugin('styles.css'),
+    new MiniCssExtractPlugin({
+      filename: 'styles.css',
+      ignoreOrder: false, // Enable to remove warnings about conflicting order
+    }),
     new CopyWebpackPlugin([
       {
         from: '*.html',

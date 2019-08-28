@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import CodeMirror from 'react-codemirror';
 import 'codemirror/mode/javascript/javascript';
-import 'codemirror/lib/codemirror.css';
-import 'codemirror/addon/lint/lint.css';
+// import 'codemirror/lib/codemirror.css';
+// import 'codemirror/addon/lint/lint.css';
 
 import Button from 'terra-button';
 import Text from 'terra-text';
