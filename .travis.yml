@@ -4,6 +4,7 @@ before_script:
   - sudo apt-get update
 node_js:
   - 'lts/*'
+  - 12
 cache:
   directories:
     - node_modules
