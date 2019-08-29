@@ -12,6 +12,10 @@
   width: 50%;
 }
 
+div.choice {
+  margin-bottom: 2px;
+}
+
 .view-title {
   padding: 0 0 10px;
   margin: 0 0 10px;
