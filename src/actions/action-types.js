@@ -60,7 +60,6 @@ export const TOGGLE_DATE = 'TOGGLE_DATE';
 
 // Order Imaging
 export const APPLY_PAMA_RATING = 'APPLY_PAMA_RATING';
-export const UPDATE_SERVICE_REQUEST = 'UPDATE_SERVICE_REQUEST';
 export const UPDATE_STUDY = 'UPDATED_STUDY';
 export const ADD_REASON = 'ADD_REASON';
 export const REMOVE_REASON = 'REMOVE_REASON';
