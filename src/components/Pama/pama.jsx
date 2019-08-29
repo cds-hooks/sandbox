@@ -38,7 +38,7 @@ const searchCodings = (codings) => {
       });
   });
 
-  const byCode = Object.fromEntries(codings.map((c) => [c.code, c]));
+  const byCode = codings.reduce((acc, c) => { acc[c.code] = c; return acc; }, {});
 
   return (q) => idx.search(q).map((r) => ({
     ...byCode[r.ref],
