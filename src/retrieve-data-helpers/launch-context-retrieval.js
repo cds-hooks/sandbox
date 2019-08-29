@@ -24,7 +24,7 @@ function retrieveLaunchContext(originalLink, accessToken, patientId, fhirBaseUrl
 
     const launchParameters = {
       patient: patientId,
-      smart_messaging_origin: window.origin
+      smart_messaging_origin: window.origin,
     };
 
     if (link.appContext) {

@@ -80,21 +80,19 @@ export const pamaTriggerHandler = {
       .map((m) => m.payload || {});
     dispatchRatingUpdates(dispatch, updates);
 
-    updates.forEach(u => {
+    updates.forEach((u) => {
       dispatch({
         type: types.UPDATE_STUDY,
-        coding: u.resource.code.coding[0]
-      })
+        coding: u.resource.code.coding[0],
+      });
       dispatch({
         type: types.ADD_REASON,
-        coding: u.resource.reasonCode[0].coding[0]
-      })
-    })
+        coding: u.resource.reasonCode[0].coding[0],
+      });
+    });
     if ([data].filter(({ messageType }) => messageType === 'ui.done').length) {
-      source.close()
+      source.close();
     }
-
-
   },
   generateContext: (state) => ({
     selections: ['ServiceRequest/example-request-id'],
