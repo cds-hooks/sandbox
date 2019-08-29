@@ -4,9 +4,10 @@ before_script:
   - sudo apt-get update
 node_js:
   - 'lts/*'
+  - 12
 cache:
-  directories:
-    - node_modules
+ directories:
+   - node_modules
 script:
   - npm run lint
   - npm run test

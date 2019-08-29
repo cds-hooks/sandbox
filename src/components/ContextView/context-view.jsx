@@ -158,7 +158,7 @@ const mapStateToProps = (store) => {
   };
 };
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
   selectService: (service) => {
     dispatch(selectService(service));
   },

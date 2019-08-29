@@ -14,22 +14,19 @@ const actionToRating = (action) => {
   const resourceId = action.resource.id;
   return (action.resource.extension || [])
     .filter(({ url }) => url === 'http://fhir.org/argonaut/Extension/pama-rating')
-    .flatMap(({ valueCodeableConcept }) =>
-      valueCodeableConcept.coding
-        .map(c => c.code)
-        .map(rating => ({ rating, resourceId })));
+    .flatMap(({ valueCodeableConcept }) => valueCodeableConcept.coding
+      .map((c) => c.code)
+      .map((rating) => ({ rating, resourceId })));
 };
 
-const dispatchUpdates = (dispatch, updates) =>
-  updates
-    .flatMap(actionToRating)
-    .slice(0, 1)
-    .forEach(({ rating, resourceId }) =>
-      dispatch({
-        type: types.APPLY_PAMA_RATING,
-        resourceId,
-        rating,
-      }));
+const dispatchUpdates = (dispatch, updates) => updates
+  .flatMap(actionToRating)
+  .slice(0, 1)
+  .forEach(({ rating, resourceId }) => dispatch({
+    type: types.APPLY_PAMA_RATING,
+    resourceId,
+    rating,
+  }));
 
 export const pamaTriggerHandler = {
   needExplicitTrigger: false,
@@ -40,11 +37,11 @@ export const pamaTriggerHandler = {
   onMessage: ({ data, dispatch }) => {
     const updates = [data]
       .filter(({ messageType }) => messageType === 'scratchpad.update')
-      .map(m => m.payload || {});
+      .map((m) => m.payload || {});
 
     dispatchUpdates(dispatch, updates);
   },
-  generateContext: state => ({
+  generateContext: (state) => ({
     selections: ['ServiceRequest/example-request-id'],
     draftOrders: {
       resourceType: 'Bundle',
@@ -129,7 +126,7 @@ export class Pama extends Component {
           value={code}
           onChange={this.updateField('code')}
         >
-          {studyCodes.map(coding => (
+          {studyCodes.map((coding) => (
             <Select.Option
               key={coding.code}
               value={coding.code}
@@ -142,7 +139,7 @@ export class Pama extends Component {
           value={reasonCode}
           onChange={this.updateField('reasonCode')}
         >
-          {reasonCodes.map(coding => (
+          {reasonCodes.map((coding) => (
             <Select.Option
               key={coding.code}
               value={coding.code}
@@ -152,7 +149,9 @@ export class Pama extends Component {
         </Select>
 
         <span>
-          PAMA Rating: {pamaRating}
+          PAMA Rating:
+          {' '}
+          {pamaRating}
           {{ appropriate: '✓', 'not-appropriate': '⚠' }[pamaRating] || '?'}
         </span>
         <br />
@@ -162,7 +161,7 @@ export class Pama extends Component {
   }
 }
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
   launchApp(link, sourceWindow) {
     dispatch({
       type: types.LAUNCH_SMART_APP,
@@ -179,7 +178,7 @@ const mapDispatchToProps = dispatch => ({
   },
 });
 
-const mapStateToProps = store => ({
+const mapStateToProps = (store) => ({
   serviceRequest: store.pama.serviceRequest,
   pamaRating: store.pama.pamaRating,
 });

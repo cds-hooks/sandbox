@@ -18,15 +18,14 @@ const remapSmartLinks = ({
   fhirServerUrl,
 }) => {
   ((cardResponse && cardResponse.cards) || [])
-    .flatMap(card => card.links || [])
+    .flatMap((card) => card.links || [])
     .filter(({ type }) => type === 'smart')
-    .forEach(link =>
-      retrieveLaunchContext(
-        link,
-        fhirAccessToken,
-        patientId,
-        fhirServerUrl,
-      ).catch(e => e).then(newLink => dispatch(storeLaunchContext(newLink))));
+    .forEach((link) => retrieveLaunchContext(
+      link,
+      fhirAccessToken,
+      patientId,
+      fhirServerUrl,
+    ).catch((e) => e).then((newLink) => dispatch(storeLaunchContext(newLink))));
 };
 
 /**
@@ -56,7 +55,7 @@ function encodeUriParameters(template) {
 function completePrefetchTemplate(state, prefetch) {
   const patient = state.patientState.currentPatient.id;
   const user = state.patientState.currentUser || state.patientState.defaultUser;
-  const prefetchRequests = Object.assign({}, prefetch);
+  const prefetchRequests = { ...prefetch };
   Object.keys(prefetchRequests).forEach((prefetchKey) => {
     let prefetchTemplate = prefetchRequests[prefetchKey];
     prefetchTemplate = prefetchTemplate.replace(
@@ -77,10 +76,10 @@ function completePrefetchTemplate(state, prefetch) {
  */
 function prefetchDataPromises(state, baseUrl, prefetch) {
   const resultingPrefetch = {};
-  const prefetchRequests = Object.assign(
-    {},
-    completePrefetchTemplate(state, prefetch),
-  );
+  const prefetchRequests = {
+
+    ...completePrefetchTemplate(state, prefetch),
+  };
   return new Promise((resolve) => {
     const prefetchKeys = Object.keys(prefetchRequests);
     const headers = { Accept: 'application/json+fhir' };
@@ -171,16 +170,15 @@ function callServices(dispatch, state, url, context, exchangeRound = 0) {
 
   const serviceDefinition = state.cdsServicesState.configuredServices[url];
 
-  const sendRequest = () =>
-    axios({
-      method: 'post',
-      url,
-      data: request,
-      headers: {
-        Accept: 'application/json',
-        Authorization: `Bearer ${generateJWT(url)}`,
-      },
-    });
+  const sendRequest = () => axios({
+    method: 'post',
+    url,
+    data: request,
+    headers: {
+      Accept: 'application/json',
+      Authorization: `Bearer ${generateJWT(url)}`,
+    },
+  });
 
   const dispatchResult = (result) => {
     if (result.data && Object.keys(result.data).length) {
@@ -206,15 +204,14 @@ function callServices(dispatch, state, url, context, exchangeRound = 0) {
     dispatch(storeExchange(
       url,
       request,
-      'Could not get a response from the CDS Service. ' +
-          'See developer tools for more details',
+      'Could not get a response from the CDS Service. '
+          + 'See developer tools for more details',
     ));
   };
 
   // Wait for prefetch to be fulfilled before making a request to the CDS service, if the service has prefetch expectations
-  const needPrefetch =
-    serviceDefinition.prefetch &&
-    Object.keys(serviceDefinition.prefetch).length > 0;
+  const needPrefetch = serviceDefinition.prefetch
+    && Object.keys(serviceDefinition.prefetch).length > 0;
 
   const prefetchPromise = needPrefetch
     ? prefetchDataPromises(state, fhirServer, serviceDefinition.prefetch)

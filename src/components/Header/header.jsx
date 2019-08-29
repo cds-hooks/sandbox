@@ -123,6 +123,7 @@ export class Header extends Component {
   }
 
   setSettingsNode(node) { this.settingsNode = node; }
+
   getSettingsNode() { return this.settingsNode; }
 
   /**
@@ -134,6 +135,7 @@ export class Header extends Component {
   }
 
   closeSettingsMenu() { this.setState({ settingsOpen: false }); }
+
   openSettingsMenu() { this.setState({ settingsOpen: true }); }
 
   /**
@@ -143,7 +145,7 @@ export class Header extends Component {
    */
   switchHook(hook, screen = hook) {
     const state = store.getState();
-    const filterService = service => service.hook === hook && service.enabled;
+    const filterService = (service) => service.hook === hook && service.enabled;
     const services = pickBy(state.cdsServicesState.configuredServices, filterService);
 
     // If the current view tab is being clicked, re-invoke the configured services on this hook.
@@ -158,8 +160,8 @@ export class Header extends Component {
           // on current context (i.e. for the Rx View, ensure a medication has been prescribed before
           // re-invoking the services on that hook if the Rx View tab is clicked multiple times)
           if (hook === 'order-select') {
-            const medicationPrescribed = state.medicationState.decisions.prescribable &&
-              state.medicationState.medListPhase === 'done';
+            const medicationPrescribed = state.medicationState.decisions.prescribable
+              && state.medicationState.medListPhase === 'done';
             if (medicationPrescribed) {
               callServices(this.props.dispatch, state, key);
             }
@@ -199,6 +201,7 @@ export class Header extends Component {
     this.setState({ isConfigureServicesOpen: true });
     if (this.state.settingsOpen) { this.closeSettingsMenu(); }
   }
+
   closeConfigureServices() { this.setState({ isConfigureServicesOpen: false }); }
 
   openAddServices() {
@@ -207,6 +210,7 @@ export class Header extends Component {
       this.closeSettingsMenu();
     }
   }
+
   closeAddServices() { this.setState({ isAddServicesOpen: false }); }
 
   /**
@@ -237,17 +241,24 @@ export class Header extends Component {
       if (this.state.settingsOpen) { this.closeSettingsMenu(); }
     }
   }
+
   closeChangePatient() { this.setState({ isChangePatientOpen: false }); }
 
   openChangeFhirServer() {
     this.setState({ isChangeFhirServerOpen: true });
     if (this.state.settingsOpen) { this.closeSettingsMenu(); }
   }
+
   closeChangeFhirServer() { this.setState({ isChangeFhirServerOpen: false }); }
 
   render() {
     // Title and Logo
-    const logo = <div><span><img src={cdsHooksLogo} alt="" height="30" width="30" /></span><b className={styles['logo-title']}>CDS Hooks Sandbox</b></div>;
+    const logo = (
+      <div>
+        <span><img src={cdsHooksLogo} alt="" height="30" width="30" /></span>
+        <b className={styles['logo-title']}>CDS Hooks Sandbox</b>
+      </div>
+    );
 
     // Gear settings menu item options
     let menuItems = [
@@ -273,7 +284,8 @@ export class Header extends Component {
         isArrowDisplayed
       >
         {menuItems}
-      </Menu>);
+      </Menu>
+    );
 
     // Navigation tabs (the hook views)
     const navigation = (
@@ -283,7 +295,8 @@ export class Header extends Component {
           <button className={this.getNavClasses('rx-view')} onClick={() => this.switchHook('order-select', 'rx-view')}>Rx View</button>
           <button className={this.getNavClasses('pama')} onClick={() => this.switchHook('order-select', 'pama')}>PAMA Imaging</button>
         </div>
-      </div>);
+      </div>
+    );
 
     // Extension tabs (Card Demo view)
     const extensions = (
@@ -302,8 +315,9 @@ export class Header extends Component {
     const utilities = (
       <div className={styles.icon} onClick={this.openSettingsMenu}>
         <span className={styles['padding-right']}><IconSettings height="1.2em" width="1.2em" /></span>
-        <span className={styles['padding-right']} ref={this.setSettingsNode} ><IconChevronDown height="1em" width="1em" /></span>
-      </div>);
+        <span className={styles['padding-right']} ref={this.setSettingsNode}><IconChevronDown height="1em" width="1em" /></span>
+      </div>
+    );
 
     return (
       <div>
@@ -315,24 +329,32 @@ export class Header extends Component {
           style={{ backgroundColor: '#384e77' }}
         />
         {gearMenu}
-        {this.state.isAddServicesOpen ? <ServicesEntry
-          isOpen={this.state.isAddServicesOpen}
-          closePrompt={this.closeAddServices}
-        /> : null}
-        {this.state.isConfigureServicesOpen ? <ConfigureServices
-          isOpen={this.state.isConfigureServicesOpen}
-          closePrompt={this.closeConfigureServices}
-        /> : null}
-        {this.state.isChangePatientOpen ? <PatientEntry
-          isOpen={this.state.isChangePatientOpen}
-          closePrompt={this.closeChangePatient}
-        /> : null}
-        {this.state.isChangeFhirServerOpen ? <FhirServerEntry
-          isOpen={this.state.isChangeFhirServerOpen}
-          closePrompt={this.closeChangeFhirServer}
-          isEntryRequired={false}
-          resolve={e => this.openChangePatient(e, true)}
-        /> : null}
+        {this.state.isAddServicesOpen ? (
+          <ServicesEntry
+            isOpen={this.state.isAddServicesOpen}
+            closePrompt={this.closeAddServices}
+          />
+        ) : null}
+        {this.state.isConfigureServicesOpen ? (
+          <ConfigureServices
+            isOpen={this.state.isConfigureServicesOpen}
+            closePrompt={this.closeConfigureServices}
+          />
+        ) : null}
+        {this.state.isChangePatientOpen ? (
+          <PatientEntry
+            isOpen={this.state.isChangePatientOpen}
+            closePrompt={this.closeChangePatient}
+          />
+        ) : null}
+        {this.state.isChangeFhirServerOpen ? (
+          <FhirServerEntry
+            isOpen={this.state.isChangeFhirServerOpen}
+            closePrompt={this.closeChangeFhirServer}
+            isEntryRequired={false}
+            resolve={(e) => this.openChangePatient(e, true)}
+          />
+        ) : null}
       </div>
     );
   }
@@ -340,7 +362,7 @@ export class Header extends Component {
 
 Header.propTypes = propTypes;
 
-const mapStateToProps = appStore => ({
+const mapStateToProps = (appStore) => ({
   hook: appStore.hookState.currentHook,
   screen: appStore.hookState.currentScreen,
   patientId: appStore.patientState.currentPatient.id,
@@ -348,7 +370,7 @@ const mapStateToProps = appStore => ({
   isSecuredSandbox: appStore.fhirServerState.accessToken,
 });
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
   setHook: (hook, screen) => {
     dispatch(setHook(hook, screen));
   },

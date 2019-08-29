@@ -30,7 +30,7 @@ const cdsServicesReducers = (state = initialState, action) => {
       // Signal that the application is retrieving CDS Services
       case types.DISCOVER_CDS_SERVICES: {
         if (action.testUrl) {
-          return Object.assign({}, state, { testServicesUrl: action.testUrl });
+          return { ...state, testServicesUrl: action.testUrl };
         }
         break;
       }
@@ -46,7 +46,7 @@ const cdsServicesReducers = (state = initialState, action) => {
             const serviceUrl = `${action.discoveryUrl}/${service.id}`;
             const serviceEndpoint = state.configuredServices[serviceUrl];
             if (!serviceEndpoint || !isEqual(serviceEndpoint, service)) {
-              const serviceCopy = Object.assign({}, service);
+              const serviceCopy = { ...service };
               serviceCopy.enabled = true;
               incomingServices[serviceUrl] = serviceCopy;
             }
@@ -55,7 +55,7 @@ const cdsServicesReducers = (state = initialState, action) => {
           const newServicesKeys = Object.keys(incomingServices);
 
           if (newServicesKeys.length) {
-            const newServices = Object.assign({}, state.configuredServices);
+            const newServices = { ...state.configuredServices };
             for (let i = 0; i < newServicesKeys.length; i += 1) {
               newServices[newServicesKeys[i]] = incomingServices[newServicesKeys[i]];
             }
@@ -66,19 +66,20 @@ const cdsServicesReducers = (state = initialState, action) => {
               // Don't add CDS Service endpoint from access token "serviceDiscoveryURL" property to cached services, as it has already
               // been called during the SMART authentication step. Ignore http(s) in case the serviceDiscoveryURL was not configured with a
               // http(s) protocol in the access token
-              if ((accessToken && accessToken.serviceDiscoveryURL &&
-                accessToken.serviceDiscoveryURL.replace(/^https?:\/\//i, '') !== action.discoveryUrl.replace(/^https?:\/\//i, ''))
+              if ((accessToken && accessToken.serviceDiscoveryURL
+                && accessToken.serviceDiscoveryURL.replace(/^https?:\/\//i, '') !== action.discoveryUrl.replace(/^https?:\/\//i, ''))
                 || (accessToken && !accessToken.serviceDiscoveryURL) || !accessToken) {
                 const concatArr = newConfiguredServiceUrls.concat([action.discoveryUrl]);
                 newConfiguredServiceUrls = uniq(concatArr);
               }
             }
             localStorage.setItem('PERSISTED_cdsServices', JSON.stringify(newConfiguredServiceUrls));
-            return Object.assign({}, state, {
+            return {
+              ...state,
               testServicesUrl: null,
               configuredServices: newServices,
               configuredServiceUrls: newConfiguredServiceUrls,
-            });
+            };
           }
         }
         break;
@@ -87,11 +88,12 @@ const cdsServicesReducers = (state = initialState, action) => {
       // Reset list of CDS services to default services, and remove any added services from the cache
       case types.RESET_SERVICES: {
         localStorage.removeItem('PERSISTED_cdsServices');
-        return Object.assign({}, state, {
+        return {
+          ...state,
           configuredServices: {},
           configuredServiceUrls: [],
           testServicesUrl: '',
-        });
+        };
       }
 
       // When configuring services on the Sandbox, toggle the availability to invoke the service
@@ -99,9 +101,7 @@ const cdsServicesReducers = (state = initialState, action) => {
         if (state.configuredServices[action.service]) {
           const servicesCopy = JSON.parse(JSON.stringify(state.configuredServices));
           servicesCopy[action.service].enabled = !servicesCopy[action.service].enabled;
-          return Object.assign({}, state, {
-            configuredServices: servicesCopy,
-          });
+          return { ...state, configuredServices: servicesCopy };
         }
         return state;
       }
@@ -111,9 +111,7 @@ const cdsServicesReducers = (state = initialState, action) => {
         if (state.configuredServices[action.service]) {
           const servicesCopy = JSON.parse(JSON.stringify(state.configuredServices));
           delete servicesCopy[action.service];
-          return Object.assign({}, state, {
-            configuredServices: servicesCopy,
-          });
+          return { ...state, configuredServices: servicesCopy };
         }
         return state;
       }

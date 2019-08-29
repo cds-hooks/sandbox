@@ -144,16 +144,20 @@ export class CardList extends Component {
     if (!this.props.isDemoCard) {
       return (
         <div className={styles['card-source']}>
-          Source:{' '}
+          Source:
+          {' '}
           <a
             className={styles['source-link']}
             href={source.url || '#'}
-            onClick={e => this.launchSource(e)}
+            onClick={(e) => this.launchSource(e)}
           >
             {' '}
-            {source.label}{' '}
-          </a>{' '}
-          {icon}{' '}
+            {source.label}
+            {' '}
+          </a>
+          {' '}
+          {icon}
+          {' '}
         </div>
       );
     }
@@ -163,11 +167,14 @@ export class CardList extends Component {
         <a // eslint-disable-line jsx-a11y/anchor-is-valid
           className={styles['source-link']}
           href="#"
-          onClick={e => this.launchSource(e)}
+          onClick={(e) => this.launchSource(e)}
         >
-          {source.label}{' '}
-        </a>{' '}
-        {icon}{' '}
+          {source.label}
+          {' '}
+        </a>
+        {' '}
+        {icon}
+        {' '}
       </div>
     );
   }
@@ -201,15 +208,15 @@ export class CardList extends Component {
             color={summaryColors[card.indicator]}
           >
             {' '}
-            {card.summary}{' '}
+            {card.summary}
+            {' '}
           </Text>
         );
 
         // -- Source --
-        const sourceSection =
-          card.source && Object.keys(card.source).length
-            ? this.renderSource(card.source)
-            : '';
+        const sourceSection = card.source && Object.keys(card.source).length
+          ? this.renderSource(card.source)
+          : '';
 
         // -- Detail (ReactMarkdown supports Github-flavored markdown) --
         const detailSection = card.detail ? (
@@ -253,11 +260,11 @@ export class CardList extends Component {
                   isDisabled={unlaunchable}
                   title={unlaunchableNotice}
                   onClick={(e) => {
-                  const launchedWindow = this.launchLink(e, link);
-                  if (this.props.onAppLaunch) {
-                    this.props.onAppLaunch(link, launchedWindow);
-                  }
-                }}
+                    const launchedWindow = this.launchLink(e, link);
+                    if (this.props.onAppLaunch) {
+                      this.props.onAppLaunch(link, launchedWindow);
+                    }
+                  }}
                   variant="action"
                   text={link.label}
                 />
@@ -276,12 +283,24 @@ export class CardList extends Component {
         const builtCard = (
           <TerraCard key={cardInd} className={classes}>
             {' '}
-            {summarySection} {sourceSection} {detailSection}{' '}
+            {summarySection}
+            {' '}
+            {sourceSection}
+            {' '}
+            {detailSection}
+            {' '}
             <div className={styles['suggestions-section']}>
               {' '}
-              {suggestionsSection}{' '}
-            </div>{' '}
-            <div className={styles['links-section']}> {linksSection} </div>{' '}
+              {suggestionsSection}
+              {' '}
+            </div>
+            {' '}
+            <div className={styles['links-section']}>
+              {' '}
+              {linksSection}
+              {' '}
+            </div>
+            {' '}
           </TerraCard>
         );
 
@@ -290,7 +309,13 @@ export class CardList extends Component {
     if (renderedCards.length === 0) {
       return <div> No Cards </div>;
     }
-    return <div> {renderedCards} </div>;
+    return (
+      <div>
+        {' '}
+        {renderedCards}
+        {' '}
+      </div>
+    );
   }
 }
 
@@ -308,7 +333,7 @@ const mapStateToProps = (state, ownProps) => ({
   launchLinks: state.serviceExchangeState.launchLinks,
 });
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
   takeSuggestion: (suggestion) => {
     dispatch(takeSuggestion(suggestion));
   },

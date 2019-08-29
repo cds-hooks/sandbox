@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import CodeMirror from 'react-codemirror';
 import 'codemirror/mode/javascript/javascript';
-import 'codemirror/lib/codemirror.css';
-import 'codemirror/addon/lint/lint.css';
+// import 'codemirror/lib/codemirror.css';
+// import 'codemirror/addon/lint/lint.css';
 
 import Button from 'terra-button';
 import Text from 'terra-text';
@@ -45,8 +45,8 @@ export class CardDemo extends Component {
     return {
       summary: 'Example Card',
       indicator: 'info',
-      detail: 'Add an XYZ complimentary medication OR switch patient order to ABC. ' +
-                'See SMART app for more details.',
+      detail: 'Add an XYZ complimentary medication OR switch patient order to ABC. '
+                + 'See SMART app for more details.',
       source: {
         label: 'Medicine Library',
         url: 'https://example.com',
@@ -138,12 +138,14 @@ export class CardDemo extends Component {
       ],
     };
 
-    const cardDisplay = (!this.state.displayJSONError && this.props.tempUserJson) ?
-      (<CardList
-        isDemoCard
-        takeSuggestion={() => { console.log('Take suggestion'); }}
-        cardResponses={constructedCardFormat}
-      />) : null;
+    const cardDisplay = (!this.state.displayJSONError && this.props.tempUserJson)
+      ? (
+        <CardList
+          isDemoCard
+          takeSuggestion={() => { console.log('Take suggestion'); }}
+          cardResponses={constructedCardFormat}
+        />
+      ) : null;
 
     return (
       <div className={styles['app-main']}>
@@ -184,11 +186,11 @@ export class CardDemo extends Component {
   }
 }
 
-const mapStateToProps = store => ({
+const mapStateToProps = (store) => ({
   tempUserJson: store.cardDemoState.tempUserJson,
 });
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
   storeTempCardResponse: (card) => {
     dispatch(storeCardDemoJson(card));
   },

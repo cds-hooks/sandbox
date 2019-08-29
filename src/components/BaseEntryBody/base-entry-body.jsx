@@ -55,7 +55,8 @@ const BaseEntryBody = ({
   if (currentFhirServer) {
     fhirServerDisplay = (
       <div>
-        <Text weight={400} fontSize={16}>Current FHIR server</Text><br />
+        <Text weight={400} fontSize={16}>Current FHIR server</Text>
+        <br />
         <Text weight={200} fontSize={14}>{currentFhirServer}</Text>
       </div>
     );

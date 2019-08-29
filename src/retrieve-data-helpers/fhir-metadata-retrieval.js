@@ -17,9 +17,9 @@ function retrieveFhirMetadata(testUrl) {
     // Lastly, use the default FHIR server URL and set that as the current FHIR server
     if (!testFhirServer) {
       const parsed = queryString.parse(window.location.search);
-      testFhirServer = parsed.fhirServiceUrl ||
-        localStorage.getItem('PERSISTED_fhirServer') ||
-        store.getState().fhirServerState.defaultFhirServer;
+      testFhirServer = parsed.fhirServiceUrl
+        || localStorage.getItem('PERSISTED_fhirServer')
+        || store.getState().fhirServerState.defaultFhirServer;
     }
     const headers = { Accept: 'application/json' };
     store.dispatch(setTestFhirServer(testFhirServer));
@@ -35,7 +35,7 @@ function retrieveFhirMetadata(testUrl) {
         method: 'get',
         url: `${testFhirServer}/Patient`,
         headers,
-        validateStatus: status => status !== 401,
+        validateStatus: (status) => status !== 401,
       }).then(() => {
         if (metadataResult.data && Object.keys(metadataResult.data).length) {
           store.dispatch(signalSuccessFhirServerRetrieval(testFhirServer, metadataResult.data));
@@ -44,8 +44,8 @@ function retrieveFhirMetadata(testUrl) {
         return reject();
       }).catch((err) => {
         if (err.response && err.response.status === 401) {
-          console.error('Cannot use secured FHIR endpoint on an open-launched Sandbox. See https://github.com/cds-hooks/sandbox#testing-w-secured-fhir-servers' +
-          ' for more details on testing the Sandbox against a secured FHIR endpoint.');
+          console.error('Cannot use secured FHIR endpoint on an open-launched Sandbox. See https://github.com/cds-hooks/sandbox#testing-w-secured-fhir-servers'
+          + ' for more details on testing the Sandbox against a secured FHIR endpoint.');
         } else {
           console.error('Could not connect to metadata endpoint of the FHIR server', err);
         }

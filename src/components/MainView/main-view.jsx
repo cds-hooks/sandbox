@@ -126,34 +126,31 @@ export class MainView extends Component {
     // Execute the SMART app launch sequence to grab a FHIR access token and SMART context (if applicable)
     await smartLaunchPromise().catch(async () => {
       // SMART app launch not needed: Grab the default FHIR server
-      await retrieveFhirMetadata().catch(err =>
-        new Promise((resolve) => {
-          let fhirErrorResponse = this.state.fhirServerInitialError;
-          if (err && err.response && err.response.status === 401) {
-            fhirErrorResponse =
-                'Cannot configure secured FHIR endpoints. Please use an open (unsecured) FHIR endpoint.';
-          }
-          // Open a Change FHIR Server modal for manual input if default FHIR server fails
-          this.setState({
-            fhirServerPrompt: true,
-            fhirServerPromptHold: resolve,
-            fhirServerInitialError: fhirErrorResponse,
-          });
-        }));
+      await retrieveFhirMetadata().catch((err) => new Promise((resolve) => {
+        let fhirErrorResponse = this.state.fhirServerInitialError;
+        if (err && err.response && err.response.status === 401) {
+          fhirErrorResponse = 'Cannot configure secured FHIR endpoints. Please use an open (unsecured) FHIR endpoint.';
+        }
+        // Open a Change FHIR Server modal for manual input if default FHIR server fails
+        this.setState({
+          fhirServerPrompt: true,
+          fhirServerPromptHold: resolve,
+          fhirServerInitialError: fhirErrorResponse,
+        });
+      }));
     });
     if (this.state.fhirServerPrompt) {
       this.setState({ fhirServerPrompt: false });
     }
 
     // Retrieve the patient in context
-    await retrievePatient().catch(() =>
-      new Promise((resolve) => {
-        // Open a Change Patient modal for manual input if default patient ID fails against configured FHIR server
-        this.setState({
-          patientPrompt: true,
-          patientPromptHold: resolve,
-        });
-      }));
+    await retrievePatient().catch(() => new Promise((resolve) => {
+      // Open a Change Patient modal for manual input if default patient ID fails against configured FHIR server
+      this.setState({
+        patientPrompt: true,
+        patientPromptHold: resolve,
+      });
+    }));
     if (this.state.patientPrompt) {
       this.setState({ patientPrompt: false });
     }
@@ -263,13 +260,13 @@ export class MainView extends Component {
 
 MainView.propTypes = propTypes;
 
-const mapStateToProps = store => ({
+const mapStateToProps = (store) => ({
   screen: store.hookState.currentScreen,
   isLoadingData: store.hookState.isLoadingData,
   isCardDemoView: store.cardDemoState.isCardDemoView,
 });
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
   setLoadingStatus: (status) => {
     dispatch(setLoadingStatus(status));
   },

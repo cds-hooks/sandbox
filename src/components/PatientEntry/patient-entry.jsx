@@ -112,11 +112,14 @@ export class PatientEntry extends Component {
     const footerContainer = (
       <div className={styles['right-align']}>
         <Button text="Save" variant="emphasis" onClick={this.handleSubmit} />
-        {this.props.isEntryRequired ? '' :
-        <Spacer marginLeft="small" isInlineBlock>
-          <Button text="Cancel" onClick={this.handleCloseModal} />
-        </Spacer>}
-      </div>);
+        {this.props.isEntryRequired ? ''
+          : (
+            <Spacer marginLeft="small" isInlineBlock>
+              <Button text="Cancel" onClick={this.handleCloseModal} />
+            </Spacer>
+          )}
+      </div>
+    );
 
     return (
       <div>
@@ -151,7 +154,7 @@ export class PatientEntry extends Component {
 
 PatientEntry.propTypes = propTypes;
 
-const mapStateToProps = store => ({
+const mapStateToProps = (store) => ({
   currentFhirServer: store.fhirServerState.currentFhirServer,
   currentPatientId: store.patientState.currentPatient.id,
 });

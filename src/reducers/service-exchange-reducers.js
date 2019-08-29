@@ -44,24 +44,23 @@ const serviceExchangeReducers = (state = initialState, action) => {
       // Select a CDS Service to display exchange context for
       case types.SELECT_SERVICE_CONTEXT: {
         if (action.service && state.selectedService !== action.service) {
-          return Object.assign({}, state, { selectedService: action.service });
+          return { ...state, selectedService: action.service };
         }
         break;
       }
 
       // Remove any CDS Service exchanges from the store
       case types.RESET_SERVICES: {
-        return Object.assign({}, state, {
+        return {
+          ...state,
           selectedService: '',
           exchanges: {},
-        });
+        };
       }
 
       // If the selected service in the CDS developer panel is toggled under the Configure CDS Services modal, then clear that selected service
       case types.TOGGLE_SERVICE: {
-        return Object.assign({}, state, {
-          selectedService: state.selectedService === action.service ? '' : state.selectedService,
-        });
+        return { ...state, selectedService: state.selectedService === action.service ? '' : state.selectedService };
       }
 
       // Delete any CDS service exchanges if a service is deleted from the Configure CDS Services modal
@@ -69,18 +68,17 @@ const serviceExchangeReducers = (state = initialState, action) => {
         if (state.exchanges[action.service]) {
           const exchangesCopy = JSON.parse(JSON.stringify(state.exchanges));
           delete exchangesCopy[action.service];
-          return Object.assign({}, state, {
+          return {
+            ...state,
             exchanges: exchangesCopy,
             selectedService: state.selectedService === action.service ? '' : state.selectedService,
-          });
+          };
         }
         break;
       }
       // Clear the selected service to display request/response for when the view changes
       case types.SET_HOOK: {
-        return Object.assign({}, state, {
-          selectedService: '',
-        });
+        return { ...state, selectedService: '' };
       }
 
       default: {

@@ -27,9 +27,9 @@ function retrievePatient(testPatient) {
       headers.Authorization = `Bearer ${accessToken.access_token}`;
     } else if (!patient) {
       const parsed = queryString.parse(window.location.search);
-      patient = parsed.patientId ||
-        localStorage.getItem('PERSISTED_patientId') ||
-        store.getState().patientState.defaultPatientId;
+      patient = parsed.patientId
+        || localStorage.getItem('PERSISTED_patientId')
+        || store.getState().patientState.defaultPatientId;
     }
     axios({
       method: 'get',

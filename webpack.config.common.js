@@ -1,14 +1,25 @@
 const webpack = require('webpack');
 const path = require('path');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
-const I18nAggregatorPlugin = require('terra-i18n-plugin');
-const i18nSupportedLocales = require('terra-i18n/lib/i18nSupportedLocales');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const Autoprefixer = require('autoprefixer');
 const CustomProperties = require('postcss-custom-properties');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const BUILD_DIR = path.resolve(__dirname, './build');
 const SRC_DIR = path.resolve(__dirname, './src');
+
+const aggregateTranslations = require('terra-aggregate-translations');
+
+const aggregateOptions = {
+    baseDir: __dirname,
+    excludes: [''],
+    locales: ['en', 'en-US'],
+    format: 'es6',
+};
+
+aggregateTranslations(aggregateOptions);
+
+
 
 const globalCss = [
   /node_modules\/terra-icon\/lib\/Icon/,
@@ -20,52 +31,22 @@ const codeMirrorCss = [
   path.resolve(path.resolve(__dirname), 'node_modules/codemirror/addon/lint/'),
 ];
 
-const cssLoaderNoModules = {
-  loader: 'css-loader',
-  options: {
-    sourceMap: true,
-    importLoaders: 2,
-    localIdentName: '[name]__[local]___[hash:base64:5]',
-  },
-};
-
-const cssLoaderWithModules = Object.assign({}, cssLoaderNoModules, { 
-  options: {
-    modules: true,
-    sourceMap: true,
-    importLoaders: 2,
-    localIdentName: '[name]__[local]___[hash:base64:5]',
-  },
-});
-
 const postCssLoader = {
   loader: 'postcss-loader',
   options: {
     plugins() {
       return [
-        Autoprefixer({
-          browsers: [
-            'ie >= 10',
-            'last 2 versions',
-            'last 2 android versions',
-            'last 2 and_chr versions',
-            'iOS >= 8',
-          ],
-        }),
+        Autoprefixer(),
         CustomProperties(),
       ];
     },
   },
 };
 
-const sassLoader = {
-  loader: 'sass-loader',
-};
-
 const config = {
   entry: {
-    app: ['babel-polyfill', `${SRC_DIR}/index.jsx`],
-    'smart-launch': ['babel-polyfill', `${SRC_DIR}/retrieve-data-helpers/smart-authorize.js`],
+    app: ['@babel/polyfill', `${SRC_DIR}/index.jsx`],
+    'smart-launch': ['@babel/polyfill', `${SRC_DIR}/retrieve-data-helpers/smart-authorize.js`],
   },
   output: {
     path: BUILD_DIR,
@@ -77,35 +58,35 @@ const config = {
     modules: [path.resolve(__dirname, 'aggregated-translations'), 'node_modules'],
   },
   module: {
-    rules: [
-      {
-        test: /\.(scss|css)$/,
-        include: globalCss,
-        exclude: codeMirrorCss,
-        use: ExtractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: [
-            cssLoaderNoModules,
-            postCssLoader,
-            sassLoader,
-          ],
-        }),
-      },
-      {
-        test: /\.(scss|css)$/,
-        exclude: globalCss.concat(codeMirrorCss),
-        use: ExtractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: [
-            cssLoaderWithModules,
-            postCssLoader,
-            sassLoader,
-          ],
-        }),
-      },
-      {
+    rules: [{
         test: /node_modules\/.*\.css$/,
         use: ['style-loader', 'css-loader'],
+      },
+      {
+        test: /\.s?[ac]ss$/i,
+        use: [
+         'style-loader',
+         {
+            loader: 'css-loader',
+            options: {
+              importLoaders: 1,
+              modules:{
+                mode: 'local',
+              localIdentName: "[name]__[local]___[hash:base64:5]",
+              }
+            },
+          },
+          {
+            loader: 'postcss-loader',
+            options: {options: {}}
+          },
+          {
+            loader: 'sass-loader',
+            options: {
+              webpackImporter: false,
+            },
+          }
+          ],
       },
       {
         test: /\.(png|jpg|gif)$/,
@@ -135,11 +116,12 @@ const config = {
     ],
   },
   plugins: [
-    new ExtractTextPlugin('styles.css'),
-    new I18nAggregatorPlugin({
-      baseDirectory: __dirname,
-      supportedLocales: i18nSupportedLocales,
+    /*
+    new MiniCssExtractPlugin({
+      filename: 'styles.css',
+      ignoreOrder: false, // Enable to remove warnings about conflicting order
     }),
+    */
     new CopyWebpackPlugin([
       {
         from: '*.html',

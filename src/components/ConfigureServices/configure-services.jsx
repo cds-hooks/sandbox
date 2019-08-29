@@ -76,11 +76,13 @@ export class ConfigureServices extends Component {
             footer={footerContainer}
             onClose={this.handleCloseModal}
           >
-            {map(this.props.services, (service, ind) => (<ServiceDisplay
-              definition={service}
-              serviceUrl={ind}
-              key={ind}
-            />))}
+            {map(this.props.services, (service, ind) => (
+              <ServiceDisplay
+                definition={service}
+                serviceUrl={ind}
+                key={ind}
+              />
+            ))}
           </Dialog>
         </Modal>
       </div>
@@ -90,7 +92,7 @@ export class ConfigureServices extends Component {
 
 ConfigureServices.propTypes = propTypes;
 
-const mapStateToProps = store => ({
+const mapStateToProps = (store) => ({
   services: store.cdsServicesState.configuredServices,
 });
 

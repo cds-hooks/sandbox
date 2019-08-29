@@ -21,9 +21,11 @@ import PatientBanner from '../PatientBanner/patient-banner';
 import styles from './rx-view.css';
 import { createFhirResource } from '../../reducers/medication-reducers';
 
-import { storeUserMedInput, storeUserChosenMedication,
+import {
+  storeUserMedInput, storeUserChosenMedication,
   storeUserCondition,
-  storeMedDosageAmount, storeDate, toggleDate } from '../../actions/medication-select-actions';
+  storeMedDosageAmount, storeDate, toggleDate,
+} from '../../actions/medication-select-actions';
 
 cdsExecution.registerTriggerHandler('rx-view/order-select', {
   needExplicitTrigger: false,
@@ -153,11 +155,11 @@ export class RxView extends Component {
    * Update any incoming values that change for state
    */
   componentWillReceiveProps(nextProps) {
-    if (nextProps.medicationInstructions.number !== this.state.dosageAmount ||
-      nextProps.medicationInstructions.frequency !== this.state.dosageFrequency ||
-      nextProps.selectedConditionCode !== this.state.conditionCode ||
-      nextProps.prescriptionDates.start.value !== this.state.startRange.value ||
-      nextProps.prescriptionDates.end.value !== this.state.endRange.value) {
+    if (nextProps.medicationInstructions.number !== this.state.dosageAmount
+      || nextProps.medicationInstructions.frequency !== this.state.dosageFrequency
+      || nextProps.selectedConditionCode !== this.state.conditionCode
+      || nextProps.prescriptionDates.start.value !== this.state.startRange.value
+      || nextProps.prescriptionDates.end.value !== this.state.endRange.value) {
       this.setState({
         conditionCode: nextProps.selectedConditionCode,
         dosageAmount: nextProps.medicationInstructions.number,
@@ -251,7 +253,8 @@ export class RxView extends Component {
                     key={code}
                     value={code}
                     display={c.resource.code.text}
-                  />);
+                  />
+                );
               })}
             </Select>
           </Field>
@@ -265,14 +268,14 @@ export class RxView extends Component {
               onChange={this.changeMedicationInput}
             />
             <List isDivided>
-              {medicationArray.map(med =>
-                (<List.Item
+              {medicationArray.map((med) => (
+                <List.Item
                   key={med.id}
                   content={<p>{med.name}</p>}
                   isSelectable
                   onClick={() => { this.props.chooseMedication(med); }}
-                />))
-              }
+                />
+              ))}
             </List>
           </Field>
           {this.props.prescription ? <Text isItalic fontSize={16}>{this.props.prescription.name}</Text> : null}
@@ -299,11 +302,12 @@ export class RxView extends Component {
           </div>
           <div className={styles['dosage-timing']}>
             <Field
-              label={
+              label={(
                 <div>
                   Start Date
-                  <Checkbox defaultChecked isInline isLabelHidden labelText="" onChange={e => this.toggleEnabledDate(e, 'start')} />
-                </div>}
+                  <Checkbox defaultChecked isInline isLabelHidden labelText="" onChange={(e) => this.toggleEnabledDate(e, 'start')} />
+                </div>
+)}
               isInline
             >
               <DatePicker
@@ -313,11 +317,12 @@ export class RxView extends Component {
               />
             </Field>
             <Field
-              label={
+              label={(
                 <div>
                   End Date
-                  <Checkbox defaultChecked isInline isLabelHidden labelText="" onChange={e => this.toggleEnabledDate(e, 'end')} />
-                </div>}
+                  <Checkbox defaultChecked isInline isLabelHidden labelText="" onChange={(e) => this.toggleEnabledDate(e, 'end')} />
+                </div>
+)}
               isInline
             >
               <DatePicker
@@ -336,7 +341,7 @@ export class RxView extends Component {
 
 RxView.propTypes = propTypes;
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   isContextVisible: state.hookState.isContextVisible,
   patient: state.patientState.currentPatient,
   medications: state.medicationState.options[state.medicationState.medListPhase] || [],
@@ -346,7 +351,7 @@ const mapStateToProps = state => ({
   selectedConditionCode: state.medicationState.selectedConditionCode,
 });
 
-const mapDispatchToProps = dispatch => (
+const mapDispatchToProps = (dispatch) => (
   {
     onMedicationChangeInput: (input) => {
       dispatch(storeUserMedInput(input));
