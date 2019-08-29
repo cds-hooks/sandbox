@@ -1,7 +1,9 @@
+import * as types from '../actions/action-types';
+
 const initialState = {
   serviceRequest: {
-    code: '123',
-    reasonCode: '456',
+    studyCoding: {},
+    reasonCodings: [],
   },
   pamaRating: 'unknown',
 };
@@ -14,12 +16,35 @@ const reducers = (state = initialState, action) => {
         return { ...state, pamaRating: 'unknown' };
       }
 
-      case 'UPDATE_SERVICE_REQUEST': return {
+      case types.REMOVE_STUDY: return {
         ...state,
-        pamaRating: 'unknown',
         serviceRequest: {
           ...(state.serviceRequest),
-          [action.field]: action.val,
+          studyCoding: {}
+        },
+      };
+
+       case types.UPDATE_STUDY: return {
+        ...state,
+        serviceRequest: {
+          ...(state.serviceRequest),
+          studyCoding: action.coding
+        },
+      };
+
+      case types.ADD_REASON: return {
+        ...state,
+        serviceRequest: {
+          ...(state.serviceRequest),
+          reasonCodings: state.serviceRequest.reasonCodings.concat([action.coding])
+        },
+      };
+
+      case types.REMOVE_REASON: return {
+        ...state,
+        serviceRequest: {
+          ...(state.serviceRequest),
+          reasonCodings: state.serviceRequest.reasonCodings.filter(c => c.code !== action.coding.code)
         },
       };
 

@@ -1,11 +1,11 @@
 import cx from "classnames";
-import debounce from "debounce";
+import debounce from "debounce-promise";
 import lunr from "lunr";
 import React, { Component } from "react";
 import { connect } from "react-redux";
+import AsyncSelect from "react-select/async";
 
-import IconAdd from "terra-icon/lib/icon/IconAdd";
-import Select from "terra-form-select";
+import IconTrash from "terra-icon/lib/icon/IconTrash";
 import Button from "terra-button";
 
 import CardList from "../CardList/card-list";
@@ -14,8 +14,11 @@ import styles from "./pama.css";
 import cdsExecution from "../../middleware/cds-execution";
 import * as types from "../../actions/action-types";
 
-import procedures from "../../assets/pama-procedure-codes.json";
-import reasons from "../../assets/pama-reason-codes.json";
+import allProcedures from "../../assets/pama-procedure-codes.json";
+import allReasons from "../../assets/pama-reason-codes.json";
+
+const allProcedureCodings = allProcedures.expansion.contains;
+const allReasonCodings = allReasons.expansion.contains;
 
 const searchCodings = codings => {
   const idx = lunr(function() {
@@ -39,13 +42,12 @@ const searchCodings = codings => {
 
   return q =>
     idx.search(q).map(r => ({
-      ...r,
       ...byCode[r.ref]
     }));
 };
 
-const searchProcedure = searchCodings(procedures.expansion.contains);
-const searchReason = searchCodings(reasons.expansion.contains);
+const searchProcedure = searchCodings(allProcedureCodings);
+const searchReason = searchCodings(allReasonCodings);
 
 const actionToRating = action => {
   const resourceId = action.resource.id;
@@ -97,26 +99,16 @@ export const pamaTriggerHandler = {
             status: "draft",
             intent: "plan",
             code: {
-              coding: [
-                {
-                  system: "http://www.ama-assn.org/go/cpt",
-                  code: state.pama.serviceRequest.code
-                }
-              ]
+              coding: [state.pama.serviceRequest.studyCoding],
+              text: state.pama.serviceRequest.studyCoding.display
             },
             subject: {
               reference: `Patient/${state.patientState.currentPatient.id}`
             },
-            reasonCode: [
-              {
-                coding: [
-                  {
-                    system: "http://snomed.info/sct",
-                    code: state.pama.serviceRequest.reasonCode
-                  }
-                ]
-              }
-            ]
+            reasonCode: state.pama.serviceRequest.reasonCodings.map(r => ({
+              coding: [r],
+              text: r.display
+            }))
           }
         }
       ]
@@ -131,32 +123,15 @@ cdsExecution.registerTriggerHandler("pama/order-sign", {
   needExplicitTrigger: "TRIGGER_ORDER_SIGN"
 });
 
-const defaultStudyCodes = [
-  {
-    display: "Lumbar spine CT",
-    code: "72133"
-  },
-  {
-    display: "Cardiac MRI",
-    code: "75561"
-  }
-];
+const toSelectOption = coding => ({
+  label: coding.display,
+  value: coding.code,
+  data: coding
+});
 
-const defaultReasonCodes = [
-  {
-    display: "Low back pain",
-    code: "279039007"
-  },
-  {
-    display: "Congenital heart disease",
-    code: "13213009"
-  }
-];
-
-const onSearchCore = (query, haystack, onResults) => {
-  console.log("Queried", query);
+const onSearchCore = (query, haystack) => {
   const matches = haystack(query);
-  onResults(matches.slice(0, 50));
+  return Promise.resolve(matches.slice(0, 50).map(toSelectOption));
 };
 
 const onSearch = debounce(onSearchCore, 200);
@@ -165,6 +140,7 @@ export class Pama extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      studyQuery: "",
       studyCodes: [],
       reasonCodes: [],
       resultLimit: 10
@@ -173,71 +149,79 @@ export class Pama extends Component {
     this.reasonInput = React.createRef();
   }
 
-  updateField(field) {
-    return (e, v) => this.props.updateServiceRequest(field, v);
-  }
-
   render() {
     const { pamaRating } = this.props;
-    const { code, reasonCode } = this.props.serviceRequest;
-    const { studyCodes, reasonCodes } = this.state;
-    const handleSearch = (searchFn, stateKey) => e =>
-      onSearch(e.target.value, searchFn, matches =>
-        this.setState({
-          [stateKey]: matches
-        })
-      );
-
-    const addStudy = coding => {
-      this.props.updateServiceRequest('code', coding.code)
-      this.state.studyCodes = []
-    }
-
-    const addReason = coding => {
-      this.props.updateServiceRequest('reasonCode', coding.code)
-      this.state.reasonCodes = []
-    }
-
+    const { studyCoding, reasonCodings } = this.props.serviceRequest;
 
     return (
       <div className={cx(styles.pama)}>
         <h1 className={styles["view-title"]}>PAMA Imaging</h1>
         <PatientBanner />
-        <div>
-          <input
-            ref={this.studyInput}
-            placeholder="Search orders"
-            onChange={handleSearch(searchProcedure, "studyCodes")}
-            onFocus={handleSearch(searchProcedure, "studyCodes")}
-          />
-          {this.state.studyCodes
+        <AsyncSelect
+          placeholder="Search orders"
+          defaultOptions={allProcedureCodings
             .slice(0, this.state.resultLimit)
-            .map(coding => (
-              <div className={styles["choice"]} key={coding.code}>
-                <Button onClick={e => addStudy(coding)} text="Add" icon={<IconAdd />} variant="action" />
-                {coding.display} ({coding.code})
-              </div>
-            ))}
-        </div>
-        <div>
-        <input
-          ref={this.reasonInput}
-          placeholder="Search reasons"
-          onChange={handleSearch(searchReason, "reasonCodes")}
-          onFocus={handleSearch(searchReason, "reasonCodes")}
+            .map(toSelectOption)}
+          value=""
+          onChange={v => this.props.updateStudy(v.data)}
+          loadOptions={q => onSearch(q, searchProcedure)}
         />
-        {this.state.reasonCodes.slice(0, this.state.resultLimit).map(coding => (
-            <div className="choice" key={coding.code}>
-            <Button onClick={e => addReason(coding)} text="Add" icon={<IconAdd />} variant="action" />
-            {coding.display} ({coding.code})
+        {studyCoding.display && (
+          <div>
+            <ul>
+              {[studyCoding].map(r => (
+                <li>
+                  <Button
+                    text="Remove"
+                    onClick={() => this.props.removeStudy(r)}
+                    isIconOnly={true}
+                    icon={<IconTrash />}
+                    variant="action"
+                  />
+                  <span className={styles["current-selection"]}>
+                    {r.display}
+                  </span>
+                </li>
+              ))}
+            </ul>
           </div>
-        ))}
+        )}
+        <br></br>
+        <AsyncSelect
+          placeholder="Search reasons"
+          defaultOptions={allReasonCodings
+            .slice(0, this.state.resultLimit)
+            .map(toSelectOption)}
+          value=""
+          onChange={v => this.props.addReason(v.data)}
+          loadOptions={q => onSearch(q, searchReason)}
+        />
+        {reasonCodings.length > 0 && (
+          <div>
+            <ul>
+              {reasonCodings.map(r => (
+                <li>
+                  <Button
+                    text="Remove"
+                    onClick={() => this.props.removeReason(r)}
+                    isIconOnly={true}
+                    icon={<IconTrash />}
+                    variant="action"
+                  />
+                  <span className={styles["current-selection"]}>
+                    {r.display}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <div className={styles["rating-box"]}>
+          PAMA Rating: {pamaRating}
+          {{ appropriate: "✓", "not-appropriate": "⚠" }[pamaRating] || ""}
         </div>
 
-        <span>
-          PAMA Rating: {pamaRating}
-          {{ appropriate: "✓", "not-appropriate": "⚠" }[pamaRating] || "?"}
-        </span>
         <br />
         <CardList onAppLaunch={this.props.launchApp} />
       </div>
@@ -254,8 +238,17 @@ const mapDispatchToProps = dispatch => ({
       sourceWindow
     });
   },
-  updateServiceRequest(field, val) {
-    dispatch({ type: types.UPDATE_SERVICE_REQUEST, field, val });
+  addReason(reason) {
+    dispatch({ type: types.ADD_REASON, coding: reason });
+  },
+  removeReason(reason) {
+    dispatch({ type: types.REMOVE_REASON, coding: reason });
+  },
+  removeStudy(study) {
+    dispatch({ type: types.REMOVE_STUDY, coding: study });
+  },
+   updateStudy(study) {
+    dispatch({ type: types.UPDATE_STUDY, coding: study });
   },
   signOrder() {
     dispatch({ type: types.TRIGGER_ORDER_SIGN });
