@@ -19,9 +19,9 @@ const store = createStore(reducers, applyMiddleware(
   persistFhirServer,
   persistPatient,
   persistHook,
+  cds.webMessageMiddleware,
   cds.middlewareFor(cds.evaluateCdsTriggers),
   cds.middlewareFor(cds.onSystemActions),
-  cds.webMessageMiddleware,
   ...loggerMiddleware,
 ));
 export default store;

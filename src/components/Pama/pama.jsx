@@ -59,7 +59,7 @@ const actionToRating = (action) => {
       .map((rating) => ({ rating, resourceId })));
 };
 
-const dispatchUpdates = (dispatch, updates) => updates
+const dispatchRatingUpdates = (dispatch, updates) => updates
   .flatMap(actionToRating)
   .slice(0, 1)
   .forEach(({ rating, resourceId }) => dispatch({
@@ -72,14 +72,29 @@ export const pamaTriggerHandler = {
   needExplicitTrigger: false,
   onSystemActions: (systemActions, state, dispatch) => {
     const updates = systemActions.filter(({ type }) => type === 'update');
-    dispatchUpdates(dispatch, updates);
+    dispatchRatingUpdates(dispatch, updates);
   },
-  onMessage: ({ data, dispatch }) => {
+  onMessage: ({ data, dispatch, source }) => {
     const updates = [data]
       .filter(({ messageType }) => messageType === 'scratchpad.update')
       .map((m) => m.payload || {});
+    dispatchRatingUpdates(dispatch, updates);
 
-    dispatchUpdates(dispatch, updates);
+    updates.forEach(u => {
+      dispatch({
+        type: types.UPDATE_STUDY,
+        coding: u.resource.code.coding[0]
+      })
+      dispatch({
+        type: types.ADD_REASON,
+        coding: u.resource.reasonCode[0].coding[0]
+      })
+    })
+    if ([data].filter(({ messageType }) => messageType === 'ui.done').length) {
+      source.close()
+    }
+
+
   },
   generateContext: (state) => ({
     selections: ['ServiceRequest/example-request-id'],
