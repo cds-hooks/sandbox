@@ -66,7 +66,7 @@
     "terra-form-checkbox": "^2.2.0",
     "terra-form-field": "^2.1.0",
     "terra-form-input": "^1.0.0",
-    "terra-form-select": "^5.27.0",
+    "terra-form-select": "^2.8.0",
     "terra-heading": "^2.1.0",
     "terra-i18n": "^4.13.0",
     "terra-i18n-plugin": "^2.0.0",

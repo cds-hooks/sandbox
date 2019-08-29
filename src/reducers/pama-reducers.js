@@ -20,15 +20,15 @@ const reducers = (state = initialState, action) => {
         ...state,
         serviceRequest: {
           ...(state.serviceRequest),
-          studyCoding: {}
+          studyCoding: {},
         },
       };
 
-       case types.UPDATE_STUDY: return {
+      case types.UPDATE_STUDY: return {
         ...state,
         serviceRequest: {
           ...(state.serviceRequest),
-          studyCoding: action.coding
+          studyCoding: action.coding,
         },
       };
 
@@ -36,7 +36,7 @@ const reducers = (state = initialState, action) => {
         ...state,
         serviceRequest: {
           ...(state.serviceRequest),
-          reasonCodings: state.serviceRequest.reasonCodings.concat([action.coding])
+          reasonCodings: state.serviceRequest.reasonCodings.concat([action.coding]),
         },
       };
 
@@ -44,7 +44,7 @@ const reducers = (state = initialState, action) => {
         ...state,
         serviceRequest: {
           ...(state.serviceRequest),
-          reasonCodings: state.serviceRequest.reasonCodings.filter(c => c.code !== action.coding.code)
+          reasonCodings: state.serviceRequest.reasonCodings.filter((c) => c.code !== action.coding.code),
         },
       };
 
