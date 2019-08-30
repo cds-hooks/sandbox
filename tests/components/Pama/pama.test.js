@@ -2,7 +2,7 @@ import React from "react";
 import { mount, shallow } from "enzyme";
 import { Provider } from "react-redux";
 import configureStore from "redux-mock-store";
-import 'core-js/es/array/flat-map';
+import "core-js/es/array/flat-map";
 
 describe("Pama component", () => {
   let storeState;
@@ -31,15 +31,17 @@ describe("Pama component", () => {
 
   beforeEach(() => {
     storeState = {
-      patientState: { currentPatient: { id: 'patient-123' } },
+      patientState: { currentPatient: { id: "patient-123" } },
       pama: {
         serviceRequest: {
           studyCoding: {
             code: "1"
           },
-          reasonCodings:  [{
-            code: "2"
-          }]
+          reasonCodings: [
+            {
+              code: "2"
+            }
+          ]
         },
         pamaRating: "appropriate"
       }
@@ -62,42 +64,43 @@ describe("Pama component", () => {
   });
 
   it("creates hook context correctly", () => {
-    const generateContext = require("../../../src/components/Pama/pama").pamaTriggerHandler.generateContext
+    const generateContext = require("../../../src/components/Pama/pama")
+      .pamaTriggerHandler.generateContext;
     const context = generateContext(storeState);
-    expect(context.selections).toEqual(['ServiceRequest/example-request-id']);
+    expect(context.selections).toEqual(["ServiceRequest/example-request-id"]);
 
     const expectedDraftOrders = {
-      resourceType: 'Bundle',
+      resourceType: "Bundle",
       entry: [
         {
           resource: {
-            resourceType: 'ServiceRequest',
-            id: 'example-request-id',
-            status: 'draft',
-            intent: 'plan',
+            resourceType: "ServiceRequest",
+            id: "example-request-id",
+            status: "draft",
+            intent: "plan",
             code: {
               coding: [
                 {
-                  code: '1',
-                },
-              ],
+                  code: "1"
+                }
+              ]
             },
             subject: {
-              reference: 'Patient/patient-123',
+              reference: "Patient/patient-123"
             },
             reasonCode: [
               {
                 coding: [
                   {
-                    code: '2',
-                  },
-                ],
-              },
-            ],
-          },
-        },
-      ],
-    }
+                    code: "2"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    };
 
     expect(context.draftOrders).toMatchObject(expectedDraftOrders);
   });
@@ -116,6 +119,7 @@ describe("Pama component", () => {
               }
             ]
           },
+          reasonCode: [{ coding: [{ code: "123" }] }],
           extension: [
             {
               url: "http://fhir.org/argonaut/Extension/pama-rating",
@@ -132,10 +136,11 @@ describe("Pama component", () => {
       }
     };
 
-    const onMessage = require("../../../src/components/Pama/pama").pamaTriggerHandler.onMessage
-    const dispatch = jest.fn()
-    onMessage({ data, dispatch })
-    expect(dispatch).toHaveBeenCalled()
-
+    const onMessage = require("../../../src/components/Pama/pama")
+      .pamaTriggerHandler.onMessage;
+    const dispatch = jest.fn();
+    onMessage({ data, dispatch });
+    expect(dispatch).toHaveBeenCalled();
+    expect(dispatch).toHaveBeenCalledTimes(3);
   });
 });
