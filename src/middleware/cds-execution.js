@@ -150,14 +150,6 @@ const onSystemActions = (action, next, pre, post) => {
 /* eslint-disable no-unused-vars */
 const webMessageMiddleware = (store) => (next) => {
   window.addEventListener('message', ({ data, origin, source }) => {
-    console.log(
-      'Received window messaage',
-      data,
-      origin,
-      source,
-      windowsRegistered,
-      triggerHandlers,
-    );
     Object.entries(windowsRegistered)
       .filter(([windowId, w]) => w.sourceWindow === source)
       .map(([windowId, w]) => w.triggerPoint)

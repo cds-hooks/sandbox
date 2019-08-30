@@ -8,6 +8,17 @@
   width: 100%;
 }
 
+.rating-box {
+  margin-top: 1em;
+  border-radius: 5px;
+  border: 1px solid #384E77;
+  padding: 5px;
+}
+
+.current-selection {
+  padding-left: 4px;
+}
+
 .half-view {
   width: 50%;
 }

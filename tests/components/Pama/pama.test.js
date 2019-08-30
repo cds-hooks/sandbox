@@ -34,8 +34,12 @@ describe("Pama component", () => {
       patientState: { currentPatient: { id: 'patient-123' } },
       pama: {
         serviceRequest: {
-          code: "1",
-          reasonCode: "2"
+          studyCoding: {
+            code: "1"
+          },
+          reasonCodings:  [{
+            code: "2"
+          }]
         },
         pamaRating: "appropriate"
       }
@@ -74,7 +78,6 @@ describe("Pama component", () => {
             code: {
               coding: [
                 {
-                  system: 'http://www.ama-assn.org/go/cpt',
                   code: '1',
                 },
               ],
@@ -86,7 +89,6 @@ describe("Pama component", () => {
               {
                 coding: [
                   {
-                    system: 'http://snomed.info/sct',
                     code: '2',
                   },
                 ],
@@ -97,7 +99,7 @@ describe("Pama component", () => {
       ],
     }
 
-    expect(context.draftOrders).toEqual(expectedDraftOrders);
+    expect(context.draftOrders).toMatchObject(expectedDraftOrders);
   });
 
   it("Handles onMessage payloads correctly", () => {
@@ -110,7 +112,6 @@ describe("Pama component", () => {
           code: {
             coding: [
               {
-                system: "http://www.ama-assn.org/go/cpt",
                 code: "72133"
               }
             ]
@@ -121,7 +122,6 @@ describe("Pama component", () => {
               valueCodeableConcept: {
                 coding: [
                   {
-                    system: "http://fhir.org/argonaut/CodeSystem/pama-rating",
                     code: "no-criteria-apply"
                   }
                 ]
