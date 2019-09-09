@@ -52,7 +52,9 @@ export const PatientView = (props) => {
           {dob}
         </p>
       </div>
-      <CardList />
+      <CardList
+        takeSuggestion={() => { }}
+      />
     </div>
   );
 };

@@ -68,6 +68,27 @@ const dispatchRatingUpdates = (dispatch, updates) => updates
     rating,
   }));
 
+const dispatchResourceUpdate = (dispatch, update) => {
+  if (update.resource.code && update.resource.code.coding.length > 0) {
+    dispatch({
+      type: types.UPDATE_STUDY,
+      coding: update.resource.code.coding[0],
+    });
+  }
+  if (update.resource.reasonCode && update.resource.reasonCode.length > 0) {
+    dispatch({
+      type: types.ADD_REASON,
+      coding: update.resource.reasonCode[0].coding[0],
+    });
+  }
+};
+
+const dispatchResourceSuggestedActions = (dispatch, suggestion) => suggestion.actions.forEach((a) => {
+  if (a.type === 'create' || a.type === 'update') {
+    dispatchResourceUpdate(dispatch, a);
+  }
+});
+
 export const pamaTriggerHandler = {
   needExplicitTrigger: false,
   onSystemActions: (systemActions, state, dispatch) => {
@@ -81,19 +102,9 @@ export const pamaTriggerHandler = {
     dispatchRatingUpdates(dispatch, updates);
 
     updates.forEach((u) => {
-      if (u.resource.code && u.resource.code.coding.length > 0) {
-        dispatch({
-          type: types.UPDATE_STUDY,
-          coding: u.resource.code.coding[0],
-        });
-      }
-      if (u.resource.reasonCode && u.resource.reasonCode.length > 0) {
-        dispatch({
-          type: types.ADD_REASON,
-          coding: u.resource.reasonCode[0].coding[0],
-        });
-      }
+      dispatchResourceUpdate(dispatch, u);
     });
+
     if ([data].filter(({ messageType }) => messageType === 'ui.done').length) {
       source.close();
     }
@@ -233,7 +244,10 @@ export class Pama extends Component {
         </div>
 
         <br />
-        <CardList onAppLaunch={this.props.launchApp} />
+        <CardList
+          takeSuggestion={this.props.takeSuggestion}
+          onAppLaunch={this.props.launchApp}
+        />
       </div>
     );
   }
@@ -262,6 +276,9 @@ const mapDispatchToProps = (dispatch) => ({
   },
   signOrder() {
     dispatch({ type: types.TRIGGER_ORDER_SIGN });
+  },
+  takeSuggestion(suggestion) {
+    dispatchResourceSuggestedActions(dispatch, suggestion);
   },
 });
 
