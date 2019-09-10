@@ -48,9 +48,9 @@ const searchCodings = (codings) => {
 const searchProcedure = searchCodings(allProcedureCodings);
 const searchReason = searchCodings(allReasonCodings);
 
-const actionToRating = (action) => {
-  const resourceId = action.resource.id;
-  return (action.resource.extension || [])
+const resourceToRating = (resource) => {
+  const resourceId = resource.id;
+  return (resource.extension || [])
     .filter(
       ({ url }) => url === 'http://fhir.org/argonaut/Extension/pama-rating',
     )
@@ -60,7 +60,8 @@ const actionToRating = (action) => {
 };
 
 const dispatchRatingUpdates = (dispatch, updates) => updates
-  .flatMap(actionToRating)
+  .map((action) => action.resource)
+  .flatMap(resourceToRating)
   .slice(0, 1)
   .forEach(({ rating, resourceId }) => dispatch({
     type: types.APPLY_PAMA_RATING,
@@ -68,26 +69,29 @@ const dispatchRatingUpdates = (dispatch, updates) => updates
     rating,
   }));
 
-const dispatchResourceUpdate = (dispatch, update) => {
-  if (update.resource.code && update.resource.code.coding.length > 0) {
-    dispatch({
-      type: types.UPDATE_STUDY,
-      coding: update.resource.code.coding[0],
-    });
-  }
-  if (update.resource.reasonCode && update.resource.reasonCode.length > 0) {
-    dispatch({
-      type: types.ADD_REASON,
-      coding: update.resource.reasonCode[0].coding[0],
-    });
-  }
+const dispatchResourceUpdate = (dispatch, resource) => {
+  const { rating } = resourceToRating(resource)[0];
+  const studyCoding = resource.code.coding[0];
+  const reasonCodings = resource.reasonCode.map((c) => c.coding[0]);
+
+  dispatch({
+    type: types.UPDATE_IMAGING_ORDER,
+    pamaRating: rating,
+    studyCoding,
+    reasonCodings,
+  });
 };
 
-const dispatchResourceSuggestedActions = (dispatch, suggestion) => suggestion.actions.forEach((a) => {
-  if (a.type === 'create' || a.type === 'update') {
-    dispatchResourceUpdate(dispatch, a);
-  }
-});
+const dispatchResourceUpdates = (dispatch, resources) => resources
+  .forEach((r) => dispatchResourceUpdate(dispatch, r));
+
+const dispatchSuggestedUpdates = (dispatch, suggestion) => {
+  const updates = suggestion.actions
+    .filter(({ type }) => type === 'update')
+    .map((m) => m.resource || {});
+
+  dispatchResourceUpdates(dispatch, updates);
+};
 
 export const pamaTriggerHandler = {
   needExplicitTrigger: false,
@@ -98,12 +102,9 @@ export const pamaTriggerHandler = {
   onMessage: ({ data, dispatch, source }) => {
     const updates = [data]
       .filter(({ messageType }) => messageType === 'scratchpad.update')
-      .map((m) => m.payload || {});
-    dispatchRatingUpdates(dispatch, updates);
+      .map((m) => m.payload.resource || {});
 
-    updates.forEach((u) => {
-      dispatchResourceUpdate(dispatch, u);
-    });
+    dispatchResourceUpdates(dispatch, updates);
 
     if ([data].filter(({ messageType }) => messageType === 'ui.done').length) {
       source.close();
@@ -278,7 +279,7 @@ const mapDispatchToProps = (dispatch) => ({
     dispatch({ type: types.TRIGGER_ORDER_SIGN });
   },
   takeSuggestion(suggestion) {
-    dispatchResourceSuggestedActions(dispatch, suggestion);
+    dispatchSuggestedUpdates(dispatch, suggestion);
   },
 });
 

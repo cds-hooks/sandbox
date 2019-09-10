@@ -141,6 +141,6 @@ describe("Pama component", () => {
     const dispatch = jest.fn();
     onMessage({ data, dispatch });
     expect(dispatch).toHaveBeenCalled();
-    expect(dispatch).toHaveBeenCalledTimes(3);
+    expect(dispatch).toHaveBeenCalledTimes(1);
   });
 });

@@ -48,10 +48,21 @@ const reducers = (state = initialState, action) => {
         },
       };
 
-      case 'APPLY_PAMA_RATING': return {
+      case types.APPLY_PAMA_RATING: return {
         ...state,
         pamaRating: action.rating,
       };
+
+      case types.UPDATE_IMAGING_ORDER: return {
+        ...state,
+        pamaRating: action.pamaRating,
+        serviceRequest: {
+          ...(state.serviceRequest),
+          studyCoding: action.studyCoding,
+          reasonCodings: action.reasonCodings,
+        },
+      };
+
       default: return state;
     }
   }
