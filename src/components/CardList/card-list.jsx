@@ -16,7 +16,6 @@ import {
   getServicesByHook,
   getCardsFromServices,
 } from '../../reducers/helpers/services-filter';
-import { takeSuggestion } from '../../actions/medication-select-actions';
 
 const propTypes = {
   /**
@@ -32,7 +31,13 @@ const propTypes = {
    * JSON response from a CDS service containing potential cards to display
    */
   cardResponses: PropTypes.object,
+  /**
+   * Function callback when an app is launched via a SMART link.
+   */
   onAppLaunch: PropTypes.func,
+  /**
+   * JSON structure allowing mapping Card links to URLs with SMART launch contexts.
+   */
   launchLinks: PropTypes.object,
 };
 
@@ -333,13 +338,6 @@ const mapStateToProps = (state, ownProps) => ({
   launchLinks: state.serviceExchangeState.launchLinks,
 });
 
-const mapDispatchToProps = (dispatch) => ({
-  takeSuggestion: (suggestion) => {
-    dispatch(takeSuggestion(suggestion));
-  },
-});
-
 export default connect(
   mapStateToProps,
-  mapDispatchToProps,
 )(CardList);

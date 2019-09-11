@@ -25,6 +25,7 @@ import {
   storeUserMedInput, storeUserChosenMedication,
   storeUserCondition,
   storeMedDosageAmount, storeDate, toggleDate,
+  takeSuggestion,
 } from '../../actions/medication-select-actions';
 
 cdsExecution.registerTriggerHandler('rx-view/order-select', {
@@ -99,6 +100,10 @@ const propTypes = {
    * Function to signal a change in the toggled status of the date (start or end)
    */
   toggleEnabledDate: PropTypes.func.isRequired,
+  /**
+   * Function callback to take a specific suggestion from a card
+   */
+  takeSuggestion: PropTypes.func.isRequired,
 };
 
 /**
@@ -333,7 +338,7 @@ export class RxView extends Component {
             </Field>
           </div>
         </form>
-        <CardList />
+        <CardList takeSuggestion={this.props.takeSuggestion} />
       </div>
     );
   }
@@ -370,6 +375,9 @@ const mapDispatchToProps = (dispatch) => (
     },
     toggleEnabledDate: (range) => {
       dispatch(toggleDate(range));
+    },
+    takeSuggestion: (suggestion) => {
+      dispatch(takeSuggestion(suggestion));
     },
   }
 );

@@ -48,9 +48,9 @@ const searchCodings = (codings) => {
 const searchProcedure = searchCodings(allProcedureCodings);
 const searchReason = searchCodings(allReasonCodings);
 
-const actionToRating = (action) => {
-  const resourceId = action.resource.id;
-  return (action.resource.extension || [])
+const resourceToRating = (resource) => {
+  const resourceId = resource.id;
+  return (resource.extension || [])
     .filter(
       ({ url }) => url === 'http://fhir.org/argonaut/Extension/pama-rating',
     )
@@ -60,13 +60,38 @@ const actionToRating = (action) => {
 };
 
 const dispatchRatingUpdates = (dispatch, updates) => updates
-  .flatMap(actionToRating)
+  .map((action) => action.resource)
+  .flatMap(resourceToRating)
   .slice(0, 1)
   .forEach(({ rating, resourceId }) => dispatch({
     type: types.APPLY_PAMA_RATING,
     resourceId,
     rating,
   }));
+
+const dispatchResourceUpdate = (dispatch, resource) => {
+  const { rating } = resourceToRating(resource)[0];
+  const studyCoding = resource.code.coding[0];
+  const reasonCodings = resource.reasonCode.map((c) => c.coding[0]);
+
+  dispatch({
+    type: types.UPDATE_IMAGING_ORDER,
+    pamaRating: rating,
+    studyCoding,
+    reasonCodings,
+  });
+};
+
+const dispatchResourceUpdates = (dispatch, resources) => resources
+  .forEach((r) => dispatchResourceUpdate(dispatch, r));
+
+export const dispatchSuggestedUpdates = (dispatch, suggestion) => {
+  const updates = suggestion.actions
+    .filter(({ type }) => type === 'update')
+    .map((m) => m.resource || {});
+
+  dispatchResourceUpdates(dispatch, updates);
+};
 
 export const pamaTriggerHandler = {
   needExplicitTrigger: false,
@@ -77,23 +102,10 @@ export const pamaTriggerHandler = {
   onMessage: ({ data, dispatch, source }) => {
     const updates = [data]
       .filter(({ messageType }) => messageType === 'scratchpad.update')
-      .map((m) => m.payload || {});
-    dispatchRatingUpdates(dispatch, updates);
+      .map((m) => m.payload.resource || {});
 
-    updates.forEach((u) => {
-      if (u.resource.code && u.resource.code.coding.length > 0) {
-        dispatch({
-          type: types.UPDATE_STUDY,
-          coding: u.resource.code.coding[0],
-        });
-      }
-      if (u.resource.reasonCode && u.resource.reasonCode.length > 0) {
-        dispatch({
-          type: types.ADD_REASON,
-          coding: u.resource.reasonCode[0].coding[0],
-        });
-      }
-    });
+    dispatchResourceUpdates(dispatch, updates);
+
     if ([data].filter(({ messageType }) => messageType === 'ui.done').length) {
       source.close();
     }
@@ -233,7 +245,10 @@ export class Pama extends Component {
         </div>
 
         <br />
-        <CardList onAppLaunch={this.props.launchApp} />
+        <CardList
+          takeSuggestion={this.props.takeSuggestion}
+          onAppLaunch={this.props.launchApp}
+        />
       </div>
     );
   }
@@ -262,6 +277,9 @@ const mapDispatchToProps = (dispatch) => ({
   },
   signOrder() {
     dispatch({ type: types.TRIGGER_ORDER_SIGN });
+  },
+  takeSuggestion(suggestion) {
+    dispatchSuggestedUpdates(dispatch, suggestion);
   },
 });
 
