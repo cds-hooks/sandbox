@@ -142,5 +142,70 @@ describe("Pama component", () => {
     onMessage({ data, dispatch });
     expect(dispatch).toHaveBeenCalled();
     expect(dispatch).toHaveBeenCalledTimes(1);
+    expect(dispatch).toHaveBeenCalledWith({
+      type: 'UPDATE_IMAGING_ORDER',
+      pamaRating: 'no-criteria-apply',
+      studyCoding: {
+        code: '72133',
+      },
+      reasonCodings: [
+        {
+          code: '123',
+        },
+      ],
+    });
+  });
+
+  it("Handles applying a suggested update correctly", () => {
+    const suggestion = {
+      actions: [
+        {
+          type: "update",
+          resource: {
+            resourceType: "ServiceRequest",
+            id: "example-request-id",
+            code: {
+              coding: [
+                {
+                  code: "72133"
+                }
+              ]
+            },
+            reasonCode: [{ coding: [{ code: "123" }] }],
+            extension: [
+              {
+                url: "http://fhir.org/argonaut/Extension/pama-rating",
+                valueCodeableConcept: {
+                  coding: [
+                    {
+                      code: "no-criteria-apply"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ],
+    };
+
+    const takeSuggestion = require("../../../src/components/Pama/pama")
+      .dispatchSuggestedUpdates;
+    const dispatch = jest.fn();
+    takeSuggestion(dispatch, suggestion);
+    expect(dispatch).toHaveBeenCalled();
+    expect(dispatch).toHaveBeenCalledTimes(1);
+    expect(dispatch).toHaveBeenCalledWith({
+      type: 'UPDATE_IMAGING_ORDER',
+      pamaRating: 'no-criteria-apply',
+      studyCoding: {
+        code: '72133',
+      },
+      reasonCodings: [
+        {
+          code: '123',
+        },
+      ],
+    });
   });
 });

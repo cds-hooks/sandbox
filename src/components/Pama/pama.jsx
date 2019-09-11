@@ -85,7 +85,7 @@ const dispatchResourceUpdate = (dispatch, resource) => {
 const dispatchResourceUpdates = (dispatch, resources) => resources
   .forEach((r) => dispatchResourceUpdate(dispatch, r));
 
-const dispatchSuggestedUpdates = (dispatch, suggestion) => {
+export const dispatchSuggestedUpdates = (dispatch, suggestion) => {
   const updates = suggestion.actions
     .filter(({ type }) => type === 'update')
     .map((m) => m.resource || {});
