@@ -19,8 +19,6 @@ const aggregateOptions = {
 
 aggregateTranslations(aggregateOptions);
 
-
-
 const globalCss = [
   /node_modules\/terra-icon\/lib\/Icon/,
   /node_modules\/terra-date-picker/,
@@ -58,35 +56,55 @@ const config = {
     modules: [path.resolve(__dirname, 'aggregated-translations'), 'node_modules'],
   },
   module: {
-    rules: [{
-        test: /node_modules\/.*\.css$/,
-        use: ['style-loader', 'css-loader'],
-      },
+    rules: [
       {
         test: /\.s?[ac]ss$/i,
+        include: globalCss,
+        exclude: codeMirrorCss,
         use: [
          'style-loader',
          {
             loader: 'css-loader',
             options: {
               importLoaders: 1,
-              modules:{
-                mode: 'local',
-              localIdentName: "[name]__[local]___[hash:base64:5]",
-              }
             },
           },
-          {
-            loader: 'postcss-loader',
-            options: {options: {}}
-          },
+          postCssLoader,
           {
             loader: 'sass-loader',
             options: {
               webpackImporter: false,
             },
           }
-          ],
+        ],
+      },
+      {
+        test: /\.s?[ac]ss$/i,
+        exclude: globalCss.concat(codeMirrorCss),
+        use: [
+         'style-loader',
+         {
+            loader: 'css-loader',
+            options: {
+              importLoaders: 1,
+              modules: {
+                mode: 'local',
+                localIdentName: '[name]__[local]___[hash:base64:5]',
+              }
+            },
+          },
+          postCssLoader,
+          {
+            loader: 'sass-loader',
+            options: {
+              webpackImporter: false,
+            },
+          }
+        ],
+      },
+      {
+        test: /node_modules\/.*\.css$/,
+        use: ['style-loader', 'css-loader'],
       },
       {
         test: /\.(png|jpg|gif)$/,
@@ -116,12 +134,10 @@ const config = {
     ],
   },
   plugins: [
-    /*
     new MiniCssExtractPlugin({
       filename: 'styles.css',
       ignoreOrder: false, // Enable to remove warnings about conflicting order
     }),
-    */
     new CopyWebpackPlugin([
       {
         from: '*.html',

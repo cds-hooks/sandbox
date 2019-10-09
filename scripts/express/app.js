@@ -9,4 +9,4 @@ const port = process.env.PORT || 8081;
 const buildPath = path.join(__dirname, '../../build');
 
 app.use(express.static(buildPath));
-app.listen(port);
+app.listen(port, () => console.log(`Project is running at http://localhost:${port}/`));
