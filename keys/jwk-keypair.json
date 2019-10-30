@@ -2,13 +2,13 @@
   "keys": [
     {
       "kty": "EC",
-      "d": "_DM2VJ_ZJSF6bIZD6KuqWX1uxn6VGQkIoEJVk7kP4A4",
+      "d": "yOcYl9QzMKnBFUiPZKBijDV_lsEtn6oWFVOqtFyXbY_-V63WCBYYdxsLo9Pclr84",
       "use": "sig",
-      "crv": "P-256",
-      "kid": "d9cd3c4f-eb08-4304-b973-44f352fd2ca2",
-      "x": "QWI9fI8TcNtdikhVs_M1N_Szb7BOj19etvIKfrQMa9k",
-      "y": "jDkhk_Z2RZZ5L5rN4vd1_i-RJLn3EfEhDcy7iFBg--I",
-      "alg": "ES256"
+      "crv": "P-384",
+      "kid": "44823f3d-0b01-4a6c-a80e-b9d3e8a7226f",
+      "x": "dw_JGR8nB2I6XveNxUOl2qk699ZPLM2nYI5STSdiEl9avAkrm3CkfYMbrrjr8laB",
+      "y": "Sm3mLE-n1zYNla_aiE3cb3nZsL51RbC7ysw3q8aJLxGm-hx79RPMYpITDjp7kgzy",
+      "alg": "ES384"
     }
   ]
 }

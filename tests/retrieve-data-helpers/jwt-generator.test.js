@@ -1,5 +1,3 @@
-import { productionClientId } from '../../src/config/fhir-config';
-
 describe('JWT Generator', () => {
   let generateJWT;
   let signedJwtMock = '1234';
@@ -24,7 +22,6 @@ describe('JWT Generator', () => {
     const audience = 'http://example-services.com/cds-services/1';
     const expectedPayload = JSON.stringify({
       iss: `https://sandbox.cds-hooks.org`,
-      sub: productionClientId,
       aud: audience,
       exp: Math.round((Date.now() / 1000) + 300),
       iat: Math.round((Date.now() / 1000)),
@@ -32,9 +29,9 @@ describe('JWT Generator', () => {
     });
 
     const expectedHeader = JSON.stringify({
-      alg: 'ES256',
+      alg: 'ES384',
       typ: 'JWT',
-      kid: 'd9cd3c4f-eb08-4304-b973-44f352fd2ca2',
+      kid: '44823f3d-0b01-4a6c-a80e-b9d3e8a7226f',
       jku: 'https://sandbox.cds-hooks.org/.well-known/jwks.json'
     });
     expect(generateJWT(audience)).toEqual(signedJwtMock);

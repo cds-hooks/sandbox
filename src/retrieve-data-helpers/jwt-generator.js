@@ -1,5 +1,4 @@
 import privKey from '../../keys/ecprivkey.pem';
-import { productionClientId } from '../config/fhir-config';
 
 const JWT = require('jsrsasign');
 const uuid = require('uuid/v4');
@@ -14,7 +13,6 @@ const uuid = require('uuid/v4');
 function generateJWT(audience) {
   const jwtPayload = JSON.stringify({
     iss: 'https://sandbox.cds-hooks.org',
-    sub: productionClientId,
     aud: audience,
     exp: Math.round((Date.now() / 1000) + 300),
     iat: Math.round((Date.now() / 1000)),
@@ -22,9 +20,9 @@ function generateJWT(audience) {
   });
 
   const jwtHeader = JSON.stringify({
-    alg: 'ES256',
+    alg: 'ES384',
     typ: 'JWT',
-    kid: 'd9cd3c4f-eb08-4304-b973-44f352fd2ca2',
+    kid: '44823f3d-0b01-4a6c-a80e-b9d3e8a7226f',
     jku: 'https://sandbox.cds-hooks.org/.well-known/jwks.json',
   });
 
