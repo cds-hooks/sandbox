@@ -76,7 +76,7 @@ export function toggleDate(range) {
  * Takes action on the user-clicked suggestion from a card. The suggestion will be the suggestion chosen
  * from the CDS service response (exact format from specification).
  *
- * @param {*} suggestion - Object containing the suggestion chosen from the user (see format here: http://cds-hooks.org/specification/1.0/#suggestion)
+ * @param {*} suggestion - Object containing the suggestion chosen from the user (see format here: https://cds-hooks.org/specification/current/#suggestion)
  */
 export function takeSuggestion(suggestion) {
   return {
