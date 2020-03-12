@@ -52,13 +52,14 @@ class MessagePanel extends Component {
   replyMessage(event) {
     let payloadStructure;
 
-    if (event.data.messageType.includes('scratchpad.')) {
+    const messageTarget = event.data.messageType.split('.');
+    if (messageTarget[0] === 'scratchpad') {
       payloadStructure = {
         status: 200,
         location: 'https://resource-location/',
         outcome: 'Success',
       };
-    } else if (event.data.messageType.includes('ui.')) {
+    } else if (messageTarget[0] === 'ui') {
       payloadStructure = {
         success: true,
         details: 'Success',
@@ -74,32 +75,44 @@ class MessagePanel extends Component {
     event.source.postMessage(msgStructure, event.origin);
   }
 
-  addMessage(event) {
+  isActionableMessage(event) {
+    // Ignore the event, if it doesn't meet our expectations.
+    if (!event.data) return false;
+    if (event.data.source === "react-devtools-bridge") return false;
+
+    // TODO: why do the following check?
     if (event.origin.includes(document.domain)) {
       console.log(`Received message from ${event.origin} but it is the same as the current document's domain: ${document.domain}.`);
-      return;
+      return false;
     }
 
-    console.log(`Received message from ${event.origin}.`);
-
     if (!event.data.messageId) {
-      console.log('Message did not have a messageId and will be ignored.');
-      return;
+      console.log('Message has no messageId.');
+      return false;
     }
 
     if (!event.data.messageType) {
-      console.log('Message did not have a messageType and will be ignored.');
-      return;
+      console.log('Message has no messageType.');
+      return false;
     }
 
-    if (!(event.data.messageType.includes('scratchpad.') || event.data.messageType.includes('ui.'))) {
-      console.log('Message did not have a supported messageType and will be ignored.');
-      return;
+    const messageTarget = event.data.messageType.split('.');
+    if (!['scratchpad', 'ui'].includes(messageTarget[0])) {
+      console.log(`Unknown message type '${messageTarget[0]}.`);
+      return false;
     }
 
-    const message = JSON.stringify(event.data, null, 2);
-    this.setState({ messages: [...this.state.messages, message] });
-    this.replyMessage(event);
+    return true;
+  }
+
+  addMessage(event) {
+    if (this.isActionableMessage(event)) {
+      console.log('Adding a message to Message panel.', event);  // XXX
+      const message = JSON.stringify(event.data, null, 2);
+      // TODO: convert this to a stack so newer messages are on top.
+      this.setState({ messages: [...this.state.messages, message] });
+      this.replyMessage(event);
+    }
   }
 
   /**
