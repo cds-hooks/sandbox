@@ -78,27 +78,20 @@ class MessagePanel extends Component {
   isActionableMessage(event) {
     // Ignore the event, if it doesn't meet our expectations.
     if (!event.data) return false;
-    if (event.data.source === "react-devtools-bridge") return false;
-
-    // TODO: why do the following check?
-    if (event.origin.includes(document.domain)) {
-      console.log(`Received message from ${event.origin} but it is the same as the current document's domain: ${document.domain}.`);
-      return false;
-    }
+    if ((event.data.source || "").startsWith('react-devtools-')) return false;
 
     if (!event.data.messageId) {
-      console.log('Message has no messageId.');
-      return false;
+      console.warn('Message has no messageId.');
     }
 
     if (!event.data.messageType) {
-      console.log('Message has no messageType.');
+      console.warn('Message has no messageType.');
       return false;
     }
 
     const messageTarget = event.data.messageType.split('.');
     if (!['scratchpad', 'ui'].includes(messageTarget[0])) {
-      console.log(`Unknown message type '${messageTarget[0]}.`);
+      console.warn(`Unknown message type '${messageTarget[0]}.`);
       return false;
     }
 
@@ -107,7 +100,6 @@ class MessagePanel extends Component {
 
   addMessage(event) {
     if (this.isActionableMessage(event)) {
-      console.log('Adding a message to Message panel.', event);  // XXX
       const message = JSON.stringify(event.data, null, 2);
       // TODO: convert this to a stack so newer messages are on top.
       this.setState({ messages: [...this.state.messages, message] });

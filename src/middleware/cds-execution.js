@@ -150,7 +150,6 @@ const onSystemActions = (action, next, pre, post) => {
 /* eslint-disable no-unused-vars */
 const webMessageMiddleware = (store) => (next) => {
   window.addEventListener('message', ({ data, origin, source }) => {
-//    console.log('CDS IN ACTION', data, origin, source);
     Object.entries(windowsRegistered)
       .filter(([windowId, w]) => w.sourceWindow === source && w.origin === origin)
       .map(([windowId, w]) => w.triggerPoint)
