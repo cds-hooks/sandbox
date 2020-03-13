@@ -82,6 +82,7 @@ class MessagePanel extends Component {
 
     if (!event.data.messageId) {
       console.warn('Message has no messageId.');
+      return false;
     }
 
     if (!event.data.messageType) {

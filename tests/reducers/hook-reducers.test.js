@@ -37,7 +37,7 @@ describe('Hook Reducer', () => {
         link: {
           url: 'http://localhost:8080/foo/bar/ignored',
         },
-        sourceWindow: 'abcdefgh-ijklm-nopqrstuvwxyz',
+        sourceWindow: 'abcdefgh-ijkl-mnop-qrst-uvwxyz012345',
       };
       const expectedApp = {
         triggerPoint: action.triggerPoint,
