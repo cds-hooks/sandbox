@@ -102,7 +102,7 @@ class MessagePanel extends Component {
   addMessage(event) {
     if (this.isActionableMessage(event)) {
       const message = JSON.stringify(event.data, null, 2);
-      // TODO: convert this to a stack so newer messages are on top.
+      // TODO(issue#129): convert this to a stack so newer messages are on top.
       this.setState({ messages: [...this.state.messages, message] });
       this.replyMessage(event);
     }
