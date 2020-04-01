@@ -6,6 +6,7 @@ describe('Hook Reducer', () => {
 
   beforeEach(() => {
     state = {
+      apps: [],
       currentHook: 'patient-view',
       isLoadingData: false,
       isContextVisible: true,
@@ -26,6 +27,28 @@ describe('Hook Reducer', () => {
       const newState = Object.assign({}, state, { isLoadingData: action.isLoaderOn});
       expect(reducer(state, action)).toEqual(newState);
     });
+  });
+
+  describe('LAUNCH_SMART_APP', () => {
+    it('should extract the origin from a link url', () => {
+      const action = {
+        type: types.LAUNCH_SMART_APP,
+        triggerPoint: 'patient-view',
+        link: {
+          url: 'http://localhost:8080/foo/bar/ignored',
+        },
+        sourceWindow: 'abcdefgh-ijkl-mnop-qrst-uvwxyz012345',
+      };
+      const expectedApp = {
+        triggerPoint: action.triggerPoint,
+        link: action.link,
+        linkOrigin: 'http://localhost:8080',
+        windowId: 0,
+      };
+      const expected = Object.assign({}, state, { apps: [ expectedApp ] });
+      const actual = reducer(state, action);
+      expect(actual).toEqual(expected);
+    })
   });
 
   describe('SET_CONTEXT_VISIBILITY', () => {

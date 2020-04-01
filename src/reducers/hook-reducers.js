@@ -49,9 +49,10 @@ const hookReducers = (state = initialState, action) => {
         return { ...state, isLoadingData: action.isLoaderOn };
       }
       case types.LAUNCH_SMART_APP: {
+        const url = new URL(action.link.url);
         const { windowId } = cdsExecution.registerWindow(
           action.triggerPoint,
-          action.link,
+          url.origin,
           action.sourceWindow,
         );
         return {
@@ -61,6 +62,7 @@ const hookReducers = (state = initialState, action) => {
             {
               triggerPoint: action.triggerPoint,
               link: action.link,
+              linkOrigin: url.origin,
               windowId,
             },
           ],

@@ -45,7 +45,7 @@ describe("CDS Execution Middleware", () => {
       unregister: unregisterWindow
     } = cdsExecution.registerWindow(
       "example-trigger-point",
-      "fake-origin",
+      "",  // jsdom makes the origin look empty
       null // jsdom makes the source window look `null`
     );
 

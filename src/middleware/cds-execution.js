@@ -151,7 +151,7 @@ const onSystemActions = (action, next, pre, post) => {
 const webMessageMiddleware = (store) => (next) => {
   window.addEventListener('message', ({ data, origin, source }) => {
     Object.entries(windowsRegistered)
-      .filter(([windowId, w]) => w.sourceWindow === source)
+      .filter(([windowId, w]) => w.sourceWindow === source && w.origin === origin)
       .map(([windowId, w]) => w.triggerPoint)
       .map((triggerPoint) => triggerHandlers[triggerPoint])
       .forEach((handler) => handler.onMessage({
