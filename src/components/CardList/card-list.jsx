@@ -68,14 +68,18 @@ export class CardList extends Component {
             method: 'POST',
             url: `${serviceUrl}/feedback`,
             data: {
-              card: cardUUID,
-              outcome: 'accepted',
-              acceptedSuggestions: [
+              feedback: [
                 {
-                  id: suggestion.uuid,
+                  card: cardUUID,
+                  outcome: 'accepted',
+                  acceptedSuggestions: [
+                    {
+                      id: suggestion.uuid,
+                    },
+                  ],
+                  outcomeTimestamp: new Date().toISOString(),
                 },
               ],
-              outcomeTimestamp: new Date().toISOString(),
             },
           });
         }
