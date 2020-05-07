@@ -27,7 +27,8 @@ export function getCardsFromServices(state, serviceUrls) {
       // Check if the service response for cards is valid and has at least one card
       if (response && Object.keys(response) && response.cards && response.cards.length) {
         response.cards.forEach((card) => {
-          // Adding a serviceUrl property to each card to distinguish which card maps to which CDS Service (for suggestions analytics endpoint)
+          // Adding a serviceUrl property to each card to distinguish which card maps to which
+          // CDS Service (for feedback endpoint)
           totalCards.cards.push({ ...card, serviceUrl: url });
         });
       }

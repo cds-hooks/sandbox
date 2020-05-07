@@ -54,19 +54,33 @@ export class CardList extends Component {
   }
 
   /**
-   * Take a suggestion from a CDS service based on action on from a card. Also pings the analytics endpoint (if any) of the
-   * CDS service to notify that a suggestion was taken
+   * Take a suggestion from a CDS service based on action on from a card. Also pings the feedback
+   * endpoint of the CDS service to notify that a suggestion was taken.
    * @param {*} suggestion - CDS service-defined suggestion to take based on CDS Hooks specification
-   * @param {*} url - CDS service endpoint URL
+   * @param {*} cardUUID - UUID of the card containing the suggestion
+   * @param {*} serviceUrl - CDS service endpoint URL
    */
-  takeSuggestion(suggestion, url) {
+  takeSuggestion(suggestion, cardUUID, serviceUrl) {
     if (!this.props.isDemoCard) {
       if (suggestion.label) {
-        if (suggestion.uuid) {
+        if (suggestion.uuid && cardUUID) {
           axios({
             method: 'POST',
-            url: `${url}/analytics/${suggestion.uuid}`,
-            data: {},
+            url: `${serviceUrl}/feedback`,
+            data: {
+              feedback: [
+                {
+                  card: cardUUID,
+                  outcome: 'accepted',
+                  acceptedSuggestions: [
+                    {
+                      id: suggestion.uuid,
+                    },
+                  ],
+                  outcomeTimestamp: new Date().toISOString(),
+                },
+              ],
+            },
           });
         }
         this.props.takeSuggestion(suggestion);
@@ -240,7 +254,7 @@ export class CardList extends Component {
           suggestionsSection = card.suggestions.map((item, ind) => (
             <Button
               key={ind}
-              onClick={() => this.takeSuggestion(item, card.serviceUrl)}
+              onClick={() => this.takeSuggestion(item, card.uuid, card.serviceUrl)}
               text={item.label}
               variant={Button.Opts.Variants.EMPHASIS}
             />

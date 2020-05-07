@@ -117,7 +117,7 @@ describe('Card component', () => {
 
   it('takes a suggestion if there is a label', () => {
     shallowedComponent.find('.suggestions-section').find('Button').at(0).simulate('click', { preventDefault() {} });
-    mockAxios.onPost(`${serviceUrl}/analytics/uuid-example`).reply(200);
+    mockAxios.onPost(`${serviceUrl}/feedback`).reply(200);
     expect(takeSuggestion).toHaveBeenCalledWith(suggestion);
   });
 
