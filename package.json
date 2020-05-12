@@ -61,6 +61,7 @@
     "terra-clinical-error-view": "^1.4.0",
     "terra-content-container": "^2.4.0",
     "terra-date-picker": "^2.5.0",
+    "terra-dropdown-button": "^1.13.0",
     "terra-dialog": "^1.0.0",
     "terra-form": "^2.4.0",
     "terra-form-checkbox": "^2.2.0",

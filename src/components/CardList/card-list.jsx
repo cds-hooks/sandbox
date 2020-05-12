@@ -10,6 +10,7 @@ import axios from 'axios';
 import TerraCard from 'terra-card';
 import Text from 'terra-text';
 import Button from 'terra-button';
+import { Item, SplitButton } from 'terra-dropdown-button';
 
 import styles from './card-list.css';
 import {
@@ -93,8 +94,7 @@ export class CardList extends Component {
     }
   }
 
-  dismissCard(serviceUrl, cardUUID) {
-    console.log(`received card list dismissal for ${serviceUrl} and ${cardUUID}`);
+  dismissCard(serviceUrl, cardUUID, reason) {
     store.dispatch(dismissCard({ serviceUrl, cardUUID }));
   }
 
@@ -303,18 +303,47 @@ export class CardList extends Component {
 
         let dismissSection;
         if (card.uuid) {
-          dismissSection = (
-            <div key="dismiss">
-              <Button
-                title="Dismiss Card"
-                onClick={() => {
-                  this.dismissCard(card.serviceUrl, card.uuid);
+          const { overrideReasons } = card;
+          if (overrideReasons) {
+            console.log(`override reasons are ${JSON.stringify(overrideReasons)}`);
+            const items = overrideReasons.map((reason) => (
+              <Item
+                label={`Override: ${reason.display}`}
+                onSelect={() => {
+                  this.dismissCard(card.serviceUrl, card.uuid, reason);
                 }}
-                variant="neutral"
-                text="Dismiss"
               />
-            </div>
-          );
+            ));
+
+            dismissSection = (
+              <div key="dismiss">
+                <hr />
+                <SplitButton
+                  primaryOptionLabel="Dismiss"
+                  onSelect={() => {
+                    this.dismissCard(card.serviceUrl, card.uuid);
+                  }}
+                  variant="neutral"
+                >
+                  {items}
+                </SplitButton>
+              </div>
+            );
+          } else {
+            dismissSection = (
+              <div key="dismiss">
+                <hr />
+                <Button
+                  title="Dismiss Card"
+                  onClick={() => {
+                    this.dismissCard(card.serviceUrl, card.uuid);
+                  }}
+                  variant="neutral"
+                  text="Dismiss"
+                />
+              </div>
+            );
+          }
         }
 
         const classes = cx(
