@@ -17,6 +17,9 @@ import {
   getCardsFromServices,
 } from '../../reducers/helpers/services-filter';
 
+import store from '../../store/store';
+import { dismissCard } from '../../actions/service-exchange-actions';
+
 const propTypes = {
   /**
    * A boolean to determine if the context of this component is under the Demo Card feature of the Sandbox, or in the actual
@@ -88,6 +91,11 @@ export class CardList extends Component {
         console.error('There was no label on this suggestion', suggestion);
       }
     }
+  }
+
+  dismissCard(serviceUrl, cardUUID) {
+    console.log(`received card list dismissal for ${serviceUrl} and ${cardUUID}`);
+    store.dispatch(dismissCard({ serviceUrl, cardUUID }));
   }
 
   /**
@@ -293,6 +301,22 @@ export class CardList extends Component {
           });
         }
 
+        let dismissSection;
+        if (card.uuid) {
+          dismissSection = (
+            <div key="dismiss">
+              <Button
+                title="Dismiss Card"
+                onClick={() => {
+                  this.dismissCard(card.serviceUrl, card.uuid);
+                }}
+                variant="neutral"
+                text="Dismiss"
+              />
+            </div>
+          );
+        }
+
         const classes = cx(
           styles['decision-card'],
           styles.alert,
@@ -317,6 +341,12 @@ export class CardList extends Component {
             <div className={styles['links-section']}>
               {' '}
               {linksSection}
+              {' '}
+            </div>
+            {' '}
+            <div className={styles['dismiss-section']}>
+              {' '}
+              {dismissSection}
               {' '}
             </div>
             {' '}

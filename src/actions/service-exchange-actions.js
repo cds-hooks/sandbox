@@ -34,6 +34,14 @@ export function storeLaunchContext({ url, appContext, remappedUrl }) {
   };
 }
 
+export function dismissCard({ serviceUrl, cardUUID }) {
+  return {
+    type: types.DISMISS_CARD,
+    serviceUrl,
+    cardUUID,
+  };
+}
+
 export const createExchangeRound = (
   exchangeRound,
   currentScreen,

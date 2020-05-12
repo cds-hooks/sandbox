@@ -19,14 +19,20 @@ export function getServicesByHook(hook, services) {
  */
 export function getCardsFromServices(state, serviceUrls) {
   const totalCards = { cards: [] };
-  const { exchanges } = state.serviceExchangeState;
+  const { exchanges, hiddenCards } = state.serviceExchangeState;
   serviceUrls.forEach((url) => {
     // Check if there is a service exchange (request and response) for this service ID url
     if (exchanges[url]) {
       const { response } = exchanges[url];
+      const hiddenUUIDs = hiddenCards[url];
+
       // Check if the service response for cards is valid and has at least one card
       if (response && Object.keys(response) && response.cards && response.cards.length) {
         response.cards.forEach((card) => {
+          // Skip adding if the card has been dismissed
+          if (card.uuid && hiddenUUIDs.includes(card.uuid)) {
+            return;
+          }
           // Adding a serviceUrl property to each card to distinguish which card maps to which
           // CDS Service (for feedback endpoint)
           totalCards.cards.push({ ...card, serviceUrl: url });
