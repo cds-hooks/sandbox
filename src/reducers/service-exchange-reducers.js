@@ -54,6 +54,7 @@ const serviceExchangeReducers = (state = initialState, action) => {
         break;
       }
 
+      // Dismiss a card from the current view
       case types.DISMISS_CARD: {
         return {
           ...state,
