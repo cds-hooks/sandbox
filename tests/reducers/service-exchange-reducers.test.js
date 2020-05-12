@@ -10,7 +10,8 @@ describe('Services Exchange Reducers', () => {
     state = {
       selectedService: '',
       exchanges: {},
-      launchLinks: {}
+      launchLinks: {},
+      hiddenCards: {},
     };
     storedExchange = {
       request: 'request',
@@ -39,6 +40,9 @@ describe('Services Exchange Reducers', () => {
       const newState = Object.assign({}, state, {
         exchanges: {
           [action.url]: storedExchange
+        },
+        hiddenCards: {
+          [action.url]: []
         }
       });
       expect(reducer(state, action)).toEqual(newState);

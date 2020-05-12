@@ -66,6 +66,8 @@ describe('Services Filters', () => {
             },
           },
         },
+        hiddenCards: {
+        }
       },
     };
     mockStore = configureStore([])(testStore);
