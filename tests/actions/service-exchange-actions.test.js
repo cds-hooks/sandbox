@@ -27,4 +27,17 @@ describe('Service Exchange Actions', () => {
 
     expect(actions.selectService(service)).toMatchObject(expectedAction);
   });
+
+  it('creates an action to dismiss a card', () => {
+    const serviceUrl = 'http://example.com/cds-services/id-1';
+    const cardUUID = '1';
+
+    const expectedAction = {
+      type: types.DISMISS_CARD,
+      serviceUrl,
+      cardUUID
+    }
+
+    expect(actions.dismissCard({serviceUrl, cardUUID})).toMatchObject(expectedAction);
+  });
 });

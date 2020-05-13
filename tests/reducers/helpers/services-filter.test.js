@@ -57,15 +57,19 @@ describe('Services Filters', () => {
           [emptyCardsExchange]: { response: {cards: []} },
           [completeServiceExchange]: {
             response: {
-              cards: [{ summary: 'test' }],
+              cards: [{ uuid: '1', summary: 'test' }],
             },
           },
           [exampleServiceExchange]: {
             response: {
-              cards: [{ summary: 'another-test' }],
+              cards: [{ uuid: '2', summary: 'another-test' }, { uuid: '3', summary: 'third-test' }],
             },
           },
         },
+        hiddenCards: {
+          [completeServiceExchange]: [],
+          [exampleServiceExchange]: ['3']
+        }
       },
     };
     mockStore = configureStore([])(testStore);

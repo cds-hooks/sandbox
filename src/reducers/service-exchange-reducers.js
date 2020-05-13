@@ -4,6 +4,7 @@ const initialState = {
   selectedService: '',
   exchanges: {},
   launchLinks: {},
+  hiddenCards: {},
 };
 
 const serviceExchangeReducers = (state = initialState, action) => {
@@ -22,6 +23,10 @@ const serviceExchangeReducers = (state = initialState, action) => {
                 responseStatus: action.responseStatus,
                 exchangeRound: action.exchangeRound,
               },
+            },
+            hiddenCards: {
+              ...state.hiddenCards,
+              [action.url]: [],
             },
           };
         }
@@ -49,12 +54,27 @@ const serviceExchangeReducers = (state = initialState, action) => {
         break;
       }
 
+      // Dismiss a card from the current view
+      case types.DISMISS_CARD: {
+        return {
+          ...state,
+          hiddenCards: {
+            ...state.hiddenCards,
+            [action.serviceUrl]: [
+              ...(state.hiddenCards[action.serviceUrl] || []),
+              action.cardUUID,
+            ],
+          },
+        };
+      }
+
       // Remove any CDS Service exchanges from the store
       case types.RESET_SERVICES: {
         return {
           ...state,
           selectedService: '',
           exchanges: {},
+          hiddenCards: {},
         };
       }
 
@@ -68,10 +88,14 @@ const serviceExchangeReducers = (state = initialState, action) => {
         if (state.exchanges[action.service]) {
           const exchangesCopy = JSON.parse(JSON.stringify(state.exchanges));
           delete exchangesCopy[action.service];
+
+          const hiddenCardsCopy = JSON.parse(JSON.stringify(state.hiddenCards));
+          delete hiddenCardsCopy[action.service];
           return {
             ...state,
             exchanges: exchangesCopy,
             selectedService: state.selectedService === action.service ? '' : state.selectedService,
+            hiddenCards: hiddenCardsCopy,
           };
         }
         break;

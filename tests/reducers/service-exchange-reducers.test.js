@@ -10,7 +10,8 @@ describe('Services Exchange Reducers', () => {
     state = {
       selectedService: '',
       exchanges: {},
-      launchLinks: {}
+      launchLinks: {},
+      hiddenCards: {},
     };
     storedExchange = {
       request: 'request',
@@ -39,6 +40,9 @@ describe('Services Exchange Reducers', () => {
       const newState = Object.assign({}, state, {
         exchanges: {
           [action.url]: storedExchange
+        },
+        hiddenCards: {
+          [action.url]: []
         }
       });
       expect(reducer(state, action)).toEqual(newState);
@@ -66,12 +70,24 @@ describe('Services Exchange Reducers', () => {
     });
   });
 
+  describe('DISMISS_CARD', () => {
+    it('should add the card uuid to the array of hidden cards when dismissed', () => {
+      state.exchanges[url] = storedExchange;
+      const stateCopy = JSON.parse(JSON.stringify(state));
+      stateCopy.hiddenCards[url] = ['1'];
+      const action = { type: types.DISMISS_CARD, serviceUrl: url, cardUUID: '1' };
+      expect(reducer(state, action)).toEqual(stateCopy);
+    });
+  });
+
   describe('RESET_SERVICES', () => {
     it('should reset the exchanges hash and any selected service', () => {
       state.exchanges[url] = storedExchange;
+      state.hiddenCards[url] = ['1', '2']
       const stateCopy = JSON.parse(JSON.stringify(state));
       stateCopy.exchanges = {};
       stateCopy.selectedService = '';
+      stateCopy.hiddenCards = {};
       const action = { type: types.RESET_SERVICES };
       expect(reducer(state, action)).toEqual(stateCopy);
     });
@@ -104,9 +120,11 @@ describe('Services Exchange Reducers', () => {
     it('should remove stored service exchanges where the exchange URL matches the URL passed in action', () => {
       state.exchanges[url] = storedExchange;
       state.selectedService = url;
+      state.hiddenCards[url] = ['1', '2'];
       const stateCopy = JSON.parse(JSON.stringify(state));
       stateCopy.exchanges =  {};
       stateCopy.selectedService = '';
+      stateCopy.hiddenCards = {};
       const action = {
         type: types.DELETE_SERVICE,
         service: url,

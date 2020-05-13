@@ -70,6 +70,7 @@ export const TRIGGER_ORDER_SIGN = 'TRIGGER_ORDER_SIGN';
 
 // Suggestions and apps
 export const TAKE_SUGGESTION = 'TAKE_SUGGESTION';
+export const DISMISS_CARD = 'DISMISS_CARD';
 export const LAUNCH_SMART_APP = 'LAUNCH_SMART_APP';
 
 export const EXPLICIT_HOOK_TRIGGER = 'EXPLICIT_HOOK_TRIGGER ';
