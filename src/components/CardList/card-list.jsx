@@ -11,6 +11,7 @@ import TerraCard from 'terra-card';
 import Text from 'terra-text';
 import Button from 'terra-button';
 import { Item, SplitButton } from 'terra-dropdown-button';
+import generateJWT from '../../retrieve-data-helpers/jwt-generator';
 
 import styles from './card-list.css';
 import {
@@ -68,25 +69,20 @@ export class CardList extends Component {
     if (!this.props.isDemoCard) {
       if (suggestion.label) {
         if (suggestion.uuid && cardUUID) {
-          axios({
-            method: 'POST',
-            url: `${serviceUrl}/feedback`,
-            data: {
-              feedback: [
-                {
-                  card: cardUUID,
-                  outcome: 'accepted',
-                  acceptedSuggestions: [
-                    {
-                      id: suggestion.uuid,
-                    },
-                  ],
-                  outcomeTimestamp: new Date().toISOString(),
-                },
-              ],
-            },
-          });
+          const cardFeedback = {
+            card: cardUUID,
+            outcome: 'accepted',
+            acceptedSuggestions: [
+              {
+                id: suggestion.uuid,
+              },
+            ],
+            outcomeTimestamp: new Date().toISOString(),
+          };
+
+          this.sendFeedback(serviceUrl, cardFeedback);
         }
+
         this.props.takeSuggestion(suggestion);
       } else {
         console.error('There was no label on this suggestion', suggestion);
@@ -95,11 +91,48 @@ export class CardList extends Component {
   }
 
   dismissCard(serviceUrl, cardUUID, reason) {
-    if (reason) {
-      console.log(`Received reason: ${reason}`);
+    if (this.props.isDemoCard) {
+      return;
     }
 
+    const cardFeedback = {
+      card: cardUUID,
+      outcome: 'overridden',
+      outcomeTimestamp: new Date().toISOString(),
+    };
+
+    if (reason && reason.code) {
+      cardFeedback.overrideReason = {
+        code: reason.code,
+      };
+
+      if (reason.system) {
+        cardFeedback.overrideReason.system = reason.system;
+      }
+    }
+
+    this.sendFeedback(serviceUrl, cardFeedback);
+
     store.dispatch(dismissCard({ serviceUrl, cardUUID }));
+  }
+
+  sendFeedback(serviceUrl, cardFeedback) {
+    const feedbackEndpoint = `${serviceUrl}/feedback`;
+    const signedPrivateJWT = generateJWT(feedbackEndpoint);
+
+    axios({
+      method: 'POST',
+      url: feedbackEndpoint,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${signedPrivateJWT}`,
+      },
+      data: {
+        feedback: [
+          cardFeedback,
+        ],
+      },
+    });
   }
 
   /**
@@ -309,7 +342,6 @@ export class CardList extends Component {
         if (card.uuid) {
           const { overrideReasons } = card;
           if (overrideReasons) {
-            console.log(`override reasons are ${JSON.stringify(overrideReasons)}`);
             const items = overrideReasons.map((reason) => (
               <Item
                 label={`Override: ${reason.display}`}
