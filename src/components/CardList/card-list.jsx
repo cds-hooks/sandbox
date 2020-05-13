@@ -95,6 +95,10 @@ export class CardList extends Component {
   }
 
   dismissCard(serviceUrl, cardUUID, reason) {
+    if (reason) {
+      console.log(`Received reason: ${reason}`);
+    }
+
     store.dispatch(dismissCard({ serviceUrl, cardUUID }));
   }
 

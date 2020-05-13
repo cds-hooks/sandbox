@@ -77,8 +77,8 @@ class MessagePanel extends Component {
 
   isActionableMessage(event) {
     // Ignore the event, if it doesn't meet our expectations.
-    if (!event.data) return false;
-    if ((event.data.source || "").startsWith('react-devtools-')) return false;
+    if (!event.data) { return false; }
+    if ((event.data.source || '').startsWith('react-devtools-')) { return false; }
 
     if (!event.data.messageId) {
       console.warn('Message has no messageId.');
