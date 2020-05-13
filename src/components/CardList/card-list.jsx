@@ -101,11 +101,14 @@ export class CardList extends Component {
       outcomeTimestamp: new Date().toISOString(),
     };
 
-    if (reason && reason.code && reason.system) {
+    if (reason && reason.code) {
       cardFeedback.overrideReason = {
         code: reason.code,
-        system: reason.system,
       };
+
+      if (reason.system) {
+        cardFeedback.overrideReason.system = reason.system;
+      }
     }
 
     this.sendFeedback(serviceUrl, cardFeedback);
