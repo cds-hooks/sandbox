@@ -103,11 +103,13 @@ export class CardList extends Component {
 
     if (reason && reason.code) {
       cardFeedback.overrideReason = {
-        code: reason.code,
+        reason: {
+          code: reason.code,
+        },
       };
 
       if (reason.system) {
-        cardFeedback.overrideReason.system = reason.system;
+        cardFeedback.overrideReason.reason.system = reason.system;
       }
     }
 
