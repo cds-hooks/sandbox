@@ -37,7 +37,7 @@
     "debounce-promise": "^3.1.2",
     "fast-deep-equal": "^2.0.1",
     "identity-obj-proxy": "^3.0.0",
-    "immer": "^3.2.0",
+    "immer": "^8.0.1",
     "jsrsasign": "^8.0.12",
     "lodash": "^4.17.15",
     "lunr": "^2.3.6",
