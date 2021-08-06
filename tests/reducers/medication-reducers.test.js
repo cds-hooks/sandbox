@@ -396,7 +396,7 @@ describe('Medication Reducers', () => {
         id: 'request-123',
         authoredOn: moment().format('YYYY-MM-DD'),
         status: 'draft',
-        intent: 'order',
+        intent: 'proposal',
         subject: {
           reference: `Patient/${patientId}`,
         },

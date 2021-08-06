@@ -32,7 +32,7 @@ export const createFhirResource = (fhirVersion, patientId, state, patientConditi
     status: 'draft',
   };
   if (isSTU3OrHigher) {
-    resource.intent = 'order'; //proposal | plan | order | instance-order
+    resource.intent = 'proposal'; //proposal | plan | order | instance-order
   }
 
   resource[`${isSTU3OrHigher ? 'subject' : 'patient'}`] = {
