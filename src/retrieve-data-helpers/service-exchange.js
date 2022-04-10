@@ -63,6 +63,7 @@ function completePrefetchTemplate(state, prefetch) {
       patient,
     );
     prefetchTemplate = prefetchTemplate.replace(/{{\s*user\s*}}/g, user);
+    prefetchTemplate = prefetchTemplate.replace(/{{\s*context\.userId\s*}}/g, user);
     prefetchRequests[prefetchKey] = encodeUriParameters(prefetchTemplate);
   });
   return prefetchRequests;
