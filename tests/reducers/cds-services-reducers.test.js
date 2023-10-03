@@ -24,7 +24,7 @@ describe('CDS Services Reducer', () => {
     state = {
       configuredServices: {},
       configuredServiceUrls: [],
-      defaultUrl: 'https://fhir-org-cds-services.appspot.com/cds-services',
+      defaultUrl: 'https://sandbox-services.cds-hooks.org/cds-services',
       testServicesUrl: null,
     };
   });

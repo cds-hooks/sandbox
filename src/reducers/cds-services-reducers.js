@@ -20,7 +20,7 @@ const getPersistedServices = () => {
 const initialState = {
   configuredServices: {},
   configuredServiceUrls: getPersistedServices(),
-  defaultUrl: 'https://fhir-org-cds-services.appspot.com/cds-services',
+  defaultUrl: 'https://sandbox-services.cds-hooks.org/cds-services',
   testServicesUrl: null,
 };
 
