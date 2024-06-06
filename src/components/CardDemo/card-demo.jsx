@@ -7,7 +7,7 @@ import 'codemirror/mode/javascript/javascript';
 
 import Button from 'terra-button';
 import Text from 'terra-text';
-import ErrorView from 'terra-clinical-error-view';
+import StatusView from 'terra-status-view';
 
 import { storeCardDemoJson } from '../../actions/card-demo-actions';
 import styles from './card-demo.css';
@@ -131,7 +131,7 @@ export class CardDemo extends Component {
     };
 
     const exampleCode = JSON.stringify(this.getExampleCard(), null, 2);
-    const errorPanel = <ErrorView description={this.state.errorText} />;
+    const errorPanel = <StatusView message={this.state.errorText} />;
     const constructedCardFormat = {
       cards: [
         (JSON.parse(this.props.tempUserJson) || this.getExampleCard()),

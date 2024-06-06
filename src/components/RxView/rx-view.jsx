@@ -3,15 +3,16 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import forIn from 'lodash/forIn';
 import cx from 'classnames';
 import Field from 'terra-form-field';
 import Checkbox from 'terra-form-checkbox';
-import Select from 'terra-form-select';
-import NumberField from 'terra-form/lib/NumberField';
+import Select from 'react-select'
+import SelectField from 'terra-form-select';
 import Text from 'terra-text';
-import Input from 'terra-form-input';
+import Input, {InputField} from 'terra-form-input';
 import DatePicker from 'terra-date-picker';
-import List from 'terra-list';
+import List, {Item} from 'terra-list';
 
 import debounce from 'debounce';
 
@@ -124,6 +125,10 @@ export class RxView extends Component {
        */
       conditionCode: '',
       /**
+       * Coding display of the Condition chosen from a dropdown list for the patient
+       */
+      conditionDisplay: '',
+      /**
        * Tracks the dosage amount chosen from the form field
        */
       dosageAmount: 1,
@@ -183,9 +188,10 @@ export class RxView extends Component {
 
 
   // Note: A second parameter (selected value) is supplied automatically by the Terra onChange function for the Form Select component
-  selectCondition(event, value) {
-    this.props.chooseCondition(value);
-    this.setState({ conditionCode: value });
+  selectCondition(event) {
+    this.props.chooseCondition(event.value);
+    this.setState({ conditionCode: event.value });
+    this.setState({ conditionDisplay: event.label });
   }
 
   changeMedicationInput(event) {
@@ -237,6 +243,22 @@ export class RxView extends Component {
     this.props.toggleEnabledDate(range);
   }
 
+  /**
+   * Create an array of key-value pair objects that React Select component understands
+   * given the Conditions present for the patient
+   */
+  createDropdownConditions() {
+    const conditions = [];
+    forIn(this.props.patient.conditionsResources, (c) => {
+      const { code } = c.resource.code.coding[0];
+      conditions.push({
+        value: code,
+        label: c.resource.code.text,
+      });
+    });
+    return conditions;
+  }
+
   render() {
     const isHalfView = this.props.isContextVisible ? styles['half-view'] : '';
     const medicationArray = this.props.medications;
@@ -250,69 +272,64 @@ export class RxView extends Component {
             label="Treating"
             labelAttrs={{ className: styles['condition-select'] }}
           >
-            <Select name="condition-select" value={this.state.conditionCode} onChange={this.selectCondition}>
-              {this.props.patient.conditionsResources.map((c) => {
-                const { code } = c.resource.code.coding[0];
-                return (
-                  <Select.Option
-                    key={code}
-                    value={code}
-                    display={c.resource.code.text}
-                  />
-                );
-              })}
-            </Select>
+            <Select
+              placeholder={this.state.conditionDisplay}
+              value={this.state.conditionDisplay}
+              options={this.createDropdownConditions()}
+              onChange={this.selectCondition}
+            />
           </Field>
           <Field
             label="Medication"
             labelAttrs={{ className: styles['medication-field'] }}
+            required
           >
             <Input
               name="medication-input"
               value={this.state.value}
               onChange={this.changeMedicationInput}
             />
-            <List isDivided>
+            <List dividerStyle="standard">
               {medicationArray.map((med) => (
-                <List.Item
+                <Item
                   key={med.id}
-                  content={<p>{med.name}</p>}
                   isSelectable
-                  onClick={() => { this.props.chooseMedication(med); }}
-                />
+                  onSelect={() => { this.props.chooseMedication(med); }}
+                >
+                  {<p>{med.name}</p>}
+                </Item>
               ))}
             </List>
           </Field>
           {this.props.prescription ? <Text isItalic fontSize={16}>{this.props.prescription.name}</Text> : null}
           <div className={styles['dose-instruction']}>
-            <NumberField
+            <InputField
+              inputId="dosage-amount"
               label="Number"
-              name="dosage-amount"
-              className={styles['dosage-amount']}
+              type="number"
               value={this.state.dosageAmount}
               onChange={this.changeDosageAmount}
-              max={5}
-              min={1}
-              step={1}
+              inputAttrs={{
+                name: 'dosage-amount',
+              }}
               isInline
             />
             <Field label="Frequency" isInline>
-              <Select name="dosage-frequency" onChange={this.changeDosageFrequency} value={this.state.dosageFrequency}>
-                <Select.Option key="daily" value="daily" display="daily" />
-                <Select.Option key="twice-daily" value="bid" display="twice daily" />
-                <Select.Option key="three-daily" value="tid" display="three times daily" />
-                <Select.Option key="four-daily" value="qid" display="four times daily" />
-              </Select>
+              <SelectField
+                name="dosage-frequency"
+                onChange={this.changeDosageFrequency}
+                value={this.state.dosageFrequency}
+              >
+                <SelectField.Option key="daily" value="daily" display="daily" />
+                <SelectField.Option key="twice-daily" value="bid" display="twice daily" />
+                <SelectField.Option key="three-daily" value="tid" display="three times daily" />
+                <SelectField.Option key="four-daily" value="qid" display="four times daily" />
+              </SelectField>
             </Field>
           </div>
           <div className={styles['dosage-timing']}>
             <Field
-              label={(
-                <div>
-                  Start Date
-                  <Checkbox defaultChecked isInline isLabelHidden labelText="" onChange={(e) => this.toggleEnabledDate(e, 'start')} />
-                </div>
-)}
+              label="Start Date"
               isInline
             >
               <DatePicker
@@ -322,12 +339,7 @@ export class RxView extends Component {
               />
             </Field>
             <Field
-              label={(
-                <div>
-                  End Date
-                  <Checkbox defaultChecked isInline isLabelHidden labelText="" onChange={(e) => this.toggleEnabledDate(e, 'end')} />
-                </div>
-)}
+              label="End Date"
               isInline
             >
               <DatePicker
