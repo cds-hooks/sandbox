@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import CodeMirror from 'react-codemirror';
-import 'codemirror/mode/javascript/javascript';
+import CodeMirror from '@uiw/react-codemirror';
 // import 'codemirror/lib/codemirror.css';
 // import 'codemirror/addon/lint/lint.css';
 
@@ -176,7 +175,7 @@ export class CardDemo extends Component {
               value={this.props.tempUserJson || exampleCode}
               ref={(el) => { this.cm = el; }}
               onChange={this.updateCard}
-              style={{ 'font-family': 'Inconsolata, Menlo, Consolas, monospace !important' }}
+              style={{ 'fontFamily': 'Inconsolata, Menlo, Consolas, monospace !important' }}
               options={options}
             />
           </div>

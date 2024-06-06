@@ -19,7 +19,7 @@ const aggregateOptions = {
 
 aggregateTranslations(aggregateOptions);
 
-
+const processPath = process.cwd();
 
 const globalCss = [
   /node_modules\/terra-icon\/lib\/Icon/,
@@ -56,9 +56,13 @@ const config = {
   resolve: {
     extensions: ['.js', '.jsx', '.json', '*'],
     modules: [path.resolve(__dirname, 'aggregated-translations'), 'node_modules'],
+    mainFields: ['browser', 'main'],
     fallback: {
       "path": false,
     } 
+  },
+  resolveLoader: {
+    modules: [path.resolve(path.join(processPath, 'node_modules'))],
   },
   module: {
     rules: [{
@@ -81,13 +85,11 @@ const config = {
           },
           {
             loader: 'postcss-loader',
-            options: {options: {}}
+            options: {postcssOptions: {}}
           },
           {
             loader: 'sass-loader',
-            options: {
-              webpackImporter: false,
-            },
+            options: {},
           }
           ],
       },
@@ -105,8 +107,13 @@ const config = {
       {
         test: /\.jsx?$/,
         include: SRC_DIR,
-        loader: 'babel-loader',
         exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            rootMode: 'upward', // needed to correctly resolve babel's config root in mono-repos
+          },
+        },
       },
       {
         test: /\.pem/,
@@ -135,6 +142,9 @@ const config = {
     ]),
     new webpack.DefinePlugin({
       'runtime.FHIR_URL': JSON.stringify(process.env.FHIR_URL || 'https://api.hspconsortium.org/cdshooksdstu2/open')
+    }),
+    new webpack.ProvidePlugin({
+      process: 'process/browser.js',
     }),
   ],
   stats: {
