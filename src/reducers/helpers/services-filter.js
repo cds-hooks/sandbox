@@ -12,7 +12,6 @@ export function getServicesByHook(hook, services) {
   return pickBy(services, filterByHook);
 }
 
-
 /**
  * Create one cards array that holds all card responses from the passed in service URLs
  * @param {*} serviceUrls - Services to retrieve valid cards from

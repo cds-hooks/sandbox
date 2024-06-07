@@ -7,12 +7,12 @@ import forIn from 'lodash/forIn';
 import cx from 'classnames';
 import Field from 'terra-form-field';
 // import Checkbox from 'terra-form-checkbox';
-import Select from 'react-select'
+import Select from 'react-select';
 import SelectField from 'terra-form-select';
 import Text from 'terra-text';
-import Input, {InputField} from 'terra-form-input';
+import Input, { InputField } from 'terra-form-input';
 import DatePicker from 'terra-date-picker';
-import List, {Item} from 'terra-list';
+import List, { Item } from 'terra-list';
 
 import debounce from 'debounce';
 
@@ -164,28 +164,28 @@ export class RxView extends Component {
   /**
    * Update any incoming values that change for state
    */
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.medicationInstructions.number !== this.state.dosageAmount
-      || nextProps.medicationInstructions.frequency !== this.state.dosageFrequency
-      || nextProps.selectedConditionCode !== this.state.conditionCode
-      || nextProps.prescriptionDates.start.value !== this.state.startRange.value
-      || nextProps.prescriptionDates.end.value !== this.state.endRange.value) {
-      this.setState({
+  static getDerivedStateFromProps(nextProps, prevState) {
+    if (nextProps.medicationInstructions.number !== prevState.dosageAmount
+      || nextProps.medicationInstructions.frequency !== prevState.dosageFrequency
+      || nextProps.selectedConditionCode !== prevState.conditionCode
+      || nextProps.prescriptionDates.start.value !== prevState.startRange.value
+      || nextProps.prescriptionDates.end.value !== prevState.endRange.value) {
+      return ({
         conditionCode: nextProps.selectedConditionCode,
         dosageAmount: nextProps.medicationInstructions.number,
         dosageFrequency: nextProps.medicationInstructions.frequency,
         startRange: {
-          enabled: this.state.startRange.enabled,
+          // enabled: nextProps.startRange.enabled,
           value: nextProps.prescriptionDates.start.value,
         },
         endRange: {
-          enabled: this.state.endRange.enabled,
+          // enabled: nextProps.endRange.enabled,
           value: nextProps.prescriptionDates.end.value,
         },
       });
     }
+    return null;
   }
-
 
   // Note: A second parameter (selected value) is supplied automatically by the Terra onChange function for the Form Select component
   selectCondition(event) {
@@ -296,7 +296,7 @@ export class RxView extends Component {
                   isSelectable
                   onSelect={() => { this.props.chooseMedication(med); }}
                 >
-                  {<p>{med.name}</p>}
+                  <p>{med.name}</p>
                 </Item>
               ))}
             </List>

@@ -104,7 +104,7 @@ export const createFhirResource = (fhirVersion, patientId, state, patientConditi
           value: dispenseRequest.supplyDuration,
           unit: 'days',
           system: 'http://unitsofmeasure.org',
-          code: 'd'
+          code: 'd',
         },
       };
 
@@ -113,10 +113,10 @@ export const createFhirResource = (fhirVersion, patientId, state, patientConditi
         coding: [
           {
             system: 'http://terminology.hl7.org/CodeSystem/medicationrequest-category',
-            code: 'community'
-          }
-        ]
-      }
+            code: 'community',
+          },
+        ],
+      };
     }
 
     const med = state.decisions.prescribable;
