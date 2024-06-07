@@ -26,6 +26,14 @@ const initialState = {
         },
       },
     },
+    'rx-sign': {
+      triggerPoints: {
+        'rx-sign/order-sign': {
+          hook: 'order-sign',
+          lastExchangeRound: 0,
+        },
+      },
+    },
     pama: {
       triggerPoints: {
         'pama/order-select': {

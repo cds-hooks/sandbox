@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import forIn from 'lodash/forIn';
 import cx from 'classnames';
 import Field from 'terra-form-field';
-import Checkbox from 'terra-form-checkbox';
+// import Checkbox from 'terra-form-checkbox';
 import Select from 'react-select'
 import SelectField from 'terra-form-select';
 import Text from 'terra-text';

@@ -58,6 +58,10 @@ export const STORE_MED_DOSAGE_AMOUNT = 'STORE_MED_DOSAGE_AMOUNT';
 export const STORE_DATE = 'STORE_DATE';
 export const TOGGLE_DATE = 'TOGGLE_DATE';
 
+// Medication Order on RxSign
+export const STORE_DISPENSE_REQUEST = 'STORE_DISPENSE_REQUEST';
+export const ORDER_SIGN_BUTTON_PRESS = 'ORDER_SIGN_BUTTON_PRESS';
+
 // Order Imaging
 export const APPLY_PAMA_RATING = 'APPLY_PAMA_RATING';
 export const UPDATE_STUDY = 'UPDATED_STUDY';

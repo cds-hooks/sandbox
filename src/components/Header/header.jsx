@@ -159,7 +159,7 @@ export class Header extends Component {
           // If the tab is clicked again, make sure the Sandbox is qualified to call out to EHR's based
           // on current context (i.e. for the Rx View, ensure a medication has been prescribed before
           // re-invoking the services on that hook if the Rx View tab is clicked multiple times)
-          if (hook === 'order-select') {
+          if (hook === 'order-select' || hook === 'order-sign') {
             const medicationPrescribed = state.medicationState.decisions.prescribable
               && state.medicationState.medListPhase === 'done';
             if (medicationPrescribed) {
@@ -293,6 +293,7 @@ export class Header extends Component {
         <div className={styles['nav-container']}>
           <button className={this.getNavClasses('patient-view')} onClick={() => this.switchHook('patient-view')}>Patient View</button>
           <button className={this.getNavClasses('rx-view')} onClick={() => this.switchHook('order-select', 'rx-view')}>Rx View</button>
+          <button className={this.getNavClasses('rx-sign')} onClick={() => this.switchHook('order-sign', 'rx-sign')}>Rx Sign</button>
           <button className={this.getNavClasses('pama')} onClick={() => this.switchHook('order-select', 'pama')}>PAMA Imaging</button>
         </div>
       </div>
