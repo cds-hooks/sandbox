@@ -13,6 +13,7 @@ import styles from './main-view.css';
 import Header from '../Header/header';
 import PatientView from '../PatientView/patient-view';
 import RxView from '../RxView/rx-view';
+import RxSign from '../RxSign/rx-sign';
 import Pama from '../Pama/pama';
 import ContextView from '../ContextView/context-view';
 import FhirServerEntry from '../FhirServerEntry/fhir-server-entry';
@@ -111,7 +112,7 @@ export class MainView extends Component {
   async componentDidMount() {
     // Set the loading spinner face-up
     this.props.setLoadingStatus(true);
-    const validHooks = ['patient-view', 'order-select'];
+    const validHooks = ['patient-view', 'order-select', 'order-sign'];
     let parsedHook = this.getQueryParam('hook');
     const parsedScreen = this.getQueryParam('screen');
     if (validHooks.indexOf(parsedHook) < 0) {
@@ -215,6 +216,7 @@ export class MainView extends Component {
     const hookView = {
       'patient-view': <PatientView />,
       'rx-view': <RxView />,
+      'rx-sign': <RxSign />,
       pama: <Pama />,
     }[this.props.screen];
 

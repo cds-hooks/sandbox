@@ -77,10 +77,11 @@ export class FhirServerEntry extends Component {
     this.handleResetDefaultServer = this.handleResetDefaultServer.bind(this);
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (this.props.isOpen !== nextProps.isOpen) {
-      this.setState({ isOpen: nextProps.isOpen });
+  static getDerivedStateFromProps(nextProps, prevState) {
+    if (nextProps.isOpen !== prevState.isOpen) {
+      return ({ isOpen: nextProps.isOpen });
     }
+    return null;
   }
 
   handleCloseModal() {

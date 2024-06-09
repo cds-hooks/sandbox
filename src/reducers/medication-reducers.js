@@ -96,6 +96,29 @@ export const createFhirResource = (fhirVersion, patientId, state, patientConditi
       }
     }
 
+    if (state.dispenseRequest) {
+      const { dispenseRequest } = state;
+
+      resource.dispenseRequest = {
+        expectedSupplyDuration: {
+          value: dispenseRequest.supplyDuration,
+          unit: 'days',
+          system: 'http://unitsofmeasure.org',
+          code: 'd',
+        },
+      };
+
+      resource.intent = 'order';
+      resource.category = {
+        coding: [
+          {
+            system: 'http://terminology.hl7.org/CodeSystem/medicationrequest-category',
+            code: 'community',
+          },
+        ],
+      };
+    }
+
     const med = state.decisions.prescribable;
 
     resource.medicationCodeableConcept = {
@@ -165,6 +188,12 @@ const initialState = {
   medicationInstructions: {
     number: parseInt(getQueryParam('prescribedInstructionNumber'), 10) || 1,
     frequency: getQueryParam('prescribedInstructionFrequency') || 'daily',
+  },
+  /**
+   * The dispense request information
+   */
+  dispenseRequest: {
+    supplyDuration: parseInt(getQueryParam('prescribedSupplyDuration'), 10) || 1,
   },
   /**
    * The dates and enabled status of the medication start and end dates
@@ -332,6 +361,16 @@ const medicationReducers = (state = initialState, action) => {
           medicationInstructions: {
             number: action.amount,
             frequency: action.frequency,
+          },
+        };
+      }
+
+      // Stores the user-defined dispense request
+      case types.STORE_DISPENSE_REQUEST: {
+        return {
+          ...state,
+          dispenseRequest: {
+            supplyDuration: action.supplyDuration,
           },
         };
       }

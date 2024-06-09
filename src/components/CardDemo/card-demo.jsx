@@ -175,7 +175,7 @@ export class CardDemo extends Component {
               value={this.props.tempUserJson || exampleCode}
               ref={(el) => { this.cm = el; }}
               onChange={this.updateCard}
-              style={{ 'fontFamily': 'Inconsolata, Menlo, Consolas, monospace !important' }}
+              style={{ fontFamily: 'Inconsolata, Menlo, Consolas, monospace !important' }}
               options={options}
             />
           </div>

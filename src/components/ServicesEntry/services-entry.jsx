@@ -50,10 +50,11 @@ export class ServicesEntry extends Component {
     this.handleChange = this.handleChange.bind(this);
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (this.props.isOpen !== nextProps.isOpen) {
-      this.setState({ isOpen: nextProps.isOpen });
+  static getDerivedStateFromProps(nextProps, prevState) {
+    if (nextProps.isOpen !== prevState.isOpen) {
+      return ({ isOpen: nextProps.isOpen });
     }
+    return null;
   }
 
   handleCloseModal() {
@@ -131,7 +132,7 @@ export class ServicesEntry extends Component {
               inputName="discovery-endpoint-input"
             />
             <Text isItalic>
-Note: See&nbsp;
+              Note: See&nbsp;
               <a
                 href="https://cds-hooks.org/specification/current/#discovery"
                 rel="noreferrer noopener"
