@@ -6,7 +6,8 @@ import { connect } from 'react-redux';
 import cx from 'classnames';
 import forIn from 'lodash/forIn';
 
-import SelectField from 'terra-form/lib/SelectField';
+import Field from 'terra-form-field';
+import Select from 'react-select';
 import ExchangePanel from '../ExchangePanel/exchange-panel';
 import MessagePanel from '../MessagePanel/message-panel';
 
@@ -66,7 +67,7 @@ export class ContextView extends Component {
    * update so that a new request/response will appear in the appropriate exchange panels
    */
   onSelectChange(e) {
-    this.props.selectService(e.target.value);
+    this.props.selectService(e.value);
   }
 
   /**
@@ -78,7 +79,7 @@ export class ContextView extends Component {
   }
 
   /**
-   * Create an array of key-value pair objects that Terra SelectField component understands
+   * Create an array of key-value pair objects that React Select component understands
    * given the CDS Services allowed to be selected for this hook
    */
   createDropdownServices() {
@@ -86,7 +87,7 @@ export class ContextView extends Component {
     forIn(this.props.services, (service, key) => {
       services.push({
         value: key,
-        display: `${service.id} - ${key}`,
+        label: `${service.id} - ${key}`,
       });
     });
     return services;
@@ -108,12 +109,14 @@ export class ContextView extends Component {
       <div className={cx(styles.container, contextToggledClass)}>
         <div className={styles['wrap-context']}>
           <h1 className={styles.title}>CDS Developer Panel</h1>
-          <SelectField
-            label={<b>Select a Service</b>}
-            value={`${serviceInContext}`}
-            options={this.createDropdownServices()}
-            onChange={this.onSelectChange}
-          />
+          <Field label="Select a Service">
+            <Select
+              placeholder={serviceInContext}
+              value={serviceInContext}
+              options={this.createDropdownServices()}
+              onChange={this.onSelectChange}
+            />
+          </Field>
           <ExchangePanel
             panelHeader=" Request"
             panelText={serviceExchange ? serviceExchange.request : 'No request made to CDS Service'}

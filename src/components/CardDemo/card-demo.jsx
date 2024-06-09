@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import CodeMirror from 'react-codemirror';
-import 'codemirror/mode/javascript/javascript';
+import CodeMirror from '@uiw/react-codemirror';
 // import 'codemirror/lib/codemirror.css';
 // import 'codemirror/addon/lint/lint.css';
 
 import Button from 'terra-button';
 import Text from 'terra-text';
-import ErrorView from 'terra-clinical-error-view';
+import StatusView from 'terra-status-view';
 
 import { storeCardDemoJson } from '../../actions/card-demo-actions';
 import styles from './card-demo.css';
@@ -131,7 +130,7 @@ export class CardDemo extends Component {
     };
 
     const exampleCode = JSON.stringify(this.getExampleCard(), null, 2);
-    const errorPanel = <ErrorView description={this.state.errorText} />;
+    const errorPanel = <StatusView message={this.state.errorText} />;
     const constructedCardFormat = {
       cards: [
         (JSON.parse(this.props.tempUserJson) || this.getExampleCard()),
@@ -176,7 +175,7 @@ export class CardDemo extends Component {
               value={this.props.tempUserJson || exampleCode}
               ref={(el) => { this.cm = el; }}
               onChange={this.updateCard}
-              style={{ 'font-family': 'Inconsolata, Menlo, Consolas, monospace !important' }}
+              style={{ 'fontFamily': 'Inconsolata, Menlo, Consolas, monospace !important' }}
               options={options}
             />
           </div>

@@ -4,10 +4,11 @@ const TerserPlugin = require('terser-webpack-plugin');
 const common = require('./webpack.config.common.js');
 
 module.exports = merge(common, {
-  devtool: 'cheap-source-map',
   mode: 'production',
+  devtool: 'cheap-source-map',
   plugins: [ ],
   optimization: {
     minimizer: [new TerserPlugin()],
+    chunkIds: 'named',
   },
 });
