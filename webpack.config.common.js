@@ -56,9 +56,6 @@ const config = {
   resolve: {
     extensions: ['.js', '.jsx', '.json', '*'],
     modules: [path.resolve(__dirname, 'aggregated-translations'), 'node_modules'],
-    fallback: {
-      "path": false,
-    } 
   },
   module: {
     rules: [{
@@ -133,13 +130,11 @@ const config = {
         from: './fhir-client.min.js',
       },
     ]),
+    new webpack.NamedChunksPlugin(),
     new webpack.DefinePlugin({
       'runtime.FHIR_URL': JSON.stringify(process.env.FHIR_URL || 'https://api.hspconsortium.org/cdshooksdstu2/open')
     }),
   ],
-  stats: {
-    errorDetails: true,
-  },
 };
 
 module.exports = config;
