@@ -35,3 +35,5 @@ npm-debug.log
 *.swp
 
 aggregated-translations
+
+build
