@@ -31,6 +31,9 @@ export const createFhirResource = (fhirVersion, patientId, state, patientConditi
     id: isSTU3OrHigher ? 'request-123' : 'order-123',
     status: 'draft',
   };
+  if (isSTU3OrHigher) {
+    resource.intent = 'proposal'; //proposal | plan | order | instance-order
+  }
 
   resource[`${isSTU3OrHigher ? 'subject' : 'patient'}`] = {
     reference: `Patient/${patientId}`,
