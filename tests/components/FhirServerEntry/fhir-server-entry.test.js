@@ -1,7 +1,7 @@
 import React from 'react';
 import { mount, shallow } from 'enzyme';
-import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
+import intlContexts from './intl-context-setup';
 
 describe('FhirServerEntry component', () => {
   let storeState;
@@ -27,7 +27,7 @@ describe('FhirServerEntry component', () => {
     FhirServerEntryView = require('../../../src/components/FhirServerEntry/fhir-server-entry')['FhirServerEntry'];
     let component;
     if (mockResolve && mockClosePrompt) {
-      component = <ConnectedView store={mockStore} 
+      component = <ConnectedView store={mockStore}
                                  resolve={mockResolve}
                                  isOpen={true}
                                  isEntryRequired={isEntryRequired} 
@@ -37,7 +37,8 @@ describe('FhirServerEntry component', () => {
     } else {
       component = <ConnectedView store={mockStore}/>;
     }
-    wrapper = shallow(component);
+    // wrapper = shallow(component);
+    wrapper = shallow(component, intlContexts.shallowContext);
     pureComponent = wrapper.find(FhirServerEntryView);
   }
 
@@ -66,10 +67,11 @@ describe('FhirServerEntry component', () => {
 
   it('changes isOpen state property if props changes for the property', () => {
     setup(storeState);
-    let component = mount(<FhirServerEntryView isOpen={false} />);
-    expect(component.prop('isOpen')).toEqual(false);
-    component.setProps({ isOpen: true });
-    expect(component.prop('isOpen')).toEqual(true);
+    // let component = mount(<FhirServerEntryView isOpen={false} />, { context: { intl }, childContextTypes: { intl: intlShape } });
+    let component = pureComponent.shallow();
+    expect(component.state('isOpen')).toEqual(true);
+    component.setProps({ isOpen: false });
+    expect(component.state('isOpen')).toEqual(false);
   });
 
   it('handles resetting the fhir server and closes the modal', async () => {
@@ -77,18 +79,17 @@ describe('FhirServerEntry component', () => {
     setup(storeState);
     let shallowedComponent = pureComponent.shallow();
     await shallowedComponent.find('Dialog').dive().find('ContentContainer').dive().find('.right-align').find('Button').at(0).simulate('click');
-    expect(shallowedComponent.state('isOpen')).toEqual(false);
+    expect(mockClosePrompt).toHaveBeenCalled();
     expect(mockResolve).toHaveBeenCalled();
     expect(mockSpy).toHaveBeenCalled();
   });
 
   it('handles closing the modal in the component', async () => {
-    mockResolve = null;
-    mockClosePrompt = null;
+    isEntryRequired = false;
     setup(storeState);
     let shallowedComponent = pureComponent.shallow();
     await shallowedComponent.find('Dialog').dive().find('ContentContainer').dive().find('.right-align').find('Button').at(2).simulate('click');
-    expect(shallowedComponent.state('isOpen')).toEqual(false);
+    expect(mockClosePrompt).toHaveBeenCalled();
   });
 
   describe('User input', () => {
@@ -134,7 +135,7 @@ describe('FhirServerEntry component', () => {
       let shallowedComponent = pureComponent.shallow();
       await enterInputAndSave(shallowedComponent, 'test');
       expect(shallowedComponent.state('shouldDisplayError')).toEqual(false);
-      expect(shallowedComponent.state('isOpen')).toEqual(false);
+      expect(mockClosePrompt).toHaveBeenCalled();
       expect(mockResolve).toHaveBeenCalled();
       expect(mockClosePrompt).toHaveBeenCalled();
     });

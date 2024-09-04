@@ -28,6 +28,9 @@ describe('Medication Reducers', () => {
         components: null,
         prescribable: null,
       },
+      dispenseRequest: {
+        supplyDuration: 1,
+      },
       medicationInstructions: {
         number: 1,
         frequency: 'daily',
@@ -353,6 +356,15 @@ describe('Medication Reducers', () => {
         id: 'order-123',
         dateWritten: moment().format('YYYY-MM-DD'),
         status: 'draft',
+        intent: 'order',
+        category: {
+          coding: [
+            {
+              code: 'community',
+              system: 'http://terminology.hl7.org/CodeSystem/medicationrequest-category',
+            }
+          ]
+        },
         patient: {
           reference: `Patient/${patientId}`,
         },
@@ -365,6 +377,14 @@ describe('Medication Reducers', () => {
             }
           ],
           text: 'Carisoprodol 250 MG Oral Tablet [Soma]'
+        },
+        dispenseRequest: {
+          expectedSupplyDuration: {
+            code: 'd',
+            system: 'http://unitsofmeasure.org',
+            unit: 'days',
+            value: 1,
+          }
         },
         dosageInstruction: [
           {
@@ -396,6 +416,15 @@ describe('Medication Reducers', () => {
         id: 'request-123',
         authoredOn: moment().format('YYYY-MM-DD'),
         status: 'draft',
+        intent: 'order',
+        category: {
+          coding: [
+            {
+              code: 'community',
+              system: 'http://terminology.hl7.org/CodeSystem/medicationrequest-category',
+            }
+          ]
+        },
         subject: {
           reference: `Patient/${patientId}`,
         },
@@ -408,6 +437,14 @@ describe('Medication Reducers', () => {
             }
           ],
           text: 'Carisoprodol 250 MG Oral Tablet [Soma]'
+        },
+        dispenseRequest: {
+          expectedSupplyDuration: {
+            code: 'd',
+            system: 'http://unitsofmeasure.org',
+            unit: 'days',
+            value: 1,
+          }
         },
         dosageInstruction: [
           {
@@ -439,6 +476,15 @@ describe('Medication Reducers', () => {
         id: 'request-123',
         authoredOn: moment().format('YYYY-MM-DD'),
         status: 'draft',
+        intent: 'order',
+        category: {
+          coding: [
+            {
+              code: 'community',
+              system: 'http://terminology.hl7.org/CodeSystem/medicationrequest-category',
+            }
+          ]
+        },
         subject: {
           reference: `Patient/${patientId}`,
         },
@@ -451,6 +497,14 @@ describe('Medication Reducers', () => {
             }
           ],
           text: 'Carisoprodol 250 MG Oral Tablet [Soma]'
+        },
+        dispenseRequest: {
+          expectedSupplyDuration: {
+            code: 'd',
+            system: 'http://unitsofmeasure.org',
+            unit: 'days',
+            value: 1,
+          }
         },
         dosageInstruction: [
           {

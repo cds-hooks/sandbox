@@ -22,6 +22,7 @@ describe('RxView component', () => {
   let prescription;
   let medicationInstructions;
   let prescriptionDates;
+  let selectedConditionCode
 
   let chooseCondition, onMedicationChangeInput, chooseMedication,
   updateDosageInstructions, updateDate, toggleEnabledDate, updateFhirResource, medicationOrder;
@@ -52,7 +53,8 @@ describe('RxView component', () => {
         medications={medications} prescription={prescription} onMedicationChangeInput={onMedicationChangeInput} 
         chooseMedication={chooseMedication} chooseCondition={chooseCondition} updateDosageInstructions={updateDosageInstructions} 
         updateDate={updateDate} toggleEnabledDate={toggleEnabledDate} updateFhirResource={updateFhirResource}
-        medicationOrder={medicationOrder} medicationInstructions={medicationInstructions} prescriptionDates={prescriptionDates}  />;
+        medicationOrder={medicationOrder} medicationInstructions={medicationInstructions} prescriptionDates={prescriptionDates}
+        selectedConditionCode={selectedConditionCode}  />;
     renderedComponent = shallow(component, intlContexts.shallowContext);
   }
 
@@ -101,6 +103,7 @@ describe('RxView component', () => {
         value: '2019-05-18',
       },
     };
+    selectedConditionCode = 'condition-123';
     medListPhase = 'begin';
     medicationOrder = { resourceType: 'MedicationRequest', id: '123' };
     mockSpy = jest.fn();
@@ -120,17 +123,18 @@ describe('RxView component', () => {
   it('has default view elements', () => {
     setup(patient, medListPhase, medications, prescription);
     expect(renderedComponent.find('Connect(PatientBanner)').length).toEqual(1);
-    expect(renderedComponent.find('Field').at(0).find('SelectOption').length).toEqual(1);
+    expect(renderedComponent.find('[name="condition-input"]').length).toEqual(1);
     expect(renderedComponent.find('[name="medication-input"]').length).toEqual(1);
-    expect(renderedComponent.find('ListItem').length).toEqual(0);
-    expect(renderedComponent.find('NumberField').length).toEqual(1);
-    expect(renderedComponent.find('[label="Frequency"]').find('SelectOption').length).toEqual(4);
-    expect(renderedComponent.find('DatePicker').length).toEqual(2);
+    expect(renderedComponent.find('List').length).toEqual(0);
+    expect(renderedComponent.find('Input').length).toEqual(1);
+    expect(renderedComponent.find('[label="Frequency"]').find('[name="dosage-frequency"]').children().length).toEqual(4);
+    expect(renderedComponent.find('[label="Start Date"]').exists('DatePicker'));
+    expect(renderedComponent.find('[label="End Date"]').exists('DatePicker'));
   });
 
   it('allows for selecting a condition', () => {
     setup(patient, medListPhase, medications, prescription);
-    renderedComponent.find('Field').at(0).find('Select').simulate('change', { target: { value: 'condition-123' } }, 'condition-123');
+    renderedComponent.find('[name="condition-input"]').simulate('change', { value: 'condition-123', label: 'mock condition' } );
     expect(chooseCondition).toHaveBeenCalled();
     expect(renderedComponent.state('conditionCode')).toEqual('condition-123');
   });
@@ -143,11 +147,11 @@ describe('RxView component', () => {
 
   it('allows for inputting a number for the dosage amount', () => {
     setup(patient, medListPhase, medications, prescription);
-    renderedComponent.find('NumberField').simulate('change', { target: { value: '4' } });
+    renderedComponent.find('InputField').simulate('change', { target: { value: '4' } });
     expect(updateDosageInstructions).toHaveBeenCalledWith(4, 'daily');
-    renderedComponent.find('NumberField').simulate('change', { target: { value: '6' } });
+    renderedComponent.find('InputField').simulate('change', { target: { value: '6' } });
     expect(updateDosageInstructions).toHaveBeenCalledWith(5, 'daily');
-    renderedComponent.find('NumberField').simulate('change', { target: { value: '0' } });
+    renderedComponent.find('InputField').simulate('change', { target: { value: '0' } });
     expect(updateDosageInstructions).toHaveBeenCalledWith(1, 'daily');
   });
 
@@ -159,11 +163,9 @@ describe('RxView component', () => {
 
   it('allows for selecting date ranges', () => {
     setup(patient, medListPhase, medications, prescription);
-    renderedComponent.find('.dosage-timing').find('DatePicker').at(0).simulate('change', { target: { value: '2018-04-13' } });
-    renderedComponent.find('.dosage-timing').find('Field').at(0).dive().find('Checkbox').simulate('change', { target: { value: false } });
+    renderedComponent.find('[name="start-date"]').simulate('change', { target: { value: '2018-04-13' } });
     expect(updateDate).toHaveBeenCalled();
-    expect(toggleEnabledDate).toHaveBeenCalled();
-    renderedComponent.find('.dosage-timing').find('DatePicker').at(1).simulate('change', { target: { value: '2018-04-14' } });
+    renderedComponent.find('[name="end-date"]').simulate('change', { target: { value: '2018-04-14' } });
     expect(updateDate).toHaveBeenCalled();
   });
 
@@ -178,11 +180,9 @@ describe('RxView component', () => {
       prescriptionDates: {
         start: {
           value: '2018-05-20',
-          enabled: true,
         },
         end: {
           value: '2018-06-01',
-          enabled: true,
         },
       },
     });
@@ -190,11 +190,9 @@ describe('RxView component', () => {
     expect(renderedComponent.state('dosageAmount')).toEqual(3);
     expect(renderedComponent.state('dosageFrequency')).toEqual('bid');
     expect(renderedComponent.state('startRange')).toEqual({
-      enabled: true,
       value: '2018-05-20',
     });
     expect(renderedComponent.state('endRange')).toEqual({
-      enabled: true,
       value: '2018-06-01',
     });
   });

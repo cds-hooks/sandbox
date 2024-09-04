@@ -273,6 +273,7 @@ export class RxView extends Component {
             labelAttrs={{ className: styles['condition-select'] }}
           >
             <Select
+              name="condition-input"
               placeholder={this.state.conditionDisplay}
               value={this.state.conditionDisplay}
               options={this.createDropdownConditions()}

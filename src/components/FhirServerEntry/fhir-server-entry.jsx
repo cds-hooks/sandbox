@@ -56,7 +56,7 @@ export class FhirServerEntry extends Component {
       /**
        * Flag to determine if the component is open or closed
        */
-      isOpen: this.props.isOpen,
+      isOpen: Boolean(props.isOpen),
       /**
        * User input text tracked inside the input box for FHIR server URL entry
        */
