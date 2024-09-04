@@ -77,7 +77,7 @@ describe('ServiceContextView component', () => {
 
   it('renders relevant child components', () => {
     const shallowComponent = pureComponent.shallow();
-    expect(shallowComponent.find('SelectField')).toHaveLength(1);
+    expect(shallowComponent.find('Field')).toHaveLength(1);
     expect(shallowComponent.find('ExchangePanel')).toHaveLength(2);
   });
 
@@ -90,14 +90,14 @@ describe('ServiceContextView component', () => {
     expect(wrapper.find('.context-open')).toHaveLength(0);
   });
 
-  describe('SelectField', () => {
+  describe('Field', () => {
     it('does not pre-select a service for the dropdown if there are no applicable services for the view', () => {
       storeState.hookState.currentHook = 'view-with-no-services';
       storeState.serviceExchangeState.selectedService = '';
       mockStore = mockStoreWrapper(storeState);
       let component = <ConnectedView store={mockStore}/>;
       wrapper = mount(component);
-      const selectDropdown = wrapper.find('SelectField');
+      const selectDropdown = wrapper.find('Select');
 
       expect(selectDropdown.prop('options')).toEqual([]);
       expect(wrapper.prop('initialService')).toEqual(undefined);
@@ -106,7 +106,7 @@ describe('ServiceContextView component', () => {
     it('preselects a service for the dropdown if there is at least one applicable service for the view', () => {
       let component = <ConnectedView store={mockStore}/>;
       wrapper = mount(component);
-      const selectDropdown = wrapper.find('SelectField');
+      const selectDropdown = wrapper.find('Select');
       expect(selectDropdown.prop('value')).toEqual(patientServiceUrl);
     });
   });
@@ -149,7 +149,7 @@ describe('ServiceContextView component', () => {
     });
 
     it('can dispatch an action via dispatch function passed in as a prop for selecting service', () => {
-      pureComponent.find('SelectField').simulate('change', { target: { value: patientServiceUrl }});
+      pureComponent.find('Field').children().simulate('change', { value: patientServiceUrl });
       const expectedAction = { type: types.SELECT_SERVICE_CONTEXT, service:  patientServiceUrl};
       expect(mockStore.getActions()).toEqual([expectedAction]);
     });

@@ -2,6 +2,7 @@ import React from 'react';
 import { mount, shallow } from 'enzyme';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
+import intlContexts from './intl-context-setup';
 
 describe('PatientEntry component', () => {
   let storeState;
@@ -33,7 +34,7 @@ describe('PatientEntry component', () => {
     } else {
       component = <ConnectedView store={mockStore}/>;
     }
-    wrapper = shallow(component);
+    wrapper = shallow(component, intlContexts.shallowContext);
     pureComponent = wrapper.find(PatientEntryView);
   }
 
@@ -62,19 +63,18 @@ describe('PatientEntry component', () => {
 
   it('changes isOpen state property if props changes for the property', () => {
     setup(storeState);
-    let component = mount(<PatientEntryView isOpen={false} />);
-    expect(component.prop('isOpen')).toEqual(false);
-    component.setProps({ isOpen: true });
-    expect(component.prop('isOpen')).toEqual(true);
+    let component = pureComponent.shallow();
+    expect(component.state('isOpen')).toEqual(true);
+    component.setProps({ isOpen: false });
+    expect(component.state('isOpen')).toEqual(false);
   });
 
   it('handles closing the modal in the component', async () => {
-    mockResolve = null;
-    mockClosePrompt = null;
+    isEntryRequired = false;
     setup(storeState);
     let shallowedComponent = pureComponent.shallow();
     await shallowedComponent.find('Dialog').dive().find('ContentContainer').dive().find('.right-align').find('Button').at(1).simulate('click');
-    expect(shallowedComponent.state('isOpen')).toEqual(false);
+    expect(mockClosePrompt).toHaveBeenCalled();
   });
 
   it('does not have cancel options on the modal if a patient is required', async () => {
@@ -113,7 +113,7 @@ describe('PatientEntry component', () => {
       let shallowedComponent = pureComponent.shallow();
       await enterInputAndSave(shallowedComponent, 'test');
       expect(shallowedComponent.state('shouldDisplayError')).toEqual(false);
-      expect(shallowedComponent.state('isOpen')).toEqual(false);
+      expect(mockClosePrompt).toHaveBeenCalled();
       expect(mockResolve).toHaveBeenCalled();
       expect(mockClosePrompt).toHaveBeenCalled();
     });
