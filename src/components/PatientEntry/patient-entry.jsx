@@ -90,7 +90,7 @@ export class PatientEntry extends Component {
     try {
       const data = await retrieveAllPatientIds();
       const patients = [];
-      data.forEach((patient) => patients.push({ value: patient, label: patient }));
+      data.forEach((patient) => patients.push({ value: patient.id, label: patient.name + ', ' + patient.dob }));
       this.setState({ patients: patients });
     } catch (error) {
       this.setState({ shouldDisplayError: true, errorMessage: 'Error fetching patients from FHIR Server' });

@@ -8,7 +8,7 @@ function retrieveAllPatientIds() {
     const headers = {
       Accept: 'application/json+fhir',
     };
-    const patientIds = [];
+    const patientInfoList = [];
 
     if (accessToken) {
       headers.Authorization = `Bearer ${accessToken.access_token}`;
@@ -19,12 +19,17 @@ function retrieveAllPatientIds() {
       url: `${fhirServer}/Patient`,
       headers,
     }).then((result) => {
-      if (result.data && result.data.resourceType === 'Bundle' 
+      if (result.data && result.data.resourceType === 'Bundle'
         && Array.isArray(result.data.entry) && result.data.entry.length) {
           for (const patient of result.data.entry) {
-            patientIds.push(patient.resource.id);
+            let patientInfo = {id: '', name: 'Unknown', dob: ''};
+            patientInfo.id = patient.resource.id;
+            const familyName = (Array.isArray(patient.resource.name[0].family)) ? patient.resource.name[0].family.join(' ') : patient.resource.name[0].family;
+            patientInfo.name = `${patient.resource.name[0].given.join(' ')} ${familyName}`;
+            patientInfo.dob = patient.resource.birthDate;
+            patientInfoList.push(patientInfo);
           }
-          return resolve(patientIds);
+          return resolve(patientInfoList);
       } else {
         return reject();
       }
