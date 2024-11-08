@@ -101,7 +101,8 @@ function prefetchDataPromises(state, baseUrl, prefetch) {
         for (let i = 0; i < prefetchKeys.length; i += 1) {
             const key = prefetchKeys[i];
             const prefetchValue = prefetchRequests[key];
-            if (prefetchValue.length > 2000) {
+            let usePost = false;
+            if (i === 0 || usePost) {
                 const resource = prefetchValue.split('?')[0]; // TODO: investigate edge cases
                 const params = new URLSearchParams(prefetchValue.split('?')[1]);
                 axios({
@@ -114,17 +115,19 @@ function prefetchDataPromises(state, baseUrl, prefetch) {
                         if (result.data && Object.keys(result.data).length) {
                             resultingPrefetch[key] = result.data;
                         }
+                        usePost = true;
                         resolveWhenDone();
                     })
                     .catch((err) => {
                         // Since prefetch is best-effort, don't throw; just log it and continue
                         console.log(
-                            `Unable to prefetch data for ${baseUrl}/${prefetchValue}`,
+                            `Unable to prefetch data using POST for ${baseUrl}/${prefetchValue}`,
                             err,
                         );
                         resolveWhenDone();
                     });
-            } else {
+            }
+            if (!usePost) {
                 axios({
                     method: 'get',
                     url: `${baseUrl}/${prefetchValue}`,
