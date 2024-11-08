@@ -1,0 +1,8 @@
+.container {
+  height: 100%;
+  word-wrap: break-word;
+}
+
+.vertical-separation {
+  padding-top: 20px;
+}

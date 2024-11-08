@@ -9,8 +9,9 @@ import Spacer from 'terra-spacer';
 import Text from 'terra-text';
 
 import styles from './patient-entry.css';
-import BaseEntryBody from '../BaseEntryBody/base-entry-body';
+import PatientSelect from '../PatientSelect/patient-select';
 import retrievePatient from '../../retrieve-data-helpers/patient-retrieval';
+import retrieveAllPatientIds from '../../retrieve-data-helpers/all-patient-retrieval';
 
 const propTypes = {
   /**
@@ -63,6 +64,14 @@ export class PatientEntry extends Component {
        * Error message to display on the Field
        */
       errorMessage: '',
+      /**
+       * The ID of the current Patient resource in context
+       */
+      currentPatient: this.props.currentPatientId,
+      /**
+       * The list of the Patient identifiers populated from the currentFhirServer
+       */
+      patients: [],
     };
 
     this.handleCloseModal = this.handleCloseModal.bind(this);
@@ -77,13 +86,26 @@ export class PatientEntry extends Component {
     return null;
   }
 
+  async componentDidMount() {
+    try {
+      const data = await retrieveAllPatientIds();
+      const patients = [];
+      data.forEach((patient) => patients.push({ value: patient.id, label: patient.name + ', ' + patient.dob }));
+      this.setState({ patients: patients });
+    } catch (error) {
+      this.setState({ shouldDisplayError: true, errorMessage: 'Error fetching patients from FHIR Server' });
+      return;
+    }
+  }
+
   handleCloseModal() {
     this.setState({ isOpen: false, shouldDisplayError: false, errorMessage: '' });
     if (this.props.closePrompt) { this.props.closePrompt(); }
   }
 
   handleChange(e) {
-    this.setState({ userInput: e.target.value });
+    this.setState({ userInput: e.value });
+    this.setState({ currentPatient: e.value });
   }
 
   async handleSubmit() {
@@ -137,14 +159,15 @@ export class PatientEntry extends Component {
             footer={footerContainer}
             onClose={this.props.isEntryRequired ? null : this.handleCloseModal}
           >
-            <BaseEntryBody
-              currentFhirServer={this.props.currentFhirServer}
-              formFieldLabel="Enter a Patient ID"
-              shouldDisplayError={this.state.shouldDisplayError}
-              errorMessage={this.state.errorMessage}
-              placeholderText={this.props.currentPatientId}
-              inputOnChange={this.handleChange}
-              inputName="patient-input"
+            <PatientSelect
+                currentFhirServer={this.props.currentFhirServer}
+                formFieldLabel="Select a Patient"
+                shouldDisplayError={this.state.shouldDisplayError}
+                errorMessage={this.state.errorMessage}
+                placeholderText={this.state.currentPatient}
+                inputOnChange={this.handleChange}
+                inputName="patient-input"
+                patients={this.state.patients}
             />
           </Dialog>
         </Modal>
