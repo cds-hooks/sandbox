@@ -90,11 +90,10 @@ export class PatientEntry extends Component {
     try {
       const data = await retrieveAllPatientIds();
       const patients = [];
-      data.forEach((patient) => patients.push({ value: patient.id, label: patient.name + ', ' + patient.dob }));
-      this.setState({ patients: patients });
+      data.forEach((patient) => patients.push({ value: patient.id, label: `${patient.name}, ${patient.dob}` }));
+      this.setState({ patients });
     } catch (error) {
       this.setState({ shouldDisplayError: true, errorMessage: 'Error fetching patients from FHIR Server' });
-      return;
     }
   }
 
@@ -160,14 +159,14 @@ export class PatientEntry extends Component {
             onClose={this.props.isEntryRequired ? null : this.handleCloseModal}
           >
             <PatientSelect
-                currentFhirServer={this.props.currentFhirServer}
-                formFieldLabel="Select a Patient"
-                shouldDisplayError={this.state.shouldDisplayError}
-                errorMessage={this.state.errorMessage}
-                placeholderText={this.state.currentPatient}
-                inputOnChange={this.handleChange}
-                inputName="patient-input"
-                patients={this.state.patients}
+              currentFhirServer={this.props.currentFhirServer}
+              formFieldLabel="Select a Patient"
+              shouldDisplayError={this.state.shouldDisplayError}
+              errorMessage={this.state.errorMessage}
+              placeholderText={this.state.currentPatient}
+              inputOnChange={this.handleChange}
+              inputName="patient-input"
+              patients={this.state.patients}
             />
           </Dialog>
         </Modal>
