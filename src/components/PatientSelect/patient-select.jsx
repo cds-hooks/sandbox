@@ -32,13 +32,9 @@ const propTypes = {
    */
   inputOnChange: PropTypes.func.isRequired,
   /**
-   * The name attribute for the Input component
-   */
-  inputName: PropTypes.string,
-  /**
    * A list of the Patient identifiers that populate the select options
    */
-  patients: PropTypes.array.isRequired
+  patients: PropTypes.instanceOf(Array).isRequired,
 };
 
 /**
@@ -53,7 +49,7 @@ const propTypes = {
  */
 const PatientSelect = ({
   currentFhirServer, formFieldLabel, shouldDisplayError,
-  errorMessage, placeholderText, inputOnChange, inputName,
+  errorMessage, placeholderText, inputOnChange,
   patients,
 }) => {
   let fhirServerDisplay;

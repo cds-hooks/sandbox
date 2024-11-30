@@ -21,18 +21,19 @@ function retrieveAllPatientIds() {
     }).then((result) => {
       if (result.data && result.data.resourceType === 'Bundle'
         && Array.isArray(result.data.entry) && result.data.entry.length) {
-          for (const patient of result.data.entry) {
-            let patientInfo = {id: '', name: 'Unknown', dob: ''};
-            patientInfo.id = patient.resource.id;
-            const familyName = (Array.isArray(patient.resource.name[0].family)) ? patient.resource.name[0].family.join(' ') : patient.resource.name[0].family;
+        result.data.entry.forEach((patient) => {
+          const patientInfo = { id: '', name: 'Unknown', dob: '' };
+          patientInfo.id = patient.resource.id;
+          if (Array.isArray(patient.resource.name)) {
+            const familyName = Array.isArray(patient.resource.name[0].family) ? patient.resource.name[0].family.join(' ') : patient.resource.name[0].family;
             patientInfo.name = `${patient.resource.name[0].given.join(' ')} ${familyName}`;
-            patientInfo.dob = patient.resource.birthDate;
-            patientInfoList.push(patientInfo);
           }
-          return resolve(patientInfoList);
-      } else {
-        return reject();
+          patientInfo.dob = patient.resource.birthDate;
+          patientInfoList.push(patientInfo);
+        });
+        return resolve(patientInfoList);
       }
+      return reject();
     }).catch((err) => {
       console.error('Could not retrieve patients from current FHIR server', err);
       return reject(err);

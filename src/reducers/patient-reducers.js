@@ -19,8 +19,11 @@ const patientReducers = (state = initialState, action) => {
       // Store Patient resource from successful connection to patient in context from FHIR server
       case types.GET_PATIENT_SUCCESS: {
         const { patient } = action;
-        const familyName = (Array.isArray(patient.name[0].family)) ? patient.name[0].family.join(' ') : patient.name[0].family;
-        const fullName = `${patient.name[0].given.join(' ')} ${familyName}`;
+        let fullName = 'Unknown';
+        if (Array.isArray(patient.name)) {
+          const familyName = (Array.isArray(patient.name[0].family)) ? patient.name[0].family.join(' ') : patient.name[0].family;
+          fullName = `${patient.name[0].given.join(' ')} ${familyName}`;
+        }
         const newPatient = {
           id: patient.id,
           name: fullName,
