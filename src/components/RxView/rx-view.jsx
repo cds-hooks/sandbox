@@ -5,14 +5,19 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import forIn from 'lodash/forIn';
 import cx from 'classnames';
-import Field from 'terra-form-field';
+import FormControl from '@mui/material/FormControl';
+import FormLabel from '@mui/material/FormLabel';
+import TextField from '@mui/material/TextField';
+import MuiSelect from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import Typography from '@mui/material/Typography';
 // import Checkbox from 'terra-form-checkbox';
 import Select from 'react-select';
-import SelectField from 'terra-form-select';
-import Text from 'terra-text';
-import Input, { InputField } from 'terra-form-input';
-import DatePicker from 'terra-date-picker';
-import List, { Item } from 'terra-list';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import List from '@mui/material/List';
+import ListItemButton from '@mui/material/ListItemButton';
 
 import debounce from 'debounce';
 
@@ -268,10 +273,8 @@ export class RxView extends Component {
         <h1 className={styles['view-title']}>Rx View</h1>
         <PatientBanner />
         <form>
-          <Field
-            label="Treating"
-            labelAttrs={{ className: styles['condition-select'] }}
-          >
+          <FormControl fullWidth margin="normal" className={styles['condition-select']}>
+            <FormLabel>Treating</FormLabel>
             <Select
               name="condition-input"
               placeholder={this.state.conditionDisplay}
@@ -279,76 +282,72 @@ export class RxView extends Component {
               options={this.createDropdownConditions()}
               onChange={this.selectCondition}
             />
-          </Field>
-          <Field
-            label="Medication"
-            labelAttrs={{ className: styles['medication-field'] }}
-            required
-          >
-            <Input
+          </FormControl>
+          <FormControl fullWidth margin="normal" className={styles['medication-field']} required>
+            <FormLabel required>Medication</FormLabel>
+            <TextField
               name="medication-input"
               value={this.state.value}
               onChange={this.changeMedicationInput}
+              fullWidth
+              required
             />
-            <List dividerStyle="standard">
+            <List>
               {medicationArray.map((med) => (
-                <Item
+                <ListItemButton
                   key={med.id}
-                  isSelectable
-                  onSelect={() => { this.props.chooseMedication(med); }}
+                  onClick={() => { this.props.chooseMedication(med); }}
                 >
-                  <p>{med.name}</p>
-                </Item>
+                  {med.name}
+                </ListItemButton>
               ))}
             </List>
-          </Field>
-          {this.props.prescription ? <Text isItalic fontSize={16}>{this.props.prescription.name}</Text> : null}
+          </FormControl>
+          {this.props.prescription ? <Typography fontStyle="italic" fontSize={16}>{this.props.prescription.name}</Typography> : null}
           <div className={styles['dose-instruction']}>
-            <InputField
-              inputId="dosage-amount"
+            <TextField
+              id="dosage-amount"
               label="Number"
               type="number"
               value={this.state.dosageAmount}
               onChange={this.changeDosageAmount}
-              inputAttrs={{
-                name: 'dosage-amount',
-              }}
-              isInline
+              name="dosage-amount"
+              size="small"
+              sx={{ mr: 2 }}
             />
-            <Field label="Frequency" isInline>
-              <SelectField
+            <FormControl size="small" sx={{ minWidth: 200 }}>
+              <FormLabel>Frequency</FormLabel>
+              <MuiSelect
                 name="dosage-frequency"
-                onChange={this.changeDosageFrequency}
+                onChange={(e) => this.changeDosageFrequency(e, e.target.value)}
                 value={this.state.dosageFrequency}
               >
-                <SelectField.Option key="daily" value="daily" display="daily" />
-                <SelectField.Option key="twice-daily" value="bid" display="twice daily" />
-                <SelectField.Option key="three-daily" value="tid" display="three times daily" />
-                <SelectField.Option key="four-daily" value="qid" display="four times daily" />
-              </SelectField>
-            </Field>
+                <MenuItem value="daily">daily</MenuItem>
+                <MenuItem value="bid">twice daily</MenuItem>
+                <MenuItem value="tid">three times daily</MenuItem>
+                <MenuItem value="qid">four times daily</MenuItem>
+              </MuiSelect>
+            </FormControl>
           </div>
           <div className={styles['dosage-timing']}>
-            <Field
-              label="Start Date"
-              isInline
-            >
-              <DatePicker
-                name="start-date"
-                selectedDate={this.state.startRange.value}
-                onChange={this.selectStartDate}
-              />
-            </Field>
-            <Field
-              label="End Date"
-              isInline
-            >
-              <DatePicker
-                name="end-date"
-                selectedDate={this.state.endRange.value}
-                onChange={this.selectEndDate}
-              />
-            </Field>
+            <LocalizationProvider dateAdapter={AdapterMoment}>
+              <FormControl sx={{ mr: 2 }}>
+                <DatePicker
+                  label="Start Date"
+                  value={this.state.startRange.value || null}
+                  onChange={(newValue) => this.selectStartDate(null, newValue)}
+                  slotProps={{ textField: { size: 'small' } }}
+                />
+              </FormControl>
+              <FormControl>
+                <DatePicker
+                  label="End Date"
+                  value={this.state.endRange.value || null}
+                  onChange={(newValue) => this.selectEndDate(null, newValue)}
+                  slotProps={{ textField: { size: 'small' } }}
+                />
+              </FormControl>
+            </LocalizationProvider>
           </div>
         </form>
         <CardList takeSuggestion={this.props.takeSuggestion} />

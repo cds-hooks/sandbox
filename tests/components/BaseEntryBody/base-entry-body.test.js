@@ -30,24 +30,23 @@ describe('BaseEntryBody component', () => {
   });
 
   it('should render relevant child components', () => {
-    expect(wrapper.find('Text')).toHaveLength(2);
-    expect(wrapper.find('Field')).toHaveLength(1);
-    expect(wrapper.find('Input')).toHaveLength(1);
+    expect(wrapper.find('ForwardRef(Typography)')).toHaveLength(2);
+    expect(wrapper.find('ForwardRef(TextField)')).toHaveLength(1);
   });
 
   it('should call onChange method when input is changed', () => {
-    wrapper.find('Input').simulate('change', {'target': {'value': 'test'}});
+    wrapper.find('ForwardRef(TextField)').simulate('change', {'target': {'value': 'test'}});
     expect(inputOnChange).toHaveBeenCalled();
   });
 
   it('should not render text displaying the current fhir server if the prop is not passed in', () => {
-    wrapper = shallow(<BaseEntryBody formFieldLabel={formFieldLabel} 
-      shouldDisplayError={shouldDisplayError} 
-      errorMessage={errorMessage} 
-      placeholderText={placeholderText} 
-      inputOnChange={inputOnChange} 
+    wrapper = shallow(<BaseEntryBody formFieldLabel={formFieldLabel}
+      shouldDisplayError={shouldDisplayError}
+      errorMessage={errorMessage}
+      placeholderText={placeholderText}
+      inputOnChange={inputOnChange}
       inputName={inputName} />);
 
-    expect(wrapper.find('Text').length).toEqual(0);
+    expect(wrapper.find('ForwardRef(Typography)').length).toEqual(0);
   });
 });

@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Text from 'terra-text';
-import Field from 'terra-form-field';
-import Input from 'terra-form-input';
+import Typography from '@mui/material/Typography';
+import TextField from '@mui/material/TextField';
 
 import styles from './base-entry-body.css';
 
@@ -55,9 +54,9 @@ const BaseEntryBody = ({
   if (currentFhirServer) {
     fhirServerDisplay = (
       <div>
-        <Text weight={400} fontSize={16}>Current FHIR server</Text>
+        <Typography fontWeight={400} fontSize={16}>Current FHIR server</Typography>
         <br />
-        <Text weight={200} fontSize={14}>{currentFhirServer}</Text>
+        <Typography fontWeight={200} fontSize={14}>{currentFhirServer}</Typography>
       </div>
     );
   }
@@ -66,19 +65,16 @@ const BaseEntryBody = ({
     <div className={styles.container}>
       {fhirServerDisplay}
       <div className={styles['vertical-separation']}>
-        <Field
+        <TextField
           label={formFieldLabel}
-          isInvalid={shouldDisplayError}
-          error={errorMessage}
+          name={inputName}
+          placeholder={placeholderText}
+          onChange={inputOnChange}
+          error={shouldDisplayError}
+          helperText={shouldDisplayError ? errorMessage : ''}
           required
-        >
-          <Input
-            name={inputName}
-            placeholder={placeholderText}
-            onChange={inputOnChange}
-            required
-          />
-        </Field>
+          fullWidth
+        />
       </div>
     </div>
   );

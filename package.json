@@ -29,7 +29,12 @@
   ],
   "dependencies": {
     "@babel/cli": "^7.17.10",
-    "@cerner/webpack-config-terra": "^4.0.0",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^5.18.0",
+    "@mui/material": "^5.18.0",
+    "@mui/toolpad-core": "^0.1.51",
+    "@mui/x-date-pickers": "^6.20.2",
     "@uiw/react-codemirror": "4.11.4",
     "acorn": "^8.11.3",
     "axios": "^0.21.1",
@@ -51,8 +56,8 @@
     "process": "^0.11.10",
     "prop-types": "^15.8.1",
     "query-string": "^5.1.0",
-    "react": "^16.9.0",
-    "react-dom": "^16.9.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
     "react-intl": "^2.8.0",
     "react-markdown": "^4.3.1",
     "react-redux": "^5.0.6",
@@ -60,31 +65,6 @@
     "redux": "^3.7.2",
     "redux-immutable-state-invariant": "^2.1.0",
     "redux-logger": "^3.0.6",
-    "terra-aggregate-translations": "^1.1.0",
-    "terra-application-header-layout": "2.1.0",
-    "terra-base": "^3.12.0",
-    "terra-button": "^3.77.0",
-    "terra-card": "^3.48.0",
-    "terra-content-container": "^3.42.0",
-    "terra-date-picker": "^4.109.0",
-    "terra-dialog": "^1.36.0",
-    "terra-dropdown-button": "^1.42.0",
-    "terra-form-checkbox": "^4.26.0",
-    "terra-form-field": "^4.34.0",
-    "terra-form-input": "^4.33.0",
-    "terra-form-select": "^6.62.1",
-    "terra-heading": "^4.58.0",
-    "terra-icon": "^3.61.0",
-    "terra-list": "^4.74.0",
-    "terra-menu": "^6.97.0",
-    "terra-modal": "^2.1.0",
-    "terra-overlay": "^3.83.0",
-    "terra-responsive-element": "^5.41.0",
-    "terra-spacer": "^3.64.0",
-    "terra-status-view": "^4.77.0",
-    "terra-text": "^4.59.0",
-    "terra-theme-provider": "^4.18.1",
-    "terra-toggle": "^3.63.0",
     "uuid": "^3.3.3"
   },
   "devDependencies": {
@@ -144,16 +124,23 @@
       "/jest-setup.js",
       "/store.js"
     ],
+    "transformIgnorePatterns": [
+      "node_modules/(?!(@mui|@babel|@emotion)/)"
+    ],
     "testEnvironment": "jest-environment-jsdom-global"
   },
   "browserslist": {
     "production": [
-      "> 1%",
-      "ie 10"
+      "> 0.5%",
+      "last 2 versions",
+      "not dead",
+      "not ie 11"
     ],
     "modern": [
-      "last 1 chrome version",
-      "last 1 firefox version"
+      "last 2 chrome versions",
+      "last 2 firefox versions",
+      "last 2 safari versions",
+      "last 2 edge versions"
     ]
   }
 }

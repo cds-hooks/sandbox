@@ -2,11 +2,12 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import Modal from 'terra-modal';
-import Button from 'terra-button';
-import Dialog from 'terra-dialog';
-import Spacer from 'terra-spacer';
-import Text from 'terra-text';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import MuiButton from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 
 import styles from './patient-entry.css';
 import PatientSelect from '../PatientSelect/patient-select';
@@ -127,50 +128,36 @@ export class PatientEntry extends Component {
   }
 
   render() {
-    const headerContainer = (
-      <Text weight={700} fontSize={20}>Change Patient</Text>
-    );
-
-    const footerContainer = (
-      <div className={styles['right-align']}>
-        <Button text="Save" variant="emphasis" onClick={this.handleSubmit} />
-        {this.props.isEntryRequired ? ''
-          : (
-            <Spacer marginLeft="small" isInlineBlock>
-              <Button text="Cancel" onClick={this.handleCloseModal} />
-            </Spacer>
-          )}
-      </div>
-    );
-
     return (
-      <div>
-        <Modal
-          ariaLabel="Patient"
-          isOpen={this.state.isOpen}
-          closeOnEsc={!this.props.isEntryRequired}
-          closeOnOutsideClick={!this.props.isEntryRequired}
-          onRequestClose={this.handleCloseModal}
-          classNameModal={styles['fixed-size']}
-        >
-          <Dialog
-            header={headerContainer}
-            footer={footerContainer}
-            onClose={this.props.isEntryRequired ? null : this.handleCloseModal}
-          >
-            <PatientSelect
-              currentFhirServer={this.props.currentFhirServer}
-              formFieldLabel="Select a Patient"
-              shouldDisplayError={this.state.shouldDisplayError}
-              errorMessage={this.state.errorMessage}
-              placeholderText={this.state.currentPatient}
-              inputOnChange={this.handleChange}
-              inputName="patient-input"
-              patients={this.state.patients}
-            />
-          </Dialog>
-        </Modal>
-      </div>
+      <Dialog
+        open={this.state.isOpen}
+        onClose={this.props.isEntryRequired ? undefined : this.handleCloseModal}
+        disableEscapeKeyDown={this.props.isEntryRequired}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>
+          <Typography fontWeight={700} fontSize={20}>Change Patient</Typography>
+        </DialogTitle>
+        <DialogContent>
+          <PatientSelect
+            currentFhirServer={this.props.currentFhirServer}
+            formFieldLabel="Select a Patient"
+            shouldDisplayError={this.state.shouldDisplayError}
+            errorMessage={this.state.errorMessage}
+            placeholderText={this.state.currentPatient}
+            inputOnChange={this.handleChange}
+            inputName="patient-input"
+            patients={this.state.patients}
+          />
+        </DialogContent>
+        <DialogActions className={styles['right-align']}>
+          {!this.props.isEntryRequired && (
+            <MuiButton onClick={this.handleCloseModal}>Cancel</MuiButton>
+          )}
+          <MuiButton variant="contained" onClick={this.handleSubmit}>Save</MuiButton>
+        </DialogActions>
+      </Dialog>
     );
   }
 }

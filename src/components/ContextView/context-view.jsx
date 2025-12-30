@@ -6,7 +6,8 @@ import { connect } from 'react-redux';
 import cx from 'classnames';
 import forIn from 'lodash/forIn';
 
-import Field from 'terra-form-field';
+import FormControl from '@mui/material/FormControl';
+import FormLabel from '@mui/material/FormLabel';
 import Select from 'react-select';
 import ExchangePanel from '../ExchangePanel/exchange-panel';
 import MessagePanel from '../MessagePanel/message-panel';
@@ -109,14 +110,15 @@ export class ContextView extends Component {
       <div className={cx(styles.container, contextToggledClass)}>
         <div className={styles['wrap-context']}>
           <h1 className={styles.title}>CDS Developer Panel</h1>
-          <Field label="Select a Service">
+          <FormControl fullWidth margin="normal">
+            <FormLabel>Select a Service</FormLabel>
             <Select
               placeholder={serviceInContext}
               value={serviceInContext}
               options={this.createDropdownServices()}
               onChange={this.onSelectChange}
             />
-          </Field>
+          </FormControl>
           <ExchangePanel
             panelHeader=" Request"
             panelText={serviceExchange ? serviceExchange.request : 'No request made to CDS Service'}

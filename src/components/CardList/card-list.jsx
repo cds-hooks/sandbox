@@ -7,10 +7,14 @@ import ReactMarkdown from 'react-markdown';
 import cx from 'classnames';
 import axios from 'axios';
 
-import TerraCard from 'terra-card';
-import Text from 'terra-text';
-import Button from 'terra-button';
-import { Item, SplitButton } from 'terra-dropdown-button';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
+import MuiButton from '@mui/material/Button';
+import ButtonGroup from '@mui/material/ButtonGroup';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import generateJWT from '../../retrieve-data-helpers/jwt-generator';
 
 import styles from './card-list.css';
@@ -53,9 +57,23 @@ const propTypes = {
 export class CardList extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      dismissMenuAnchor: null,
+      currentCardId: null,
+    };
     this.launchLink = this.launchLink.bind(this);
     this.launchSource = this.launchSource.bind(this);
     this.renderSource = this.renderSource.bind(this);
+    this.handleDismissMenuOpen = this.handleDismissMenuOpen.bind(this);
+    this.handleDismissMenuClose = this.handleDismissMenuClose.bind(this);
+  }
+
+  handleDismissMenuOpen(event, cardId) {
+    this.setState({ dismissMenuAnchor: event.currentTarget, currentCardId: cardId });
+  }
+
+  handleDismissMenuClose() {
+    this.setState({ dismissMenuAnchor: null, currentCardId: null });
   }
 
   /**
@@ -268,15 +286,15 @@ export class CardList extends Component {
 
         // -- Summary --
         const summarySection = (
-          <Text
+          <Typography
             fontSize={18}
-            weight={700}
+            fontWeight={700}
             color={summaryColors[card.indicator]}
           >
             {' '}
             {card.summary}
             {' '}
-          </Text>
+          </Typography>
         );
 
         // -- Source --
@@ -299,12 +317,13 @@ export class CardList extends Component {
         let suggestionsSection;
         if (card.suggestions) {
           suggestionsSection = card.suggestions.map((item, ind) => (
-            <Button
+            <MuiButton
               key={ind}
               onClick={() => this.takeSuggestion(item, card.uuid, card.serviceUrl)}
-              text={item.label}
-              variant={Button.Opts.Variants.EMPHASIS}
-            />
+              variant="contained"
+            >
+              {item.label}
+            </MuiButton>
           ));
         }
 
@@ -322,8 +341,8 @@ export class CardList extends Component {
 
             return (
               <div key={ind}>
-                <Button
-                  isDisabled={unlaunchable}
+                <MuiButton
+                  disabled={unlaunchable}
                   title={unlaunchableNotice}
                   onClick={(e) => {
                     const launchedWindow = this.launchLink(e, link);
@@ -331,9 +350,10 @@ export class CardList extends Component {
                       this.props.onAppLaunch(link, launchedWindow);
                     }
                   }}
-                  variant="action"
-                  text={link.label}
-                />
+                  variant="text"
+                >
+                  {link.label}
+                </MuiButton>
                 <div className={styles.unlaunchable}>{unlaunchableNotice}</div>
               </div>
             );
@@ -344,41 +364,69 @@ export class CardList extends Component {
         if (card.uuid) {
           const { overrideReasons } = card;
           if (overrideReasons) {
-            const items = overrideReasons.map((reason) => (
-              <Item
-                label={`Override: ${reason.display}`}
-                onSelect={() => {
-                  this.dismissCard(card.serviceUrl, card.uuid, reason);
-                }}
-              />
-            ));
+            const menuId = `dismiss-menu-${card.uuid}`;
+            const isMenuOpen = this.state.currentCardId === card.uuid && Boolean(this.state.dismissMenuAnchor);
 
             dismissSection = (
               <div key="dismiss">
                 <hr />
-                <SplitButton
-                  primaryOptionLabel="Dismiss"
-                  onSelect={() => {
-                    this.dismissCard(card.serviceUrl, card.uuid);
+                <ButtonGroup variant="outlined">
+                  <MuiButton
+                    onClick={() => {
+                      this.dismissCard(card.serviceUrl, card.uuid);
+                    }}
+                  >
+                    Dismiss
+                  </MuiButton>
+                  <MuiButton
+                    size="small"
+                    aria-controls={isMenuOpen ? menuId : undefined}
+                    aria-expanded={isMenuOpen ? 'true' : undefined}
+                    aria-label="select dismiss reason"
+                    aria-haspopup="menu"
+                    onClick={(e) => this.handleDismissMenuOpen(e, card.uuid)}
+                  >
+                    <ArrowDropDownIcon />
+                  </MuiButton>
+                </ButtonGroup>
+                <Menu
+                  id={menuId}
+                  anchorEl={isMenuOpen ? this.state.dismissMenuAnchor : null}
+                  open={isMenuOpen}
+                  onClose={this.handleDismissMenuClose}
+                  MenuListProps={{
+                    'aria-labelledby': 'split-button',
                   }}
-                  variant="neutral"
                 >
-                  {items}
-                </SplitButton>
+                  {overrideReasons.map((reason, idx) => (
+                    <MenuItem
+                      key={idx}
+                      onClick={() => {
+                        this.dismissCard(card.serviceUrl, card.uuid, reason);
+                        this.handleDismissMenuClose();
+                      }}
+                    >
+                      Override:
+                      {' '}
+                      {reason.display}
+                    </MenuItem>
+                  ))}
+                </Menu>
               </div>
             );
           } else {
             dismissSection = (
               <div key="dismiss">
                 <hr />
-                <Button
+                <MuiButton
                   title="Dismiss Card"
                   onClick={() => {
                     this.dismissCard(card.serviceUrl, card.uuid);
                   }}
-                  variant="neutral"
-                  text="Dismiss"
-                />
+                  variant="outlined"
+                >
+                  Dismiss
+                </MuiButton>
               </div>
             );
           }
@@ -391,33 +439,22 @@ export class CardList extends Component {
         );
 
         const builtCard = (
-          <TerraCard key={cardInd} className={classes}>
-            {' '}
-            {summarySection}
-            {' '}
-            {sourceSection}
-            {' '}
-            {detailSection}
-            {' '}
-            <div className={styles['suggestions-section']}>
-              {' '}
-              {suggestionsSection}
-              {' '}
-            </div>
-            {' '}
-            <div className={styles['links-section']}>
-              {' '}
-              {linksSection}
-              {' '}
-            </div>
-            {' '}
-            <div className={styles['dismiss-section']}>
-              {' '}
-              {dismissSection}
-              {' '}
-            </div>
-            {' '}
-          </TerraCard>
+          <Card key={cardInd} className={classes}>
+            <CardContent>
+              {summarySection}
+              {sourceSection}
+              {detailSection}
+              <div className={styles['suggestions-section']}>
+                {suggestionsSection}
+              </div>
+              <div className={styles['links-section']}>
+                {linksSection}
+              </div>
+              <div className={styles['dismiss-section']}>
+                {dismissSection}
+              </div>
+            </CardContent>
+          </Card>
         );
 
         renderedCards.push(builtCard);

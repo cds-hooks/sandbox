@@ -78,7 +78,7 @@ describe('FhirServerEntry component', () => {
     isEntryRequired = false;
     setup(storeState);
     let shallowedComponent = pureComponent.shallow();
-    await shallowedComponent.find('Dialog').dive().find('ContentContainer').dive().find('.right-align').find('Button').at(0).simulate('click');
+    await shallowedComponent.find('ForwardRef(DialogActions)').find('ForwardRef(Button)').at(0).simulate('click');
     expect(mockClosePrompt).toHaveBeenCalled();
     expect(mockResolve).toHaveBeenCalled();
     expect(mockSpy).toHaveBeenCalled();
@@ -88,14 +88,14 @@ describe('FhirServerEntry component', () => {
     isEntryRequired = false;
     setup(storeState);
     let shallowedComponent = pureComponent.shallow();
-    await shallowedComponent.find('Dialog').dive().find('ContentContainer').dive().find('.right-align').find('Button').at(2).simulate('click');
+    await shallowedComponent.find('ForwardRef(DialogActions)').find('ForwardRef(Button)').at(1).simulate('click');
     expect(mockClosePrompt).toHaveBeenCalled();
   });
 
   describe('User input', () => {
     const enterInputAndSave = (shallowedComponent, input) => {
-      shallowedComponent.find('BaseEntryBody').dive().find('Input').simulate('change', {'target': {'value': input}});
-      shallowedComponent.find('Dialog').dive().find('ContentContainer').dive().find('.right-align').find('Button').at(0).simulate('click');
+      shallowedComponent.find('BaseEntryBody').prop('inputOnChange')({'target': {'value': input}});
+      shallowedComponent.find('ForwardRef(DialogActions)').find('ForwardRef(Button)').last().simulate('click');
     };
 
     it('displays an error if input is empty', () => {

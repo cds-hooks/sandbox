@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import LoadingOverlay from 'terra-overlay/lib/LoadingOverlay';
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 import queryString from 'query-string';
 
 import smartLaunchPromise from '../../retrieve-data-helpers/smart-launch';
@@ -233,7 +234,12 @@ export class MainView extends Component {
 
     return (
       <div>
-        <LoadingOverlay isOpen={this.props.isLoadingData} isAnimated />
+        <Backdrop
+          sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          open={this.props.isLoadingData}
+        >
+          <CircularProgress color="inherit" />
+        </Backdrop>
         {this.state.fhirServerPrompt ? (
           <FhirServerEntry
             isOpen={this.state.fhirServerPrompt}

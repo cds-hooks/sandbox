@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Text from 'terra-text';
-import Field from 'terra-form-field';
+import Typography from '@mui/material/Typography';
+import FormControl from '@mui/material/FormControl';
+import FormLabel from '@mui/material/FormLabel';
+import FormHelperText from '@mui/material/FormHelperText';
 import Select from 'react-select';
 
 import styles from './patient-select.css';
@@ -56,9 +58,9 @@ const PatientSelect = ({
   if (currentFhirServer) {
     fhirServerDisplay = (
       <div>
-        <Text weight={400} fontSize={16}>Current FHIR server</Text>
+        <Typography fontWeight={400} fontSize={16}>Current FHIR server</Typography>
         <br />
-        <Text weight={200} fontSize={14}>{currentFhirServer}</Text>
+        <Typography fontWeight={200} fontSize={14}>{currentFhirServer}</Typography>
       </div>
     );
   }
@@ -67,19 +69,16 @@ const PatientSelect = ({
     <div className={styles.container}>
       {fhirServerDisplay}
       <div className={styles['vertical-separation']}>
-        <Field
-          label={formFieldLabel}
-          isInvalid={shouldDisplayError}
-          error={errorMessage}
-          required
-        >
+        <FormControl fullWidth error={shouldDisplayError} required>
+          <FormLabel required>{formFieldLabel}</FormLabel>
           <Select
             placeholder={placeholderText}
             value={placeholderText}
             onChange={inputOnChange}
             options={patients}
           />
-        </Field>
+          {shouldDisplayError && <FormHelperText>{errorMessage}</FormHelperText>}
+        </FormControl>
       </div>
     </div>
   );

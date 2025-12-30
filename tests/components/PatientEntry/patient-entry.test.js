@@ -74,7 +74,7 @@ describe('PatientEntry component', () => {
     isEntryRequired = false;
     setup(storeState);
     let shallowedComponent = pureComponent.shallow();
-    await shallowedComponent.find('Dialog').dive().find('ContentContainer').dive().find('.right-align').find('Button').at(1).simulate('click');
+    await shallowedComponent.find('ForwardRef(DialogActions)').find('ForwardRef(Button)').at(0).simulate('click');
     expect(mockClosePrompt).toHaveBeenCalled();
   });
 
@@ -82,14 +82,14 @@ describe('PatientEntry component', () => {
     isEntryRequired = false;
     setup(storeState);
     let shallowedComponent = pureComponent.shallow();
-    expect(await shallowedComponent.find('Dialog').dive().find('ContentContainer').dive().find('.right-align').find('Button').length).toEqual(2);
+    expect(await shallowedComponent.find('ForwardRef(DialogActions)').find('ForwardRef(Button)').length).toEqual(2);
   });
 
   describe('User input', () => {
     const enterInputAndSave = (shallowedComponent, input) => {
       shallowedComponent.find('PatientSelect').simulate('change', {'value': input});
       let x = shallowedComponent.find('PatientSelect');
-      shallowedComponent.find('Dialog').dive().find('ContentContainer').dive().find('.right-align').find('Button').at(0).simulate('click');
+      shallowedComponent.find('ForwardRef(DialogActions)').find('ForwardRef(Button)').last().simulate('click');
     };
 
     it('displays an error if input is empty', () => {

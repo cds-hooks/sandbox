@@ -37,7 +37,7 @@ describe('ServiceDisplay component', () => {
   });
 
   it('toggles enabled status for a service if the enabled button is clicked', () => {
-    pureComponent.find('.btn-container').find('Button').at(0).simulate('click');
+    pureComponent.find('.btn-container').find('ForwardRef(Button)').at(0).simulate('click');
     expect(mockStore.getActions()).toEqual([{
       type: types.TOGGLE_SERVICE,
       service: url,
@@ -45,7 +45,7 @@ describe('ServiceDisplay component', () => {
   });
 
   it('deletes a configured service if the delete button is clicked', () => {
-    pureComponent.find('.btn-container').find('Button').at(1).simulate('click');
+    pureComponent.find('.btn-container').find('ForwardRef(Button)').at(1).simulate('click');
     expect(mockStore.getActions()).toEqual([{
       type: types.DELETE_SERVICE,
       service: url,

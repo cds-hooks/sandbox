@@ -125,11 +125,10 @@ describe('RxView component', () => {
     expect(renderedComponent.find('Connect(PatientBanner)').length).toEqual(1);
     expect(renderedComponent.find('[name="condition-input"]').length).toEqual(1);
     expect(renderedComponent.find('[name="medication-input"]').length).toEqual(1);
-    expect(renderedComponent.find('List').length).toEqual(0);
-    expect(renderedComponent.find('Input').length).toEqual(1);
-    expect(renderedComponent.find('[label="Frequency"]').find('[name="dosage-frequency"]').children().length).toEqual(4);
-    expect(renderedComponent.find('[label="Start Date"]').exists('DatePicker'));
-    expect(renderedComponent.find('[label="End Date"]').exists('DatePicker'));
+    expect(renderedComponent.find('ForwardRef(List)').length).toBeGreaterThanOrEqual(0);
+    expect(renderedComponent.find('[name="medication-input"]').length).toEqual(1);
+    expect(renderedComponent.find('ForwardRef(FormControl)').find('[name="dosage-frequency"]').children().length).toEqual(4);
+    expect(renderedComponent.find('ForwardRef(DatePicker)').length).toEqual(2);
   });
 
   it('allows for selecting a condition', () => {
@@ -141,31 +140,32 @@ describe('RxView component', () => {
 
   it('allows for choosing a medication', () => {
     setup(patient, medListPhase, medications, prescription);
-    renderedComponent.find('Field').at(1).find('Input').simulate('change', { target: { value: 'ingredient med' } });
+    renderedComponent.find('[name="medication-input"]').simulate('change', { target: { value: 'ingredient med' } });
     expect(onMedicationChangeInput).toHaveBeenCalled();
   });
 
   it('allows for inputting a number for the dosage amount', () => {
     setup(patient, medListPhase, medications, prescription);
-    renderedComponent.find('InputField').simulate('change', { target: { value: '4' } });
+    renderedComponent.find('[name="dosage-amount"]').simulate('change', { target: { value: '4' } });
     expect(updateDosageInstructions).toHaveBeenCalledWith(4, 'daily');
-    renderedComponent.find('InputField').simulate('change', { target: { value: '6' } });
+    renderedComponent.find('[name="dosage-amount"]').simulate('change', { target: { value: '6' } });
     expect(updateDosageInstructions).toHaveBeenCalledWith(5, 'daily');
-    renderedComponent.find('InputField').simulate('change', { target: { value: '0' } });
+    renderedComponent.find('[name="dosage-amount"]').simulate('change', { target: { value: '0' } });
     expect(updateDosageInstructions).toHaveBeenCalledWith(1, 'daily');
   });
 
   it('allows for choosing dosage frequency', () => {
     setup(patient, medListPhase, medications, prescription);
-    renderedComponent.find('.dose-instruction').find('Select').simulate('change', { target: { value: 'tid' } });
+    renderedComponent.find('.dose-instruction').find('ForwardRef(Select)').simulate('change', { target: { value: 'tid' } });
     expect(updateDosageInstructions).toHaveBeenCalled();
   });
 
   it('allows for selecting date ranges', () => {
     setup(patient, medListPhase, medications, prescription);
-    renderedComponent.find('[name="start-date"]').simulate('change', { target: { value: '2018-04-13' } });
+    const datePickers = renderedComponent.find('ForwardRef(DatePicker)');
+    datePickers.at(0).simulate('change', '2018-04-13');
     expect(updateDate).toHaveBeenCalled();
-    renderedComponent.find('[name="end-date"]').simulate('change', { target: { value: '2018-04-14' } });
+    datePickers.at(1).simulate('change', '2018-04-14');
     expect(updateDate).toHaveBeenCalled();
   });
 

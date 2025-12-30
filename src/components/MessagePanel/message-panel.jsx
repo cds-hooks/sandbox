@@ -2,11 +2,12 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import cx from 'classnames';
 
-import Card from 'terra-card';
-import Heading from 'terra-heading';
-import Toggle from 'terra-toggle/lib/Toggle';
-import IconChevronRight from 'terra-icon/lib/icon/IconChevronRight';
-import IconChevronDown from 'terra-icon/lib/icon/IconChevronDown';
+import CardContent from '@mui/material/CardContent';
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import Typography from '@mui/material/Typography';
+import { IconChevronRight, IconChevronDown } from '../../utils/iconMapping';
 
 import styles from './message-panel.css';
 
@@ -117,33 +118,29 @@ class MessagePanel extends Component {
 
   render() {
     const cards = this.state.messages.map((item, i) => (
-      <Card.Body key={`card-${i}`}>
+      <CardContent key={`card-${i}`}>
         <div key={`item-${i}`} className={cx(styles['fhir-view'], styles['panel-text'], styles['panel-height'])}>
           <pre>
             {item}
           </pre>
         </div>
-      </Card.Body>
+      </CardContent>
     ));
 
-    const iconToggle = this.state.isExpanded ? <IconChevronDown /> : <IconChevronRight />;
-
     return (
-      <Card>
-        <Heading
+      <Accordion expanded={this.state.isExpanded} onChange={this.toggleExpansion}>
+        <AccordionSummary
+          expandIcon={this.state.isExpanded ? <IconChevronDown /> : <IconChevronRight />}
           className={styles['header-toggle']}
-          level={1}
-          size="medium"
-          weight={700}
-          onClick={this.toggleExpansion}
         >
-          {iconToggle}
-          {this.props.panelHeader}
-        </Heading>
-        <Toggle isOpen={this.state.isExpanded} isAnimated>
+          <Typography variant="h6" fontWeight={700}>
+            {this.props.panelHeader}
+          </Typography>
+        </AccordionSummary>
+        <AccordionDetails>
           {cards}
-        </Toggle>
-      </Card>
+        </AccordionDetails>
+      </Accordion>
     );
   }
 }
