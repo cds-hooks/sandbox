@@ -140,9 +140,38 @@ export const createFhirResource = (fhirVersion, patientId, state, patientConditi
   return resource;
 };
 
+// Build a flat list of all prescribable medications for direct search
+const buildAllPrescribables = () => {
+  const allPrescribables = [];
+  const seenIds = new Set();
+
+  Object.keys(rxnorm.pillToComponentSets).forEach((pill) => {
+    rxnorm.pillToComponentSets[pill].forEach((componentSet) => {
+      const componentKey = componentSet.join(',');
+      if (rxnorm.componentSetsToPrescribables[componentKey]) {
+        rxnorm.componentSetsToPrescribables[componentKey].forEach((prescribableId) => {
+          if (!seenIds.has(prescribableId)) {
+            seenIds.add(prescribableId);
+            allPrescribables.push({
+              id: prescribableId,
+              name: rxnorm.cuiToName[prescribableId],
+            });
+          }
+        });
+      }
+    });
+  });
+
+  return allPrescribables.sort((a, b) => a.name.localeCompare(b.name));
+};
+
 const initialState = {
   /**
-   * Total list of medications the user may select from
+   * Flat list of all prescribable medications for direct search
+   */
+  allPrescribables: buildAllPrescribables(),
+  /**
+   * Total list of medications the user may select from (kept for backward compatibility)
    */
   medications: Object.keys(rxnorm.pillToComponentSets).map((pill) => (
     {
@@ -151,14 +180,7 @@ const initialState = {
     }
   )),
   /**
-   * With the rxnorm library of medications, there are three phases to a medication that may be specified:
-   * 1) Ingredient (i.e. Tylenol pill)
-   * 2) Components (i.e. Acetaminophen 650 MG [Tylenol])
-   * 3) Prescribable (i.e. 8 HR Acetaminophen 650 MG Extended Release Oral Tablet [Tylenol])
-   * A user may have to drill down to the specific medication if multiple components are encompassed
-   * within an ingredient, and posisble multiple prescribables per component. This property should
-   * keep track of what stage the medication-selection is in (any of the 3 strings above, or 'begin' and 'done'),
-   * in order to get the right rx code
+   * Medication list phase - simplified to 'begin' or 'done'
    */
   medListPhase: getPrescribableFromID(getQueryParam('prescribedMedication')) ? 'done' : 'begin',
   /**
@@ -166,8 +188,12 @@ const initialState = {
    */
   userInput: '',
   /**
+   * Filtered list of prescribable medications based on user input
+   */
+  filteredPrescribables: [],
+  /**
    * This property keeps track of the filtered options that remains face up for the user, in each of the
-   * phases of the medication list
+   * phases of the medication list (kept for backward compatibility)
    */
   options: {
     ingredient: [],
@@ -193,7 +219,7 @@ const initialState = {
    * The dispense request information
    */
   dispenseRequest: {
-    supplyDuration: parseInt(getQueryParam('prescribedSupplyDuration'), 10) || 1,
+    supplyDuration: parseInt(getQueryParam('prescribedSupplyDuration'), 10) || 30,
   },
   /**
    * The dates and enabled status of the medication start and end dates
@@ -214,76 +240,22 @@ const initialState = {
   selectedConditionCode: getQueryParam('prescribedReason') || '',
 };
 
-const filterSearch = (input) => {
-  // Break the user input for medication into an array of strings separated by whitespace and filter out any empty strings
+// Filter prescribable medications based on user input
+const filterPrescribables = (input) => {
   const inputParts = input.split(/\s+/).filter((x) => x !== '');
 
-  let newIngredients;
   if (inputParts.length === 0) {
-    newIngredients = [];
-  } else {
-    // For each medication in our "database", filter to get an array of medications (max 30) matching the user-input string
-    // and sort the medications accordingly by name
-    newIngredients = initialState.medications
-      .filter((med) => inputParts.map((part) => med.name
-        .match(RegExp(`(?:^|\\s)${part}`, 'i')))
-        .every((x) => x))
-      .sort((b, a) => b.name.length - a.name.length)
-      .slice(0, 30)
-      .map((med) => ({
-        name: med.name.slice(0, -5),
-        id: med.id,
-      }));
+    return [];
   }
-  return newIngredients;
+
+  // Search all prescribable medications and return matches (max 30)
+  return initialState.allPrescribables
+    .filter((med) => inputParts.map((part) => med.name
+      .match(RegExp(`(?:^|\\s)${part}`, 'i')))
+      .every((x) => x))
+    .sort((a, b) => a.name.length - b.name.length)
+    .slice(0, 30);
 };
-
-// Converts string numbers that contain decimals into Number objects to use for sorting medications
-const toNumbers = (medication) => (
-  medication.name.match(/(\d*\.?\d*)/g)
-    .filter((v) => v.length > 0)
-    .map((d) => Number(d))
-    .filter((n) => !Number.isNaN(n))
-);
-
-const compareArrays = (a, b) => {
-  if (a.length === 0 && b.length === 0) {
-    return 0;
-  }
-  if (a.length === 0) {
-    return 1;
-  }
-  if (b.length === 0) {
-    return -1;
-  }
-  if (a[0] < b[0]) {
-    return -1;
-  }
-  if (a[0] > b[0]) {
-    return 1;
-  }
-  return compareArrays(a.slice(1), b.slice(1));
-};
-
-const compareDrugNames = (a, b) => (compareArrays(toNumbers(a), toNumbers(b)));
-
-const getMedicationComponentsList = (input) => (
-  rxnorm.pillToComponentSets[input.id].map((medSet) => (
-    {
-      name: medSet.map((id) => rxnorm.cuiToName[id]).join(' / '),
-      id: medSet,
-    }
-  )).sort(compareDrugNames)
-);
-
-const getMedicationPrescribableList = (input) => (
-  rxnorm.componentSetsToPrescribables[input.id.join(',')].map((medSet) => (
-    {
-      name: rxnorm.cuiToName[medSet],
-      id: medSet,
-    }
-  )).sort(compareDrugNames)
-);
 
 const medicationReducers = (state = initialState, action) => {
   if (action.type) {
@@ -292,61 +264,28 @@ const medicationReducers = (state = initialState, action) => {
       case types.STORE_USER_MED_INPUT: {
         return {
           ...state,
-          medListPhase: 'ingredient',
-          options: {
-            ingredient: filterSearch(action.input),
-            components: [],
-            prescribable: [],
-          },
+          userInput: action.input,
+          filteredPrescribables: filterPrescribables(action.input),
           decisions: {
-            ingredient: null,
-            components: null,
+            ...state.decisions,
             prescribable: null,
           },
-          userInput: action.input,
         };
       }
 
       // Store the medication choice the user settled on in Rx View
       case types.STORE_USER_CHOSEN_MEDICATION: {
-        if (state.medListPhase === 'ingredient') {
-          return {
-            ...state,
-            medListPhase: 'components',
-            decisions: {
-              ...state.decisions,
-              ingredient: action.medication,
-            },
-            options: {
-              ...state.options,
-              components: getMedicationComponentsList(action.medication),
-            },
-          };
-        } if (state.medListPhase === 'components') {
-          return {
-            ...state,
-            medListPhase: 'prescribable',
-            decisions: {
-              ...state.decisions,
-              components: action.medication,
-            },
-            options: {
-              ...state.options,
-              prescribable: getMedicationPrescribableList(action.medication),
-            },
-          };
-        } if (state.medListPhase === 'prescribable') {
-          return {
-            ...state,
-            medListPhase: 'done',
-            userInput: '',
-            decisions: {
-              ...state.decisions,
-              prescribable: action.medication,
-            },
-          };
-        }
-        return state;
+        // Direct prescribable selection - simplified workflow
+        return {
+          ...state,
+          medListPhase: 'done',
+          userInput: action.medication.name,
+          filteredPrescribables: [],
+          decisions: {
+            ...state.decisions,
+            prescribable: action.medication,
+          },
+        };
       }
 
       // Stores the user-chosen condition from the list of conditions for the current patient
@@ -460,6 +399,43 @@ const medicationReducers = (state = initialState, action) => {
           }
         }
         return state;
+      }
+
+      // Clear medication form state when a new patient is selected
+      case types.GET_PATIENT_SUCCESS: {
+        return {
+          ...state,
+          medListPhase: 'begin',
+          userInput: '',
+          options: {
+            ingredient: [],
+            components: [],
+            prescribable: [],
+          },
+          decisions: {
+            ingredient: null,
+            components: null,
+            prescribable: null,
+          },
+          medicationInstructions: {
+            number: 1,
+            frequency: 'daily',
+          },
+          dispenseRequest: {
+            supplyDuration: 30,
+          },
+          prescriptionDates: {
+            start: {
+              enabled: true,
+              value: undefined,
+            },
+            end: {
+              enabled: true,
+              value: undefined,
+            },
+          },
+          selectedConditionCode: '',
+        };
       }
 
       default:

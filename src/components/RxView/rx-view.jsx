@@ -7,10 +7,10 @@ import forIn from 'lodash/forIn';
 import cx from 'classnames';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
+import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
 import MuiSelect from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
-import Typography from '@mui/material/Typography';
 // import Checkbox from 'terra-form-checkbox';
 import Select from 'react-select';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -67,10 +67,6 @@ const propTypes = {
    */
   medications: PropTypes.arrayOf(PropTypes.object),
   /**
-   * Prescribed medicine chosen by the user for the patient
-   */
-  prescription: PropTypes.object,
-  /**
    * Hash detailing the dosage and frequency of the prescribed medicine
    */
   medicationInstructions: PropTypes.object,
@@ -82,6 +78,10 @@ const propTypes = {
    * Coding code from the selected Condition resource in context
    */
   selectedConditionCode: PropTypes.string,
+  /**
+   * Current user input value for the medication field
+   */
+  userInput: PropTypes.string,
   /**
    * Function for storing user input when the medication field changes
    */
@@ -164,32 +164,51 @@ export class RxView extends Component {
     this.selectStartDate = this.selectStartDate.bind(this);
     this.selectEndDate = this.selectEndDate.bind(this);
     this.toggleEnabledDate = this.toggleEnabledDate.bind(this);
+
+    // Create debounced version of the medication input handler
+    this.debouncedMedicationInput = debounce((value) => {
+      this.props.onMedicationChangeInput(value);
+    }, 150);
   }
 
   /**
    * Update any incoming values that change for state
    */
   static getDerivedStateFromProps(nextProps, prevState) {
-    if (nextProps.medicationInstructions.number !== prevState.dosageAmount
-      || nextProps.medicationInstructions.frequency !== prevState.dosageFrequency
-      || nextProps.selectedConditionCode !== prevState.conditionCode
-      || nextProps.prescriptionDates.start.value !== prevState.startRange.value
-      || nextProps.prescriptionDates.end.value !== prevState.endRange.value) {
-      return ({
-        conditionCode: nextProps.selectedConditionCode,
-        dosageAmount: nextProps.medicationInstructions.number,
-        dosageFrequency: nextProps.medicationInstructions.frequency,
-        startRange: {
-          // enabled: nextProps.startRange.enabled,
-          value: nextProps.prescriptionDates.start.value,
-        },
-        endRange: {
-          // enabled: nextProps.endRange.enabled,
-          value: nextProps.prescriptionDates.end.value,
-        },
-      });
+    const updates = {};
+    let hasUpdates = false;
+
+    if (nextProps.medicationInstructions.number !== prevState.dosageAmount) {
+      updates.dosageAmount = nextProps.medicationInstructions.number;
+      hasUpdates = true;
     }
-    return null;
+    if (nextProps.medicationInstructions.frequency !== prevState.dosageFrequency) {
+      updates.dosageFrequency = nextProps.medicationInstructions.frequency;
+      hasUpdates = true;
+    }
+    if (nextProps.selectedConditionCode !== prevState.conditionCode) {
+      updates.conditionCode = nextProps.selectedConditionCode;
+      hasUpdates = true;
+    }
+    if (nextProps.prescriptionDates.start.value !== prevState.startRange.value) {
+      updates.startRange = {
+        value: nextProps.prescriptionDates.start.value,
+      };
+      hasUpdates = true;
+    }
+    if (nextProps.prescriptionDates.end.value !== prevState.endRange.value) {
+      updates.endRange = {
+        value: nextProps.prescriptionDates.end.value,
+      };
+      hasUpdates = true;
+    }
+    // Sync input value with userInput from Redux state
+    if (nextProps.userInput !== prevState.value) {
+      updates.value = nextProps.userInput;
+      hasUpdates = true;
+    }
+
+    return hasUpdates ? updates : null;
   }
 
   // Note: A second parameter (selected value) is supplied automatically by the Terra onChange function for the Form Select component
@@ -200,8 +219,9 @@ export class RxView extends Component {
   }
 
   changeMedicationInput(event) {
-    this.setState({ value: event.target.value });
-    debounce(this.props.onMedicationChangeInput(event.target.value), 50);
+    const { value } = event.target;
+    this.setState({ value });
+    this.debouncedMedicationInput(value);
   }
 
   // Note: Bound the dosage amount to a value between 1 and 5
@@ -303,7 +323,6 @@ export class RxView extends Component {
               ))}
             </List>
           </FormControl>
-          {this.props.prescription ? <Typography fontStyle="italic" fontSize={16}>{this.props.prescription.name}</Typography> : null}
           <div className={styles['dose-instruction']}>
             <TextField
               id="dosage-amount"
@@ -316,9 +335,12 @@ export class RxView extends Component {
               sx={{ mr: 2 }}
             />
             <FormControl size="small" sx={{ minWidth: 200 }}>
-              <FormLabel>Frequency</FormLabel>
+              <InputLabel id="dosage-frequency-label">Frequency</InputLabel>
               <MuiSelect
+                labelId="dosage-frequency-label"
+                id="dosage-frequency"
                 name="dosage-frequency"
+                label="Frequency"
                 onChange={(e) => this.changeDosageFrequency(e, e.target.value)}
                 value={this.state.dosageFrequency}
               >
@@ -361,11 +383,12 @@ RxView.propTypes = propTypes;
 const mapStateToProps = (state) => ({
   isContextVisible: state.hookState.isContextVisible,
   patient: state.patientState.currentPatient,
-  medications: state.medicationState.options[state.medicationState.medListPhase] || [],
+  medications: state.medicationState.filteredPrescribables || [],
   prescription: state.medicationState.decisions.prescribable,
   medicationInstructions: state.medicationState.medicationInstructions,
   prescriptionDates: state.medicationState.prescriptionDates,
   selectedConditionCode: state.medicationState.selectedConditionCode,
+  userInput: state.medicationState.userInput,
 });
 
 const mapDispatchToProps = (dispatch) => (

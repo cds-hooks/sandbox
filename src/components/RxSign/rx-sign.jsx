@@ -7,10 +7,10 @@ import forIn from 'lodash/forIn';
 import cx from 'classnames';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
+import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
 import MuiSelect from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
-import Typography from '@mui/material/Typography';
 import MuiButton from '@mui/material/Button';
 // import Checkbox from 'terra-form-checkbox';
 import Select from 'react-select';
@@ -67,10 +67,6 @@ const propTypes = {
      */
   medications: PropTypes.arrayOf(PropTypes.object),
   /**
-     * Prescribed medicine chosen by the user for the patient
-     */
-  prescription: PropTypes.object,
-  /**
      * Hash detailing the dosage and frequency of the prescribed medicine
      */
   medicationInstructions: PropTypes.object,
@@ -83,9 +79,9 @@ const propTypes = {
      */
   prescriptionDates: PropTypes.object,
   /**
-     * Coding code from the selected Condition resource in context
+     * Current user input value for the medication field
      */
-  selectedConditionCode: PropTypes.string,
+  userInput: PropTypes.string,
   /**
      * Function for storing user input when the medication field changes
      */
@@ -134,10 +130,6 @@ export class RxSign extends Component {
          */
       value: '',
       /**
-         * Coding code of the Condition chosen from a dropdown list for the patient
-         */
-      conditionCode: '',
-      /**
          * Coding display of the Condition chosen from a dropdown list for the patient
          */
       conditionDisplay: '',
@@ -152,7 +144,7 @@ export class RxSign extends Component {
       /**
          * Tracks the supply duration chosen from the form field
          */
-      supplyDuration: 1,
+      supplyDuration: 30,
       /**
          * Tracks the start date value and toggle of the prescription
          */
@@ -178,45 +170,62 @@ export class RxSign extends Component {
     this.selectEndDate = this.selectEndDate.bind(this);
     this.toggleEnabledDate = this.toggleEnabledDate.bind(this);
     this.signOrder = this.signOrder.bind(this);
+
+    // Create debounced version of the medication input handler
+    this.debouncedMedicationInput = debounce((value) => {
+      this.props.onMedicationChangeInput(value);
+    }, 150);
   }
 
   /**
      * Update any incoming values that change for state
      */
   static getDerivedStateFromProps(nextProps, prevState) {
-    if (nextProps.medicationInstructions.number !== prevState.dosageAmount
-            || nextProps.medicationInstructions.frequency !== prevState.dosageFrequency
-            || nextProps.medicationInstructions.supplyDuration !== prevState.supplyDuration
-            || nextProps.selectedConditionCode !== prevState.conditionCode
-            || nextProps.prescriptionDates.start.value !== prevState.startRange.value
-            || nextProps.prescriptionDates.end.value !== prevState.endRange.value) {
-      return ({
-        conditionCode: nextProps.selectedConditionCode,
-        dosageAmount: nextProps.medicationInstructions.number,
-        dosageFrequency: nextProps.medicationInstructions.frequency,
-        supplyDuration: nextProps.medicationInstructions.supplyDuration,
-        startRange: {
-          // enabled: nextProps.startRange.enabled,
-          value: nextProps.prescriptionDates.start.value,
-        },
-        endRange: {
-          // enabled: nextProps.endRange.enabled,
-          value: nextProps.prescriptionDates.end.value,
-        },
-      });
+    const updates = {};
+    let hasUpdates = false;
+
+    if (nextProps.medicationInstructions.number !== prevState.dosageAmount) {
+      updates.dosageAmount = nextProps.medicationInstructions.number;
+      hasUpdates = true;
     }
-    return null;
+    if (nextProps.medicationInstructions.frequency !== prevState.dosageFrequency) {
+      updates.dosageFrequency = nextProps.medicationInstructions.frequency;
+      hasUpdates = true;
+    }
+    if (nextProps.dispenseRequest.supplyDuration !== prevState.supplyDuration) {
+      updates.supplyDuration = nextProps.dispenseRequest.supplyDuration;
+      hasUpdates = true;
+    }
+    if (nextProps.prescriptionDates.start.value !== prevState.startRange.value) {
+      updates.startRange = {
+        value: nextProps.prescriptionDates.start.value,
+      };
+      hasUpdates = true;
+    }
+    if (nextProps.prescriptionDates.end.value !== prevState.endRange.value) {
+      updates.endRange = {
+        value: nextProps.prescriptionDates.end.value,
+      };
+      hasUpdates = true;
+    }
+    // Sync input value with userInput from Redux state
+    if (nextProps.userInput !== prevState.value) {
+      updates.value = nextProps.userInput;
+      hasUpdates = true;
+    }
+
+    return hasUpdates ? updates : null;
   }
 
   changeMedicationInput(event) {
-    this.setState({ value: event.target.value });
-    debounce(this.props.onMedicationChangeInput(event.target.value), 50);
+    const { value } = event.target;
+    this.setState({ value });
+    this.debouncedMedicationInput(value);
   }
 
   // Note: A second parameter (selected value) is supplied automatically by the Terra onChange function for the Form Select component
   selectCondition(event) {
     this.props.chooseCondition(event.value);
-    this.setState({ conditionCode: event.value });
     this.setState({ conditionDisplay: event.label });
   }
 
@@ -236,11 +245,9 @@ export class RxSign extends Component {
   }
 
   changeSupplyDuration(event) {
-    let transformedNumber = Number(event.target.value) || 1;
-    if (transformedNumber > 90) { transformedNumber = 90; }
-    if (transformedNumber < 1) { transformedNumber = 1; }
-    this.setState({ supplyDuration: transformedNumber });
-    this.props.updateDispenseRequest(transformedNumber, this.state.supplyDuration);
+    const value = Number(event.target.value);
+    this.setState({ supplyDuration: value });
+    this.props.updateDispenseRequest(value);
   }
 
   // Note: A second parameter (date value) is supplied automatically by the Terra onChange function for the DatePicker component
@@ -329,7 +336,6 @@ export class RxSign extends Component {
               ))}
             </List>
           </FormControl>
-          {this.props.prescription ? <Typography fontStyle="italic" fontSize={16}>{this.props.prescription.name}</Typography> : null}
           <div className={styles['dose-instruction']}>
             <TextField
               id="dosage-amount"
@@ -342,9 +348,12 @@ export class RxSign extends Component {
               sx={{ mr: 2 }}
             />
             <FormControl size="small" sx={{ minWidth: 200, mr: 2 }}>
-              <FormLabel>Frequency</FormLabel>
+              <InputLabel id="dosage-frequency-label">Frequency</InputLabel>
               <MuiSelect
+                labelId="dosage-frequency-label"
+                id="dosage-frequency"
                 name="dosage-frequency"
+                label="Frequency"
                 onChange={(e) => this.changeDosageFrequency(e, e.target.value)}
                 value={this.state.dosageFrequency}
               >
@@ -354,15 +363,23 @@ export class RxSign extends Component {
                 <MenuItem value="qid">four times daily</MenuItem>
               </MuiSelect>
             </FormControl>
-            <TextField
-              id="supply-duration"
-              label="Supply Duration (Days)"
-              type="number"
-              value={this.props.dispenseRequest.supplyDuration}
-              onChange={this.changeSupplyDuration}
-              name="supply-duration"
-              size="small"
-            />
+            <FormControl size="small" sx={{ minWidth: 200 }}>
+              <InputLabel id="supply-duration-label">Supply Duration</InputLabel>
+              <MuiSelect
+                labelId="supply-duration-label"
+                id="supply-duration"
+                name="supply-duration"
+                label="Supply Duration"
+                onChange={this.changeSupplyDuration}
+                value={this.state.supplyDuration}
+              >
+                <MenuItem value={7}>7 days</MenuItem>
+                <MenuItem value={14}>14 days</MenuItem>
+                <MenuItem value={30}>30 days</MenuItem>
+                <MenuItem value={60}>60 days</MenuItem>
+                <MenuItem value={90}>90 days</MenuItem>
+              </MuiSelect>
+            </FormControl>
           </div>
           <div className={styles['dosage-timing']}>
             <LocalizationProvider dateAdapter={AdapterMoment}>
@@ -386,8 +403,10 @@ export class RxSign extends Component {
           </div>
           <div>
             <MuiButton
-              variant="text"
+              variant="contained"
+              size="large"
               onClick={this.signOrder}
+              sx={{ mt: 3 }}
             >
               Sign Order
             </MuiButton>
@@ -404,11 +423,12 @@ RxSign.propTypes = propTypes;
 const mapStateToProps = (state) => ({
   isContextVisible: state.hookState.isContextVisible,
   patient: state.patientState.currentPatient,
-  medications: state.medicationState.options[state.medicationState.medListPhase] || [],
+  medications: state.medicationState.filteredPrescribables || [],
   prescription: state.medicationState.decisions.prescribable,
   medicationInstructions: state.medicationState.medicationInstructions,
   dispenseRequest: state.medicationState.dispenseRequest,
   prescriptionDates: state.medicationState.prescriptionDates,
+  userInput: state.medicationState.userInput,
 });
 
 const mapDispatchToProps = (dispatch) => (

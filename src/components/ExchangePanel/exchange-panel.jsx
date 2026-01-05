@@ -56,7 +56,11 @@ class ExchangePanel extends Component {
     )) : '';
 
     return (
-      <Accordion expanded={this.state.isExpanded} onChange={this.toggleExpansion}>
+      <Accordion
+        expanded={this.state.isExpanded}
+        onChange={this.toggleExpansion}
+        disableGutters
+      >
         <AccordionSummary
           expandIcon={this.state.isExpanded ? <IconChevronDown /> : <IconChevronRight />}
           className={styles['header-toggle']}
@@ -65,7 +69,7 @@ class ExchangePanel extends Component {
             {this.props.panelHeader}
           </Typography>
         </AccordionSummary>
-        <AccordionDetails>
+        <AccordionDetails sx={{ padding: 0 }}>
           <div className={cx(styles['fhir-view'], styles['panel-text'], styles['panel-height'])}>
             <pre>
               {textHtml}

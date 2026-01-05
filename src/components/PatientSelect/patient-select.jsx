@@ -76,6 +76,11 @@ const PatientSelect = ({
             value={placeholderText}
             onChange={inputOnChange}
             options={patients}
+            menuPortalTarget={document.body}
+            menuPosition="fixed"
+            styles={{
+              menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+            }}
           />
           {shouldDisplayError && <FormHelperText>{errorMessage}</FormHelperText>}
         </FormControl>

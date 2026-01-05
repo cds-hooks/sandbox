@@ -6,7 +6,8 @@ import PropTypes from 'prop-types';
 
 import Typography from '@mui/material/Typography';
 import MuiButton from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
+import Switch from '@mui/material/Switch';
+import FormControlLabel from '@mui/material/FormControlLabel';
 
 import styles from './service-display.css';
 import { toggleService, deleteService } from '../../../actions/cds-services-actions';
@@ -44,22 +45,21 @@ export const ServiceDisplay = ({
         <Typography fontWeight={700} fontSize={14}>{serviceUrl}</Typography>
       </div>
       <div className={styles['btn-container']}>
-        <MuiButton
-          startIcon={(
-            <Checkbox
+        <FormControlLabel
+          control={(
+            <Switch
               checked={definition.enabled}
-              onChange={() => {}}
+              onChange={() => toggle(serviceUrl)}
+              color="primary"
             />
           )}
-          variant="contained"
-          onClick={() => toggle(serviceUrl)}
-        >
-          Enabled?
-        </MuiButton>
+          label="Enabled"
+        />
         <MuiButton
-          variant="contained"
+          variant="outlined"
+          color="error"
           onClick={() => remove(serviceUrl)}
-          sx={{ ml: 1 }}
+          sx={{ ml: 2 }}
         >
           Delete
         </MuiButton>

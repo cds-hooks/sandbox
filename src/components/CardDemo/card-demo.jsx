@@ -115,7 +115,6 @@ export class CardDemo extends Component {
   resetExample() {
     const exampleCode = JSON.stringify(this.getExampleCard(), null, 2);
     this.updateCard(exampleCode);
-    this.cm.codeMirror.setValue(exampleCode);
   }
 
   render() {
@@ -174,7 +173,6 @@ export class CardDemo extends Component {
           <div className={styles['card-render-json-border']}>
             <CodeMirror
               value={this.props.tempUserJson || exampleCode}
-              ref={(el) => { this.cm = el; }}
               onChange={this.updateCard}
               style={{ fontFamily: 'Inconsolata, Menlo, Consolas, monospace !important' }}
               options={options}

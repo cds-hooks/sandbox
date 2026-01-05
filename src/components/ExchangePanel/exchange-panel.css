@@ -1,21 +1,25 @@
 .fhir-view {
   position: static;
   background: #0D0630;
+  border-radius: 4px;
 }
 
 .header-toggle {
-  padding-left: 10px;
   cursor: pointer;
 }
 
 .panel-height {
-  padding: 0.2% 2%;
+  padding: 16px;
   overflow-y: auto;
+  max-height: 400px;
 }
 
 .panel-text pre {
   color: #fff;
-  font-size: 100%;
+  font-size: 13px;
   font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
   word-wrap: break-word;
+  margin: 0;
+  padding: 0;
+  line-height: 1.5;
 }

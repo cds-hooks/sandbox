@@ -14,7 +14,9 @@ import MuiButton from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import Box from '@mui/material/Box';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import generateJWT from '../../retrieve-data-helpers/jwt-generator';
 
 import styles from './card-list.css';
@@ -460,7 +462,45 @@ export class CardList extends Component {
         renderedCards.push(builtCard);
       });
     if (renderedCards.length === 0) {
-      return <div> No Cards </div>;
+      return (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '60px 20px',
+            textAlign: 'center',
+          }}
+        >
+          <CheckCircleOutlineIcon
+            sx={{
+              fontSize: 64,
+              color: '#9e9e9e',
+              marginBottom: 2,
+            }}
+          />
+          <Typography
+            variant="h6"
+            sx={{
+              color: '#666',
+              fontWeight: 500,
+              marginBottom: 1,
+            }}
+          >
+            No recommendations to display
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{
+              color: '#999',
+              maxWidth: 400,
+            }}
+          >
+            All clear! No clinical decision support cards are available for this context.
+          </Typography>
+        </Box>
+      );
     }
     return (
       <div>

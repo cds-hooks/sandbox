@@ -36,8 +36,11 @@ describe('ServiceDisplay component', () => {
     expect(component.prop('serviceUrl')).toBeDefined();
   });
 
-  it('toggles enabled status for a service if the enabled button is clicked', () => {
-    pureComponent.find('.btn-container').find('ForwardRef(Button)').at(0).simulate('click');
+  it('toggles enabled status for a service if the toggle switch is changed', () => {
+    // Find the FormControlLabel and get its control prop (the Switch)
+    const formControlLabel = pureComponent.find('ForwardRef(FormControlLabel)');
+    // Call the onChange prop directly from the Switch control
+    formControlLabel.prop('control').props.onChange();
     expect(mockStore.getActions()).toEqual([{
       type: types.TOGGLE_SERVICE,
       service: url,
@@ -45,7 +48,7 @@ describe('ServiceDisplay component', () => {
   });
 
   it('deletes a configured service if the delete button is clicked', () => {
-    pureComponent.find('.btn-container').find('ForwardRef(Button)').at(1).simulate('click');
+    pureComponent.find('.btn-container').find('ForwardRef(Button)').simulate('click');
     expect(mockStore.getActions()).toEqual([{
       type: types.DELETE_SERVICE,
       service: url,

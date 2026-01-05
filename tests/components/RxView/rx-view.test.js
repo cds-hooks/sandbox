@@ -138,10 +138,15 @@ describe('RxView component', () => {
     expect(renderedComponent.state('conditionCode')).toEqual('condition-123');
   });
 
-  it('allows for choosing a medication', () => {
+  it('allows for choosing a medication', (done) => {
     setup(patient, medListPhase, medications, prescription);
     renderedComponent.find('[name="medication-input"]').simulate('change', { target: { value: 'ingredient med' } });
-    expect(onMedicationChangeInput).toHaveBeenCalled();
+    // Wait for debounced handler (150ms delay)
+    setTimeout(() => {
+      expect(onMedicationChangeInput).toHaveBeenCalled();
+      expect(onMedicationChangeInput).toHaveBeenCalledWith('ingredient med');
+      done();
+    }, 200);
   });
 
   it('allows for inputting a number for the dosage amount', () => {

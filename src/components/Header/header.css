@@ -25,8 +25,6 @@
   -ms-flex-align: center;
   display: -ms-flexbox;
   display: flex;
-  height: 100%;
-  -ms-flex-pack: center;
   width: 100%;
   justify-content: center;
   position: relative;
@@ -37,42 +35,49 @@
   display: flex;
   -ms-flex: 1 1 auto;
   flex: 1 1 auto;
-  height: 100%;
   position: relative;
+  gap: 8px;
 }
 
 .nav-links {
-  border-right: .07143rem solid #dedfe0;
-  padding: 0 1.5rem;
+  padding: 0.5rem 1.5rem;
   text-align: center;
-  color: #fff;
-  display: block;
+  color: rgba(255, 255, 255, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   -ms-flex: 0 0 auto;
   flex: 0 0 auto;
   font-size: .9286rem;
-  height: 100%;
   max-width: 17.143rem;
   min-width: 5.714rem;
   position: relative;
   text-decoration: none;
-  line-height: 2.571rem;
-  background-color: transparent;
-}
-
-.nav-links:first-child {
-  border-left: .07143rem solid #fff;
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  will-change: background-color, color;
 }
 
 .nav-links:hover {
-  background-color: #5070ab;
+  background-color: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #fff;
   cursor: pointer;
 }
 
 .active-link {
-  background-color: #fff;
-  color: #1c1f21;
-  font-weight: bold;
-  bottom: -.07143rem;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-color: rgba(255, 255, 255, 0.95);
+  color: #384e77;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .extensions {
