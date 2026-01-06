@@ -27,6 +27,8 @@ describe('Service Exchange', () => {
     let mockServiceWithUserTokens;
     let mockServiceWithUnresolved;
     let mockServiceWithQueryRestriction;
+    let mockServiceWithDateAddition;
+    let mockServiceWithMultipleDateTokens;
     let mockHookInstance;
     let mockRequest;
     let mockRequestWithContext;
@@ -65,6 +67,8 @@ describe('Service Exchange', () => {
         mockServiceWithUserTokens = 'http://example.com/cds-services/id-6';
         mockServiceWithUnresolved = 'http://example.com/cds-services/id-7';
         mockServiceWithQueryRestriction = 'http://example.com/cds-services/id-8';
+        mockServiceWithDateAddition = 'http://example.com/cds-services/id-9';
+        mockServiceWithMultipleDateTokens = 'http://example.com/cds-services/id-10';
         mockHookInstance = '123';
         mockAccessToken = {
             access_token: 'access-token',
@@ -148,6 +152,16 @@ describe('Service Exchange', () => {
                     [`${mockServiceWithQueryRestriction}`]: {
                         prefetch: {
                             test: 'Patient?identifier:contains=foo'
+                        }
+                    },
+                    [`${mockServiceWithDateAddition}`]: {
+                        prefetch: {
+                            test: 'Observation?patient={{context.patientId}}&date=le{{today() + 30 days}}'
+                        }
+                    },
+                    [`${mockServiceWithMultipleDateTokens}`]: {
+                        prefetch: {
+                            test: 'Observation?patient={{context.patientId}}&date=ge{{today() - 90 days}}&date=le{{today()}}'
                         }
                     }
                 }
@@ -315,6 +329,81 @@ describe('Service Exchange', () => {
                 return callServices(mockStore.dispatch, mockStore.getState(), mockServiceWithQueryRestriction).then(() => {
                     expect(console.warn).toHaveBeenCalled();
                     expect(spy).toHaveBeenCalledWith(mockServiceWithQueryRestriction, mockRequest, mockServiceResult, serviceResultStatus, 0);
+                });
+            });
+
+            it('resolves date tokens with addition for future dates', () => {
+                const serviceResultStatus = 200;
+                const today = new Date();
+                today.setHours(0,0,0,0);
+                const d = new Date(today);
+                d.setDate(d.getDate() + 30);
+                const yyyy = d.getFullYear();
+                const mm = String(d.getMonth()+1).padStart(2,'0');
+                const dd = String(d.getDate()).padStart(2,'0');
+                const expected = `${yyyy}-${mm}-${dd}`;
+
+                mockAxios
+                    .onPost(`${mockFhirServer}/Observation/_search`)
+                    .reply((config) => {
+                        expect(config.data).toContain(`patient=${mockPatient}`);
+                        expect(config.data).toContain(`date=le${expected}`);
+                        return [200, prefetchedData];
+                    })
+                    .onPost(mockServiceWithDateAddition).reply(serviceResultStatus, mockServiceResult);
+
+                return callServices(mockStore.dispatch, mockStore.getState(), mockServiceWithDateAddition).then(() => {
+                    const expectedReq = expect.objectContaining({
+                        hookInstance: mockHookInstance,
+                        hook: 'patient-view',
+                        fhirServer: mockFhirServer,
+                        context: { patientId: mockPatient, userId: 'Practitioner/specified-1' },
+                        prefetch: { test: prefetchedData },
+                    });
+                    expect(spy).toHaveBeenCalledWith(
+                        mockServiceWithDateAddition,
+                        expectedReq,
+                        mockServiceResult,
+                        serviceResultStatus,
+                        0
+                    );
+                });
+            });
+
+            it('resolves multiple date tokens in a single query', () => {
+                const serviceResultStatus = 200;
+                const today = new Date();
+                today.setHours(0,0,0,0);
+                const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+
+                const past = new Date(today);
+                past.setDate(past.getDate() - 90);
+                const pastStr = `${past.getFullYear()}-${String(past.getMonth()+1).padStart(2,'0')}-${String(past.getDate()).padStart(2,'0')}`;
+
+                mockAxios
+                    .onPost(`${mockFhirServer}/Observation/_search`)
+                    .reply((config) => {
+                        expect(config.data).toContain(`patient=${mockPatient}`);
+                        expect(config.data).toContain(`date=ge${pastStr}`);
+                        expect(config.data).toContain(`date=le${todayStr}`);
+                        return [200, prefetchedData];
+                    })
+                    .onPost(mockServiceWithMultipleDateTokens).reply(serviceResultStatus, mockServiceResult);
+
+                return callServices(mockStore.dispatch, mockStore.getState(), mockServiceWithMultipleDateTokens).then(() => {
+                    const expectedReq = expect.objectContaining({
+                        hookInstance: mockHookInstance,
+                        hook: 'patient-view',
+                        fhirServer: mockFhirServer,
+                        context: { patientId: mockPatient, userId: 'Practitioner/specified-1' },
+                    });
+                    expect(spy).toHaveBeenCalledWith(
+                        mockServiceWithMultipleDateTokens,
+                        expectedReq,
+                        mockServiceResult,
+                        serviceResultStatus,
+                        0
+                    );
                 });
             });
         });
