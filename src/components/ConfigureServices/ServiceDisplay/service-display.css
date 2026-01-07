@@ -24,10 +24,12 @@
   display: inline-block;
   padding-bottom: 5px;
   text-align: right;
+  vertical-align: middle;
 }
 
 .btn-container > button {
   margin-left: 5px;
+  vertical-align: middle;
 }
 
 @media screen and (max-width: 46em) {

@@ -93,7 +93,7 @@ describe('Card component', () => {
   });
 
   it('invokes a launch link sequence if a link is clicked', () => {
-    shallowedComponent.find('.links-section').find('Button').simulate('click', { preventDefault() {} });
+    shallowedComponent.find('.links-section').find('ForwardRef(Button)').simulate('click', { preventDefault() {} });
     expect(windowSpy).toHaveBeenCalled();
   });
 
@@ -111,18 +111,18 @@ describe('Card component', () => {
         }]
       },
     });
-    shallowedComponent.find('.links-section').find('Button').simulate('click', { preventDefault() {} });
+    shallowedComponent.find('.links-section').find('ForwardRef(Button)').simulate('click', { preventDefault() {} });
     expect(windowSpy).not.toHaveBeenCalled();
   });
 
   it('takes a suggestion if there is a label', () => {
-    shallowedComponent.find('.suggestions-section').find('Button').at(0).simulate('click', { preventDefault() {} });
+    shallowedComponent.find('.suggestions-section').find('ForwardRef(Button)').at(0).simulate('click', { preventDefault() {} });
     mockAxios.onPost(`${serviceUrl}/feedback`).reply(200);
     expect(takeSuggestion).toHaveBeenCalledWith(suggestion);
   });
 
   it('does not take a suggestion if it is does not have a label', () => {
-    shallowedComponent.find('.suggestions-section').find('Button').at(1).simulate('click', { preventDefault() {} });
+    shallowedComponent.find('.suggestions-section').find('ForwardRef(Button)').at(1).simulate('click', { preventDefault() {} });
     expect(takeSuggestion).not.toHaveBeenCalled();
   });
 });

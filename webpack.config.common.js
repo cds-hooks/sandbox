@@ -8,23 +8,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const BUILD_DIR = path.resolve(__dirname, './build');
 const SRC_DIR = path.resolve(__dirname, './src');
 
-const aggregateTranslations = require('terra-aggregate-translations');
-
-const aggregateOptions = {
-    baseDir: __dirname,
-    excludes: [''],
-    locales: ['en', 'en-US'],
-    format: 'es6',
-};
-
-aggregateTranslations(aggregateOptions);
-
 const processPath = process.cwd();
-
-const globalCss = [
-  /node_modules\/terra-icon\/lib\/Icon/,
-  /node_modules\/terra-date-picker/,
-];
 
 const codeMirrorCss = [
   path.resolve(path.resolve(__dirname), 'node_modules/codemirror/lib'),
@@ -55,11 +39,11 @@ const config = {
   context: __dirname,
   resolve: {
     extensions: ['.js', '.jsx', '.json', '*'],
-    modules: [path.resolve(__dirname, 'aggregated-translations'), 'node_modules'],
+    modules: ['node_modules'],
     mainFields: ['browser', 'main'],
     fallback: {
       "path": false,
-    } 
+    }
   },
   resolveLoader: {
     modules: [path.resolve(path.join(processPath, 'node_modules'))],

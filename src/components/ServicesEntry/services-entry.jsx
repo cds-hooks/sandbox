@@ -1,11 +1,14 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import Modal from 'terra-modal';
-import Button from 'terra-button';
-import Dialog from 'terra-dialog';
-import Spacer from 'terra-spacer';
-import Text from 'terra-text';
+import MuiButton from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
+import CloseIcon from '@mui/icons-material/Close';
 
 import styles from './services-entry.css';
 import BaseEntryBody from '../BaseEntryBody/base-entry-body';
@@ -95,56 +98,54 @@ export class ServicesEntry extends Component {
   }
 
   render() {
-    const headerContainer = (
-      <Text weight={700} fontSize={20}>Add CDS Services</Text>
-    );
-
-    const footerContainer = (
-      <div className={styles['right-align']}>
-        <Button text="Save" variant="emphasis" onClick={this.handleSubmit} />
-        <Spacer marginLeft="small" isInlineBlock>
-          <Button text="Cancel" onClick={this.handleCloseModal} />
-        </Spacer>
-      </div>
-    );
-
     return (
-      <div>
-        <Modal
-          ariaLabel="CDS Services"
-          isOpen={this.state.isOpen}
-          closeOnEsc
-          closeOnOutsideClick
-          onRequestClose={this.handleCloseModal}
-          classNameModal={styles['fixed-size']}
-        >
-          <Dialog
-            header={headerContainer}
-            footer={footerContainer}
-            onClose={this.handleCloseModal}
+      <Dialog
+        open={this.state.isOpen}
+        onClose={this.handleCloseModal}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>
+          <Typography fontWeight={700} fontSize={20}>Add CDS Services</Typography>
+          <IconButton
+            aria-label="close"
+            onClick={this.handleCloseModal}
+            sx={{
+              position: 'absolute',
+              right: 8,
+              top: 8,
+              color: (theme) => theme.palette.grey[500],
+            }}
           >
-            <BaseEntryBody
-              formFieldLabel="Enter discovery endpoint url"
-              shouldDisplayError={this.state.shouldDisplayError}
-              errorMessage={this.state.errorMessage}
-              placeholderText="https://example-services.com/cds-services"
-              inputOnChange={this.handleChange}
-              inputName="discovery-endpoint-input"
-            />
-            <Text isItalic>
-              Note: See&nbsp;
-              <a
-                href="https://cds-hooks.org/specification/current/#discovery"
-                rel="noreferrer noopener"
-                target="_blank"
-              >
-                documentation
-              </a>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent>
+          <BaseEntryBody
+            formFieldLabel="Enter discovery endpoint url"
+            shouldDisplayError={this.state.shouldDisplayError}
+            errorMessage={this.state.errorMessage}
+            placeholderText="https://example-services.com/cds-services"
+            inputOnChange={this.handleChange}
+            inputName="discovery-endpoint-input"
+          />
+          <Typography fontStyle="italic">
+            Note: See&nbsp;
+            <a
+              href="https://cds-hooks.org/specification/current/#discovery"
+              rel="noreferrer noopener"
+              target="_blank"
+            >
+              documentation
+            </a>
 &nbsp;for more details regarding the Discovery endpoint.
-            </Text>
-          </Dialog>
-        </Modal>
-      </div>
+          </Typography>
+        </DialogContent>
+        <DialogActions className={styles['right-align']}>
+          <MuiButton onClick={this.handleCloseModal}>Cancel</MuiButton>
+          <MuiButton variant="contained" onClick={this.handleSubmit}>Save</MuiButton>
+        </DialogActions>
+      </Dialog>
     );
   }
 }

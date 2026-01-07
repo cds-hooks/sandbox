@@ -4,15 +4,18 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import cx from 'classnames';
-import ApplicationHeaderLayout from 'terra-application-header-layout';
-import IconSettings from 'terra-icon/lib/icon/IconSettings';
-import IconChevronDown from 'terra-icon/lib/icon/IconChevronDown';
-import Menu from 'terra-menu';
-import Button from 'terra-button';
-import IconLeft from 'terra-icon/lib/icon/IconLeft';
-import IconEdit from 'terra-icon/lib/icon/IconEdit';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import Box from '@mui/material/Box';
+import IconButton from '@mui/material/IconButton';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import Divider from '@mui/material/Divider';
 import pickBy from 'lodash/pickBy';
 import forIn from 'lodash/forIn';
+import {
+  IconSettings, IconChevronDown, IconLeft, IconEdit,
+} from '../../utils/iconMapping';
 
 import ConfigureServices from '../ConfigureServices/configure-services';
 import ServicesEntry from '../ServicesEntry/services-entry';
@@ -252,83 +255,78 @@ export class Header extends Component {
   closeChangeFhirServer() { this.setState({ isChangeFhirServerOpen: false }); }
 
   render() {
-    // Title and Logo
-    const logo = (
-      <div>
-        <span><img src={cdsHooksLogo} alt="" height="30" width="30" /></span>
-        <b className={styles['logo-title']}>CDS Hooks Sandbox</b>
-      </div>
-    );
-
     // Gear settings menu item options
     let menuItems = [
-      <Menu.Item className={styles['add-services']} text="Add CDS Services" key="add-services" onClick={this.openAddServices} />,
-      <Menu.Item className={styles['configure-services']} text="Configure CDS Services" key="configure-services" onClick={this.openConfigureServices} />,
-      <Menu.Divider className={styles['divider-1']} key="Divider1" />,
-      <Menu.Item className={styles['change-patient']} text="Change Patient" key="change-patient" onClick={this.openChangePatient} />,
+      <MenuItem className={styles['add-services']} key="add-services" onClick={this.openAddServices}>Add CDS Services</MenuItem>,
+      <MenuItem className={styles['configure-services']} key="configure-services" onClick={this.openConfigureServices}>Configure CDS Services</MenuItem>,
+      <Divider className={styles['divider-1']} key="Divider1" />,
+      <MenuItem className={styles['change-patient']} key="change-patient" onClick={this.openChangePatient}>Change Patient</MenuItem>,
     ];
     if (!this.props.isSecuredSandbox) {
-      menuItems.push(<Menu.Item className={styles['change-fhir-server']} text="Change FHIR Server" key="change-fhir-server" onClick={this.openChangeFhirServer} />);
+      menuItems.push(<MenuItem className={styles['change-fhir-server']} key="change-fhir-server" onClick={this.openChangeFhirServer}>Change FHIR Server</MenuItem>);
     }
     menuItems = menuItems.concat([
-      <Menu.Divider className={styles['divider-2']} key="Divider2" />,
-      <Menu.Item className={styles['reset-configuration']} text="Reset Configuration" key="reset-configuration" onClick={this.resetConfiguration} />,
+      <Divider className={styles['divider-2']} key="Divider2" />,
+      <MenuItem className={styles['reset-configuration']} key="reset-configuration" onClick={this.resetConfiguration}>Reset Configuration</MenuItem>,
     ]);
 
     // Gear settings menu
     const gearMenu = (
       <Menu
-        isOpen={this.state.settingsOpen}
-        onRequestClose={this.closeSettingsMenu}
-        targetRef={this.getSettingsNode}
-        isArrowDisplayed
+        anchorEl={this.settingsNode}
+        open={this.state.settingsOpen}
+        onClose={this.closeSettingsMenu}
       >
         {menuItems}
       </Menu>
     );
 
-    // Navigation tabs (the hook views)
-    const navigation = (
-      <div className={styles['nav-tabs']}>
-        <div className={styles['nav-container']}>
-          <button className={this.getNavClasses('patient-view')} onClick={() => this.switchHook('patient-view')}>Patient View</button>
-          <button className={this.getNavClasses('rx-view')} onClick={() => this.switchHook('order-select', 'rx-view')}>Rx View</button>
-          <button className={this.getNavClasses('rx-sign')} onClick={() => this.switchHook('order-sign', 'rx-sign')}>Rx Sign</button>
-          <button className={this.getNavClasses('pama')} onClick={() => this.switchHook('order-select', 'pama')}>PAMA Imaging</button>
-        </div>
-      </div>
-    );
-
-    // Extension tabs (Card Demo view)
-    const extensions = (
-      <div className={styles.extensions}>
-        <Button
-          text=""
-          isIconOnly
-          icon={this.props.isCardDemoView ? <IconLeft /> : <IconEdit />}
-          variant="action"
-          onClick={this.props.toggleCardDemoView}
-        />
-      </div>
-    );
-
-    // The actual gear icon for the settings menu
-    const utilities = (
-      <div className={styles.icon} onClick={this.openSettingsMenu}>
-        <span className={styles['padding-right']}><IconSettings height="1.2em" width="1.2em" /></span>
-        <span className={styles['padding-right']} ref={this.setSettingsNode}><IconChevronDown height="1em" width="1em" /></span>
-      </div>
-    );
-
     return (
       <div>
-        <ApplicationHeaderLayout
-          logo={logo}
-          navigation={this.props.isCardDemoView ? null : navigation}
-          extensions={extensions}
-          utilities={utilities}
-          style={{ backgroundColor: '#384e77' }}
-        />
+        <AppBar position="static" sx={{ backgroundColor: '#384e77' }}>
+          <Toolbar>
+            {/* Logo */}
+            <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
+              <img src={cdsHooksLogo} alt="" height="30" width="30" />
+              <b className={styles['logo-title']}>CDS Hooks Sandbox</b>
+            </Box>
+
+            {/* Navigation tabs */}
+            {!this.props.isCardDemoView && (
+              <Box sx={{ flexGrow: 1 }}>
+                <div className={styles['nav-tabs']}>
+                  <div className={styles['nav-container']}>
+                    <button className={this.getNavClasses('patient-view')} onClick={() => this.switchHook('patient-view')}>Patient View</button>
+                    <button className={this.getNavClasses('rx-view')} onClick={() => this.switchHook('order-select', 'rx-view')}>Rx View</button>
+                    <button className={this.getNavClasses('rx-sign')} onClick={() => this.switchHook('order-sign', 'rx-sign')}>Rx Sign</button>
+                    <button className={this.getNavClasses('pama')} onClick={() => this.switchHook('order-select', 'pama')}>PAMA Imaging</button>
+                  </div>
+                </div>
+              </Box>
+            )}
+
+            {this.props.isCardDemoView && <Box sx={{ flexGrow: 1 }} />}
+
+            {/* Card Demo toggle button */}
+            <IconButton
+              onClick={this.props.toggleCardDemoView}
+              sx={{ color: 'white', mr: 1 }}
+            >
+              {this.props.isCardDemoView ? <IconLeft /> : <IconEdit />}
+            </IconButton>
+
+            {/* Settings gear icon */}
+            <IconButton
+              onClick={this.openSettingsMenu}
+              ref={this.setSettingsNode}
+              sx={{ color: 'white' }}
+            >
+              <IconSettings height="1.2em" width="1.2em" />
+              <IconChevronDown height="1em" width="1em" />
+            </IconButton>
+          </Toolbar>
+        </AppBar>
+
         {gearMenu}
         {this.state.isAddServicesOpen ? (
           <ServicesEntry

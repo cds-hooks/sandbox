@@ -105,6 +105,16 @@ const serviceExchangeReducers = (state = initialState, action) => {
         return { ...state, selectedService: '' };
       }
 
+      // Clear all card exchanges when a new patient is selected
+      case types.GET_PATIENT_SUCCESS: {
+        return {
+          ...state,
+          selectedService: '',
+          exchanges: {},
+          hiddenCards: {},
+        };
+      }
+
       default: {
         return state;
       }

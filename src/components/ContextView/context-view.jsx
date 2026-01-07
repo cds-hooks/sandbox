@@ -6,7 +6,8 @@ import { connect } from 'react-redux';
 import cx from 'classnames';
 import forIn from 'lodash/forIn';
 
-import Field from 'terra-form-field';
+import FormControl from '@mui/material/FormControl';
+import FormLabel from '@mui/material/FormLabel';
 import Select from 'react-select';
 import ExchangePanel from '../ExchangePanel/exchange-panel';
 import MessagePanel from '../MessagePanel/message-panel';
@@ -60,6 +61,7 @@ export class ContextView extends Component {
     this.onSelectChange = this.onSelectChange.bind(this);
     this.createDropdownServices = this.createDropdownServices.bind(this);
     this.onContextToggle = this.onContextToggle.bind(this);
+    this.formatOptionLabel = this.formatOptionLabel.bind(this);
   }
 
   /**
@@ -87,10 +89,32 @@ export class ContextView extends Component {
     forIn(this.props.services, (service, key) => {
       services.push({
         value: key,
-        label: `${service.id} - ${key}`,
+        label: service.id,
+        url: key,
       });
     });
     return services;
+  }
+
+  /**
+   * Custom label formatter for react-select to display service ID and truncated URL
+   */
+  formatOptionLabel(option) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', padding: '8px 0' }}>
+        <div style={{ fontWeight: 600 }}>{option.label}</div>
+        <div style={{
+          fontSize: '0.85em',
+          color: '#666',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+        }}
+        >
+          {option.url}
+        </div>
+      </div>
+    );
   }
 
   render() {
@@ -105,18 +129,34 @@ export class ContextView extends Component {
       contextToggledClass = styles['context-open'];
     }
 
+    // Find the selected option object for proper display
+    const dropdownOptions = this.createDropdownServices();
+    const selectedOption = dropdownOptions.find((opt) => opt.value === serviceInContext);
+
     return (
       <div className={cx(styles.container, contextToggledClass)}>
         <div className={styles['wrap-context']}>
           <h1 className={styles.title}>CDS Developer Panel</h1>
-          <Field label="Select a Service">
+          <FormControl fullWidth margin="normal">
+            <FormLabel>Select a Service</FormLabel>
             <Select
-              placeholder={serviceInContext}
-              value={serviceInContext}
-              options={this.createDropdownServices()}
+              placeholder="Select a service..."
+              value={selectedOption}
+              options={dropdownOptions}
               onChange={this.onSelectChange}
+              formatOptionLabel={this.formatOptionLabel}
+              styles={{
+                control: (base) => ({
+                  ...base,
+                  minHeight: '60px',
+                }),
+                valueContainer: (base) => ({
+                  ...base,
+                  padding: '8px',
+                }),
+              }}
             />
-          </Field>
+          </FormControl>
           <ExchangePanel
             panelHeader=" Request"
             panelText={serviceExchange ? serviceExchange.request : 'No request made to CDS Service'}

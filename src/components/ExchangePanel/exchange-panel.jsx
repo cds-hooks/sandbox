@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import cx from 'classnames';
 
-import Card from 'terra-card';
-import Heading from 'terra-heading';
-import Toggle from 'terra-toggle/lib/Toggle';
-import IconChevronRight from 'terra-icon/lib/icon/IconChevronRight';
-import IconChevronDown from 'terra-icon/lib/icon/IconChevronDown';
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import Typography from '@mui/material/Typography';
+import { IconChevronRight, IconChevronDown } from '../../utils/iconMapping';
 
 import styles from './exchange-panel.css';
 
@@ -55,30 +55,28 @@ class ExchangePanel extends Component {
       <div key={`${l}-${i}`}>{l}</div>
     )) : '';
 
-    const iconToggle = this.state.isExpanded ? <IconChevronDown /> : <IconChevronRight />;
-
     return (
-      <Card>
-        <Heading
+      <Accordion
+        expanded={this.state.isExpanded}
+        onChange={this.toggleExpansion}
+        disableGutters
+      >
+        <AccordionSummary
+          expandIcon={this.state.isExpanded ? <IconChevronDown /> : <IconChevronRight />}
           className={styles['header-toggle']}
-          level={1}
-          size="medium"
-          weight={700}
-          onClick={this.toggleExpansion}
         >
-          {iconToggle}
-          {this.props.panelHeader}
-        </Heading>
-        <Toggle isOpen={this.state.isExpanded} isAnimated>
-          <Card.Body>
-            <div className={cx(styles['fhir-view'], styles['panel-text'], styles['panel-height'])}>
-              <pre>
-                {textHtml}
-              </pre>
-            </div>
-          </Card.Body>
-        </Toggle>
-      </Card>
+          <Typography variant="h6" fontWeight={700}>
+            {this.props.panelHeader}
+          </Typography>
+        </AccordionSummary>
+        <AccordionDetails sx={{ padding: 0 }}>
+          <div className={cx(styles['fhir-view'], styles['panel-text'], styles['panel-height'])}>
+            <pre>
+              {textHtml}
+            </pre>
+          </div>
+        </AccordionDetails>
+      </Accordion>
     );
   }
 }

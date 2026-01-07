@@ -5,14 +5,19 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import forIn from 'lodash/forIn';
 import cx from 'classnames';
-import Field from 'terra-form-field';
+import FormControl from '@mui/material/FormControl';
+import FormLabel from '@mui/material/FormLabel';
+import InputLabel from '@mui/material/InputLabel';
+import TextField from '@mui/material/TextField';
+import MuiSelect from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
 // import Checkbox from 'terra-form-checkbox';
 import Select from 'react-select';
-import SelectField from 'terra-form-select';
-import Text from 'terra-text';
-import Input, { InputField } from 'terra-form-input';
-import DatePicker from 'terra-date-picker';
-import List, { Item } from 'terra-list';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import List from '@mui/material/List';
+import ListItemButton from '@mui/material/ListItemButton';
 
 import debounce from 'debounce';
 
@@ -62,10 +67,6 @@ const propTypes = {
    */
   medications: PropTypes.arrayOf(PropTypes.object),
   /**
-   * Prescribed medicine chosen by the user for the patient
-   */
-  prescription: PropTypes.object,
-  /**
    * Hash detailing the dosage and frequency of the prescribed medicine
    */
   medicationInstructions: PropTypes.object,
@@ -77,6 +78,10 @@ const propTypes = {
    * Coding code from the selected Condition resource in context
    */
   selectedConditionCode: PropTypes.string,
+  /**
+   * Current user input value for the medication field
+   */
+  userInput: PropTypes.string,
   /**
    * Function for storing user input when the medication field changes
    */
@@ -159,32 +164,51 @@ export class RxView extends Component {
     this.selectStartDate = this.selectStartDate.bind(this);
     this.selectEndDate = this.selectEndDate.bind(this);
     this.toggleEnabledDate = this.toggleEnabledDate.bind(this);
+
+    // Create debounced version of the medication input handler
+    this.debouncedMedicationInput = debounce((value) => {
+      this.props.onMedicationChangeInput(value);
+    }, 150);
   }
 
   /**
    * Update any incoming values that change for state
    */
   static getDerivedStateFromProps(nextProps, prevState) {
-    if (nextProps.medicationInstructions.number !== prevState.dosageAmount
-      || nextProps.medicationInstructions.frequency !== prevState.dosageFrequency
-      || nextProps.selectedConditionCode !== prevState.conditionCode
-      || nextProps.prescriptionDates.start.value !== prevState.startRange.value
-      || nextProps.prescriptionDates.end.value !== prevState.endRange.value) {
-      return ({
-        conditionCode: nextProps.selectedConditionCode,
-        dosageAmount: nextProps.medicationInstructions.number,
-        dosageFrequency: nextProps.medicationInstructions.frequency,
-        startRange: {
-          // enabled: nextProps.startRange.enabled,
-          value: nextProps.prescriptionDates.start.value,
-        },
-        endRange: {
-          // enabled: nextProps.endRange.enabled,
-          value: nextProps.prescriptionDates.end.value,
-        },
-      });
+    const updates = {};
+    let hasUpdates = false;
+
+    if (nextProps.medicationInstructions.number !== prevState.dosageAmount) {
+      updates.dosageAmount = nextProps.medicationInstructions.number;
+      hasUpdates = true;
     }
-    return null;
+    if (nextProps.medicationInstructions.frequency !== prevState.dosageFrequency) {
+      updates.dosageFrequency = nextProps.medicationInstructions.frequency;
+      hasUpdates = true;
+    }
+    if (nextProps.selectedConditionCode !== prevState.conditionCode) {
+      updates.conditionCode = nextProps.selectedConditionCode;
+      hasUpdates = true;
+    }
+    if (nextProps.prescriptionDates.start.value !== prevState.startRange.value) {
+      updates.startRange = {
+        value: nextProps.prescriptionDates.start.value,
+      };
+      hasUpdates = true;
+    }
+    if (nextProps.prescriptionDates.end.value !== prevState.endRange.value) {
+      updates.endRange = {
+        value: nextProps.prescriptionDates.end.value,
+      };
+      hasUpdates = true;
+    }
+    // Sync input value with userInput from Redux state
+    if (nextProps.userInput !== prevState.value) {
+      updates.value = nextProps.userInput;
+      hasUpdates = true;
+    }
+
+    return hasUpdates ? updates : null;
   }
 
   // Note: A second parameter (selected value) is supplied automatically by the Terra onChange function for the Form Select component
@@ -195,8 +219,9 @@ export class RxView extends Component {
   }
 
   changeMedicationInput(event) {
-    this.setState({ value: event.target.value });
-    debounce(this.props.onMedicationChangeInput(event.target.value), 50);
+    const { value } = event.target;
+    this.setState({ value });
+    this.debouncedMedicationInput(value);
   }
 
   // Note: Bound the dosage amount to a value between 1 and 5
@@ -268,10 +293,8 @@ export class RxView extends Component {
         <h1 className={styles['view-title']}>Rx View</h1>
         <PatientBanner />
         <form>
-          <Field
-            label="Treating"
-            labelAttrs={{ className: styles['condition-select'] }}
-          >
+          <FormControl fullWidth margin="normal" className={styles['condition-select']}>
+            <FormLabel>Treating</FormLabel>
             <Select
               name="condition-input"
               placeholder={this.state.conditionDisplay}
@@ -279,76 +302,74 @@ export class RxView extends Component {
               options={this.createDropdownConditions()}
               onChange={this.selectCondition}
             />
-          </Field>
-          <Field
-            label="Medication"
-            labelAttrs={{ className: styles['medication-field'] }}
-            required
-          >
-            <Input
+          </FormControl>
+          <FormControl fullWidth margin="normal" className={styles['medication-field']} required>
+            <FormLabel required>Medication</FormLabel>
+            <TextField
               name="medication-input"
               value={this.state.value}
               onChange={this.changeMedicationInput}
+              fullWidth
+              required
             />
-            <List dividerStyle="standard">
+            <List>
               {medicationArray.map((med) => (
-                <Item
+                <ListItemButton
                   key={med.id}
-                  isSelectable
-                  onSelect={() => { this.props.chooseMedication(med); }}
+                  onClick={() => { this.props.chooseMedication(med); }}
                 >
-                  <p>{med.name}</p>
-                </Item>
+                  {med.name}
+                </ListItemButton>
               ))}
             </List>
-          </Field>
-          {this.props.prescription ? <Text isItalic fontSize={16}>{this.props.prescription.name}</Text> : null}
+          </FormControl>
           <div className={styles['dose-instruction']}>
-            <InputField
-              inputId="dosage-amount"
+            <TextField
+              id="dosage-amount"
               label="Number"
               type="number"
               value={this.state.dosageAmount}
               onChange={this.changeDosageAmount}
-              inputAttrs={{
-                name: 'dosage-amount',
-              }}
-              isInline
+              name="dosage-amount"
+              size="small"
+              sx={{ mr: 2 }}
             />
-            <Field label="Frequency" isInline>
-              <SelectField
+            <FormControl size="small" sx={{ minWidth: 200 }}>
+              <InputLabel id="dosage-frequency-label">Frequency</InputLabel>
+              <MuiSelect
+                labelId="dosage-frequency-label"
+                id="dosage-frequency"
                 name="dosage-frequency"
-                onChange={this.changeDosageFrequency}
+                label="Frequency"
+                onChange={(e) => this.changeDosageFrequency(e, e.target.value)}
                 value={this.state.dosageFrequency}
               >
-                <SelectField.Option key="daily" value="daily" display="daily" />
-                <SelectField.Option key="twice-daily" value="bid" display="twice daily" />
-                <SelectField.Option key="three-daily" value="tid" display="three times daily" />
-                <SelectField.Option key="four-daily" value="qid" display="four times daily" />
-              </SelectField>
-            </Field>
+                <MenuItem value="daily">daily</MenuItem>
+                <MenuItem value="bid">twice daily</MenuItem>
+                <MenuItem value="tid">three times daily</MenuItem>
+                <MenuItem value="qid">four times daily</MenuItem>
+              </MuiSelect>
+            </FormControl>
           </div>
           <div className={styles['dosage-timing']}>
-            <Field
-              label="Start Date"
-              isInline
-            >
-              <DatePicker
-                name="start-date"
-                selectedDate={this.state.startRange.value}
-                onChange={this.selectStartDate}
-              />
-            </Field>
-            <Field
-              label="End Date"
-              isInline
-            >
-              <DatePicker
-                name="end-date"
-                selectedDate={this.state.endRange.value}
-                onChange={this.selectEndDate}
-              />
-            </Field>
+            <LocalizationProvider dateAdapter={AdapterMoment}>
+              <FormControl sx={{ mr: 2 }}>
+                <DatePicker
+                  label="Start Date"
+                  value={this.state.startRange.value || null}
+                  onChange={(newValue) => this.selectStartDate(null, newValue)}
+                  slotProps={{ textField: { size: 'small' } }}
+                />
+              </FormControl>
+              <FormControl>
+                <DatePicker
+                  label="End Date"
+                  value={this.state.endRange.value || null}
+                  onChange={(newValue) => this.selectEndDate(null, newValue)}
+                  slotProps={{ textField: { size: 'small' } }}
+                />
+              </FormControl>
+            </LocalizationProvider>
           </div>
         </form>
         <CardList takeSuggestion={this.props.takeSuggestion} />
@@ -362,11 +383,12 @@ RxView.propTypes = propTypes;
 const mapStateToProps = (state) => ({
   isContextVisible: state.hookState.isContextVisible,
   patient: state.patientState.currentPatient,
-  medications: state.medicationState.options[state.medicationState.medListPhase] || [],
+  medications: state.medicationState.filteredPrescribables || [],
   prescription: state.medicationState.decisions.prescribable,
   medicationInstructions: state.medicationState.medicationInstructions,
   prescriptionDates: state.medicationState.prescriptionDates,
   selectedConditionCode: state.medicationState.selectedConditionCode,
+  userInput: state.medicationState.userInput,
 });
 
 const mapDispatchToProps = (dispatch) => (

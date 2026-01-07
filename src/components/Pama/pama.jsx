@@ -5,8 +5,8 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import AsyncSelect from 'react-select/async';
 
-import IconTrash from 'terra-icon/lib/icon/IconTrash';
-import Button from 'terra-button';
+import MuiButton from '@mui/material/Button';
+import { IconTrash } from '../../utils/iconMapping';
 
 import CardList from '../CardList/card-list';
 import PatientBanner from '../PatientBanner/patient-banner';
@@ -191,13 +191,13 @@ export class Pama extends Component {
             <ul>
               {[studyCoding].map((r) => (
                 <li>
-                  <Button
-                    text="Remove"
+                  <MuiButton
+                    title="Remove"
                     onClick={() => this.props.removeStudy(r)}
-                    isIconOnly
-                    icon={<IconTrash />}
-                    variant="action"
-                  />
+                    sx={{ minWidth: 'auto' }}
+                  >
+                    <IconTrash />
+                  </MuiButton>
                   <span className={styles['current-selection']}>
                     {r.display}
                   </span>
@@ -221,13 +221,13 @@ export class Pama extends Component {
             <ul>
               {reasonCodings.map((r) => (
                 <li>
-                  <Button
-                    text="Remove"
+                  <MuiButton
+                    title="Remove"
                     onClick={() => this.props.removeReason(r)}
-                    isIconOnly
-                    icon={<IconTrash />}
-                    variant="action"
-                  />
+                    sx={{ minWidth: 'auto' }}
+                  >
+                    <IconTrash />
+                  </MuiButton>
                   <span className={styles['current-selection']}>
                     {r.display}
                   </span>

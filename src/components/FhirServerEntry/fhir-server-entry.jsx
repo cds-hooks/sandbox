@@ -2,11 +2,15 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import Modal from 'terra-modal';
-import Button from 'terra-button';
-import Dialog from 'terra-dialog';
-import Spacer from 'terra-spacer';
-import Text from 'terra-text';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import MuiButton from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
+import CloseIcon from '@mui/icons-material/Close';
 
 import styles from './fhir-server-entry.css';
 import BaseEntryBody from '../BaseEntryBody/base-entry-body';
@@ -140,59 +144,59 @@ export class FhirServerEntry extends Component {
   }
 
   render() {
-    const headerContainer = (
-      <Text weight={700} fontSize={20}>Change FHIR Server</Text>
-    );
-
-    const footerContainer = (
-      <div className={styles['right-align']}>
-        {this.props.isEntryRequired ? ''
-          : (
-            <div className={styles['left-aligned-text']}>
-              <Button
-                text="Reset to default FHIR server"
-                variant="de-emphasis"
-                onClick={this.handleResetDefaultServer}
-              />
-            </div>
-          )}
-        <Button text="Next" variant="emphasis" onClick={this.handleSubmit} />
-        {this.props.isEntryRequired ? ''
-          : (
-            <Spacer marginLeft="small" isInlineBlock>
-              <Button text="Cancel" onClick={this.handleCloseModal} />
-            </Spacer>
-          )}
-      </div>
-    );
-
     return (
-      <div>
-        <Modal
-          ariaLabel="FHIR Server"
-          isOpen={this.state.isOpen}
-          closeOnEsc={!this.props.isEntryRequired}
-          closeOnOutsideClick={!this.props.isEntryRequired}
-          onRequestClose={this.handleCloseModal}
-          classNameModal={styles['fixed-size']}
-        >
-          <Dialog
-            header={headerContainer}
-            footer={footerContainer}
-            onClose={this.props.isEntryRequired ? null : this.handleCloseModal}
-          >
-            <BaseEntryBody
-              currentFhirServer={this.props.currentFhirServer}
-              formFieldLabel="Enter a FHIR Server URL"
-              shouldDisplayError={this.state.shouldDisplayError}
-              errorMessage={this.state.errorMessage}
-              placeholderText={this.props.currentFhirServer}
-              inputOnChange={this.handleChange}
-              inputName="fhir-server-input"
-            />
-          </Dialog>
-        </Modal>
-      </div>
+      <Dialog
+        open={this.state.isOpen}
+        onClose={this.props.isEntryRequired ? undefined : this.handleCloseModal}
+        disableEscapeKeyDown={this.props.isEntryRequired}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>
+          <Typography fontWeight={700} fontSize={20}>Change FHIR Server</Typography>
+          {!this.props.isEntryRequired && (
+            <IconButton
+              aria-label="close"
+              onClick={this.handleCloseModal}
+              sx={{
+                position: 'absolute',
+                right: 8,
+                top: 8,
+                color: (theme) => theme.palette.grey[500],
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+          )}
+        </DialogTitle>
+        <DialogContent>
+          <BaseEntryBody
+            currentFhirServer={this.props.currentFhirServer}
+            formFieldLabel="Enter a FHIR Server URL"
+            shouldDisplayError={this.state.shouldDisplayError}
+            errorMessage={this.state.errorMessage}
+            placeholderText={this.props.currentFhirServer}
+            inputOnChange={this.handleChange}
+            inputName="fhir-server-input"
+          />
+        </DialogContent>
+        <DialogActions className={styles['right-align']}>
+          {!this.props.isEntryRequired && (
+            <Box sx={{ flexGrow: 1 }}>
+              <MuiButton
+                variant="text"
+                onClick={this.handleResetDefaultServer}
+              >
+                Reset to default FHIR server
+              </MuiButton>
+            </Box>
+          )}
+          {!this.props.isEntryRequired && (
+            <MuiButton onClick={this.handleCloseModal}>Cancel</MuiButton>
+          )}
+          <MuiButton variant="contained" onClick={this.handleSubmit}>Next</MuiButton>
+        </DialogActions>
+      </Dialog>
     );
   }
 }

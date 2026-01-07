@@ -59,7 +59,7 @@ describe('MainView component', () => {
   it('renders relevant child components', () => {
     setup(storeState);
     const shallowedComponent = pureComponent.shallow();
-    expect(shallowedComponent.find('LoadingOverlay')).toHaveLength(1);
+    expect(shallowedComponent.find('ForwardRef(Backdrop)')).toHaveLength(1);
     // TODO: Add logic to check view when app can flex between med and patient view
     expect(shallowedComponent.find('Connect(PatientView)')).toHaveLength(1);
     expect(shallowedComponent.find('Connect(ContextView)')).toHaveLength(1);

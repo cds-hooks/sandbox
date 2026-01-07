@@ -4,9 +4,10 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import Text from 'terra-text';
-import Button from 'terra-button';
-import Checkbox from 'terra-form-checkbox';
+import Typography from '@mui/material/Typography';
+import MuiButton from '@mui/material/Button';
+import Switch from '@mui/material/Switch';
+import FormControlLabel from '@mui/material/FormControlLabel';
 
 import styles from './service-display.css';
 import { toggleService, deleteService } from '../../../actions/cds-services-actions';
@@ -41,27 +42,27 @@ export const ServiceDisplay = ({
   return (
     <div className={styles.container}>
       <div className={styles['url-container']}>
-        <Text weight={700} fontSize={14}>{serviceUrl}</Text>
+        <Typography fontWeight={700} fontSize={14}>{serviceUrl}</Typography>
       </div>
       <div className={styles['btn-container']}>
-        <Button
-          text="Enabled?"
-          icon={(
-            <Checkbox
+        <FormControlLabel
+          control={(
+            <Switch
               checked={definition.enabled}
-              isLabelHidden
-              onChange={() => {}}
-              labelText="Enabled?"
+              onChange={() => toggle(serviceUrl)}
+              color="primary"
             />
-)}
-          variant="emphasis"
-          onClick={() => toggle(serviceUrl)}
+          )}
+          label="Enabled"
         />
-        <Button
-          text="Delete"
-          variant="emphasis"
+        <MuiButton
+          variant="outlined"
+          color="error"
           onClick={() => remove(serviceUrl)}
-        />
+          sx={{ ml: 2 }}
+        >
+          Delete
+        </MuiButton>
       </div>
       <div
         className={styles['definition-body']}

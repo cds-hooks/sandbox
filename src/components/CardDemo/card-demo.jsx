@@ -4,9 +4,9 @@ import CodeMirror from '@uiw/react-codemirror';
 // import 'codemirror/lib/codemirror.css';
 // import 'codemirror/addon/lint/lint.css';
 
-import Button from 'terra-button';
-import Text from 'terra-text';
-import StatusView from 'terra-status-view';
+import MuiButton from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import Alert from '@mui/material/Alert';
 
 import { storeCardDemoJson } from '../../actions/card-demo-actions';
 import styles from './card-demo.css';
@@ -115,7 +115,6 @@ export class CardDemo extends Component {
   resetExample() {
     const exampleCode = JSON.stringify(this.getExampleCard(), null, 2);
     this.updateCard(exampleCode);
-    this.cm.codeMirror.setValue(exampleCode);
   }
 
   render() {
@@ -130,7 +129,7 @@ export class CardDemo extends Component {
     };
 
     const exampleCode = JSON.stringify(this.getExampleCard(), null, 2);
-    const errorPanel = <StatusView message={this.state.errorText} />;
+    const errorPanel = <Alert severity="error">{this.state.errorText}</Alert>;
     const constructedCardFormat = {
       cards: [
         (JSON.parse(this.props.tempUserJson) || this.getExampleCard()),
@@ -149,7 +148,7 @@ export class CardDemo extends Component {
     return (
       <div className={styles['app-main']}>
         <div className={styles['card-render-view-container']}>
-          <Text weight={700} fontSize={20}>Card Demo</Text>
+          <Typography fontWeight={700} fontSize={20}>Card Demo</Typography>
           <div className={styles['card-render-space']}>
             {cardDisplay}
             <div className={styles['error-space']}>
@@ -160,20 +159,20 @@ export class CardDemo extends Component {
         <div className={styles['card-render-json-container']}>
           <div className={styles['full-width']}>
             <div className={styles['card-render-json-title']}>
-              <Text weight={400} fontSize={16}>Preview a Card with JSON</Text>
+              <Typography fontWeight={400} fontSize={16}>Preview a Card with JSON</Typography>
             </div>
             <div className={styles['card-render-json-reset']}>
-              <Button
-                variant={Button.Opts.Variants['DE-EMPHASIS']}
-                text="Reset Example"
+              <MuiButton
+                variant="text"
                 onClick={this.resetExample}
-              />
+              >
+                Reset Example
+              </MuiButton>
             </div>
           </div>
           <div className={styles['card-render-json-border']}>
             <CodeMirror
               value={this.props.tempUserJson || exampleCode}
-              ref={(el) => { this.cm = el; }}
               onChange={this.updateCard}
               style={{ fontFamily: 'Inconsolata, Menlo, Consolas, monospace !important' }}
               options={options}

@@ -9,7 +9,31 @@ describe('Medication Reducers', () => {
   console.error = jest.fn();
 
   beforeEach(() => {
+    // Build allPrescribables the same way the reducer does
+    const buildAllPrescribables = () => {
+      const allPrescribables = [];
+      const seenIds = new Set();
+      Object.keys(rxnorm.pillToComponentSets).forEach((pill) => {
+        rxnorm.pillToComponentSets[pill].forEach((componentSet) => {
+          const componentKey = componentSet.join(',');
+          if (rxnorm.componentSetsToPrescribables[componentKey]) {
+            rxnorm.componentSetsToPrescribables[componentKey].forEach((prescribableId) => {
+              if (!seenIds.has(prescribableId)) {
+                seenIds.add(prescribableId);
+                allPrescribables.push({
+                  id: prescribableId,
+                  name: rxnorm.cuiToName[prescribableId],
+                });
+              }
+            });
+          }
+        });
+      });
+      return allPrescribables.sort((a, b) => a.name.localeCompare(b.name));
+    };
+
     state = {
+      allPrescribables: buildAllPrescribables(),
       medications: Object.keys(rxnorm.pillToComponentSets).map(pill => (
         {
           id: pill,
@@ -18,6 +42,7 @@ describe('Medication Reducers', () => {
       )),
       medListPhase: 'begin',
       userInput: '',
+      filteredPrescribables: [],
       options: {
         ingredient: [],
         components: [],
@@ -29,7 +54,7 @@ describe('Medication Reducers', () => {
         prescribable: null,
       },
       dispenseRequest: {
-        supplyDuration: 1,
+        supplyDuration: 30,
       },
       medicationInstructions: {
         number: 1,
@@ -54,93 +79,42 @@ describe('Medication Reducers', () => {
   });
 
   describe('STORE_USER_MED_INPUT', () => {
-    it('should handle the STORE_USER_MED_INPUT action', () => {
-      const input = 'STRIX';
+    it('should handle the STORE_USER_MED_INPUT action with simplified workflow', () => {
+      const input = 'acetaminophen';
       const action = {
         type: types.STORE_USER_MED_INPUT,
         input,
       };
 
-      const newState = Object.assign({}, state, {
-        medListPhase: 'ingredient',
-        options: {
-          ...state.options,
-          ingredient: [
-            {
-              name: 'STRIX',
-              id: '1374865',
-            },
-          ],
-        },
-        userInput: input,
-      });
+      const result = reducer(state, action);
 
-      expect(reducer(state, action)).toEqual(newState);
+      // Verify userInput is set
+      expect(result.userInput).toEqual(input);
+
+      // Verify filteredPrescribables is populated (should have matches for "acetaminophen")
+      expect(result.filteredPrescribables.length).toBeGreaterThan(0);
+
+      // Verify prescribable decision is cleared
+      expect(result.decisions.prescribable).toBeNull();
+
+      // Verify medListPhase remains at 'begin' (simplified workflow)
+      expect(result.medListPhase).toEqual('begin');
+    });
+
+    it('should clear filteredPrescribables when input is empty', () => {
+      const action = {
+        type: types.STORE_USER_MED_INPUT,
+        input: '',
+      };
+
+      const result = reducer(state, action);
+      expect(result.filteredPrescribables).toEqual([]);
+      expect(result.userInput).toEqual('');
     });
   });
 
   describe('STORE_USER_CHOSEN_MEDICATION', () => {
-    it('handles the ingredient phase', () => {
-      state.medListPhase = 'ingredient';
-      const medication = {
-        name: 'Soma',
-        id: ['1185414'],
-      };
-      const action = {
-        type: types.STORE_USER_CHOSEN_MEDICATION,
-        medication,
-      };
-
-      const newState = Object.assign({}, state, {
-        medListPhase: 'components',
-        decisions: {
-          ...state.decisions,
-          ingredient: medication,
-        },
-        options: {
-          ...state.options,
-          components: [{
-            id: ['730917'],
-            name: 'Carisoprodol 250 MG [Soma]'},{
-            id: ['573558'],
-            name: 'Carisoprodol 350 MG [Soma]'},
-          ],
-        },
-      });
-
-      expect(reducer(state, action)).toEqual(newState);
-    });
-
-    it('handles the components phase', () => {
-      state.medListPhase = 'components';
-      const medication = {
-        name: 'Carisoprodol 250 MG [Soma]',
-        id: ['730917'],
-      };
-      const action = {
-        type: types.STORE_USER_CHOSEN_MEDICATION,
-        medication,
-      };
-      
-      const newState = Object.assign({}, state, {
-        medListPhase: 'prescribable',
-        decisions: {
-          ...state.decisions,
-          components: action.medication,
-        },
-        options: {
-          ...state.options,
-          prescribable: [{
-            name: 'Carisoprodol 250 MG Oral Tablet [Soma]',
-            id: '730918',
-          }],
-        },
-      });
-      expect(reducer(state, action)).toEqual(newState);
-    });
-
-    it('handles the prescribable phase', () => {
-      state.medListPhase = 'prescribable';
+    it('handles direct prescribable selection with simplified workflow', () => {
       const medication = {
         name: 'Carisoprodol 250 MG Oral Tablet [Soma]',
         id: '730918',
@@ -152,14 +126,48 @@ describe('Medication Reducers', () => {
 
       const newState = Object.assign({}, state, {
         medListPhase: 'done',
-        userInput: '',
+        userInput: medication.name,
+        filteredPrescribables: [],
         decisions: {
           ...state.decisions,
-          prescribable: action.medication,
+          prescribable: medication,
         },
       });
 
       expect(reducer(state, action)).toEqual(newState);
+    });
+
+    it('updates userInput to medication name when medication is chosen', () => {
+      const medication = {
+        name: 'Acetaminophen 500 MG Oral Tablet',
+        id: '313782',
+      };
+      const action = {
+        type: types.STORE_USER_CHOSEN_MEDICATION,
+        medication,
+      };
+
+      const result = reducer(state, action);
+      expect(result.userInput).toEqual(medication.name);
+      expect(result.medListPhase).toEqual('done');
+    });
+
+    it('clears filteredPrescribables when medication is chosen', () => {
+      state.filteredPrescribables = [
+        { id: '123', name: 'Test Med 1' },
+        { id: '456', name: 'Test Med 2' },
+      ];
+      const medication = {
+        name: 'Carisoprodol 250 MG Oral Tablet [Soma]',
+        id: '730918',
+      };
+      const action = {
+        type: types.STORE_USER_CHOSEN_MEDICATION,
+        medication,
+      };
+
+      const result = reducer(state, action);
+      expect(result.filteredPrescribables).toEqual([]);
     });
   });
 
@@ -344,6 +352,8 @@ describe('Medication Reducers', () => {
           id: '730918',
         },
       };
+      // Set supplyDuration to 1 for these tests to match expected values
+      state.dispenseRequest.supplyDuration = 1;
     });
 
 

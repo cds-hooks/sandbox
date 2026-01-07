@@ -1,10 +1,18 @@
 .decision-card {
-  padding: 15px;
-  margin: 10px;
-  background: #fcfcfc;
-  border: 2px solid #ddd;
-  border-radius: 4px;
-  border-left-width: 3px;
+  padding: 20px;
+  margin: 16px;
+  margin-left: 0px;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  border-left-width: 5px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.decision-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.06);
+  transform: translateY(-2px);
 }
 
 .decision-card img {
@@ -44,18 +52,22 @@
 
 .alert-info {
   border-left-color: #0079be;
+  background: linear-gradient(to right, rgba(0, 121, 190, 0.03) 0%, #ffffff 15%);
 }
 
 .alert-warning {
   border-left-color: #ffae42;
+  background: linear-gradient(to right, rgba(255, 174, 66, 0.05) 0%, #ffffff 15%);
 }
 
 .alert-critical {
   border-left-color: #c00;
+  background: linear-gradient(to right, rgba(204, 0, 0, 0.04) 0%, #ffffff 15%);
 }
 
 .alert-error {
   border-left-color: #333;
+  background: linear-gradient(to right, rgba(51, 51, 51, 0.03) 0%, #ffffff 15%);
 }
 
 .unlaunchable {

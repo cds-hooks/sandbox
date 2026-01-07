@@ -15,16 +15,16 @@ describe('MessagePanel component', () => {
   });
 
   it('should render relevant child components', () => {
-    expect(wrapper.find('Card')).toHaveLength(1);
-    expect(wrapper.find('Heading')).toHaveLength(1);
-    expect(wrapper.find('Toggle')).toHaveLength(1);
-    expect(wrapper.find('IconChevronDown')).toHaveLength(1);
+    expect(wrapper.find('ForwardRef(Accordion)')).toHaveLength(1);
+    expect(wrapper.find('ForwardRef(AccordionSummary)')).toHaveLength(1);
+    expect(wrapper.find('ForwardRef(AccordionDetails)')).toHaveLength(1);
   });
 
-  it('should render an icon indicating collapsed panel if specified', () => {
+  it('should have correct expansion state', () => {
+    expect(wrapper.find('ForwardRef(Accordion)').prop('expanded')).toEqual(true);
     wrapper = shallow(<MessagePanel panelHeader={panelHeader}
       isExpanded={false} />);
-    expect(wrapper.find('IconChevronRight')).toHaveLength(1);
+    expect(wrapper.find('ForwardRef(Accordion)').prop('expanded')).toEqual(false);
   });
 
   it('should have state', () => {
@@ -32,15 +32,15 @@ describe('MessagePanel component', () => {
   });
 
   it('should have props', () => {
-    wrapper = mount(<MessagePanel panelHeader={panelHeader}
+    wrapper = shallow(<MessagePanel panelHeader={panelHeader}
       isExpanded={true} />);
-    expect(wrapper.prop('isExpanded')).toEqual(true);
-    expect(wrapper.prop('panelHeader')).toEqual(panelHeader);
+    expect(wrapper.instance().props.isExpanded).toEqual(true);
+    expect(wrapper.instance().props.panelHeader).toEqual(panelHeader);
   });
 
   it('should update state when the panel is expanded or collapsed', () => {
     expect(wrapper.state('isExpanded')).toEqual(true);
-    wrapper.find('Heading').simulate('click');
+    wrapper.find('ForwardRef(Accordion)').simulate('change');
     expect(wrapper.state('isExpanded')).toEqual(false);
   });
 

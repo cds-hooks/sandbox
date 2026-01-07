@@ -5,10 +5,14 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import map from 'lodash/map';
 
-import Modal from 'terra-modal';
-import Button from 'terra-button';
-import Dialog from 'terra-dialog';
-import Text from 'terra-text';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import MuiButton from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
+import CloseIcon from '@mui/icons-material/Close';
 
 import styles from './configure-services.css';
 import ServiceDisplay from './ServiceDisplay/service-display';
@@ -52,41 +56,40 @@ export class ConfigureServices extends Component {
   }
 
   render() {
-    const headerContainer = (
-      <Text weight={700} fontSize={20}>Configure CDS Services</Text>
-    );
-
-    const footerContainer = (
-      <div className={styles['right-align']}>
-        <Button text="Cancel" onClick={this.handleCloseModal} />
-      </div>
-    );
-
     return (
-      <div>
-        <Modal
-          ariaLabel="Configure CDS Services"
-          isOpen={this.state.isOpen}
-          closeOnEsc
-          closeOnOutsideClick
-          onRequestClose={this.handleCloseModal}
-          isFullscreen
-        >
-          <Dialog
-            header={headerContainer}
-            footer={footerContainer}
-            onClose={this.handleCloseModal}
+      <Dialog
+        open={this.state.isOpen}
+        onClose={this.handleCloseModal}
+        fullScreen
+      >
+        <DialogTitle>
+          <Typography fontWeight={700} fontSize={20}>Configure CDS Services</Typography>
+          <IconButton
+            aria-label="close"
+            onClick={this.handleCloseModal}
+            sx={{
+              position: 'absolute',
+              right: 8,
+              top: 8,
+              color: (theme) => theme.palette.grey[500],
+            }}
           >
-            {map(this.props.services, (service, ind) => (
-              <ServiceDisplay
-                definition={service}
-                serviceUrl={ind}
-                key={ind}
-              />
-            ))}
-          </Dialog>
-        </Modal>
-      </div>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent>
+          {map(this.props.services, (service, ind) => (
+            <ServiceDisplay
+              definition={service}
+              serviceUrl={ind}
+              key={ind}
+            />
+          ))}
+        </DialogContent>
+        <DialogActions className={styles['right-align']}>
+          <MuiButton onClick={this.handleCloseModal}>Cancel</MuiButton>
+        </DialogActions>
+      </Dialog>
     );
   }
 }

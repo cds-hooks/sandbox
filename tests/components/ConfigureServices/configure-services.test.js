@@ -37,19 +37,18 @@ describe('ConfigureServices component', () => {
   });
 
   it('changes isOpen state property if props changes for the property', () => {
-    let component = mount(<ConfigureServices store={mockStore} isOpen={false} />, intlContexts.mountContext);
-    expect(component.prop('isOpen')).toEqual(false);
+    let component = shallow(<ConfigureServices isOpen={false} services={storeState.cdsServicesState.configuredServices} />);
+    expect(component.state('isOpen')).toEqual(false);
     component.setProps({ isOpen: true });
-    expect(component.prop('isOpen')).toEqual(true);
+    expect(component.state('isOpen')).toEqual(true);
   });
 
   it('handles closing the modal in the component', async () => {
-    let component = shallow(<ConnectedView store={mockStore} 
-                                           isOpen={true} 
-                                           closePrompt={mockClosePrompt} />, intlContexts.shallowContext);
-    let childComponent = component.find('ConfigureServices'); 
-    let shallowedComponent = childComponent.shallow();                         
-    await shallowedComponent.find('Dialog').dive().find('ContentContainer').dive().find('.right-align').find('Button').at(0).simulate('click');
+    let component = shallow(<ConfigureServices
+                                           isOpen={true}
+                                           closePrompt={mockClosePrompt}
+                                           services={storeState.cdsServicesState.configuredServices} />);
+    await component.find('ForwardRef(DialogActions)').find('ForwardRef(Button)').simulate('click');
     expect(mockClosePrompt).toHaveBeenCalled();
   });
 });
