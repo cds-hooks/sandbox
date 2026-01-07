@@ -47,6 +47,103 @@ describe('Services Exchange Reducers', () => {
       });
       expect(reducer(state, action)).toEqual(newState);
     });
+
+    it('should store exchangeRound for enhanced prefetch tracking', () => {
+      const action = {
+        type: types.STORE_SERVICE_EXCHANGE,
+        url,
+        request: { hookInstance: '123', hook: 'patient-view' },
+        response: { cards: [] },
+        responseStatus: 200,
+        exchangeRound: 0,
+      };
+
+      const result = reducer(state, action);
+      expect(result.exchanges[url].exchangeRound).toEqual(0);
+    });
+
+    it('should store multiple exchange rounds for the same service', () => {
+      const firstAction = {
+        type: types.STORE_SERVICE_EXCHANGE,
+        url,
+        request: { hookInstance: '123', hook: 'patient-view' },
+        response: { cards: [] },
+        responseStatus: 200,
+        exchangeRound: 0,
+      };
+
+      let result = reducer(state, firstAction);
+      expect(result.exchanges[url].exchangeRound).toEqual(0);
+
+      const secondAction = {
+        type: types.STORE_SERVICE_EXCHANGE,
+        url,
+        request: { hookInstance: '456', hook: 'patient-view' },
+        response: { cards: [{ summary: 'Updated card' }] },
+        responseStatus: 200,
+        exchangeRound: 1,
+      };
+
+      result = reducer(result, secondAction);
+      expect(result.exchanges[url].exchangeRound).toEqual(1);
+      expect(result.exchanges[url].response.cards[0].summary).toEqual('Updated card');
+    });
+
+    it('should store request with prefetch data containing resolved date tokens', () => {
+      const requestWithPrefetch = {
+        hookInstance: '123',
+        hook: 'patient-view',
+        prefetch: {
+          'p1': {
+            resourceType: 'Bundle',
+            entry: [{ resource: { id: 'obs-1' } }],
+          },
+        },
+      };
+
+      const action = {
+        type: types.STORE_SERVICE_EXCHANGE,
+        url,
+        request: requestWithPrefetch,
+        response: { cards: [] },
+        responseStatus: 200,
+        exchangeRound: 0,
+      };
+
+      const result = reducer(state, action);
+      expect(result.exchanges[url].request.prefetch).toBeDefined();
+      expect(result.exchanges[url].request.prefetch.p1.resourceType).toEqual('Bundle');
+    });
+
+    it('should initialize hiddenCards as empty array for new exchange', () => {
+      const action = {
+        type: types.STORE_SERVICE_EXCHANGE,
+        url,
+        request: { hookInstance: '123' },
+        response: { cards: [] },
+        responseStatus: 200,
+        exchangeRound: 0,
+      };
+
+      const result = reducer(state, action);
+      expect(result.hiddenCards[url]).toEqual([]);
+    });
+
+    it('should preserve hiddenCards when updating existing exchange', () => {
+      state.hiddenCards[url] = ['card-uuid-1', 'card-uuid-2'];
+
+      const action = {
+        type: types.STORE_SERVICE_EXCHANGE,
+        url,
+        request: { hookInstance: '456' },
+        response: { cards: [] },
+        responseStatus: 200,
+        exchangeRound: 1,
+      };
+
+      const result = reducer(state, action);
+      expect(result.hiddenCards[url]).toEqual([]);
+    });
   });
 
   describe('SELECT_SERVICE_CONTEXT', () => {
@@ -159,6 +256,120 @@ describe('Services Exchange Reducers', () => {
         type: types.SET_HOOK,
       };
       expect(reducer(state, action)).toEqual(Object.assign({}, state, { selectedService: '' }));
+    });
+  });
+
+  describe('STORE_LAUNCH_LINK', () => {
+    it('should store a SMART launch link with default context', () => {
+      const launchUrl = 'http://example.com/cds-services/launch-1';
+      const remappedUrl = 'http://ehr.example.com/launch?iss=...';
+      const action = {
+        type: types.STORE_LAUNCH_LINK,
+        url: launchUrl,
+        remappedUrl,
+      };
+
+      const result = reducer(state, action);
+      expect(result.launchLinks[launchUrl]).toBeDefined();
+      expect(result.launchLinks[launchUrl].default).toEqual(remappedUrl);
+    });
+
+    it('should store a SMART launch link with specific app context', () => {
+      const launchUrl = 'http://example.com/cds-services/launch-1';
+      const remappedUrl = 'http://ehr.example.com/launch?iss=...';
+      const appContext = 'patient-123';
+      const action = {
+        type: types.STORE_LAUNCH_LINK,
+        url: launchUrl,
+        remappedUrl,
+        appContext,
+      };
+
+      const result = reducer(state, action);
+      expect(result.launchLinks[launchUrl][appContext]).toEqual(remappedUrl);
+    });
+
+    it('should preserve existing launch links when adding new ones', () => {
+      const launchUrl1 = 'http://example.com/cds-services/launch-1';
+      const launchUrl2 = 'http://example.com/cds-services/launch-2';
+      const remappedUrl1 = 'http://ehr.example.com/launch1';
+      const remappedUrl2 = 'http://ehr.example.com/launch2';
+
+      const action1 = {
+        type: types.STORE_LAUNCH_LINK,
+        url: launchUrl1,
+        remappedUrl: remappedUrl1,
+      };
+
+      let result = reducer(state, action1);
+
+      const action2 = {
+        type: types.STORE_LAUNCH_LINK,
+        url: launchUrl2,
+        remappedUrl: remappedUrl2,
+        appContext: 'patient-456',
+      };
+
+      result = reducer(result, action2);
+      expect(result.launchLinks[launchUrl1].default).toEqual(remappedUrl1);
+      expect(result.launchLinks[launchUrl2]['patient-456']).toEqual(remappedUrl2);
+    });
+
+    it('should allow multiple app contexts for the same launch URL', () => {
+      const launchUrl = 'http://example.com/cds-services/launch-1';
+      const remappedUrl1 = 'http://ehr.example.com/launch?patient=123';
+      const remappedUrl2 = 'http://ehr.example.com/launch?patient=456';
+
+      const action1 = {
+        type: types.STORE_LAUNCH_LINK,
+        url: launchUrl,
+        remappedUrl: remappedUrl1,
+        appContext: 'patient-123',
+      };
+
+      let result = reducer(state, action1);
+
+      const action2 = {
+        type: types.STORE_LAUNCH_LINK,
+        url: launchUrl,
+        remappedUrl: remappedUrl2,
+        appContext: 'patient-456',
+      };
+
+      result = reducer(result, action2);
+      expect(result.launchLinks[launchUrl]['patient-123']).toEqual(remappedUrl1);
+      expect(result.launchLinks[launchUrl]['patient-456']).toEqual(remappedUrl2);
+    });
+  });
+
+  describe('GET_PATIENT_SUCCESS', () => {
+    it('should clear all exchanges and selected service when new patient is loaded', () => {
+      state.exchanges[url] = storedExchange;
+      state.selectedService = url;
+      state.hiddenCards[url] = ['card-1', 'card-2'];
+
+      const action = {
+        type: types.GET_PATIENT_SUCCESS,
+      };
+
+      const result = reducer(state, action);
+      expect(result.exchanges).toEqual({});
+      expect(result.selectedService).toEqual('');
+      expect(result.hiddenCards).toEqual({});
+    });
+
+    it('should preserve launchLinks when patient changes', () => {
+      const launchUrl = 'http://example.com/launch';
+      state.launchLinks[launchUrl] = { default: 'http://ehr.example.com/launch' };
+      state.exchanges[url] = storedExchange;
+
+      const action = {
+        type: types.GET_PATIENT_SUCCESS,
+      };
+
+      const result = reducer(state, action);
+      expect(result.exchanges).toEqual({});
+      expect(result.launchLinks[launchUrl]).toBeDefined();
     });
   });
 
