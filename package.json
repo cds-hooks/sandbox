@@ -4,11 +4,8 @@
   "description": "A SPA tool that simulates the CDS Hooks standard on a mock-ehr system",
   "main": "build/bundle.js",
   "scripts": {
-    "start": "node scripts/express/app.js",
     "dev": "webpack-dev-server --config webpack.config.dev.js",
-    "compile:heroku": "webpack --config webpack.config.prod.js --progress",
     "build": "webpack --config webpack.config.prod.js --progress",
-    "heroku-postbuild": "npm install --only=dev && npm run compile:heroku",
     "lint": "./node_modules/.bin/eslint --ext .js,.jsx ./src --fix",
     "test": "jest"
   },
@@ -90,7 +87,6 @@
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-react": "^7.14.3",
     "eslint-plugin-react-hooks": "^1.7.0",
-    "express": "^4.19.2",
     "file-loader": "^6.0.0",
     "jest": "^24.9.0",
     "jest-environment-jsdom": "^24.9.0",
