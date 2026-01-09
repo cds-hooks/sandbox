@@ -34,7 +34,7 @@
     "@mui/x-date-pickers": "^6.20.2",
     "@uiw/react-codemirror": "4.11.4",
     "acorn": "^8.11.3",
-    "axios": "^0.21.1",
+    "axios": "^1.13.2",
     "axios-mock-adapter": "^1.17.0",
     "classnames": "^2.2.6",
     "codemirror": "^6.0.0",
