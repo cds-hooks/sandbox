@@ -76,7 +76,7 @@
     "babel-jest": "^24.9.0",
     "babel-loader": "^8.0.6",
     "copy-webpack-plugin": "^4.6.0",
-    "core-js": "^3.37.1",
+    "core-js": "^3.47.0",
     "css-loader": "^5.0.1",
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.14.0",
