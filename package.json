@@ -104,7 +104,7 @@
     "webpack": "^5.104.1",
     "webpack-cli": "^4.10.0",
     "webpack-dev-server": "^5.2.1",
-    "webpack-merge": "^4.2.2"
+    "webpack-merge": "^6.0.1"
   },
   "jest": {
     "testURL": "https://cds-client.org",
