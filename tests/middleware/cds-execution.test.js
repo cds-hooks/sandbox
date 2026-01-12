@@ -90,7 +90,7 @@ describe("CDS Execution Middleware", () => {
 
     expect(await onSystemActionsPromise).toEqual(["example-actions"]);
 
-    expect(callServices).not.toBeCalled();
+    expect(callServices).not.toHaveBeenCalled();
     cdsExecution.evaluateCdsTriggers(
       {
         type: types.STORE_SERVICE_EXCHANGE,
@@ -129,7 +129,7 @@ describe("CDS Execution Middleware", () => {
       }
     );
 
-    expect(callServices).toBeCalledWith(
+    expect(callServices).toHaveBeenCalledWith(
       expect.anything(),
       expect.anything(),
       fakeServiceUrl,

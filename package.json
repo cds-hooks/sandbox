@@ -30,7 +30,6 @@
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^5.18.0",
     "@mui/material": "^5.18.0",
-    "@mui/toolpad-core": "^0.1.51",
     "@mui/x-date-pickers": "^6.20.2",
     "@uiw/react-codemirror": "4.11.4",
     "acorn": "^8.11.3",
@@ -55,7 +54,7 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-intl": "^2.8.0",
-    "react-markdown": "^10.1.0",
+    "react-markdown": "4.3.1",
     "react-redux": "^5.0.6",
     "react-select": "^3.2.0",
     "redux": "^3.7.2",
@@ -66,6 +65,7 @@
   "devDependencies": {
     "@babel/core": "^7.24.7",
     "@babel/plugin-proposal-object-rest-spread": "^7.5.5",
+    "cheerio": "1.0.0-rc.3",
     "@babel/plugin-transform-async-to-generator": "^7.5.0",
     "@babel/plugin-transform-spread": "^7.2.2",
     "@babel/polyfill": "^7.4.4",
@@ -89,7 +89,6 @@
     "file-loader": "^6.0.0",
     "jest": "^30.2.0",
     "jest-environment-jsdom": "^30.2.0",
-    "jest-environment-jsdom-global": "^1.0.3",
     "mini-css-extract-plugin": "^1.6.1",
     "postcss": "^8.1.0",
     "postcss-custom-properties": "^14.0.6",
@@ -107,7 +106,10 @@
     "webpack-merge": "^4.2.2"
   },
   "jest": {
-    "testURL": "https://cds-client.org",
+    "testEnvironment": "jsdom",
+    "testEnvironmentOptions": {
+      "url": "https://cds-client.org"
+    },
     "setupFiles": [
       "./tests/jest-setup.js"
     ],
@@ -121,8 +123,7 @@
     ],
     "transformIgnorePatterns": [
       "node_modules/(?!(@mui|@babel|@emotion)/)"
-    ],
-    "testEnvironment": "jest-environment-jsdom-global"
+    ]
   },
   "browserslist": {
     "production": [

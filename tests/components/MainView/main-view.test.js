@@ -10,6 +10,12 @@ import queryString from 'query-string';
 import { setLoadingStatus } from '../../../src/actions/ui-actions';
 import { setHook } from '../../../src/actions/hook-actions';
 
+// Helper to replace jsdom.reconfigure
+const setWindowLocation = (url) => {
+  delete window.location;
+  window.location = new URL(url);
+};
+
 describe('MainView component', () => {
   let storeState;
   let wrapper;
@@ -157,9 +163,7 @@ describe('MainView component', () => {
 
   describe('URL Parameter Values', () => {
     it('grabs the hook from the hook URL query parameter and sets it if its a known hook', async () => {
-      jsdom.reconfigure({
-        url: 'http://example.com/?hook=order-select&screen=rx-view',
-      });
+      setWindowLocation('http://example.com/?hook=order-select&screen=rx-view');
       setup(storeState);
       const shallowedComponent = await pureComponent.shallow();
       expect(mockStore.getActions()[1]).toEqual(setHook('order-select', 'rx-view'));
@@ -168,18 +172,14 @@ describe('MainView component', () => {
     it('sets stored local storage hook for unsupported hooks in the URL param', async () => {
       localStorage.setItem('PERSISTED_hook', 'order-select');
       localStorage.setItem('PERSISTED_screen', 'rx-view');
-      jsdom.reconfigure({
-        url: 'http://example.com/?hook=abc-123',
-      });
+      setWindowLocation('http://example.com/?hook=abc-123');
       setup(storeState);
       const shallowedComponent = await pureComponent.shallow();
       expect(mockStore.getActions()[1]).toEqual(setHook('order-select', 'rx-view'));
     });
 
     it('calls the discovery endpoints of service discovery URLs in query parameters', async (done) => {
-      jsdom.reconfigure({
-        url: 'http://example.com/?serviceDiscoveryURL=https://service-1.com/cds-services,foo.com/cds-services',
-      });
+      setWindowLocation('http://example.com/?serviceDiscoveryURL=https://service-1.com/cds-services,foo.com/cds-services');
       setup(storeState);
       const shallowedComponent = await pureComponent.shallow();
       Promise.resolve(await shallowedComponent).then(async () => {
