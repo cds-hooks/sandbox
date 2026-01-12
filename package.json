@@ -57,7 +57,7 @@
     "react-intl": "^2.8.0",
     "react-markdown": "^10.1.0",
     "react-redux": "^5.0.6",
-    "react-select": "^3.2.0",
+    "react-select": "^5.10.2",
     "redux": "^3.7.2",
     "redux-immutable-state-invariant": "^2.1.0",
     "redux-logger": "^3.0.6",
