@@ -1,16 +1,13 @@
 import React from 'react';
-import { mount, shallow } from 'enzyme';
-import { Provider } from 'react-redux';
+import { render, screen, fireEvent } from '@testing-library/react';
 import MockAdapter from 'axios-mock-adapter';
 
 describe('Card component', () => {
   console.error = jest.fn();
-  let storeState;
   let mockAxios;
   let axios;
 
   let CardList;
-  let shallowedComponent;
   let mockSpy;
 
   let smartLink;
@@ -26,21 +23,26 @@ describe('Card component', () => {
 
   let windowSpy;
 
-  function setup(state) {
+  function setup(props = {}) {
     jest.setMock('../../../src/retrieve-data-helpers/launch-context-retrieval', mockSpy);
     CardList = require('../../../src/components/CardList/card-list')['CardList'];
-    let component = <CardList fhirServerUrl={fhirBaseUrl} 
-                              fhirAccessToken={accessToken} 
-                              patientId={patientId} 
-                              smartLaunchSupported={true}
-                              cardResponses={cardResponses}
-                              launchLinks={{
-                                "http://example-smart.com/launch": {
-                                  "default": "http://remapped-link"
-                                }
-                              }}
-                              takeSuggestion={takeSuggestion} />;
-    shallowedComponent = shallow(component);
+
+    const defaultProps = {
+      fhirServerUrl: fhirBaseUrl,
+      fhirAccessToken: accessToken,
+      patientId: patientId,
+      smartLaunchSupported: true,
+      cardResponses: cardResponses,
+      launchLinks: {
+        "http://example-smart.com/launch": {
+          "default": "http://remapped-link"
+        }
+      },
+      takeSuggestion: takeSuggestion,
+      ...props
+    };
+
+    return render(<CardList {...defaultProps} />);
   }
 
   beforeEach(() => {
@@ -85,7 +87,6 @@ describe('Card component', () => {
         }
       ],
     };
-    setup(storeState);
   });
 
   afterEach(() => {
@@ -93,36 +94,45 @@ describe('Card component', () => {
   });
 
   it('invokes a launch link sequence if a link is clicked', () => {
-    shallowedComponent.find('.links-section').find('ForwardRef(Button)').simulate('click', { preventDefault() {} });
+    const { container } = setup();
+    const linkButton = container.querySelector('.links-section button');
+    fireEvent.click(linkButton);
     expect(windowSpy).toHaveBeenCalled();
   });
 
   it('prevents default action if a event source link is clicked', () => {
     let eventWatch = jest.fn();
-    shallowedComponent.find('.card-source').first().find('a').simulate('click', { preventDefault() { return eventWatch(); }});
+    const { container } = setup();
+    const sourceLink = container.querySelector('.card-source a');
+    fireEvent.click(sourceLink, { preventDefault() { return eventWatch(); }});
     expect(eventWatch).toHaveBeenCalled();
   });
 
   it('does not launch a link if the link has an error', () => {
-    shallowedComponent.setProps({
+    const { container } = setup({
       cardResponses: {
         cards: [{
           links: [{ type: 'smart', url: `${smartLink}?foo=boo`, error: true }],
         }]
       },
     });
-    shallowedComponent.find('.links-section').find('ForwardRef(Button)').simulate('click', { preventDefault() {} });
+    const linkButton = container.querySelector('.links-section button');
+    fireEvent.click(linkButton);
     expect(windowSpy).not.toHaveBeenCalled();
   });
 
   it('takes a suggestion if there is a label', () => {
-    shallowedComponent.find('.suggestions-section').find('ForwardRef(Button)').at(0).simulate('click', { preventDefault() {} });
+    const { container } = setup();
+    const suggestionButtons = container.querySelectorAll('.suggestions-section button');
+    fireEvent.click(suggestionButtons[0]);
     mockAxios.onPost(`${serviceUrl}/feedback`).reply(200);
     expect(takeSuggestion).toHaveBeenCalledWith(suggestion);
   });
 
   it('does not take a suggestion if it is does not have a label', () => {
-    shallowedComponent.find('.suggestions-section').find('ForwardRef(Button)').at(1).simulate('click', { preventDefault() {} });
+    const { container } = setup();
+    const suggestionButtons = container.querySelectorAll('.suggestions-section button');
+    fireEvent.click(suggestionButtons[1]);
     expect(takeSuggestion).not.toHaveBeenCalled();
   });
 });

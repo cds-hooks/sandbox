@@ -70,6 +70,9 @@
     "@babel/polyfill": "^7.4.4",
     "@babel/preset-env": "^7.5.5",
     "@babel/preset-react": "^7.0.0",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^12.1.5",
+    "@testing-library/user-event": "^14.5.2",
     "autoprefixer": "^10.4.23",
     "babel-eslint": "^10.0.3",
     "babel-jest": "^30.2.0",
@@ -112,6 +115,9 @@
     },
     "setupFiles": [
       "./tests/jest-setup.js"
+    ],
+    "setupFilesAfterEnv": [
+      "./tests/jest-dom-setup.js"
     ],
     "moduleNameMapper": {
       "\\.(jpg|jpeg|png|svg|pem)$": "<rootDir>/src/assets/__mocks__/fileMock.js",
