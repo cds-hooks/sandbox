@@ -1,64 +1,71 @@
 import React from 'react';
-import { shallow, mount } from 'enzyme';
+import { render, screen, fireEvent, cleanup } from '../../test-utils';
 
 import ExchangePanel from '../../../src/components/ExchangePanel/exchange-panel';
 
 describe('ExchangePanel component', () => {
 
-  let wrapper;
   let panelHeader;
   let panelText;
+  let container;
+  let rerender;
 
   beforeEach(() => {
     panelHeader = 'Header';
     panelText = { test: 'test' };
-    wrapper = shallow(<ExchangePanel panelHeader={panelHeader}
+    const rendered = render(<ExchangePanel panelHeader={panelHeader}
                                      panelText={panelText}
                                      isExpanded={true} />);
+    container = rendered.container;
+    rerender = rendered.rerender;
+  });
+
+  afterEach(() => {
+    cleanup();
   });
 
   it('should render relevant child components', () => {
-    expect(wrapper.find('ForwardRef(Accordion)')).toHaveLength(1);
-    expect(wrapper.find('ForwardRef(AccordionSummary)')).toHaveLength(1);
-    expect(wrapper.find('ForwardRef(AccordionDetails)')).toHaveLength(1);
+    expect(container.querySelectorAll('.MuiAccordion-root')).toHaveLength(1);
+    expect(container.querySelectorAll('.MuiAccordionSummary-root')).toHaveLength(1);
+    expect(container.querySelectorAll('.MuiAccordionDetails-root')).toHaveLength(1);
   });
 
   it('should have correct expansion state', () => {
-    expect(wrapper.find('ForwardRef(Accordion)').prop('expanded')).toEqual(true);
-    wrapper = shallow(<ExchangePanel panelHeader={panelHeader}
+    const accordion = container.querySelector('.MuiAccordion-root');
+    expect(accordion).toHaveClass('Mui-expanded');
+
+    const { container: container2 } = render(<ExchangePanel panelHeader={panelHeader}
                                      panelText={panelText}
                                      isExpanded={false} />);
-    expect(wrapper.find('ForwardRef(Accordion)').prop('expanded')).toEqual(false);
+    const accordion2 = container2.querySelector('.MuiAccordion-root');
+    expect(accordion2).not.toHaveClass('Mui-expanded');
   });
 
-  it('should have state', () => {
-    expect(wrapper.state('isExpanded')).toEqual(true);
-  });
-
-  it('should have props', () => {
-    wrapper = shallow(<ExchangePanel panelHeader={panelHeader}
-                                     panelText={panelText}
-                                     isExpanded={true} />);
-    expect(wrapper.instance().props.isExpanded).toEqual(true);
-    expect(wrapper.instance().props.panelText).toEqual(panelText);
-    expect(wrapper.instance().props.panelHeader).toEqual(panelHeader);
+  it('should display the panel header', () => {
+    expect(screen.getByText(panelHeader)).toBeInTheDocument();
   });
 
   it('should update state when the panel is expanded or collapsed', () => {
-    expect(wrapper.state('isExpanded')).toEqual(true);
-    wrapper.find('ForwardRef(Accordion)').simulate('change');
-    expect(wrapper.state('isExpanded')).toEqual(false);
+    const accordion = container.querySelector('.MuiAccordion-root');
+    expect(accordion).toHaveClass('Mui-expanded');
+
+    const summary = container.querySelector('.MuiAccordionSummary-root');
+    fireEvent.click(summary);
+
+    expect(accordion).not.toHaveClass('Mui-expanded');
   });
 
   it('should generate a div for each line of the JSON stringified panel text', () => {
-    expect(wrapper.find('.panel-text').find('pre').find('div')).toHaveLength(3);
+    const preDivs = container.querySelectorAll('.panel-text pre div');
+    expect(preDivs).toHaveLength(3);
   });
 
   it('should not generate any divs for empty panel text', () => {
     panelText = '';
-    wrapper = shallow(<ExchangePanel panelHeader={panelHeader}
+    const { container: emptyContainer } = render(<ExchangePanel panelHeader={panelHeader}
                                      panelText={panelText}
                                      isExpanded={true} />);
-    expect(wrapper.find('.panel-text').find('pre').find('div')).toHaveLength(0);
+    const preDivs = emptyContainer.querySelectorAll('.panel-text pre div');
+    expect(preDivs).toHaveLength(0);
   });
 });

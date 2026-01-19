@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, cleanup } from '../../test-utils';
 import MockAdapter from 'axios-mock-adapter';
 
 describe('Card component', () => {
@@ -90,7 +90,7 @@ describe('Card component', () => {
   });
 
   afterEach(() => {
-    jest.resetModules();
+    cleanup();
   });
 
   it('invokes a launch link sequence if a link is clicked', () => {
@@ -101,11 +101,16 @@ describe('Card component', () => {
   });
 
   it('prevents default action if a event source link is clicked', () => {
-    let eventWatch = jest.fn();
     const { container } = setup();
     const sourceLink = container.querySelector('.card-source a');
-    fireEvent.click(sourceLink, { preventDefault() { return eventWatch(); }});
-    expect(eventWatch).toHaveBeenCalled();
+
+    // Create a mock event with preventDefault
+    const clickEvent = new MouseEvent('click', { bubbles: true, cancelable: true });
+    const preventDefaultSpy = jest.spyOn(clickEvent, 'preventDefault');
+
+    sourceLink.dispatchEvent(clickEvent);
+
+    expect(preventDefaultSpy).toHaveBeenCalled();
   });
 
   it('does not launch a link if the link has an error', () => {

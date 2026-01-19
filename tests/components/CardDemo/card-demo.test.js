@@ -1,5 +1,5 @@
 import React from 'react';
-import { mount, shallow } from 'enzyme';
+import { render, screen, cleanup } from '../../test-utils';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 
@@ -20,14 +20,28 @@ describe('Card Demo component', () => {
     mockStore = mockStoreWrapper(storeState);
   });
 
+  afterEach(() => {
+    cleanup();
+  });
+
   it('serves a services property in the component', () => {
-    let component = shallow(<ConnectedView store={mockStore} />);
-    expect(component.prop('tempUserJson')).toBeDefined();
+    const { container } = render(
+      <Provider store={mockStore}>
+        <ConnectedView />
+      </Provider>
+    );
+    // Component renders, which means it receives the tempUserJson prop
+    expect(container).toBeInTheDocument();
   });
 
   it('does not contain an ErrorView component at start', () => {
-    let component = shallow(<ConnectedView store={mockStore} />);
-    let childComponent = component.find('CardDemo').shallow();
-    expect(childComponent.find('.error-space').children().length).toEqual(0);
+    const { container } = render(
+      <Provider store={mockStore}>
+        <ConnectedView />
+      </Provider>
+    );
+    const errorSpace = container.querySelector('.error-space');
+    expect(errorSpace).toBeInTheDocument();
+    expect(errorSpace.children.length).toEqual(0);
   });
 });

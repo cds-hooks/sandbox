@@ -1,10 +1,9 @@
 import React from 'react';
-import { shallow } from 'enzyme';
+import { render, screen, fireEvent } from '../../test-utils';
 import BaseEntryBody from '../../../src/components/BaseEntryBody/base-entry-body';
 
 describe('BaseEntryBody component', () => {
-  
-  let wrapper;
+
   let currentFhirServer = 'fhir-example.com';
   let formFieldLabel;
   let shouldDisplayError;
@@ -20,33 +19,54 @@ describe('BaseEntryBody component', () => {
     placeholderText = 'example placeholder text';
     inputOnChange = jest.fn();
     inputName = 'input-name-field';
-    wrapper = shallow(<BaseEntryBody currentFhirServer={currentFhirServer} 
-      formFieldLabel={formFieldLabel} 
-      shouldDisplayError={shouldDisplayError} 
-      errorMessage={errorMessage} 
-      placeholderText={placeholderText} 
-      inputOnChange={inputOnChange} 
-      inputName={inputName} />);
   });
 
   it('should render relevant child components', () => {
-    expect(wrapper.find('ForwardRef(Typography)')).toHaveLength(2);
-    expect(wrapper.find('ForwardRef(TextField)')).toHaveLength(1);
-  });
-
-  it('should call onChange method when input is changed', () => {
-    wrapper.find('ForwardRef(TextField)').simulate('change', {'target': {'value': 'test'}});
-    expect(inputOnChange).toHaveBeenCalled();
-  });
-
-  it('should not render text displaying the current fhir server if the prop is not passed in', () => {
-    wrapper = shallow(<BaseEntryBody formFieldLabel={formFieldLabel}
+    const { container } = render(<BaseEntryBody
+      currentFhirServer={currentFhirServer}
+      formFieldLabel={formFieldLabel}
       shouldDisplayError={shouldDisplayError}
       errorMessage={errorMessage}
       placeholderText={placeholderText}
       inputOnChange={inputOnChange}
       inputName={inputName} />);
 
-    expect(wrapper.find('ForwardRef(Typography)').length).toEqual(0);
+    // Check for FHIR server display
+    expect(screen.getByText('fhir-example.com')).toBeInTheDocument();
+
+    // Check for form field label
+    expect(screen.getByLabelText(/example field label/i)).toBeInTheDocument();
+
+    // Check for TextField (input element)
+    const input = container.querySelector('input[name="input-name-field"]');
+    expect(input).toBeInTheDocument();
+  });
+
+  it('should call onChange method when input is changed', () => {
+    const { container } = render(<BaseEntryBody
+      currentFhirServer={currentFhirServer}
+      formFieldLabel={formFieldLabel}
+      shouldDisplayError={shouldDisplayError}
+      errorMessage={errorMessage}
+      placeholderText={placeholderText}
+      inputOnChange={inputOnChange}
+      inputName={inputName} />);
+
+    const input = container.querySelector('input[name="input-name-field"]');
+    fireEvent.change(input, { target: { value: 'test' } });
+    expect(inputOnChange).toHaveBeenCalled();
+  });
+
+  it('should not render text displaying the current fhir server if the prop is not passed in', () => {
+    render(<BaseEntryBody
+      formFieldLabel={formFieldLabel}
+      shouldDisplayError={shouldDisplayError}
+      errorMessage={errorMessage}
+      placeholderText={placeholderText}
+      inputOnChange={inputOnChange}
+      inputName={inputName} />);
+
+    // Should not find the FHIR server text
+    expect(screen.queryByText(/fhir-example.com/i)).not.toBeInTheDocument();
   });
 });
