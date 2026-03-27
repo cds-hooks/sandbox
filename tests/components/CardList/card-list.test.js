@@ -1,5 +1,5 @@
 import React from 'react';
-import { shallow } from 'enzyme';
+import { render } from '@testing-library/react';
 
 import { CardList } from '../../../src/components/CardList/card-list';
 
@@ -20,7 +20,7 @@ describe('Card List component', () => {
   });
 
   it('does not error on empty launchLinks when link type is smart', () => {
-    let component = shallow(<CardList cardResponses={cardResponses} />);
-    expect(component).toBeDefined();
+    const { container } = render(<CardList cardResponses={cardResponses} takeSuggestion={jest.fn()} />);
+    expect(container).toBeDefined();
   });
 });

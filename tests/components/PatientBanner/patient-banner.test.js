@@ -1,5 +1,5 @@
 import React from 'react';
-import { shallow } from 'enzyme';
+import { render, screen } from '@testing-library/react';
 
 import * as pb from '../../../src/components/PatientBanner/patient-banner';
 
@@ -9,11 +9,7 @@ describe('Patient Banner component', () => {
     patientId: '123',
   };
 
-  function expectContainsElement(renderedComponent, expected) {
-    expect(renderedComponent.containsMatchingElement(expected)).toBeTruthy();
-  }
-
- it('has a functioning mapStateToProps', () => {
+  it('has a functioning mapStateToProps', () => {
     let state = {
       patientState: {
         currentPatient: {
@@ -26,16 +22,14 @@ describe('Patient Banner component', () => {
   });
 
   it('contains a default name and id when no patient is selected', () => {
-    let component = <pb.PatientBanner />;
-    let renderedComponent = shallow(component);
-    expectContainsElement(renderedComponent, pb.defaultName);
-    expectContainsElement(renderedComponent, pb.defaultId);
+    const { container } = render(<pb.PatientBanner />);
+    expect(container.textContent).toContain(pb.defaultName);
+    expect(container.textContent).toContain(pb.defaultId);
   });
 
   it('contains a name and id when a patient is selected', () => {
-    let component = <pb.PatientBanner {...props} />;
-    let renderedComponent = shallow(component);
-    expectContainsElement(renderedComponent, props.patientName);
-    expectContainsElement(renderedComponent, props.patientId);
+    const { container } = render(<pb.PatientBanner {...props} />);
+    expect(container.textContent).toContain(props.patientName);
+    expect(container.textContent).toContain(props.patientId);
   });
 });

@@ -1,18 +1,15 @@
 import React from "react";
-import { mount, shallow } from "enzyme";
+import { render, screen } from "@testing-library/react";
 import { Provider } from "react-redux";
 import configureStore from "redux-mock-store";
 import "core-js/es/array/flat-map";
 
 describe("Pama component", () => {
   let storeState;
-  let wrapper;
-  let pureComponent;
   let mockStore;
   let mockStoreWrapper = configureStore([]);
 
   let ConnectedView;
-  let Pama;
   let mockSpy;
 
   function setup(state) {
@@ -22,16 +19,20 @@ describe("Pama component", () => {
       mockSpy
     );
     ConnectedView = require("../../../src/components/Pama/pama").default;
-    Pama = require("../../../src/components/Pama/pama")["Pama"];
-
-    let component = <ConnectedView store={mockStore} />;
-    wrapper = shallow(component);
-    pureComponent = wrapper.find(Pama);
   }
 
   beforeEach(() => {
     storeState = {
       patientState: { currentPatient: { id: "patient-123" } },
+      fhirServerState: { currentFhirServer: "http://test-fhir.com" },
+      hookState: { currentHook: "pama/order-select", isContextVisible: true },
+      cdsServicesState: { configuredServices: {} },
+      serviceExchangeState: {
+        selectedService: "",
+        exchanges: {},
+        hiddenCards: {},
+      },
+      cardDemoState: { isDemoCardEnabled: false },
       pama: {
         serviceRequest: {
           studyCoding: {
@@ -54,13 +55,16 @@ describe("Pama component", () => {
     jest.resetModules();
   });
 
-  it("matches props passed down from Redux decorator", () => {
-    expect(pureComponent.prop("pamaRating")).toEqual(
-      storeState.pama.pamaRating
+  it("renders connected component with expected content from Redux state", () => {
+    render(
+      <Provider store={mockStore}>
+        <ConnectedView />
+      </Provider>
     );
-    expect(pureComponent.prop("serviceRequest")).toEqual(
-      storeState.pama.serviceRequest
-    );
+    // The pamaRating from state should appear in rendered output
+    expect(screen.getByText("appropriate", { exact: false })).toBeDefined();
+    // The component title should render
+    expect(screen.getByText("PAMA Imaging")).toBeDefined();
   });
 
   it("creates hook context correctly", () => {

@@ -1,143 +1,141 @@
 import React from 'react';
-import { mount, shallow } from 'enzyme';
-import configureStore from 'redux-mock-store';
-import intlContexts from './intl-context-setup';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+
+const theme = createTheme();
+
+let mockMetadataFn = jest.fn();
+
+jest.mock('../../../src/retrieve-data-helpers/fhir-metadata-retrieval', () => {
+  return (...args) => mockMetadataFn(...args);
+});
+
+import { FhirServerEntry } from '../../../src/components/FhirServerEntry/fhir-server-entry';
 
 describe('FhirServerEntry component', () => {
   let storeState;
-  let wrapper;
-  let pureComponent;
-  let mockStore;
-  let mockStoreWrapper = configureStore([]);
   console.error = jest.fn();
 
-  let ConnectedView;
-  let FhirServerEntryView;
-  let mockSpy;
   let mockResolve;
   let mockClosePrompt;
   let isEntryRequired;
   let initialError;
-  let defaultFhirServer;
 
-  function setup(state) {
-    mockStore = mockStoreWrapper(state);
-    jest.setMock('../../../src/retrieve-data-helpers/fhir-metadata-retrieval', mockSpy);
-    ConnectedView = require('../../../src/components/FhirServerEntry/fhir-server-entry').default;
-    FhirServerEntryView = require('../../../src/components/FhirServerEntry/fhir-server-entry')['FhirServerEntry'];
-    let component;
-    if (mockResolve && mockClosePrompt) {
-      component = <ConnectedView store={mockStore}
-                                 resolve={mockResolve}
-                                 isOpen={true}
-                                 isEntryRequired={isEntryRequired} 
-                                 initialError={initialError}
-                                 defaultFhirServer={defaultFhirServer}
-                                 closePrompt={mockClosePrompt} />
-    } else {
-      component = <ConnectedView store={mockStore}/>;
-    }
-    // wrapper = shallow(component);
-    wrapper = shallow(component, intlContexts.shallowContext);
-    pureComponent = wrapper.find(FhirServerEntryView);
+  function renderComponent(overrides = {}) {
+    const props = {
+      currentFhirServer: storeState.fhirServerState.currentFhirServer,
+      defaultFhirServer: storeState.fhirServerState.defaultFhirServer,
+      resolve: mockResolve,
+      isOpen: true,
+      isEntryRequired: isEntryRequired,
+      initialError: initialError,
+      closePrompt: mockClosePrompt,
+      ...overrides,
+    };
+    return render(<ThemeProvider theme={theme}><FhirServerEntry {...props} /></ThemeProvider>);
   }
 
   beforeEach(() => {
     storeState = {
-      fhirServerState: { 
+      fhirServerState: {
         currentFhirServer: 'http://test-fhir.com',
         defaultFhirServer: 'http://default-fhir-server.com',
       },
     };
-    mockSpy = jest.fn();
+    mockMetadataFn = jest.fn();
     mockResolve = jest.fn();
     mockClosePrompt = jest.fn();
     initialError = '';
     isEntryRequired = true;
   });
 
-  afterEach(() => {
-    jest.resetModules();
+  it('renders the dialog when isOpen is true', () => {
+    renderComponent();
+    expect(screen.getByText('Change FHIR Server')).toBeDefined();
   });
 
-  it('matches props passed down from Redux decorator', () => {
-    setup(storeState);
-    expect(pureComponent.prop('currentFhirServer')).toEqual(storeState.fhirServerState.currentFhirServer);
-  });
-
-  it('changes isOpen state property if props changes for the property', () => {
-    setup(storeState);
-    // let component = mount(<FhirServerEntryView isOpen={false} />, { context: { intl }, childContextTypes: { intl: intlShape } });
-    let component = pureComponent.shallow();
-    expect(component.state('isOpen')).toEqual(true);
-    component.setProps({ isOpen: false });
-    expect(component.state('isOpen')).toEqual(false);
+  it('dialog closes when isOpen prop changes to false via rerender', () => {
+    const { unmount } = renderComponent();
+    expect(screen.getByText('Change FHIR Server')).toBeDefined();
+    unmount();
+    // Render fresh with isOpen=false
+    renderComponent({ isOpen: false });
+    expect(screen.queryByRole('dialog')).toBeNull();
   });
 
   it('handles resetting the fhir server and closes the modal', async () => {
     isEntryRequired = false;
-    setup(storeState);
-    let shallowedComponent = pureComponent.shallow();
-    await shallowedComponent.find('ForwardRef(DialogActions)').find('ForwardRef(Button)').at(0).simulate('click');
-    expect(mockClosePrompt).toHaveBeenCalled();
-    expect(mockResolve).toHaveBeenCalled();
-    expect(mockSpy).toHaveBeenCalled();
+    mockMetadataFn = jest.fn(() => Promise.resolve(1));
+    renderComponent();
+    const resetButton = screen.getByText('Reset to default FHIR server');
+    fireEvent.click(resetButton);
+    await waitFor(() => {
+      expect(mockClosePrompt).toHaveBeenCalled();
+      expect(mockResolve).toHaveBeenCalled();
+      expect(mockMetadataFn).toHaveBeenCalled();
+    });
   });
 
-  it('handles closing the modal in the component', async () => {
+  it('handles closing the modal via the Cancel button', async () => {
     isEntryRequired = false;
-    setup(storeState);
-    let shallowedComponent = pureComponent.shallow();
-    await shallowedComponent.find('ForwardRef(DialogActions)').find('ForwardRef(Button)').at(1).simulate('click');
+    renderComponent();
+    const cancelButton = screen.getByText('Cancel');
+    fireEvent.click(cancelButton);
     expect(mockClosePrompt).toHaveBeenCalled();
   });
 
   describe('User input', () => {
-    const enterInputAndSave = (shallowedComponent, input) => {
-      shallowedComponent.find('BaseEntryBody').prop('inputOnChange')({'target': {'value': input}});
-      shallowedComponent.find('ForwardRef(DialogActions)').find('ForwardRef(Button)').last().simulate('click');
+    const enterInputAndSave = (input) => {
+      const textField = screen.getByLabelText('Enter a FHIR Server URL *');
+      fireEvent.change(textField, { target: { value: input } });
+      const saveButton = screen.getByText('Next');
+      fireEvent.click(saveButton);
     };
 
-    it('displays an error if input is empty', () => {
-      mockSpy = jest.fn(() => { Promise.resolve(1) });
-      setup(storeState);
-      let shallowedComponent = pureComponent.shallow();
-      enterInputAndSave(shallowedComponent, '');
-      expect(shallowedComponent.state('shouldDisplayError')).toEqual(true);
-      expect(shallowedComponent.state('errorMessage')).not.toEqual('');
-    });
-
-    it('displays an error message if retrieving fhir server metadata fails', () => {
-      mockSpy = jest.fn(() => { throw new Error(1); });
-      setup(storeState);
-      let shallowedComponent = pureComponent.shallow();
-      enterInputAndSave(shallowedComponent, 'test');
-      expect(shallowedComponent.state('shouldDisplayError')).toEqual(true);
-      expect(shallowedComponent.state('errorMessage')).not.toEqual('');
-    });
-
-    it('displays an error message if input resolves to a 401 error', () => {
-      mockSpy = jest.fn(() => { 
-        throw new Error({
-          response: { status: 401 },
-        }); 
+    it('displays an error if input is empty', async () => {
+      mockMetadataFn = jest.fn(() => new Promise(() => {}));
+      renderComponent();
+      enterInputAndSave('');
+      await waitFor(() => {
+        expect(screen.getByText('Enter a valid FHIR server base url')).toBeDefined();
       });
-      setup(storeState);
-      let shallowedComponent = pureComponent.shallow();
-      enterInputAndSave(shallowedComponent, 'http://secured-fhir-endpoint.com');
-      expect(shallowedComponent.state('shouldDisplayError')).toEqual(true);
-      expect(shallowedComponent.state('errorMessage')).not.toEqual('');
+    });
+
+    it('displays an error message if retrieving fhir server metadata fails', async () => {
+      mockMetadataFn = jest.fn(() => { throw new Error(1); });
+      renderComponent();
+      enterInputAndSave('test');
+      await waitFor(() => {
+        expect(screen.getByText('Failed to connect to the FHIR server. See console for details.')).toBeDefined();
+      });
+    });
+
+    it('displays an error message if input resolves to a 401 error', async () => {
+      mockMetadataFn = jest.fn(() => {
+        throw Object.assign(new Error('Unauthorized'), {
+          response: { status: 401 },
+        });
+      });
+      renderComponent();
+      enterInputAndSave('http://secured-fhir-endpoint.com');
+      await waitFor(() => {
+        expect(screen.getByText('Cannot configure secured FHIR endpoints. Please use an open (unsecured) FHIR endpoint.')).toBeDefined();
+      });
     });
 
     it('closes the modal, resolves passed in prop promise if applicable, and closes prompt if possible', async () => {
-      mockSpy = jest.fn(() => { return Promise.resolve(1)} );
-      setup(storeState);
-      let shallowedComponent = pureComponent.shallow();
-      await enterInputAndSave(shallowedComponent, 'test');
-      expect(shallowedComponent.state('shouldDisplayError')).toEqual(false);
-      expect(mockClosePrompt).toHaveBeenCalled();
-      expect(mockResolve).toHaveBeenCalled();
-      expect(mockClosePrompt).toHaveBeenCalled();
+      mockMetadataFn = jest.fn(() => { return Promise.resolve(1) });
+      renderComponent();
+      const textField = screen.getByLabelText('Enter a FHIR Server URL *');
+      fireEvent.change(textField, { target: { value: 'test' } });
+      const saveButton = screen.getByText('Next');
+      fireEvent.click(saveButton);
+      await waitFor(() => {
+        expect(mockClosePrompt).toHaveBeenCalled();
+        expect(mockResolve).toHaveBeenCalled();
+      });
+      // Error message should not be displayed on success
+      expect(screen.queryByText('Enter a valid FHIR server base url')).toBeNull();
     });
   });
 });

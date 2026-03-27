@@ -1,72 +1,89 @@
 import React from 'react';
-import { mount, shallow } from 'enzyme';
-import intlContexts from './intl-context-setup';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 
-describe('FhirServerEntry component', () => {
-  let ServicesEntryView;
-  let mockSpy;
+const theme = createTheme();
+
+let mockDiscoveryFn = jest.fn(() => Promise.resolve(1));
+
+jest.mock('../../../src/retrieve-data-helpers/discovery-services-retrieval', () => {
+  return (...args) => mockDiscoveryFn(...args);
+});
+
+import ServicesEntryView from '../../../src/components/ServicesEntry/services-entry';
+
+describe('ServicesEntry component', () => {
   console.error = jest.fn();
 
-  function setup() {
-    jest.setMock('../../../src/retrieve-data-helpers/discovery-services-retrieval', mockSpy);
-    ServicesEntryView = require('../../../src/components/ServicesEntry/services-entry').default;
+  function renderWithTheme(ui, options) {
+    return render(<ThemeProvider theme={theme}>{ui}</ThemeProvider>, options);
   }
 
   beforeEach(() => {
-    mockSpy = jest.fn(() => Promise.resolve(1));
+    mockDiscoveryFn = jest.fn(() => Promise.resolve(1));
   });
 
-  afterEach(() => {
-    jest.resetModules();
+  it('dialog closes when isOpen prop changes to false via rerender', () => {
+    const { unmount } = renderWithTheme(<ServicesEntryView isOpen={true} />);
+    expect(screen.getByText('Add CDS Services')).toBeDefined();
+    unmount();
+    // Render with isOpen=false and verify dialog is not shown
+    renderWithTheme(<ServicesEntryView isOpen={false} />);
+    expect(screen.queryByRole('dialog')).toBeNull();
   });
 
-  it('changes isOpen state property if props changes for the property', () => {
-    setup();
-    let component = shallow(<ServicesEntryView isOpen={false} />);
-    expect(component.state('isOpen')).toEqual(false);
-    component.setProps({ isOpen: true });
-    expect(component.state('isOpen')).toEqual(true);
+  it('dialog opens when isOpen prop changes to true via rerender', () => {
+    const { rerender } = renderWithTheme(<ServicesEntryView isOpen={false} />);
+    expect(screen.queryByText('Add CDS Services')).toBeNull();
+    rerender(<ThemeProvider theme={theme}><ServicesEntryView isOpen={true} /></ThemeProvider>);
+    expect(screen.getByText('Add CDS Services')).toBeDefined();
   });
 
-  it('handles closing the modal in the component', async () => {
+  it('handles closing the modal via the Cancel button', async () => {
     const closePromptSpy = jest.fn();
-    setup();
-    let component = shallow(<ServicesEntryView isOpen={true} closePrompt={closePromptSpy} />);
-    await component.find('ForwardRef(DialogActions)').find('ForwardRef(Button)').at(0).simulate('click');
+    renderWithTheme(<ServicesEntryView isOpen={true} closePrompt={closePromptSpy} />);
+    const cancelButton = screen.getByText('Cancel');
+    fireEvent.click(cancelButton);
     expect(closePromptSpy).toHaveBeenCalled();
   });
 
   describe('User input', () => {
-    const enterInputAndSave = (shallowedComponent, input) => {
-      shallowedComponent.find('BaseEntryBody').prop('inputOnChange')({'target': {'value': input}});
-      shallowedComponent.find('ForwardRef(DialogActions)').find('ForwardRef(Button)').at(1).simulate('click');
+    const enterInputAndSave = (input) => {
+      const textField = screen.getByLabelText('Enter discovery endpoint url *');
+      fireEvent.change(textField, { target: { value: input } });
+      const saveButton = screen.getByText('Save');
+      fireEvent.click(saveButton);
     };
 
-    it('displays an error if input is empty', () => {
-      mockSpy = jest.fn(() => { Promise.resolve(1) });
-      setup();
-      let component = shallow(<ServicesEntryView isOpen={true} />);
-      enterInputAndSave(component, '');
-      expect(component.state('shouldDisplayError')).toEqual(true);
-      expect(component.state('errorMessage')).not.toEqual('');
+    it('displays an error if input is empty', async () => {
+      mockDiscoveryFn = jest.fn(() => new Promise(() => {}));
+      renderWithTheme(<ServicesEntryView isOpen={true} />);
+      enterInputAndSave('');
+      await waitFor(() => {
+        expect(screen.getByText('Enter a valid discovery endpoint')).toBeDefined();
+      });
     });
 
-    it('displays an error message if retrieving discovery endpoint fails', () => {
-      mockSpy = jest.fn(() => { throw new Error(1); });
-      setup();
-      let component = shallow(<ServicesEntryView isOpen={true} />);
-      enterInputAndSave(component, 'test');
-      expect(component.state('shouldDisplayError')).toEqual(true);
-      expect(component.state('errorMessage')).not.toEqual('');
+    it('displays an error message if retrieving discovery endpoint fails', async () => {
+      mockDiscoveryFn = jest.fn(() => { throw new Error(1); });
+      renderWithTheme(<ServicesEntryView isOpen={true} />);
+      enterInputAndSave('test');
+      await waitFor(() => {
+        expect(screen.getByText('Failed to connect to the discovery endpoint. See console for details.')).toBeDefined();
+      });
     });
 
     it('closes the modal, resolves passed in prop promise if applicable, and closes prompt if possible', async () => {
       const closePromptSpy = jest.fn();
-      setup();
-      let component = shallow(<ServicesEntryView isOpen={true} closePrompt={closePromptSpy} />);
-      await enterInputAndSave(component, 'https://test.com');
-      expect(component.state('shouldDisplayError')).toEqual(false);
-      expect(closePromptSpy).toHaveBeenCalled();
+      renderWithTheme(<ServicesEntryView isOpen={true} closePrompt={closePromptSpy} />);
+      const textField = screen.getByLabelText('Enter discovery endpoint url *');
+      fireEvent.change(textField, { target: { value: 'https://test.com' } });
+      const saveButton = screen.getByText('Save');
+      fireEvent.click(saveButton);
+      await waitFor(() => {
+        expect(closePromptSpy).toHaveBeenCalled();
+      });
+      expect(screen.queryByText('Enter a valid discovery endpoint')).toBeNull();
     });
   });
 });

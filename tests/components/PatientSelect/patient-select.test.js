@@ -1,9 +1,8 @@
 import React from 'react';
-import { shallow } from 'enzyme';
+import { render } from '@testing-library/react';
 import PatientSelect from '../../../src/components/PatientSelect/patient-select';
 
 describe('PatientSelect component', () => {
-  let component;
   let inputOnChange;
   const patients = [
     { value: 'patient-1', label: 'John Doe (1990-01-01)' },
@@ -16,7 +15,7 @@ describe('PatientSelect component', () => {
 
   describe('rendering', () => {
     it('renders without FHIR server display when currentFhirServer is not provided', () => {
-      component = shallow(
+      const { container, queryByText } = render(
         <PatientSelect
           formFieldLabel="Select a Patient"
           shouldDisplayError={false}
@@ -25,13 +24,15 @@ describe('PatientSelect component', () => {
         />,
       );
 
-      expect(component.find('ForwardRef(Typography)').length).toEqual(0);
-      expect(component.find('ForwardRef(FormControl)').length).toEqual(1);
+      // No FHIR server text should be present
+      expect(queryByText('Current FHIR server')).toBeNull();
+      // FormControl should be rendered (check for required label)
+      expect(container.querySelector('.vertical-separation')).toBeTruthy();
     });
 
     it('renders with FHIR server display when currentFhirServer is provided', () => {
       const fhirServer = 'http://example.com/fhir';
-      component = shallow(
+      const { getByText } = render(
         <PatientSelect
           currentFhirServer={fhirServer}
           formFieldLabel="Select a Patient"
@@ -41,14 +42,13 @@ describe('PatientSelect component', () => {
         />,
       );
 
-      expect(component.find('ForwardRef(Typography)').length).toEqual(2);
-      expect(component.find('ForwardRef(Typography)').at(0).dive().text()).toEqual('Current FHIR server');
-      expect(component.find('ForwardRef(Typography)').at(1).dive().text()).toEqual(fhirServer);
+      expect(getByText('Current FHIR server')).toBeTruthy();
+      expect(getByText(fhirServer)).toBeTruthy();
     });
 
     it('renders the form field label correctly', () => {
       const label = 'Choose a Patient';
-      component = shallow(
+      const { getByText } = render(
         <PatientSelect
           formFieldLabel={label}
           shouldDisplayError={false}
@@ -57,13 +57,12 @@ describe('PatientSelect component', () => {
         />,
       );
 
-      const formLabel = component.find('ForwardRef(FormLabel)');
-      expect(formLabel.length).toEqual(1);
-      expect(formLabel.prop('required')).toBe(true);
+      const formLabel = getByText(label);
+      expect(formLabel).toBeTruthy();
     });
 
     it('renders with FormControl component', () => {
-      component = shallow(
+      const { container } = render(
         <PatientSelect
           formFieldLabel="Select a Patient"
           shouldDisplayError={false}
@@ -72,13 +71,13 @@ describe('PatientSelect component', () => {
         />,
       );
 
-      expect(component.find('ForwardRef(FormControl)').length).toEqual(1);
-      expect(component.find('ForwardRef(FormControl)').prop('fullWidth')).toBe(true);
+      // MUI FormControl with fullWidth renders with MuiFormControl-fullWidth class
+      expect(container.querySelector('.MuiFormControl-fullWidth')).toBeTruthy();
     });
 
     it('renders with required FormLabel', () => {
       const placeholder = 'Start typing to search...';
-      component = shallow(
+      const { container } = render(
         <PatientSelect
           formFieldLabel="Select a Patient"
           shouldDisplayError={false}
@@ -88,14 +87,15 @@ describe('PatientSelect component', () => {
         />,
       );
 
-      expect(component.find('ForwardRef(FormLabel)').length).toEqual(1);
-      expect(component.find('ForwardRef(FormLabel)').prop('required')).toBe(true);
+      // MUI required FormLabel has an asterisk element
+      const asterisk = container.querySelector('.MuiFormLabel-asterisk');
+      expect(asterisk).toBeTruthy();
     });
   });
 
   describe('error handling', () => {
     it('does not display error message when shouldDisplayError is false', () => {
-      component = shallow(
+      const { container, queryByText } = render(
         <PatientSelect
           formFieldLabel="Select a Patient"
           shouldDisplayError={false}
@@ -105,13 +105,14 @@ describe('PatientSelect component', () => {
         />,
       );
 
-      expect(component.find('ForwardRef(FormHelperText)').length).toEqual(0);
-      expect(component.find('ForwardRef(FormControl)').prop('error')).toEqual(false);
+      expect(queryByText('An error occurred')).toBeNull();
+      // FormControl should not have error class
+      expect(container.querySelector('.MuiFormControl-root.Mui-error')).toBeNull();
     });
 
     it('displays error message when shouldDisplayError is true', () => {
       const errorMsg = 'Please select a valid patient';
-      component = shallow(
+      const { getByText, container } = render(
         <PatientSelect
           formFieldLabel="Select a Patient"
           shouldDisplayError
@@ -121,15 +122,15 @@ describe('PatientSelect component', () => {
         />,
       );
 
-      expect(component.find('ForwardRef(FormHelperText)').length).toEqual(1);
-      expect(component.find('ForwardRef(FormHelperText)').dive().text()).toEqual(errorMsg);
-      expect(component.find('ForwardRef(FormControl)').prop('error')).toEqual(true);
+      expect(getByText(errorMsg)).toBeTruthy();
+      // FormControl should have error class
+      expect(container.querySelector('.Mui-error')).toBeTruthy();
     });
   });
 
   describe('patient list handling', () => {
     it('renders with provided patient list', () => {
-      component = shallow(
+      const { container } = render(
         <PatientSelect
           formFieldLabel="Select a Patient"
           shouldDisplayError={false}
@@ -139,11 +140,11 @@ describe('PatientSelect component', () => {
       );
 
       // Component should render without errors
-      expect(component.find('ForwardRef(FormControl)').length).toEqual(1);
+      expect(container.querySelector('.vertical-separation')).toBeTruthy();
     });
 
     it('renders with empty patient list', () => {
-      component = shallow(
+      const { container } = render(
         <PatientSelect
           formFieldLabel="Select a Patient"
           shouldDisplayError={false}
@@ -152,7 +153,7 @@ describe('PatientSelect component', () => {
         />,
       );
 
-      expect(component.find('ForwardRef(FormControl)').length).toEqual(1);
+      expect(container.querySelector('.vertical-separation')).toBeTruthy();
     });
   });
 });

@@ -1,64 +1,83 @@
 import React from 'react';
-import { shallow, mount } from 'enzyme';
+import { render, screen, fireEvent } from '@testing-library/react';
 
 import ExchangePanel from '../../../src/components/ExchangePanel/exchange-panel';
 
 describe('ExchangePanel component', () => {
 
-  let wrapper;
   let panelHeader;
   let panelText;
 
   beforeEach(() => {
     panelHeader = 'Header';
     panelText = { test: 'test' };
-    wrapper = shallow(<ExchangePanel panelHeader={panelHeader}
-                                     panelText={panelText}
-                                     isExpanded={true} />);
   });
 
   it('should render relevant child components', () => {
-    expect(wrapper.find('ForwardRef(Accordion)')).toHaveLength(1);
-    expect(wrapper.find('ForwardRef(AccordionSummary)')).toHaveLength(1);
-    expect(wrapper.find('ForwardRef(AccordionDetails)')).toHaveLength(1);
+    const { container } = render(<ExchangePanel panelHeader={panelHeader}
+                                     panelText={panelText}
+                                     isExpanded={true} />);
+    // Accordion, AccordionSummary, AccordionDetails all render in the DOM
+    expect(screen.getByText(panelHeader)).toBeInTheDocument();
+    expect(container.querySelector('.panel-text')).toBeInTheDocument();
   });
 
   it('should have correct expansion state', () => {
-    expect(wrapper.find('ForwardRef(Accordion)').prop('expanded')).toEqual(true);
-    wrapper = shallow(<ExchangePanel panelHeader={panelHeader}
+    const { container, unmount } = render(<ExchangePanel panelHeader={panelHeader}
                                      panelText={panelText}
-                                     isExpanded={false} />);
-    expect(wrapper.find('ForwardRef(Accordion)').prop('expanded')).toEqual(false);
+                                     isExpanded={true} />);
+    // When expanded, the accordion region should be visible
+    expect(container.querySelector('.MuiAccordion-root.Mui-expanded')).toBeInTheDocument();
+
+    unmount();
+    const { container: container2 } = render(<ExchangePanel panelHeader={panelHeader}
+                            panelText={panelText}
+                            isExpanded={false} />);
+    expect(container2.querySelector('.MuiAccordion-root.Mui-expanded')).not.toBeInTheDocument();
   });
 
   it('should have state', () => {
-    expect(wrapper.state('isExpanded')).toEqual(true);
+    const { container } = render(<ExchangePanel panelHeader={panelHeader}
+                                     panelText={panelText}
+                                     isExpanded={true} />);
+    // Verify expanded state via the rendered DOM
+    expect(container.querySelector('.MuiAccordion-root.Mui-expanded')).toBeInTheDocument();
   });
 
   it('should have props', () => {
-    wrapper = shallow(<ExchangePanel panelHeader={panelHeader}
-                                     panelText={panelText}
-                                     isExpanded={true} />);
-    expect(wrapper.instance().props.isExpanded).toEqual(true);
-    expect(wrapper.instance().props.panelText).toEqual(panelText);
-    expect(wrapper.instance().props.panelHeader).toEqual(panelHeader);
+    render(<ExchangePanel panelHeader={panelHeader}
+                          panelText={panelText}
+                          isExpanded={true} />);
+    // Verify props are rendered correctly
+    expect(screen.getByText(panelHeader)).toBeInTheDocument();
+    // panelText is JSON stringified; check for the content
+    expect(screen.getByText(/"test": "test"/)).toBeInTheDocument();
   });
 
   it('should update state when the panel is expanded or collapsed', () => {
-    expect(wrapper.state('isExpanded')).toEqual(true);
-    wrapper.find('ForwardRef(Accordion)').simulate('change');
-    expect(wrapper.state('isExpanded')).toEqual(false);
+    const { container } = render(<ExchangePanel panelHeader={panelHeader}
+                                     panelText={panelText}
+                                     isExpanded={true} />);
+    expect(container.querySelector('.MuiAccordion-root.Mui-expanded')).toBeInTheDocument();
+    // Click the accordion summary to toggle
+    fireEvent.click(screen.getByText(panelHeader));
+    expect(container.querySelector('.MuiAccordion-root.Mui-expanded')).not.toBeInTheDocument();
   });
 
   it('should generate a div for each line of the JSON stringified panel text', () => {
-    expect(wrapper.find('.panel-text').find('pre').find('div')).toHaveLength(3);
+    const { container } = render(<ExchangePanel panelHeader={panelHeader}
+                                     panelText={panelText}
+                                     isExpanded={true} />);
+    const divs = container.querySelectorAll('.panel-text pre div');
+    expect(divs).toHaveLength(3);
   });
 
   it('should not generate any divs for empty panel text', () => {
     panelText = '';
-    wrapper = shallow(<ExchangePanel panelHeader={panelHeader}
+    const { container } = render(<ExchangePanel panelHeader={panelHeader}
                                      panelText={panelText}
                                      isExpanded={true} />);
-    expect(wrapper.find('.panel-text').find('pre').find('div')).toHaveLength(0);
+    const divs = container.querySelectorAll('.panel-text pre div');
+    expect(divs).toHaveLength(0);
   });
 });

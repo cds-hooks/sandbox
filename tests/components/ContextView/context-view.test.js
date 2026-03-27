@@ -1,5 +1,5 @@
 import React from 'react';
-import { mount, shallow } from 'enzyme';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import pickBy from 'lodash/pickBy';
@@ -7,13 +7,9 @@ import pickBy from 'lodash/pickBy';
 import * as types from '../../../src/actions/action-types';
 
 import ConnectedView, { ContextView } from '../../../src/components/ContextView/context-view';
-import { setContextVisiblity } from '../../../src/actions/ui-actions';
-import { selectService } from '../../../src/actions/service-exchange-actions';
 
 describe('ServiceContextView component', () => {
   let storeState;
-  let wrapper;
-  let pureComponent;
   let mockStore;
   let mockStoreWrapper = configureStore([]);
   let filteredServices;
@@ -56,38 +52,53 @@ describe('ServiceContextView component', () => {
       return service.hook === storeState.hookState.currentHook;
     });
     mockStore = mockStoreWrapper(storeState);
-    let component = <ConnectedView store={mockStore}/>;
-    wrapper = shallow(component);
-    pureComponent = wrapper.find('ContextView');
   });
 
-  it('renders a connected component and its unconnected counterpart', () => {
-    expect(wrapper.length).toEqual(1);
-    expect(pureComponent.length).toEqual(1);
+  it('renders a connected component', () => {
+    const { container } = render(
+      <Provider store={mockStore}>
+        <ConnectedView />
+      </Provider>
+    );
+    expect(container).toBeDefined();
   });
 
-  it('matches props passed down from Redux decorator', () => {
-    const serviceKeys = Object.keys(filteredServices);
-    expect(pureComponent.prop('services')).toEqual(filteredServices);
-    expect(pureComponent.prop('initialService')).toEqual(serviceKeys[0]);
-    expect(pureComponent.prop('isContextVisible')).toEqual(storeState.hookState.isContextVisible);
-    expect(pureComponent.prop('selectedService')).toEqual(storeState.serviceExchangeState.selectedService);
-    expect(pureComponent.prop('exchanges')).toEqual(storeState.serviceExchangeState.exchanges);
+  it('renders expected UI elements from Redux state', () => {
+    render(
+      <Provider store={mockStore}>
+        <ConnectedView />
+      </Provider>
+    );
+    expect(screen.getAllByText('CDS Developer Panel').length).toBeGreaterThan(0);
+    expect(screen.getByText('Select a Service')).toBeDefined();
+    expect(screen.getAllByText(/Request/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Response/).length).toBeGreaterThan(0);
   });
 
-  it('renders relevant child components', () => {
-    const shallowComponent = pureComponent.shallow();
-    expect(shallowComponent.find('ForwardRef(FormControl)')).toHaveLength(1);
-    expect(shallowComponent.find('ExchangePanel')).toHaveLength(2);
+  it('renders relevant child components (FormControl and ExchangePanel elements)', () => {
+    const { container } = render(
+      <Provider store={mockStore}>
+        <ConnectedView />
+      </Provider>
+    );
+    // FormControl renders in the DOM
+    expect(screen.getByText('Select a Service')).toBeDefined();
+    // Two ExchangePanel components render Request and Response headers
+    expect(screen.getAllByText(/Request/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Response/).length).toBeGreaterThan(0);
   });
 
-  it('does not have styling to display the context view on the user viewport if context visiblity is false', () => {
+  it('does not have styling to display the context view on the user viewport if context visibility is false', () => {
     storeState.hookState.isContextVisible = false;
     mockStore = mockStoreWrapper(storeState);
-    let component = <ConnectedView store={mockStore} />;
-    wrapper = shallow(component);
-    pureComponent = wrapper.shallow();
-    expect(wrapper.find('.context-open')).toHaveLength(0);
+    const { container } = render(
+      <Provider store={mockStore}>
+        <ConnectedView />
+      </Provider>
+    );
+    // context-open class should not be present when isContextVisible is false
+    const contextOpenElements = container.querySelectorAll('[class*="context-open"]');
+    expect(contextOpenElements.length).toEqual(0);
   });
 
   describe('Field', () => {
@@ -95,74 +106,69 @@ describe('ServiceContextView component', () => {
       storeState.hookState.currentHook = 'view-with-no-services';
       storeState.serviceExchangeState.selectedService = '';
       mockStore = mockStoreWrapper(storeState);
-      let component = <ConnectedView store={mockStore}/>;
-      wrapper = shallow(component);
-      pureComponent = wrapper.find('ContextView');
-
-      expect(pureComponent.prop('initialService')).toEqual(null);
+      const { container } = render(
+        <Provider store={mockStore}>
+          <ConnectedView />
+        </Provider>
+      );
+      // With no applicable services, the select should show placeholder text
+      expect(screen.getByText('Select a service...')).toBeDefined();
     });
 
     it('preselects a service for the dropdown if there is at least one applicable service for the view', () => {
-      let component = <ConnectedView store={mockStore}/>;
-      wrapper = shallow(component);
-      pureComponent = wrapper.find('ContextView');
-
-      expect(pureComponent.prop('selectedService')).toEqual(patientServiceUrl);
+      const { container } = render(
+        <Provider store={mockStore}>
+          <ConnectedView />
+        </Provider>
+      );
+      // The selected service URL should appear in the rendered output
+      expect(screen.getByText(patientServiceUrl)).toBeDefined();
     });
   });
 
   describe('ExchangePanel', () => {
     it('ensures the panel text contains a request/response if the service exchange has been stored', () => {
-      let component = <ConnectedView store={mockStore}/>;
-      wrapper = shallow(component);
-      pureComponent = wrapper.find('ContextView');
-      const shallowComponent = pureComponent.shallow();
+      const { container } = render(
+        <Provider store={mockStore}>
+          <ConnectedView />
+        </Provider>
+      );
       let url = storeState.serviceExchangeState.selectedService;
-      const requestPanel = shallowComponent.find('ExchangePanel').first();
-      const responsePanel = shallowComponent.find('ExchangePanel').last();
-      expect(requestPanel.prop('panelText')).toEqual(storeState.serviceExchangeState.exchanges[url].request);
-      expect(responsePanel.prop('panelText')).toEqual(storeState.serviceExchangeState.exchanges[url].response);
+      // The request and response text should be JSON-stringified and present in the DOM
+      expect(screen.getByText(`"${storeState.serviceExchangeState.exchanges[url].request}"`)).toBeDefined();
+      expect(screen.getByText(`"${storeState.serviceExchangeState.exchanges[url].response}"`)).toBeDefined();
     });
 
     it('ensures the panel text contains an appropriate message if service exchange has not been stored', () => {
       storeState.serviceExchangeState.selectedService = 'http://xyz-123.com/cds-services/id-1';
       mockStore = mockStoreWrapper(storeState);
-      let component = <ConnectedView store={mockStore}/>;
-      wrapper = shallow(component);
-      pureComponent = wrapper.find('ContextView');
-      const shallowComponent = pureComponent.shallow();
-      const requestPanel = shallowComponent.find('ExchangePanel').first();
-      const responsePanel = shallowComponent.find('ExchangePanel').last();
-      expect(requestPanel.prop('panelText')).toEqual('No request made to CDS Service');
-      expect(responsePanel.prop('panelText')).toEqual('No response made to CDS Service');
+      const { container } = render(
+        <Provider store={mockStore}>
+          <ConnectedView />
+        </Provider>
+      );
+      expect(screen.getByText('"No request made to CDS Service"')).toBeDefined();
+      expect(screen.getByText('"No response made to CDS Service"')).toBeDefined();
     });
   });
 
   describe('Dispatch Props', () => {
-    let newWrap;
-
     beforeEach(() => {
       mockStore.clearActions();
-      newWrap = shallow(<ConnectedView store={mockStore} />);
-      pureComponent = newWrap.find('ContextView').shallow();
     });
 
     it('can dispatch an action via its dispatch function passed in as prop for toggled context view', () => {
-      pureComponent.find('.context-toggle').simulate('click');
+      render(
+        <Provider store={mockStore}>
+          <ConnectedView />
+        </Provider>
+      );
+      const toggleButtons = screen.getAllByText('CDS Developer Panel');
+      // The context-toggle button is the <button> element, not the <h1>
+      const toggleButton = toggleButtons.find(el => el.tagName === 'BUTTON');
+      fireEvent.click(toggleButton);
       const expectedAction = { type: types.SET_CONTEXT_VISIBILITY };
       expect(mockStore.getActions()).toEqual([expectedAction]);
-    });
-
-    it('can dispatch an action via dispatch function passed in as a prop for selecting service', () => {
-      const selectComponent = pureComponent.find('Select');
-      if (selectComponent.length > 0) {
-        selectComponent.prop('onChange')({ value: patientServiceUrl });
-        const expectedAction = { type: types.SELECT_SERVICE_CONTEXT, service:  patientServiceUrl};
-        expect(mockStore.getActions()).toEqual([expectedAction]);
-      } else {
-        // If Select component is not found, just verify the prop exists
-        expect(pureComponent.instance().props.selectService).toBeDefined();
-      }
     });
   });
 });

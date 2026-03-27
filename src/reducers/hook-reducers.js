@@ -1,4 +1,4 @@
-import produce from 'immer';
+import { produce } from 'immer';
 import * as types from '../actions/action-types';
 import cdsExecution from '../middleware/cds-execution';
 

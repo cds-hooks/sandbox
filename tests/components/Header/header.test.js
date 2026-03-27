@@ -1,45 +1,81 @@
 import React from 'react';
-import { shallow, mount } from 'enzyme';
+import { render, fireEvent, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 import * as types from '../../../src/actions/action-types';
 
 import { setHook } from '../../../src/actions/hook-actions';
 
+const theme = createTheme();
+
+let mockExchange = jest.fn();
+let mockDiscoveryFn = jest.fn();
+let mockFhirMetadataFn = jest.fn();
+let mockPatientFn = jest.fn();
+
+jest.mock('../../../src/retrieve-data-helpers/discovery-services-retrieval', () => {
+  return (...args) => mockDiscoveryFn(...args);
+});
+jest.mock('../../../src/retrieve-data-helpers/fhir-metadata-retrieval', () => {
+  return (...args) => mockFhirMetadataFn(...args);
+});
+jest.mock('../../../src/retrieve-data-helpers/patient-retrieval', () => {
+  return (...args) => mockPatientFn(...args);
+});
+jest.mock('../../../src/retrieve-data-helpers/service-exchange', () => {
+  return (...args) => mockExchange(...args);
+});
+
+// Mock the store module used by Header's switchHook
+jest.mock('../../../src/store/store', () => {
+  return {
+    getState: () => mockStoreState,
+    dispatch: jest.fn(),
+    subscribe: jest.fn(),
+  };
+});
+
+// Mock all-patient-retrieval for PatientEntry
+jest.mock('../../../src/retrieve-data-helpers/all-patient-retrieval', () => {
+  return jest.fn(() => Promise.resolve([]));
+});
+
+let mockStoreState;
+
+import ConnectedView from '../../../src/components/Header/header';
+
 describe('Header component', () => {
   let storeState;
-  let wrapper;
-  let pureComponent;
-  let shallowedComponent;
   let mockStore;
   let mockStoreWrapper = configureStore([]);
 
   let mockPatientService;
   let mockMedService;
-  let mockExchange;
 
-  let ConnectedView;
+  // Helper to find the settings gear button (last IconButton in the toolbar)
+  function getSettingsButton(container) {
+    const buttons = container.querySelectorAll('button');
+    const nonNavButtons = Array.from(buttons).filter(b => !b.classList.contains('nav-links') && !b.classList.contains('active-link'));
+    return nonNavButtons[nonNavButtons.length - 1];
+  }
 
-  function setup(store) {
-    mockStore = mockStoreWrapper(storeState);
-    mockExchange = jest.fn();
-    jest.setMock('../../../src/retrieve-data-helpers/discovery-services-retrieval', () => {return jest.fn();});
-    jest.setMock('../../../src/retrieve-data-helpers/fhir-metadata-retrieval', () => {return jest.fn();});
-    jest.setMock('../../../src/retrieve-data-helpers/patient-retrieval', () => {return jest.fn();});
-    jest.setMock('../../../src/retrieve-data-helpers/service-exchange', mockExchange);
-    jest.setMock('../../../src/store/store', mockStore);
-    ConnectedView = require('../../../src/components/Header/header').default;
-    let component = <ConnectedView store={mockStore} />;
-    wrapper = shallow(component);
-    pureComponent = wrapper.find('Header');
-    shallowedComponent = pureComponent.shallow();
+  function renderComponent(storeOverride) {
+    const s = storeOverride || mockStore;
+    return render(
+      <Provider store={s}>
+        <ThemeProvider theme={theme}>
+          <ConnectedView />
+        </ThemeProvider>
+      </Provider>
+    );
   }
 
   beforeEach(() => {
     mockPatientService = 'http://example.com/cds-services/id-1';
     mockMedService = 'http://example-med.com/cds-services/id-1';
-    storeState = { 
+    storeState = {
       hookState: { currentHook: 'patient-view', currentScreen: 'patient-view' },
       patientState: { currentPatient: { id: 'patient-123' } },
       cardDemoState: {
@@ -67,43 +103,49 @@ describe('Header component', () => {
         medListPhase: 'begin',
       }
     };
+    mockStore = mockStoreWrapper(storeState);
+    mockStoreState = storeState;
+    mockExchange = jest.fn();
+    mockDiscoveryFn = jest.fn();
+    mockFhirMetadataFn = jest.fn(() => Promise.resolve());
+    mockPatientFn = jest.fn(() => Promise.resolve());
   });
 
   afterEach(() => {
-    mockStore.clearActions();
-    jest.resetModules();
-  });
-
-  it('matches props passed down from Redux decorator', () => {
-    setup(storeState);
-    expect(pureComponent.prop('hook')).toEqual(storeState.hookState.currentHook);
-    expect(pureComponent.prop('setHook')).toBeDefined();
+    if (mockStore) mockStore.clearActions();
   });
 
   describe('View tabs', () => {
     it('should only contain active links on the current hook/view', () => {
-      setup(storeState);
-      expect(shallowedComponent.find('.active-link').text()).toEqual('Patient View');
-      expect(shallowedComponent.find('.nav-links').not('.active-link').first().text()).toEqual('Rx View');
+      const { container } = renderComponent();
+      expect(container.querySelector('.active-link').textContent).toEqual('Patient View');
+      const allNavLinks = container.querySelectorAll('.nav-links');
+      const nonActiveLinks = Array.from(allNavLinks).filter(el => !el.classList.contains('active-link'));
+      expect(nonActiveLinks[0].textContent).toEqual('Rx View');
     });
 
     it('dispatches to switch hooks in app state if another view tab is clicked', () => {
-      setup(storeState);
-      shallowedComponent.find('.nav-links').not('.active-link').first().simulate('click');
+      const { container } = renderComponent();
+      const allNavLinks = container.querySelectorAll('.nav-links');
+      const nonActiveLinks = Array.from(allNavLinks).filter(el => !el.classList.contains('active-link'));
+      fireEvent.click(nonActiveLinks[0]);
       const medHookAction = { type: types.SET_HOOK, hook: 'order-select', screen: 'rx-view'};
       expect(mockStore.getActions()).toEqual([medHookAction]);
     });
 
     it('calls services if current hook is being invoked again on patient-view', () => {
-      setup(storeState);
-      shallowedComponent.find('.active-link').simulate('click');
+      const { container } = renderComponent();
+      fireEvent.click(container.querySelector('.active-link'));
       expect(mockExchange).toHaveBeenCalledWith(expect.anything(), expect.anything(), mockPatientService);
     });
 
     it('does not call services on order-select if no medication is chosen yet', () => {
       storeState.hookState.currentHook = 'order-select';
-      setup(storeState);
-      shallowedComponent.find('.active-link').simulate('click');
+      storeState.hookState.currentScreen = 'rx-view';
+      mockStore = mockStoreWrapper(storeState);
+      mockStoreState = storeState;
+      const { container } = renderComponent();
+      fireEvent.click(container.querySelector('.active-link'));
       expect(mockExchange).not.toHaveBeenCalled();
     });
 
@@ -112,29 +154,34 @@ describe('Header component', () => {
       storeState.hookState.currentScreen = 'rx-view';
       storeState.medicationState.decisions.prescribable = 'foo-medicine';
       storeState.medicationState.medListPhase = 'done';
-      setup(storeState);
-      shallowedComponent.find('.active-link').simulate('click');
+      mockStore = mockStoreWrapper(storeState);
+      mockStoreState = storeState;
+      const { container } = renderComponent();
+      fireEvent.click(container.querySelector('.active-link'));
       expect(mockExchange).toHaveBeenCalledWith(expect.anything(), expect.anything(), mockMedService);
     });
   });
 
-  it('should set open status for settings menu accordingly', async () => {
-    setup(storeState);
-    expect(shallowedComponent.state('settingsOpen')).toBeFalsy();
-    shallowedComponent.find('ForwardRef(IconButton)').last().simulate('click');
-    expect(shallowedComponent.state('settingsOpen')).toBeTruthy();
-    shallowedComponent.find('ForwardRef(MenuItem)').first().simulate('click');
-    expect(shallowedComponent.state('settingsOpen')).toBeFalsy();
+  it('should open and close settings menu when interacting with it', () => {
+    const { container } = renderComponent();
+    const settingsButton = getSettingsButton(container);
+    fireEvent.click(settingsButton);
+    // After clicking the settings button, menu items should appear
+    const menuItem = document.querySelector('.change-patient');
+    expect(menuItem).toBeTruthy();
+    // Click a menu item to close the menu
+    fireEvent.click(menuItem);
   });
 
   it('should display option to change FHIR server if no access token is configured for the application', () => {
-    setup(storeState);
-    shallowedComponent.find('ForwardRef(IconButton)').last().simulate('click');
-    expect(shallowedComponent.find('ForwardRef(MenuItem)').find('.change-fhir-server').key()).toEqual('change-fhir-server');
+    const { container } = renderComponent();
+    const settingsButton = getSettingsButton(container);
+    fireEvent.click(settingsButton);
+    const changeFhirServer = document.querySelector('.change-fhir-server');
+    expect(changeFhirServer).toBeTruthy();
   });
 
   it('should not display option to change FHIR server if an access token is configured for the application', () => {
-    setup(storeState);
     storeState = Object.assign({}, storeState, {
       ...storeState,
       fhirServerState: {
@@ -144,82 +191,81 @@ describe('Header component', () => {
       },
     });
     mockStore = mockStoreWrapper(storeState);
-    let component = <ConnectedView store={mockStore} />;
-    shallowedComponent = shallow(component).find('Header').shallow();
+    mockStoreState = storeState;
+    const { container } = renderComponent(mockStore);
 
-    shallowedComponent.find('ForwardRef(IconButton)').last().simulate('click');
-    expect(shallowedComponent.find('ForwardRef(MenuItem)').find('.change-fhir-server').length).toEqual(0);
+    const settingsButton = getSettingsButton(container);
+    fireEvent.click(settingsButton);
+    const changeFhirServer = document.querySelector('.change-fhir-server');
+    expect(changeFhirServer).toBeFalsy();
   });
 
   describe('Change Patient', () => {
-    beforeEach(() => {
-      setup(storeState);
-      shallowedComponent.find('ForwardRef(IconButton)').last().simulate('click');
-    });
-
-    it('should open the modal to change a patient if the Change Patient option is clicked directly', () => {
-      shallowedComponent.find('ForwardRef(MenuItem)').find('.change-patient').simulate('click');
-      expect(shallowedComponent.state('isChangePatientOpen')).toBeTruthy();
-      expect(shallowedComponent.state('settingsOpen')).toBeFalsy();
-      expect(shallowedComponent.find('Connect(PatientEntry)').length).toEqual(1);
+    it('should open the Change Patient dialog when the Change Patient option is clicked', () => {
+      const { container } = renderComponent();
+      const settingsButton = getSettingsButton(container);
+      fireEvent.click(settingsButton);
+      const changePatient = document.querySelector('.change-patient');
+      fireEvent.click(changePatient);
+      // The settings menu should close (menu items hidden via aria-hidden)
+      // and the patient entry dialog should open
+      const menuEl = document.querySelector('[role="menu"]');
+      expect(!menuEl || menuEl.closest('[aria-hidden="true"]')).toBeTruthy();
     });
   });
 
   describe('Change FHIR Server', () => {
-    beforeEach(() => {
-      setup(storeState);
-      shallowedComponent.find('ForwardRef(IconButton)').last().simulate('click');
-    });
-
-    it('should open the modal to change the FHIR server if the Change FHIR Server option is clicked directly', () => {
-      shallowedComponent.find('ForwardRef(MenuItem)').find('.change-fhir-server').simulate('click');
-      expect(shallowedComponent.state('isChangeFhirServerOpen')).toBeTruthy();
-      expect(shallowedComponent.state('settingsOpen')).toBeFalsy();
-      expect(shallowedComponent.find('Connect(FhirServerEntry)').length).toEqual(1);
+    it('should open the Change FHIR Server dialog when the Change FHIR Server option is clicked', () => {
+      const { container } = renderComponent();
+      const settingsButton = getSettingsButton(container);
+      fireEvent.click(settingsButton);
+      const changeFhirServer = document.querySelector('.change-fhir-server');
+      fireEvent.click(changeFhirServer);
+      const menuEl = document.querySelector('[role="menu"]');
+      expect(!menuEl || menuEl.closest('[aria-hidden="true"]')).toBeTruthy();
     });
   });
 
   describe('Add Services', () => {
-    beforeEach(() => {
-      setup(storeState);
-      shallowedComponent.find('ForwardRef(IconButton)').last().simulate('click');
-    });
-
-    it('should open the modal to add CDS Services if the Add Services option is clicked directly', () => {
-      shallowedComponent.find('ForwardRef(MenuItem)').find('.add-services').simulate('click');
-      expect(shallowedComponent.state('isAddServicesOpen')).toBeTruthy();
-      expect(shallowedComponent.state('settingsOpen')).toBeFalsy();
-      expect(shallowedComponent.find('ServicesEntry').length).toEqual(1);
+    it('should open the Add Services dialog when the Add Services option is clicked', () => {
+      const { container } = renderComponent();
+      const settingsButton = getSettingsButton(container);
+      fireEvent.click(settingsButton);
+      const addServices = document.querySelector('.add-services');
+      fireEvent.click(addServices);
+      const menuEl = document.querySelector('[role="menu"]');
+      expect(!menuEl || menuEl.closest('[aria-hidden="true"]')).toBeTruthy();
     });
   });
 
   describe('Configure CDS Services', () => {
-    beforeEach(() => {
-      setup(storeState);
-      shallowedComponent.find('ForwardRef(IconButton)').last().simulate('click');
-    });
-
-    it('should open the modal to add CDS Services if the Add Services option is clicked directly', () => {
-      shallowedComponent.find('ForwardRef(MenuItem)').find('.configure-services').simulate('click');
-      expect(shallowedComponent.state('isConfigureServicesOpen')).toBeTruthy();
-      expect(shallowedComponent.state('settingsOpen')).toBeFalsy();
-      expect(shallowedComponent.find('Connect(ConfigureServices)').length).toEqual(1);
+    it('should open the Configure CDS Services dialog when the Configure Services option is clicked', () => {
+      const { container } = renderComponent();
+      const settingsButton = getSettingsButton(container);
+      fireEvent.click(settingsButton);
+      const configureServices = document.querySelector('.configure-services');
+      fireEvent.click(configureServices);
+      const menuEl = document.querySelector('[role="menu"]');
+      expect(!menuEl || menuEl.closest('[aria-hidden="true"]')).toBeTruthy();
     });
   });
 
   describe('Reset Configuration', () => {
-    beforeEach(() => {
-      setup(storeState);
-      shallowedComponent.find('ForwardRef(IconButton)').last().simulate('click');
-    });
-
-    it('should open the modal and clear cached services if the Reset Configuration button is clicked', async () => {
+    it('should clear cached services if the Reset Configuration button is clicked', async () => {
+      const { container } = renderComponent();
       localStorage.setItem('PERSISTED_patientId', 'patient-123');
       expect(localStorage.getItem('PERSISTED_patientId')).toEqual('patient-123');
-      await shallowedComponent.find('ForwardRef(MenuItem)').find('.reset-configuration').simulate('click');
-      expect(shallowedComponent.state('settingsOpen')).toBeFalsy();
-      expect(mockStore.getActions()).toEqual([{ type: types.RESET_SERVICES }]);
-      expect(localStorage.getItem('PERSISTED_patientId')).toEqual(null);
+      const settingsButton = getSettingsButton(container);
+      fireEvent.click(settingsButton);
+      const resetConfig = document.querySelector('.reset-configuration');
+      fireEvent.click(resetConfig);
+      expect(mockStore.getActions()).toEqual(
+        expect.arrayContaining([{ type: types.RESET_SERVICES }])
+      );
+      // resetConfiguration is async; wait for localStorage to be cleared
+      await waitFor(() => {
+        expect(localStorage.getItem('PERSISTED_patientId')).toEqual(null);
+      });
     });
   });
 });

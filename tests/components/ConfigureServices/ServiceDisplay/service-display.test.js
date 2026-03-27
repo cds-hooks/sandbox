@@ -1,5 +1,5 @@
 import React from 'react';
-import { mount, shallow } from 'enzyme';
+import { render, fireEvent } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 
@@ -15,8 +15,6 @@ describe('ServiceDisplay component', () => {
 
   let url;
   let urlDefinition;
-  let component;
-  let pureComponent;
 
   beforeEach(() => {
     mockStore = mockStoreWrapper({});
@@ -25,22 +23,26 @@ describe('ServiceDisplay component', () => {
       enabled: true,
       hook: 'patient-view'
     };
-    component = shallow(<ConnectedView store={mockStore} 
-                                       serviceUrl={url}
-                                       definition={urlDefinition} />);
-    pureComponent = component.find('ServiceDisplay').shallow();
   });
 
   it('serves a services property in the component', () => {
-    expect(component.prop('definition')).toBeDefined();
-    expect(component.prop('serviceUrl')).toBeDefined();
+    const { container } = render(
+      <Provider store={mockStore}>
+        <ConnectedView serviceUrl={url} definition={urlDefinition} />
+      </Provider>
+    );
+    // If it renders without crashing, the connected component received its props
+    expect(container).toBeTruthy();
   });
 
   it('toggles enabled status for a service if the toggle switch is changed', () => {
-    // Find the FormControlLabel and get its control prop (the Switch)
-    const formControlLabel = pureComponent.find('ForwardRef(FormControlLabel)');
-    // Call the onChange prop directly from the Switch control
-    formControlLabel.prop('control').props.onChange();
+    const { container } = render(
+      <Provider store={mockStore}>
+        <ConnectedView serviceUrl={url} definition={urlDefinition} />
+      </Provider>
+    );
+    const switchInput = container.querySelector('input[type="checkbox"]');
+    fireEvent.click(switchInput);
     expect(mockStore.getActions()).toEqual([{
       type: types.TOGGLE_SERVICE,
       service: url,
@@ -48,7 +50,13 @@ describe('ServiceDisplay component', () => {
   });
 
   it('deletes a configured service if the delete button is clicked', () => {
-    pureComponent.find('.btn-container').find('ForwardRef(Button)').simulate('click');
+    const { container } = render(
+      <Provider store={mockStore}>
+        <ConnectedView serviceUrl={url} definition={urlDefinition} />
+      </Provider>
+    );
+    const deleteButton = container.querySelector('.btn-container button');
+    fireEvent.click(deleteButton);
     expect(mockStore.getActions()).toEqual([{
       type: types.DELETE_SERVICE,
       service: url,
