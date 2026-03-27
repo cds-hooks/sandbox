@@ -223,6 +223,18 @@ describe('RxView component', () => {
     expect(updateDosageInstructions).toHaveBeenCalled();
   });
 
+  it('allows for selecting date ranges', () => {
+    setup(patient, medListPhase, prescription);
+    const { container } = renderComponent();
+    const dateInputs = container.querySelectorAll('input[placeholder="MM/DD/YYYY"]');
+    if (dateInputs.length >= 2) {
+      fireEvent.change(dateInputs[0], { target: { value: '04/13/2018' } });
+      expect(updateDate).toHaveBeenCalled();
+      fireEvent.change(dateInputs[1], { target: { value: '04/14/2018' } });
+      expect(updateDate).toHaveBeenCalledTimes(2);
+    }
+  });
+
   it('updates the form fields in the UI if incoming props for those values differ', () => {
     setup(patient, medListPhase, prescription);
     const { container, rerender } = renderComponent();

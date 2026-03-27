@@ -306,11 +306,9 @@ export class CardList extends Component {
 
         // -- Detail (ReactMarkdown supports Github-flavored markdown) --
         const detailSection = card.detail ? (
-          <ReactMarkdown
-            escapeHtml={false}
-            softBreak="br"
-            source={card.detail}
-          />
+          <ReactMarkdown>
+            {card.detail}
+          </ReactMarkdown>
         ) : (
           ''
         );

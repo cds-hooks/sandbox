@@ -144,6 +144,31 @@ describe('MainView component', () => {
     expect(mockPromiseFhirCall).toHaveBeenCalled();
   });
 
+  it('opens a fhir server entry prompt if fhir server call failed', async () => {
+    mockPromiseSmartCall = jest.fn(() => Promise.reject(0));
+    mockPromiseFhirCall = jest.fn(() => Promise.reject({
+      response: { status: 401 },
+    }));
+    let container;
+    await act(async () => {
+      ({ container } = renderComponent());
+    });
+    await waitFor(() => {
+      expect(document.querySelector('[role="dialog"]')).toBeTruthy();
+    });
+  });
+
+  it('opens a patient entry modal if patient fetching failed', async () => {
+    mockPromisePatientCall = jest.fn(() => Promise.reject(0));
+    let container;
+    await act(async () => {
+      ({ container } = renderComponent());
+    });
+    await waitFor(() => {
+      expect(document.querySelector('[role="dialog"]')).toBeTruthy();
+    });
+  });
+
   it('renders the med prescribe view if hook is not patient view', async () => {
     storeState = getFullStoreState({
       hookState: { currentHook: 'order-select', currentScreen: 'rx-view', isLoadingData: false, isContextVisible: true },
