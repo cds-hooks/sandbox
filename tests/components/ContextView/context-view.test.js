@@ -69,19 +69,6 @@ describe('ServiceContextView component', () => {
     expect(screen.getAllByText(/Response/).length).toBeGreaterThan(0);
   });
 
-  it('renders relevant child components (FormControl and ExchangePanel elements)', () => {
-    const { container } = render(
-      <Provider store={mockStore}>
-        <ConnectedView />
-      </Provider>
-    );
-    // FormControl renders in the DOM
-    expect(screen.getByText('Select a Service')).toBeDefined();
-    // Two ExchangePanel components render Request and Response headers
-    expect(screen.getAllByText(/Request/).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Response/).length).toBeGreaterThan(0);
-  });
-
   it('does not have styling to display the context view on the user viewport if context visibility is false', () => {
     storeState.hookState.isContextVisible = false;
     mockStore = mockStoreWrapper(storeState);

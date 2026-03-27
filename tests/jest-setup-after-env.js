@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom';
 
 afterEach(() => {
-  console.warn.mockRestore?.();
   console.error.mockRestore?.();
+  console.warn.mockRestore?.();
+  console.log.mockRestore?.();
 });

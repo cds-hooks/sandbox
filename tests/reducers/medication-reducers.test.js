@@ -6,9 +6,8 @@ import { getConditionCodingFromCode } from '../../src/reducers/helpers/services-
 
 describe('Medication Reducers', () => {
   let state = {};
-  console.error = jest.fn();
-
   beforeEach(() => {
+    jest.spyOn(console, 'error').mockImplementation(() => {});
     // Build allPrescribables the same way the reducer does
     const buildAllPrescribables = () => {
       const allPrescribables = [];

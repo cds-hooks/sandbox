@@ -10,10 +10,9 @@ describe('Discovery Services Retrieval', () => {
   let mockStore = {};
   let retrieveServices;
   let jwtMock = 'jwt-mock';
-  console.error = jest.fn();
-  console.log = jest.fn();
-
   beforeEach(() => {
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+    jest.spyOn(console, 'log').mockImplementation(() => {});
     const mockStoreWrapper = configureStore([]);
     mockStore = mockStoreWrapper({
       cdsServicesState: {
