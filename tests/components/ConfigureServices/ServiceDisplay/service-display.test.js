@@ -11,7 +11,10 @@ describe('ServiceDisplay component', () => {
   let storeState;
   let mockStoreWrapper = configureStore([]);
   let mockStore;
-  console.error = jest.fn();
+
+  beforeEach(() => {
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
 
   let url;
   let urlDefinition;

@@ -1,6 +1,6 @@
 import LocalStorageMock from './local-storage-mock';
 
-console.warn = jest.fn();
+jest.spyOn(console, 'warn').mockImplementation(() => {});
 
 const htmlTag = document.getElementsByTagName('html')[0];
 htmlTag.setAttribute('dir', 'ltr');

@@ -14,7 +14,10 @@ import { FhirServerEntry } from '../../../src/components/FhirServerEntry/fhir-se
 
 describe('FhirServerEntry component', () => {
   let storeState;
-  console.error = jest.fn();
+
+  beforeEach(() => {
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
 
   let mockResolve;
   let mockClosePrompt;

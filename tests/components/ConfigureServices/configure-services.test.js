@@ -12,7 +12,10 @@ describe('ConfigureServices component', () => {
   let storeState;
   let mockStore;
   let mockStoreWrapper = configureStore([]);
-  console.error = jest.fn();
+
+  beforeEach(() => {
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
 
   let mockClosePrompt;
 

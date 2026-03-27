@@ -182,14 +182,14 @@ describe('Header component', () => {
   });
 
   it('should not display option to change FHIR server if an access token is configured for the application', () => {
-    storeState = Object.assign({}, storeState, {
+    storeState = {
       ...storeState,
       fhirServerState: {
         accessToken: {
           serviceDiscoveryUrl: 'http://pre-configured-service.com/cds-services',
         },
       },
-    });
+    };
     mockStore = mockStoreWrapper(storeState);
     mockStoreState = storeState;
     const { container } = renderComponent(mockStore);
@@ -207,10 +207,9 @@ describe('Header component', () => {
       fireEvent.click(settingsButton);
       const changePatient = document.querySelector('.change-patient');
       fireEvent.click(changePatient);
-      // The settings menu should close (menu items hidden via aria-hidden)
-      // and the patient entry dialog should open
       const menuEl = document.querySelector('[role="menu"]');
       expect(!menuEl || menuEl.closest('[aria-hidden="true"]')).toBeTruthy();
+      expect(document.querySelector('[role="dialog"]')).toBeTruthy();
     });
   });
 
@@ -223,6 +222,7 @@ describe('Header component', () => {
       fireEvent.click(changeFhirServer);
       const menuEl = document.querySelector('[role="menu"]');
       expect(!menuEl || menuEl.closest('[aria-hidden="true"]')).toBeTruthy();
+      expect(document.querySelector('[role="dialog"]')).toBeTruthy();
     });
   });
 
@@ -235,6 +235,7 @@ describe('Header component', () => {
       fireEvent.click(addServices);
       const menuEl = document.querySelector('[role="menu"]');
       expect(!menuEl || menuEl.closest('[aria-hidden="true"]')).toBeTruthy();
+      expect(document.querySelector('[role="dialog"]')).toBeTruthy();
     });
   });
 
@@ -247,6 +248,7 @@ describe('Header component', () => {
       fireEvent.click(configureServices);
       const menuEl = document.querySelector('[role="menu"]');
       expect(!menuEl || menuEl.closest('[aria-hidden="true"]')).toBeTruthy();
+      expect(document.querySelector('[role="dialog"]')).toBeTruthy();
     });
   });
 

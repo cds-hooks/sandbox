@@ -2,8 +2,6 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
-import pickBy from 'lodash/pickBy';
-
 import * as types from '../../../src/actions/action-types';
 
 import ConnectedView, { ContextView } from '../../../src/components/ContextView/context-view';
@@ -12,7 +10,6 @@ describe('ServiceContextView component', () => {
   let storeState;
   let mockStore;
   let mockStoreWrapper = configureStore([]);
-  let filteredServices;
   let patientServiceUrl;
   let medServiceUrl;
 
@@ -48,9 +45,6 @@ describe('ServiceContextView component', () => {
         },
       },
     };
-    filteredServices = pickBy(storeState.cdsServicesState.configuredServices, (service) => {
-      return service.hook === storeState.hookState.currentHook;
-    });
     mockStore = mockStoreWrapper(storeState);
   });
 
@@ -153,12 +147,38 @@ describe('ServiceContextView component', () => {
   });
 
   describe('Dispatch Props', () => {
-    // Note: The original Enzyme test for "dispatch action for selecting service" was dropped
-    // because react-select's custom dropdown is not easily interactable via fireEvent.
-    // The dispatch wiring is covered by the toggle test below.
-
     beforeEach(() => {
       mockStore.clearActions();
+    });
+
+    it('can dispatch an action for selecting a service from the dropdown', () => {
+      // Add a second patient-view service so there is something new to select
+      const secondServiceUrl = 'http://example.com/cds-services/id-patient-2';
+      storeState.cdsServicesState.configuredServices[secondServiceUrl] = {
+        hook: 'patient-view',
+        url: secondServiceUrl,
+        enabled: true,
+        id: 'id-patient-2',
+      };
+      storeState.cdsServicesState.configuredServices[patientServiceUrl].id = 'id-patient';
+      mockStore = mockStoreWrapper(storeState);
+
+      const { container } = render(
+        <Provider store={mockStore}>
+          <ConnectedView />
+        </Provider>
+      );
+
+      // Open the react-select dropdown via keyboard navigation
+      const selectInput = container.querySelector('input[id*="react-select"]');
+      fireEvent.focus(selectInput);
+      fireEvent.keyDown(selectInput, { key: 'ArrowDown' });
+      // Move past the already-selected first option to the second
+      fireEvent.keyDown(selectInput, { key: 'ArrowDown' });
+      fireEvent.keyDown(selectInput, { key: 'Enter' });
+
+      const expectedAction = { type: types.SELECT_SERVICE_CONTEXT, service: secondServiceUrl };
+      expect(mockStore.getActions()).toContainEqual(expectedAction);
     });
 
     it('can dispatch an action via its dispatch function passed in as prop for toggled context view', () => {

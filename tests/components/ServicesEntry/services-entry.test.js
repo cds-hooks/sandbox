@@ -13,7 +13,9 @@ jest.mock('../../../src/retrieve-data-helpers/discovery-services-retrieval', () 
 import ServicesEntryView from '../../../src/components/ServicesEntry/services-entry';
 
 describe('ServicesEntry component', () => {
-  console.error = jest.fn();
+  beforeEach(() => {
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
 
   function renderWithTheme(ui, options) {
     return render(<ThemeProvider theme={theme}>{ui}</ThemeProvider>, options);

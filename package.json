@@ -61,6 +61,7 @@
     "redux": "^3.7.2",
     "redux-immutable-state-invariant": "^2.1.0",
     "redux-logger": "^3.0.6",
+    "remark-gfm": "^4.0.1",
     "uuid": "^3.3.3"
   },
   "devDependencies": {
@@ -116,7 +117,8 @@
     "moduleNameMapper": {
       "\\.(jpg|jpeg|png|svg|pem)$": "<rootDir>/src/assets/__mocks__/fileMock.js",
       "\\.(css|scss)$": "identity-obj-proxy",
-      "^react-markdown$": "<rootDir>/src/__mocks__/react-markdown.js"
+      "^react-markdown$": "<rootDir>/src/__mocks__/react-markdown.js",
+      "^remark-gfm$": "<rootDir>/src/__mocks__/remark-gfm.js"
     },
     "coveragePathIgnorePatterns": [
       "/jest-setup.js",

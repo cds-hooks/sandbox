@@ -19,7 +19,10 @@ import { PatientEntry } from '../../../src/components/PatientEntry/patient-entry
 
 describe('PatientEntry component', () => {
   let storeState;
-  console.error = jest.fn();
+
+  beforeEach(() => {
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
 
   let mockResolve;
   let mockClosePrompt;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
@@ -24,7 +24,9 @@ jest.mock('../../../src/store/store', () => ({
 import { RxView } from '../../../src/components/RxView/rx-view';
 
 describe('RxView component', () => {
-  console.error = jest.fn();
+  beforeEach(() => {
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
   window.matchMedia = window.matchMedia || (() => ({
     matches: true,
     addListener: jest.fn(),
@@ -188,17 +190,16 @@ describe('RxView component', () => {
     expect(container.querySelector('[name="dosage-frequency"]')).toBeTruthy();
   });
 
-  it('allows for choosing a medication', (done) => {
+  it('allows for choosing a medication', async () => {
     setup(patient, medListPhase, prescription);
     const { container } = renderComponent();
     const medicationInput = container.querySelector('[name="medication-input"]');
     fireEvent.change(medicationInput, { target: { value: 'ingredient med' } });
     // Wait for debounced handler (150ms delay)
-    setTimeout(() => {
+    await waitFor(() => {
       expect(onMedicationChangeInput).toHaveBeenCalled();
       expect(onMedicationChangeInput).toHaveBeenCalledWith('ingredient med');
-      done();
-    }, 200);
+    });
   });
 
   it('allows for inputting a number for the dosage amount', () => {
@@ -227,12 +228,23 @@ describe('RxView component', () => {
     setup(patient, medListPhase, prescription);
     const { container } = renderComponent();
     const dateInputs = container.querySelectorAll('input[placeholder="MM/DD/YYYY"]');
-    if (dateInputs.length >= 2) {
-      fireEvent.change(dateInputs[0], { target: { value: '04/13/2018' } });
-      expect(updateDate).toHaveBeenCalled();
-      fireEvent.change(dateInputs[1], { target: { value: '04/14/2018' } });
-      expect(updateDate).toHaveBeenCalledTimes(2);
-    }
+    expect(dateInputs.length).toBeGreaterThanOrEqual(2);
+    fireEvent.change(dateInputs[0], { target: { value: '04/13/2018' } });
+    expect(updateDate).toHaveBeenCalled();
+    fireEvent.change(dateInputs[1], { target: { value: '04/14/2018' } });
+    expect(updateDate).toHaveBeenCalledTimes(2);
+  });
+
+  it('allows for selecting a condition', () => {
+    setup(patient, medListPhase, prescription);
+    renderComponent();
+    // Open the condition react-select dropdown via keyboard
+    const selectInput = document.querySelector('input[id*="react-select"]');
+    fireEvent.focus(selectInput);
+    fireEvent.keyDown(selectInput, { key: 'ArrowDown' });
+    // Select the condition option
+    fireEvent.click(screen.getByText('mock condition'));
+    expect(chooseCondition).toHaveBeenCalledWith('condition-123');
   });
 
   it('updates the form fields in the UI if incoming props for those values differ', () => {

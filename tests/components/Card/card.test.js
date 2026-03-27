@@ -14,7 +14,9 @@ jest.mock('../../../src/retrieve-data-helpers/launch-context-retrieval', () => {
 import { CardList } from '../../../src/components/CardList/card-list';
 
 describe('Card component', () => {
-  console.error = jest.fn();
+  beforeEach(() => {
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
   let mockAxios;
   let axios;
   let smartLink;
