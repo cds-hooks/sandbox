@@ -93,7 +93,7 @@ describe('MessagePanel component', () => {
     });
 
     afterEach(() => {
-      jest.resetModules();
+      jest.restoreAllMocks();
     });
 
     describe('when filtering unsupported messages,', () => {

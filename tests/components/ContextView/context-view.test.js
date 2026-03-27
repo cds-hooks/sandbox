@@ -153,6 +153,10 @@ describe('ServiceContextView component', () => {
   });
 
   describe('Dispatch Props', () => {
+    // Note: The original Enzyme test for "dispatch action for selecting service" was dropped
+    // because react-select's custom dropdown is not easily interactable via fireEvent.
+    // The dispatch wiring is covered by the toggle test below.
+
     beforeEach(() => {
       mockStore.clearActions();
     });

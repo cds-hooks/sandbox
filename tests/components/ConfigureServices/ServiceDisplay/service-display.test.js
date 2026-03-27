@@ -25,14 +25,14 @@ describe('ServiceDisplay component', () => {
     };
   });
 
-  it('serves a services property in the component', () => {
+  it('renders service definition and URL from props', () => {
     const { container } = render(
       <Provider store={mockStore}>
         <ConnectedView serviceUrl={url} definition={urlDefinition} />
       </Provider>
     );
-    // If it renders without crashing, the connected component received its props
-    expect(container).toBeTruthy();
+    // Verify the service URL is rendered in the display
+    expect(container.textContent).toContain(url);
   });
 
   it('toggles enabled status for a service if the toggle switch is changed', () => {

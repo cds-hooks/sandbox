@@ -20,14 +20,14 @@ describe('Card Demo component', () => {
     mockStore = mockStoreWrapper(storeState);
   });
 
-  it('serves a services property in the component', () => {
+  it('renders connected component with Redux state', () => {
     const { container } = render(
       <Provider store={mockStore}>
         <ConnectedView />
       </Provider>
     );
-    // If it renders without crashing, the connected component received its props
-    expect(container).toBeTruthy();
+    // Verify the component renders its editor area (proves mapStateToProps wired correctly)
+    expect(container.querySelector('.error-space')).toBeTruthy();
   });
 
   it('does not contain an ErrorView component at start', () => {
