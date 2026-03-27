@@ -10,5 +10,5 @@ module.exports = {
       }
     ]
   ],
-  plugins: ['@babel/plugin-transform-async-to-generator', '@babel/plugin-transform-spread', '@babel/plugin-proposal-object-rest-spread', '@babel/plugin-transform-classes']
+  plugins: ['@babel/plugin-transform-async-to-generator', '@babel/plugin-transform-spread', '@babel/plugin-proposal-object-rest-spread']
 };

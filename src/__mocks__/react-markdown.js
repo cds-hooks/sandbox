@@ -5,4 +5,3 @@ function ReactMarkdown({ children }) {
 }
 
 module.exports = ReactMarkdown;
-module.exports.default = ReactMarkdown;

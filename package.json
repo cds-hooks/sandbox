@@ -123,7 +123,7 @@
       "/store.js"
     ],
     "transformIgnorePatterns": [
-      "/node_modules/(?!(@mui|@babel|@emotion|@testing-library)/)"
+      "/node_modules/(?!(@mui|@babel|@emotion)/)"
     ],
     "testEnvironment": "./tests/jest-environment-jsdom-global.js",
     "testEnvironmentOptions": {

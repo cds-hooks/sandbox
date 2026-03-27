@@ -20,5 +20,5 @@ root.render(
       <CssBaseline />
       <MainView />
     </ThemeProvider>
-  </Provider>,
+  </Provider>
 );
