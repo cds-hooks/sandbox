@@ -306,7 +306,7 @@ export class CardList extends Component {
           ? this.renderSource(card.source)
           : '';
 
-        // -- Detail (ReactMarkdown supports Github-flavored markdown) --
+        // -- Detail (GFM enabled via remark-gfm plugin) --
         const detailSection = card.detail ? (
           <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
             {card.detail}

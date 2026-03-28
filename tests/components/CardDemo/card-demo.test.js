@@ -26,7 +26,7 @@ describe('Card Demo component', () => {
         <ConnectedView />
       </Provider>
     );
-    // Verify the component renders its editor area (proves mapStateToProps wired correctly)
+    // Verify the connected component renders without errors
     expect(container.querySelector('.error-space')).toBeTruthy();
   });
 

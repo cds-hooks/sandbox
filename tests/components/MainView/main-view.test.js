@@ -2,7 +2,7 @@ jest.mock('../../../keys/ecprivkey.pem');
 jest.unmock('query-string');
 
 import React from 'react';
-import { render, act, waitFor } from '@testing-library/react';
+import { render, act, waitFor, screen } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
@@ -154,7 +154,7 @@ describe('MainView component', () => {
       ({ container } = renderComponent());
     });
     await waitFor(() => {
-      expect(document.querySelector('[role="dialog"]')).toBeTruthy();
+      expect(screen.getByText('Change FHIR Server')).toBeInTheDocument();
     });
   });
 
@@ -165,7 +165,7 @@ describe('MainView component', () => {
       ({ container } = renderComponent());
     });
     await waitFor(() => {
-      expect(document.querySelector('[role="dialog"]')).toBeTruthy();
+      expect(screen.getByText('Change Patient')).toBeInTheDocument();
     });
   });
 

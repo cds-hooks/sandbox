@@ -122,5 +122,32 @@ describe('PatientEntry component', () => {
         expect(screen.getByText('Enter a valid patient ID')).toBeInTheDocument();
       });
     });
+
+    it('closes the modal and resolves when patient retrieval succeeds', async () => {
+      mockPatientFn = jest.fn(() => Promise.resolve(1));
+      mockAllPatientFn = jest.fn(() => Promise.resolve([
+        { id: 'patient-1', name: 'John Doe', dob: '1990-01-01' },
+      ]));
+      const { container } = renderComponent();
+
+      // Wait for componentDidMount to populate the patient list
+      await waitFor(() => {
+        expect(mockAllPatientFn).toHaveBeenCalled();
+      });
+
+      // Open react-select dropdown and pick the first option
+      const selectInput = document.querySelector('input');
+      fireEvent.focus(selectInput);
+      fireEvent.keyDown(selectInput, { key: 'ArrowDown' });
+      fireEvent.keyDown(selectInput, { key: 'Enter' });
+
+      const saveButton = screen.getByText('Save');
+      fireEvent.click(saveButton);
+      await waitFor(() => {
+        expect(mockPatientFn).toHaveBeenCalledWith('patient-1');
+        expect(mockResolve).toHaveBeenCalled();
+        expect(mockClosePrompt).toHaveBeenCalled();
+      });
+    });
   });
 });
