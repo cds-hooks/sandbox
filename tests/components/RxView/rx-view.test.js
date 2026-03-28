@@ -299,5 +299,14 @@ describe('RxView component', () => {
     // Verify rendered values reflect the updated props
     const dosageAmount = container.querySelector('[name="dosage-amount"]');
     expect(dosageAmount.value).toEqual('3');
+
+    const dosageFrequency = container.querySelector('[name="dosage-frequency"]');
+    expect(dosageFrequency.value).toEqual('bid');
+
+    const startDateInput = container.querySelectorAll('input[placeholder="MM/DD/YYYY"]')[0];
+    expect(startDateInput.value).toEqual('05/20/2018');
+
+    const endDateInput = container.querySelectorAll('input[placeholder="MM/DD/YYYY"]')[1];
+    expect(endDateInput.value).toEqual('06/01/2018');
   });
 });

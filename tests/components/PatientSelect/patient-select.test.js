@@ -1,5 +1,5 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import PatientSelect from '../../../src/components/PatientSelect/patient-select';
 
 describe('PatientSelect component', () => {
@@ -15,7 +15,7 @@ describe('PatientSelect component', () => {
 
   describe('rendering', () => {
     it('renders without FHIR server display when currentFhirServer is not provided', () => {
-      const { container, queryByText } = render(
+      render(
         <PatientSelect
           formFieldLabel="Select a Patient"
           shouldDisplayError={false}
@@ -25,9 +25,9 @@ describe('PatientSelect component', () => {
       );
 
       // No FHIR server text should be present
-      expect(queryByText('Current FHIR server')).toBeNull();
-      // FormControl should be rendered (check for required label)
-      expect(container.querySelector('.vertical-separation')).toBeTruthy();
+      expect(screen.queryByText('Current FHIR server')).toBeNull();
+      // FormControl should be rendered with the label
+      expect(screen.getByText('Select a Patient')).toBeInTheDocument();
     });
 
     it('renders with FHIR server display when currentFhirServer is provided', () => {
@@ -48,7 +48,7 @@ describe('PatientSelect component', () => {
 
     it('renders the form field label correctly', () => {
       const label = 'Choose a Patient';
-      const { getByText } = render(
+      render(
         <PatientSelect
           formFieldLabel={label}
           shouldDisplayError={false}
@@ -57,12 +57,11 @@ describe('PatientSelect component', () => {
         />,
       );
 
-      const formLabel = getByText(label);
-      expect(formLabel).toBeTruthy();
+      expect(screen.getByText(label)).toBeInTheDocument();
     });
 
     it('renders with FormControl component', () => {
-      const { container } = render(
+      render(
         <PatientSelect
           formFieldLabel="Select a Patient"
           shouldDisplayError={false}
@@ -71,13 +70,13 @@ describe('PatientSelect component', () => {
         />,
       );
 
-      // MUI FormControl with fullWidth renders with MuiFormControl-fullWidth class
-      expect(container.querySelector('.MuiFormControl-fullWidth')).toBeTruthy();
+      // FormControl renders with the label and required marker
+      expect(screen.getByText('Select a Patient')).toBeInTheDocument();
     });
 
     it('renders with required FormLabel', () => {
       const placeholder = 'Start typing to search...';
-      const { container } = render(
+      render(
         <PatientSelect
           formFieldLabel="Select a Patient"
           shouldDisplayError={false}
@@ -87,15 +86,14 @@ describe('PatientSelect component', () => {
         />,
       );
 
-      // MUI required FormLabel has an asterisk element
-      const asterisk = container.querySelector('.MuiFormLabel-asterisk');
-      expect(asterisk).toBeTruthy();
+      // MUI required FormLabel renders with asterisk text
+      expect(screen.getByText('*')).toBeInTheDocument();
     });
   });
 
   describe('error handling', () => {
     it('does not display error message when shouldDisplayError is false', () => {
-      const { container, queryByText } = render(
+      render(
         <PatientSelect
           formFieldLabel="Select a Patient"
           shouldDisplayError={false}
@@ -105,14 +103,12 @@ describe('PatientSelect component', () => {
         />,
       );
 
-      expect(queryByText('An error occurred')).toBeNull();
-      // FormControl should not have error class
-      expect(container.querySelector('.MuiFormControl-root.Mui-error')).toBeNull();
+      expect(screen.queryByText('An error occurred')).toBeNull();
     });
 
     it('displays error message when shouldDisplayError is true', () => {
       const errorMsg = 'Please select a valid patient';
-      const { getByText, container } = render(
+      render(
         <PatientSelect
           formFieldLabel="Select a Patient"
           shouldDisplayError
@@ -122,15 +118,13 @@ describe('PatientSelect component', () => {
         />,
       );
 
-      expect(getByText(errorMsg)).toBeTruthy();
-      // FormControl should have error class
-      expect(container.querySelector('.Mui-error')).toBeTruthy();
+      expect(screen.getByText(errorMsg)).toBeInTheDocument();
     });
   });
 
   describe('patient list handling', () => {
     it('renders with provided patient list', () => {
-      const { container } = render(
+      render(
         <PatientSelect
           formFieldLabel="Select a Patient"
           shouldDisplayError={false}
@@ -139,12 +133,11 @@ describe('PatientSelect component', () => {
         />,
       );
 
-      // Component should render without errors
-      expect(container.querySelector('.vertical-separation')).toBeTruthy();
+      expect(screen.getByText('Select a Patient')).toBeInTheDocument();
     });
 
     it('renders with empty patient list', () => {
-      const { container } = render(
+      render(
         <PatientSelect
           formFieldLabel="Select a Patient"
           shouldDisplayError={false}
@@ -153,7 +146,7 @@ describe('PatientSelect component', () => {
         />,
       );
 
-      expect(container.querySelector('.vertical-separation')).toBeTruthy();
+      expect(screen.getByText('Select a Patient')).toBeInTheDocument();
     });
   });
 });

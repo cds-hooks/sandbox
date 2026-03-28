@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
@@ -37,19 +37,19 @@ describe('ConfigureServices component', () => {
   });
 
   it('serves a services property in the component', () => {
-    const { container } = render(
+    render(
       <Provider store={mockStore}>
         <ThemeProvider theme={theme}>
-          <ConnectedView />
+          <ConnectedView isOpen={true} />
         </ThemeProvider>
       </Provider>
     );
-    // If it renders without crashing, the connected component received its props
-    expect(container).toBeTruthy();
+    // The connected component receives its services prop and renders the service URL
+    expect(screen.getByText('http://example.com')).toBeInTheDocument();
   });
 
   it('changes isOpen state property if props changes for the property', () => {
-    const { unmount } = render(
+    const { rerender } = render(
       <Provider store={mockStore}>
         <ThemeProvider theme={theme}>
           <ConfigureServices isOpen={false} services={storeState.cdsServicesState.configuredServices} />
@@ -57,18 +57,16 @@ describe('ConfigureServices component', () => {
       </Provider>
     );
     // Dialog should not be visible when isOpen is false
-    expect(document.querySelector('[role="dialog"]')).toBeNull();
+    expect(screen.queryByRole('dialog')).toBeNull();
 
-    unmount();
-    // Render with isOpen=true
-    const { queryByRole } = render(
+    rerender(
       <Provider store={mockStore}>
         <ThemeProvider theme={theme}>
           <ConfigureServices isOpen={true} services={storeState.cdsServicesState.configuredServices} />
         </ThemeProvider>
       </Provider>
     );
-    expect(queryByRole('dialog')).toBeTruthy();
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
   });
 
   it('handles closing the modal in the component', () => {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
@@ -167,18 +167,17 @@ describe('Header component', () => {
     const settingsButton = getSettingsButton(container);
     fireEvent.click(settingsButton);
     // After clicking the settings button, menu items should appear
-    const menuItem = document.querySelector('.change-patient');
-    expect(menuItem).toBeTruthy();
+    expect(screen.getByRole('menu')).toBeInTheDocument();
     // Click a menu item to close the menu
-    fireEvent.click(menuItem);
+    fireEvent.click(screen.getByText('Change Patient'));
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument();
   });
 
   it('should display option to change FHIR server if no access token is configured for the application', () => {
     const { container } = renderComponent();
     const settingsButton = getSettingsButton(container);
     fireEvent.click(settingsButton);
-    const changeFhirServer = document.querySelector('.change-fhir-server');
-    expect(changeFhirServer).toBeTruthy();
+    expect(screen.getByText('Change FHIR Server')).toBeInTheDocument();
   });
 
   it('should not display option to change FHIR server if an access token is configured for the application', () => {
@@ -196,8 +195,7 @@ describe('Header component', () => {
 
     const settingsButton = getSettingsButton(container);
     fireEvent.click(settingsButton);
-    const changeFhirServer = document.querySelector('.change-fhir-server');
-    expect(changeFhirServer).toBeFalsy();
+    expect(screen.queryByText('Change FHIR Server')).not.toBeInTheDocument();
   });
 
   describe('Change Patient', () => {
@@ -205,11 +203,10 @@ describe('Header component', () => {
       const { container } = renderComponent();
       const settingsButton = getSettingsButton(container);
       fireEvent.click(settingsButton);
-      const changePatient = document.querySelector('.change-patient');
-      fireEvent.click(changePatient);
-      const menuEl = document.querySelector('[role="menu"]');
-      expect(!menuEl || menuEl.closest('[aria-hidden="true"]')).toBeTruthy();
-      expect(document.querySelector('[role="dialog"]')).toBeTruthy();
+      fireEvent.click(screen.getByText('Change Patient'));
+      expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(screen.getByText('Select a Patient')).toBeInTheDocument();
     });
   });
 
@@ -218,11 +215,10 @@ describe('Header component', () => {
       const { container } = renderComponent();
       const settingsButton = getSettingsButton(container);
       fireEvent.click(settingsButton);
-      const changeFhirServer = document.querySelector('.change-fhir-server');
-      fireEvent.click(changeFhirServer);
-      const menuEl = document.querySelector('[role="menu"]');
-      expect(!menuEl || menuEl.closest('[aria-hidden="true"]')).toBeTruthy();
-      expect(document.querySelector('[role="dialog"]')).toBeTruthy();
+      fireEvent.click(screen.getByText('Change FHIR Server'));
+      expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(screen.getByLabelText(/Enter a FHIR Server URL/)).toBeInTheDocument();
     });
   });
 
@@ -231,11 +227,10 @@ describe('Header component', () => {
       const { container } = renderComponent();
       const settingsButton = getSettingsButton(container);
       fireEvent.click(settingsButton);
-      const addServices = document.querySelector('.add-services');
-      fireEvent.click(addServices);
-      const menuEl = document.querySelector('[role="menu"]');
-      expect(!menuEl || menuEl.closest('[aria-hidden="true"]')).toBeTruthy();
-      expect(document.querySelector('[role="dialog"]')).toBeTruthy();
+      fireEvent.click(screen.getByText('Add CDS Services'));
+      expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(screen.getByLabelText(/Enter discovery endpoint url/)).toBeInTheDocument();
     });
   });
 
@@ -244,11 +239,10 @@ describe('Header component', () => {
       const { container } = renderComponent();
       const settingsButton = getSettingsButton(container);
       fireEvent.click(settingsButton);
-      const configureServices = document.querySelector('.configure-services');
-      fireEvent.click(configureServices);
-      const menuEl = document.querySelector('[role="menu"]');
-      expect(!menuEl || menuEl.closest('[aria-hidden="true"]')).toBeTruthy();
-      expect(document.querySelector('[role="dialog"]')).toBeTruthy();
+      fireEvent.click(screen.getByText('Configure CDS Services'));
+      expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(screen.getByText(mockPatientService)).toBeInTheDocument();
     });
   });
 
@@ -259,8 +253,7 @@ describe('Header component', () => {
       expect(localStorage.getItem('PERSISTED_patientId')).toEqual('patient-123');
       const settingsButton = getSettingsButton(container);
       fireEvent.click(settingsButton);
-      const resetConfig = document.querySelector('.reset-configuration');
-      fireEvent.click(resetConfig);
+      fireEvent.click(screen.getByText('Reset Configuration'));
       expect(mockStore.getActions()).toEqual(
         expect.arrayContaining([{ type: types.RESET_SERVICES }])
       );

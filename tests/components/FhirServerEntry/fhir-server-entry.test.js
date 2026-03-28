@@ -54,16 +54,28 @@ describe('FhirServerEntry component', () => {
 
   it('renders the dialog when isOpen is true', () => {
     renderComponent();
-    expect(screen.getByText('Change FHIR Server')).toBeDefined();
+    expect(screen.getByText('Change FHIR Server')).toBeInTheDocument();
   });
 
-  it('dialog closes when isOpen prop changes to false via rerender', () => {
-    const { unmount } = renderComponent();
-    expect(screen.getByText('Change FHIR Server')).toBeDefined();
-    unmount();
-    // Render fresh with isOpen=false
-    renderComponent({ isOpen: false });
-    expect(screen.queryByRole('dialog')).toBeNull();
+  it('dialog closes when isOpen prop changes to false via rerender', async () => {
+    const { rerender } = renderComponent();
+    expect(screen.getByText('Change FHIR Server')).toBeInTheDocument();
+    rerender(
+      <ThemeProvider theme={theme}>
+        <FhirServerEntry
+          currentFhirServer={storeState.fhirServerState.currentFhirServer}
+          defaultFhirServer={storeState.fhirServerState.defaultFhirServer}
+          resolve={mockResolve}
+          isOpen={false}
+          isEntryRequired={isEntryRequired}
+          initialError={initialError}
+          closePrompt={mockClosePrompt}
+        />
+      </ThemeProvider>
+    );
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).toBeNull();
+    });
   });
 
   it('handles resetting the fhir server and closes the modal', async () => {
@@ -100,7 +112,7 @@ describe('FhirServerEntry component', () => {
       renderComponent();
       enterInputAndSave('');
       await waitFor(() => {
-        expect(screen.getByText('Enter a valid FHIR server base url')).toBeDefined();
+        expect(screen.getByText('Enter a valid FHIR server base url')).toBeInTheDocument();
       });
     });
 
@@ -109,7 +121,7 @@ describe('FhirServerEntry component', () => {
       renderComponent();
       enterInputAndSave('test');
       await waitFor(() => {
-        expect(screen.getByText('Failed to connect to the FHIR server. See console for details.')).toBeDefined();
+        expect(screen.getByText('Failed to connect to the FHIR server. See console for details.')).toBeInTheDocument();
       });
     });
 
@@ -122,7 +134,7 @@ describe('FhirServerEntry component', () => {
       renderComponent();
       enterInputAndSave('http://secured-fhir-endpoint.com');
       await waitFor(() => {
-        expect(screen.getByText('Cannot configure secured FHIR endpoints. Please use an open (unsecured) FHIR endpoint.')).toBeDefined();
+        expect(screen.getByText('Cannot configure secured FHIR endpoints. Please use an open (unsecured) FHIR endpoint.')).toBeInTheDocument();
       });
     });
 

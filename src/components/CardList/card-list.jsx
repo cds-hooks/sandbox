@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
 import cx from 'classnames';
 import axios from 'axios';
 
@@ -307,7 +308,7 @@ export class CardList extends Component {
 
         // -- Detail (ReactMarkdown supports Github-flavored markdown) --
         const detailSection = card.detail ? (
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+          <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
             {card.detail}
           </ReactMarkdown>
         ) : (

@@ -14,34 +14,34 @@ describe('ExchangePanel component', () => {
   });
 
   it('should render relevant child components', () => {
-    const { container } = render(<ExchangePanel panelHeader={panelHeader}
+    render(<ExchangePanel panelHeader={panelHeader}
                                      panelText={panelText}
                                      isExpanded={true} />);
     // Accordion, AccordionSummary, AccordionDetails all render in the DOM
     expect(screen.getByText(panelHeader)).toBeInTheDocument();
-    expect(container.querySelector('.panel-text')).toBeInTheDocument();
+    expect(screen.getByText(/"test": "test"/)).toBeInTheDocument();
   });
 
   it('should have correct expansion state', () => {
-    const { container, unmount } = render(<ExchangePanel panelHeader={panelHeader}
+    // isExpanded is used as initial state, so test each value with a fresh render
+    const { unmount } = render(<ExchangePanel panelHeader={panelHeader}
                                      panelText={panelText}
                                      isExpanded={true} />);
-    // When expanded, the accordion region should be visible
-    expect(container.querySelector('.MuiAccordion-root.Mui-expanded')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: panelHeader })).toHaveAttribute('aria-expanded', 'true');
 
     unmount();
-    const { container: container2 } = render(<ExchangePanel panelHeader={panelHeader}
+    render(<ExchangePanel panelHeader={panelHeader}
                             panelText={panelText}
                             isExpanded={false} />);
-    expect(container2.querySelector('.MuiAccordion-root.Mui-expanded')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: panelHeader })).toHaveAttribute('aria-expanded', 'false');
   });
 
   it('should have state', () => {
-    const { container } = render(<ExchangePanel panelHeader={panelHeader}
+    render(<ExchangePanel panelHeader={panelHeader}
                                      panelText={panelText}
                                      isExpanded={true} />);
-    // Verify expanded state via the rendered DOM
-    expect(container.querySelector('.MuiAccordion-root.Mui-expanded')).toBeInTheDocument();
+    // Verify expanded state via aria-expanded attribute
+    expect(screen.getByRole('button', { name: panelHeader })).toHaveAttribute('aria-expanded', 'true');
   });
 
   it('should have props', () => {
@@ -55,29 +55,28 @@ describe('ExchangePanel component', () => {
   });
 
   it('should update state when the panel is expanded or collapsed', () => {
-    const { container } = render(<ExchangePanel panelHeader={panelHeader}
+    render(<ExchangePanel panelHeader={panelHeader}
                                      panelText={panelText}
                                      isExpanded={true} />);
-    expect(container.querySelector('.MuiAccordion-root.Mui-expanded')).toBeInTheDocument();
+    const toggleButton = screen.getByRole('button', { name: panelHeader });
+    expect(toggleButton).toHaveAttribute('aria-expanded', 'true');
     // Click the accordion summary to toggle
-    fireEvent.click(screen.getByText(panelHeader));
-    expect(container.querySelector('.MuiAccordion-root.Mui-expanded')).not.toBeInTheDocument();
+    fireEvent.click(toggleButton);
+    expect(toggleButton).toHaveAttribute('aria-expanded', 'false');
   });
 
-  it('should generate a div for each line of the JSON stringified panel text', () => {
-    const { container } = render(<ExchangePanel panelHeader={panelHeader}
+  it('should display formatted JSON panel text', () => {
+    render(<ExchangePanel panelHeader={panelHeader}
                                      panelText={panelText}
                                      isExpanded={true} />);
-    const divs = container.querySelectorAll('.panel-text pre div');
-    expect(divs).toHaveLength(3);
+    expect(screen.getByText(/"test": "test"/)).toBeInTheDocument();
   });
 
-  it('should not generate any divs for empty panel text', () => {
+  it('should not display any content for empty panel text', () => {
     panelText = '';
-    const { container } = render(<ExchangePanel panelHeader={panelHeader}
+    render(<ExchangePanel panelHeader={panelHeader}
                                      panelText={panelText}
                                      isExpanded={true} />);
-    const divs = container.querySelectorAll('.panel-text pre div');
-    expect(divs).toHaveLength(0);
+    expect(screen.queryByText(/"test"/)).not.toBeInTheDocument();
   });
 });

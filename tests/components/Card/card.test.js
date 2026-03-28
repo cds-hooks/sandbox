@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import MockAdapter from 'axios-mock-adapter';
 
@@ -100,14 +100,15 @@ describe('Card component', () => {
 
   it('invokes a launch link sequence if a link is clicked', () => {
     const { container } = renderCardList();
-    const linkButton = container.querySelector('.links-section button');
+    // The smart link has no label text; use container query as the button has no accessible name
+    const linkButton = container.querySelector('[class*="links-section"] button');
     fireEvent.click(linkButton);
     expect(windowSpy).toHaveBeenCalled();
   });
 
   it('prevents default action if a event source link is clicked', () => {
-    const { container } = renderCardList();
-    const sourceLink = container.querySelector('.card-source a');
+    renderCardList();
+    const sourceLink = screen.getByText('Patient service').closest('a');
     const eventWatch = jest.fn();
     const event = new MouseEvent('click', { bubbles: true, cancelable: true });
     Object.defineProperty(event, 'preventDefault', { value: eventWatch });
@@ -127,22 +128,22 @@ describe('Card component', () => {
         }]
       }
     });
-    const linkButton = container.querySelector('.links-section button');
+    const linkButton = container.querySelector('[class*="links-section"] button');
     fireEvent.click(linkButton);
     expect(windowSpy).not.toHaveBeenCalled();
   });
 
   it('takes a suggestion if there is a label', () => {
-    const { container } = renderCardList();
-    const suggestionButtons = container.querySelectorAll('.suggestions-section button');
-    fireEvent.click(suggestionButtons[0]);
+    renderCardList();
+    fireEvent.click(screen.getByRole('button', { name: 'sug-label' }));
     mockAxios.onPost(`${serviceUrl}/feedback`).reply(200);
     expect(takeSuggestion).toHaveBeenCalledWith(suggestion);
   });
 
   it('does not take a suggestion if it is does not have a label', () => {
     const { container } = renderCardList();
-    const suggestionButtons = container.querySelectorAll('.suggestions-section button');
+    // The invalid suggestion has no label; use container query for the second suggestion button
+    const suggestionButtons = container.querySelectorAll('[class*="suggestions-section"] button');
     fireEvent.click(suggestionButtons[1]);
     expect(takeSuggestion).not.toHaveBeenCalled();
   });

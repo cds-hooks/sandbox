@@ -1,5 +1,5 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 import { CardList } from '../../../src/components/CardList/card-list';
 
@@ -20,7 +20,7 @@ describe('Card List component', () => {
   });
 
   it('does not error on empty launchLinks when link type is smart', () => {
-    const { container } = render(<CardList cardResponses={cardResponses} takeSuggestion={jest.fn()} />);
-    expect(container).toBeDefined();
+    render(<CardList cardResponses={cardResponses} takeSuggestion={jest.fn()} />);
+    expect(screen.getByText('Cannot launch SMART link without a SMART-enabled FHIR server')).toBeInTheDocument();
   });
 });

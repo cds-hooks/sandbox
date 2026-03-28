@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 
@@ -29,23 +29,21 @@ describe('ServiceDisplay component', () => {
   });
 
   it('renders service definition and URL from props', () => {
-    const { container } = render(
+    render(
       <Provider store={mockStore}>
         <ConnectedView serviceUrl={url} definition={urlDefinition} />
       </Provider>
     );
-    // Verify the service URL is rendered in the display
-    expect(container.textContent).toContain(url);
+    expect(screen.getByText(url)).toBeInTheDocument();
   });
 
   it('toggles enabled status for a service if the toggle switch is changed', () => {
-    const { container } = render(
+    render(
       <Provider store={mockStore}>
         <ConnectedView serviceUrl={url} definition={urlDefinition} />
       </Provider>
     );
-    const switchInput = container.querySelector('input[type="checkbox"]');
-    fireEvent.click(switchInput);
+    fireEvent.click(screen.getByRole('checkbox'));
     expect(mockStore.getActions()).toEqual([{
       type: types.TOGGLE_SERVICE,
       service: url,
@@ -53,13 +51,12 @@ describe('ServiceDisplay component', () => {
   });
 
   it('deletes a configured service if the delete button is clicked', () => {
-    const { container } = render(
+    render(
       <Provider store={mockStore}>
         <ConnectedView serviceUrl={url} definition={urlDefinition} />
       </Provider>
     );
-    const deleteButton = container.querySelector('.btn-container button');
-    fireEvent.click(deleteButton);
+    fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
     expect(mockStore.getActions()).toEqual([{
       type: types.DELETE_SERVICE,
       service: url,

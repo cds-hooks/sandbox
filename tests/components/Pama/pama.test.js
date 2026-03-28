@@ -62,9 +62,9 @@ describe("Pama component", () => {
       </Provider>
     );
     // The pamaRating from state should appear in rendered output
-    expect(screen.getByText("appropriate", { exact: false })).toBeDefined();
+    expect(screen.getByText("appropriate", { exact: false })).toBeInTheDocument();
     // The component title should render
-    expect(screen.getByText("PAMA Imaging")).toBeDefined();
+    expect(screen.getByText("PAMA Imaging")).toBeInTheDocument();
   });
 
   it("creates hook context correctly", () => {

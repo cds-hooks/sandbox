@@ -25,20 +25,20 @@ describe('ServicesEntry component', () => {
     mockDiscoveryFn = jest.fn(() => Promise.resolve(1));
   });
 
-  it('dialog closes when isOpen prop changes to false via rerender', () => {
-    const { unmount } = renderWithTheme(<ServicesEntryView isOpen={true} />);
-    expect(screen.getByText('Add CDS Services')).toBeDefined();
-    unmount();
-    // Render with isOpen=false and verify dialog is not shown
-    renderWithTheme(<ServicesEntryView isOpen={false} />);
-    expect(screen.queryByRole('dialog')).toBeNull();
+  it('dialog closes when isOpen prop changes to false via rerender', async () => {
+    const { rerender } = renderWithTheme(<ServicesEntryView isOpen={true} />);
+    expect(screen.getByText('Add CDS Services')).toBeInTheDocument();
+    rerender(<ThemeProvider theme={theme}><ServicesEntryView isOpen={false} /></ThemeProvider>);
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).toBeNull();
+    });
   });
 
   it('dialog opens when isOpen prop changes to true via rerender', () => {
     const { rerender } = renderWithTheme(<ServicesEntryView isOpen={false} />);
     expect(screen.queryByText('Add CDS Services')).toBeNull();
     rerender(<ThemeProvider theme={theme}><ServicesEntryView isOpen={true} /></ThemeProvider>);
-    expect(screen.getByText('Add CDS Services')).toBeDefined();
+    expect(screen.getByText('Add CDS Services')).toBeInTheDocument();
   });
 
   it('handles closing the modal via the Cancel button', async () => {
@@ -62,7 +62,7 @@ describe('ServicesEntry component', () => {
       renderWithTheme(<ServicesEntryView isOpen={true} />);
       enterInputAndSave('');
       await waitFor(() => {
-        expect(screen.getByText('Enter a valid discovery endpoint')).toBeDefined();
+        expect(screen.getByText('Enter a valid discovery endpoint')).toBeInTheDocument();
       });
     });
 
@@ -71,7 +71,7 @@ describe('ServicesEntry component', () => {
       renderWithTheme(<ServicesEntryView isOpen={true} />);
       enterInputAndSave('test');
       await waitFor(() => {
-        expect(screen.getByText('Failed to connect to the discovery endpoint. See console for details.')).toBeDefined();
+        expect(screen.getByText('Failed to connect to the discovery endpoint. See console for details.')).toBeInTheDocument();
       });
     });
 

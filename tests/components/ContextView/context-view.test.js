@@ -49,12 +49,12 @@ describe('ServiceContextView component', () => {
   });
 
   it('renders a connected component', () => {
-    const { container } = render(
+    render(
       <Provider store={mockStore}>
         <ConnectedView />
       </Provider>
     );
-    expect(container).toBeDefined();
+    expect(screen.getAllByText('CDS Developer Panel').length).toBeGreaterThan(0);
   });
 
   it('renders expected UI elements from Redux state', () => {
@@ -64,7 +64,7 @@ describe('ServiceContextView component', () => {
       </Provider>
     );
     expect(screen.getAllByText('CDS Developer Panel').length).toBeGreaterThan(0);
-    expect(screen.getByText('Select a Service')).toBeDefined();
+    expect(screen.getByText('Select a Service')).toBeInTheDocument();
     expect(screen.getAllByText(/Request/).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Response/).length).toBeGreaterThan(0);
   });
@@ -93,7 +93,7 @@ describe('ServiceContextView component', () => {
         </Provider>
       );
       // With no applicable services, the select should show placeholder text
-      expect(screen.getByText('Select a service...')).toBeDefined();
+      expect(screen.getByText('Select a service...')).toBeInTheDocument();
     });
 
     it('preselects a service for the dropdown if there is at least one applicable service for the view', () => {
@@ -103,7 +103,7 @@ describe('ServiceContextView component', () => {
         </Provider>
       );
       // The selected service URL should appear in the rendered output
-      expect(screen.getByText(patientServiceUrl)).toBeDefined();
+      expect(screen.getByText(patientServiceUrl)).toBeInTheDocument();
     });
   });
 
@@ -116,8 +116,8 @@ describe('ServiceContextView component', () => {
       );
       let url = storeState.serviceExchangeState.selectedService;
       // The request and response text should be JSON-stringified and present in the DOM
-      expect(screen.getByText(`"${storeState.serviceExchangeState.exchanges[url].request}"`)).toBeDefined();
-      expect(screen.getByText(`"${storeState.serviceExchangeState.exchanges[url].response}"`)).toBeDefined();
+      expect(screen.getByText(`"${storeState.serviceExchangeState.exchanges[url].request}"`)).toBeInTheDocument();
+      expect(screen.getByText(`"${storeState.serviceExchangeState.exchanges[url].response}"`)).toBeInTheDocument();
     });
 
     it('ensures the panel text contains an appropriate message if service exchange has not been stored', () => {
@@ -128,8 +128,8 @@ describe('ServiceContextView component', () => {
           <ConnectedView />
         </Provider>
       );
-      expect(screen.getByText('"No request made to CDS Service"')).toBeDefined();
-      expect(screen.getByText('"No response made to CDS Service"')).toBeDefined();
+      expect(screen.getByText('"No request made to CDS Service"')).toBeInTheDocument();
+      expect(screen.getByText('"No response made to CDS Service"')).toBeInTheDocument();
     });
   });
 

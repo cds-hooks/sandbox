@@ -12,27 +12,28 @@ describe('MessagePanel component', () => {
   });
 
   it('should render relevant child components', () => {
-    const { container } = render(<MessagePanel panelHeader={panelHeader}
+    render(<MessagePanel panelHeader={panelHeader}
       isExpanded={true} />);
     expect(screen.getByText(panelHeader)).toBeInTheDocument();
-    expect(container.querySelector('.MuiAccordion-root')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: panelHeader })).toBeInTheDocument();
   });
 
   it('should have correct expansion state', () => {
-    const { container, unmount } = render(<MessagePanel panelHeader={panelHeader}
+    // isExpanded is used as initial state, so test each value with a fresh render
+    const { unmount } = render(<MessagePanel panelHeader={panelHeader}
       isExpanded={true} />);
-    expect(container.querySelector('.MuiAccordion-root.Mui-expanded')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: panelHeader })).toHaveAttribute('aria-expanded', 'true');
 
     unmount();
-    const { container: container2 } = render(<MessagePanel panelHeader={panelHeader}
+    render(<MessagePanel panelHeader={panelHeader}
       isExpanded={false} />);
-    expect(container2.querySelector('.MuiAccordion-root.Mui-expanded')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: panelHeader })).toHaveAttribute('aria-expanded', 'false');
   });
 
   it('should have state', () => {
-    const { container } = render(<MessagePanel panelHeader={panelHeader}
+    render(<MessagePanel panelHeader={panelHeader}
       isExpanded={true} />);
-    expect(container.querySelector('.MuiAccordion-root.Mui-expanded')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: panelHeader })).toHaveAttribute('aria-expanded', 'true');
   });
 
   it('should have props', () => {
@@ -42,15 +43,16 @@ describe('MessagePanel component', () => {
   });
 
   it('should update state when the panel is expanded or collapsed', () => {
-    const { container } = render(<MessagePanel panelHeader={panelHeader}
+    render(<MessagePanel panelHeader={panelHeader}
       isExpanded={true} />);
-    expect(container.querySelector('.MuiAccordion-root.Mui-expanded')).toBeInTheDocument();
-    fireEvent.click(screen.getByText(panelHeader));
-    expect(container.querySelector('.MuiAccordion-root.Mui-expanded')).not.toBeInTheDocument();
+    const toggleButton = screen.getByRole('button', { name: panelHeader });
+    expect(toggleButton).toHaveAttribute('aria-expanded', 'true');
+    fireEvent.click(toggleButton);
+    expect(toggleButton).toHaveAttribute('aria-expanded', 'false');
   });
 
-  it('should generate a div for each received message', () => {
-    const { container } = render(<MessagePanel panelHeader={panelHeader}
+  it('should display each received message', () => {
+    render(<MessagePanel panelHeader={panelHeader}
       isExpanded={true} />);
 
     // Dispatch valid message events to add messages
@@ -70,16 +72,15 @@ describe('MessagePanel component', () => {
       source: source,
     }));
 
-    const preElements = container.querySelectorAll('.panel-text pre');
-    expect(preElements).toHaveLength(2);
+    expect(screen.getByText(/"messageId": "123"/)).toBeInTheDocument();
+    expect(screen.getByText(/"messageId": "456"/)).toBeInTheDocument();
   });
 
-  it('should not generate any divs for empty messages', () => {
-    const { container } = render(<MessagePanel panelHeader={panelHeader}
+  it('should not display any messages initially', () => {
+    render(<MessagePanel panelHeader={panelHeader}
       isExpanded={true} />);
-    // No messages dispatched, so no pre elements
-    const preElements = container.querySelectorAll('.panel-text pre');
-    expect(preElements).toHaveLength(0);
+    // No messages dispatched, so no message content
+    expect(screen.queryByText(/"messageId"/)).not.toBeInTheDocument();
   });
 
   describe('when receiving and responding to messages,', () => {
@@ -98,19 +99,16 @@ describe('MessagePanel component', () => {
 
     describe('when filtering unsupported messages,', () => {
       let responseListener;
-      let container;
 
       beforeEach(() => {
         responseListener = jest.fn();
-        const rendered = render(<MessagePanel panelHeader={panelHeader}
+        render(<MessagePanel panelHeader={panelHeader}
           isExpanded={true} />);
-        container = rendered.container;
       });
 
       afterEach(() => {
         // No messages should have been added for unsupported messages
-        const preElements = container.querySelectorAll('.panel-text pre');
-        expect(preElements).toHaveLength(0);
+        expect(screen.queryByText(/"messageId"/)).not.toBeInTheDocument();
         expect(responseListener).toHaveBeenCalledTimes(0);
       });
 
@@ -128,7 +126,7 @@ describe('MessagePanel component', () => {
     });
 
     it('should update state for each received message', () => {
-      const { container } = render(<MessagePanel panelHeader={panelHeader}
+      render(<MessagePanel panelHeader={panelHeader}
         isExpanded={true} />);
 
       const messageData1 = { 'messageId': '123', 'messageType': 'scratchpad.update' };
@@ -145,10 +143,8 @@ describe('MessagePanel component', () => {
       });
 
       // Verify messages are rendered in the DOM
-      const preElements = container.querySelectorAll('.panel-text pre');
-      expect(preElements).toHaveLength(2);
-      expect(preElements[0].textContent).toContain('"messageId": "123"');
-      expect(preElements[1].textContent).toContain('"messageId": "456"');
+      expect(screen.getByText(/"messageId": "123"/)).toBeInTheDocument();
+      expect(screen.getByText(/"messageId": "456"/)).toBeInTheDocument();
 
       expect(responseListener1).toHaveBeenCalled();
       expect(responseListener2).toHaveBeenCalled();

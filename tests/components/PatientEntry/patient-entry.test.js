@@ -58,15 +58,27 @@ describe('PatientEntry component', () => {
 
   it('renders the dialog when isOpen is true', () => {
     renderComponent();
-    expect(screen.getByText('Change Patient')).toBeDefined();
+    expect(screen.getByText('Change Patient')).toBeInTheDocument();
   });
 
-  it('dialog closes when isOpen prop changes to false via rerender', () => {
-    const { unmount } = renderComponent();
-    expect(screen.getByText('Change Patient')).toBeDefined();
-    unmount();
-    renderComponent({ isOpen: false });
-    expect(screen.queryByRole('dialog')).toBeNull();
+  it('dialog closes when isOpen prop changes to false via rerender', async () => {
+    const { rerender } = renderComponent();
+    expect(screen.getByText('Change Patient')).toBeInTheDocument();
+    rerender(
+      <ThemeProvider theme={theme}>
+        <PatientEntry
+          currentFhirServer={storeState.fhirServerState.currentFhirServer}
+          currentPatientId={storeState.patientState.currentPatient.id}
+          resolve={mockResolve}
+          isOpen={false}
+          isEntryRequired={isEntryRequired}
+          closePrompt={mockClosePrompt}
+        />
+      </ThemeProvider>
+    );
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).toBeNull();
+    });
   });
 
   it('handles closing the modal via the Cancel button', async () => {
@@ -80,15 +92,15 @@ describe('PatientEntry component', () => {
   it('shows Cancel and Save buttons when entry is not required', () => {
     isEntryRequired = false;
     renderComponent();
-    expect(screen.getByText('Cancel')).toBeDefined();
-    expect(screen.getByText('Save')).toBeDefined();
+    expect(screen.getByText('Cancel')).toBeInTheDocument();
+    expect(screen.getByText('Save')).toBeInTheDocument();
   });
 
   it('does not show Cancel button when entry is required', () => {
     isEntryRequired = true;
     renderComponent();
     expect(screen.queryByText('Cancel')).toBeNull();
-    expect(screen.getByText('Save')).toBeDefined();
+    expect(screen.getByText('Save')).toBeInTheDocument();
   });
 
   describe('User input', () => {
@@ -97,7 +109,7 @@ describe('PatientEntry component', () => {
       const saveButton = screen.getByText('Save');
       fireEvent.click(saveButton);
       await waitFor(() => {
-        expect(screen.getByText('Enter a valid patient ID')).toBeDefined();
+        expect(screen.getByText('Enter a valid patient ID')).toBeInTheDocument();
       });
     });
 
@@ -107,7 +119,7 @@ describe('PatientEntry component', () => {
       const saveButton = screen.getByText('Save');
       fireEvent.click(saveButton);
       await waitFor(() => {
-        expect(screen.getByText('Enter a valid patient ID')).toBeDefined();
+        expect(screen.getByText('Enter a valid patient ID')).toBeInTheDocument();
       });
     });
   });
