@@ -12,11 +12,11 @@ describe('SMART Launch', () => {
   let smartLaunchPromise; // function to test
   let retrieveDiscoveryServices;
 
-  console.log = jest.fn();
-  console.error = jest.fn();
   let FHIR;
 
   beforeEach(() => {
+    jest.spyOn(console, 'log').mockImplementation(() => {});
+    jest.spyOn(console, 'error').mockImplementation(() => {});
     defaultStore = {
       fhirServerState: {
         accessToken: null

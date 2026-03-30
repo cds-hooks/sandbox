@@ -4,6 +4,8 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
 import cx from 'classnames';
 import axios from 'axios';
 
@@ -304,13 +306,11 @@ export class CardList extends Component {
           ? this.renderSource(card.source)
           : '';
 
-        // -- Detail (ReactMarkdown supports Github-flavored markdown) --
+        // -- Detail (GFM enabled via remark-gfm plugin) --
         const detailSection = card.detail ? (
-          <ReactMarkdown
-            escapeHtml={false}
-            softBreak="br"
-            source={card.detail}
-          />
+          <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+            {card.detail}
+          </ReactMarkdown>
         ) : (
           ''
         );

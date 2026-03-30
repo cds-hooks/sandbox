@@ -116,14 +116,12 @@ const config = {
       ignoreOrder: false, // Enable to remove warnings about conflicting order
     }),
     */
-    new CopyWebpackPlugin([
-      {
-        from: '*.html',
-      },
-      {
-        from: './fhir-client.min.js',
-      },
-    ]),
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: '*.html' },
+        { from: './fhir-client.min.js' },
+      ],
+    }),
     new webpack.DefinePlugin({
       'runtime.FHIR_URL': JSON.stringify(process.env.FHIR_URL || 'https://api.hspconsortium.org/cdshooksdstu2/open')
     }),

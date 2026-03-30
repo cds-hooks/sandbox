@@ -1,5 +1,5 @@
 import React from 'react';
-import { mount, shallow } from 'enzyme';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 
@@ -11,12 +11,13 @@ describe('ServiceDisplay component', () => {
   let storeState;
   let mockStoreWrapper = configureStore([]);
   let mockStore;
-  console.error = jest.fn();
+
+  beforeEach(() => {
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
 
   let url;
   let urlDefinition;
-  let component;
-  let pureComponent;
 
   beforeEach(() => {
     mockStore = mockStoreWrapper({});
@@ -25,22 +26,24 @@ describe('ServiceDisplay component', () => {
       enabled: true,
       hook: 'patient-view'
     };
-    component = shallow(<ConnectedView store={mockStore} 
-                                       serviceUrl={url}
-                                       definition={urlDefinition} />);
-    pureComponent = component.find('ServiceDisplay').shallow();
   });
 
-  it('serves a services property in the component', () => {
-    expect(component.prop('definition')).toBeDefined();
-    expect(component.prop('serviceUrl')).toBeDefined();
+  it('renders service definition and URL from props', () => {
+    render(
+      <Provider store={mockStore}>
+        <ConnectedView serviceUrl={url} definition={urlDefinition} />
+      </Provider>
+    );
+    expect(screen.getByText(url)).toBeInTheDocument();
   });
 
   it('toggles enabled status for a service if the toggle switch is changed', () => {
-    // Find the FormControlLabel and get its control prop (the Switch)
-    const formControlLabel = pureComponent.find('ForwardRef(FormControlLabel)');
-    // Call the onChange prop directly from the Switch control
-    formControlLabel.prop('control').props.onChange();
+    render(
+      <Provider store={mockStore}>
+        <ConnectedView serviceUrl={url} definition={urlDefinition} />
+      </Provider>
+    );
+    fireEvent.click(screen.getByRole('checkbox'));
     expect(mockStore.getActions()).toEqual([{
       type: types.TOGGLE_SERVICE,
       service: url,
@@ -48,7 +51,12 @@ describe('ServiceDisplay component', () => {
   });
 
   it('deletes a configured service if the delete button is clicked', () => {
-    pureComponent.find('.btn-container').find('ForwardRef(Button)').simulate('click');
+    render(
+      <Provider store={mockStore}>
+        <ConnectedView serviceUrl={url} definition={urlDefinition} />
+      </Provider>
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
     expect(mockStore.getActions()).toEqual([{
       type: types.DELETE_SERVICE,
       service: url,

@@ -12,7 +12,9 @@ describe('Patient Retrieval', () => {
   const expectedConditions = {};
   let retrievePatient;
   let defaultStore = {};
-  console.error = jest.fn();
+  beforeEach(() => {
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
 
   function setMocksAndTestFunction(testStore) {
     const mockStoreWrapper = configureStore([]);

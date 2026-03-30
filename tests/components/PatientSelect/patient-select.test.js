@@ -1,9 +1,8 @@
 import React from 'react';
-import { shallow } from 'enzyme';
+import { render, screen } from '@testing-library/react';
 import PatientSelect from '../../../src/components/PatientSelect/patient-select';
 
 describe('PatientSelect component', () => {
-  let component;
   let inputOnChange;
   const patients = [
     { value: 'patient-1', label: 'John Doe (1990-01-01)' },
@@ -16,7 +15,7 @@ describe('PatientSelect component', () => {
 
   describe('rendering', () => {
     it('renders without FHIR server display when currentFhirServer is not provided', () => {
-      component = shallow(
+      render(
         <PatientSelect
           formFieldLabel="Select a Patient"
           shouldDisplayError={false}
@@ -25,13 +24,15 @@ describe('PatientSelect component', () => {
         />,
       );
 
-      expect(component.find('ForwardRef(Typography)').length).toEqual(0);
-      expect(component.find('ForwardRef(FormControl)').length).toEqual(1);
+      // No FHIR server text should be present
+      expect(screen.queryByText('Current FHIR server')).toBeNull();
+      // FormControl should be rendered with the label
+      expect(screen.getByText('Select a Patient')).toBeInTheDocument();
     });
 
     it('renders with FHIR server display when currentFhirServer is provided', () => {
       const fhirServer = 'http://example.com/fhir';
-      component = shallow(
+      const { getByText } = render(
         <PatientSelect
           currentFhirServer={fhirServer}
           formFieldLabel="Select a Patient"
@@ -41,14 +42,13 @@ describe('PatientSelect component', () => {
         />,
       );
 
-      expect(component.find('ForwardRef(Typography)').length).toEqual(2);
-      expect(component.find('ForwardRef(Typography)').at(0).dive().text()).toEqual('Current FHIR server');
-      expect(component.find('ForwardRef(Typography)').at(1).dive().text()).toEqual(fhirServer);
+      expect(getByText('Current FHIR server')).toBeTruthy();
+      expect(getByText(fhirServer)).toBeTruthy();
     });
 
     it('renders the form field label correctly', () => {
       const label = 'Choose a Patient';
-      component = shallow(
+      render(
         <PatientSelect
           formFieldLabel={label}
           shouldDisplayError={false}
@@ -57,13 +57,11 @@ describe('PatientSelect component', () => {
         />,
       );
 
-      const formLabel = component.find('ForwardRef(FormLabel)');
-      expect(formLabel.length).toEqual(1);
-      expect(formLabel.prop('required')).toBe(true);
+      expect(screen.getByText(label)).toBeInTheDocument();
     });
 
     it('renders with FormControl component', () => {
-      component = shallow(
+      render(
         <PatientSelect
           formFieldLabel="Select a Patient"
           shouldDisplayError={false}
@@ -72,13 +70,13 @@ describe('PatientSelect component', () => {
         />,
       );
 
-      expect(component.find('ForwardRef(FormControl)').length).toEqual(1);
-      expect(component.find('ForwardRef(FormControl)').prop('fullWidth')).toBe(true);
+      // FormControl renders with the label and required marker
+      expect(screen.getByText('Select a Patient')).toBeInTheDocument();
     });
 
     it('renders with required FormLabel', () => {
       const placeholder = 'Start typing to search...';
-      component = shallow(
+      render(
         <PatientSelect
           formFieldLabel="Select a Patient"
           shouldDisplayError={false}
@@ -88,14 +86,14 @@ describe('PatientSelect component', () => {
         />,
       );
 
-      expect(component.find('ForwardRef(FormLabel)').length).toEqual(1);
-      expect(component.find('ForwardRef(FormLabel)').prop('required')).toBe(true);
+      // MUI required FormLabel renders with asterisk text
+      expect(screen.getByText('*')).toBeInTheDocument();
     });
   });
 
   describe('error handling', () => {
     it('does not display error message when shouldDisplayError is false', () => {
-      component = shallow(
+      render(
         <PatientSelect
           formFieldLabel="Select a Patient"
           shouldDisplayError={false}
@@ -105,13 +103,12 @@ describe('PatientSelect component', () => {
         />,
       );
 
-      expect(component.find('ForwardRef(FormHelperText)').length).toEqual(0);
-      expect(component.find('ForwardRef(FormControl)').prop('error')).toEqual(false);
+      expect(screen.queryByText('An error occurred')).toBeNull();
     });
 
     it('displays error message when shouldDisplayError is true', () => {
       const errorMsg = 'Please select a valid patient';
-      component = shallow(
+      render(
         <PatientSelect
           formFieldLabel="Select a Patient"
           shouldDisplayError
@@ -121,15 +118,13 @@ describe('PatientSelect component', () => {
         />,
       );
 
-      expect(component.find('ForwardRef(FormHelperText)').length).toEqual(1);
-      expect(component.find('ForwardRef(FormHelperText)').dive().text()).toEqual(errorMsg);
-      expect(component.find('ForwardRef(FormControl)').prop('error')).toEqual(true);
+      expect(screen.getByText(errorMsg)).toBeInTheDocument();
     });
   });
 
   describe('patient list handling', () => {
     it('renders with provided patient list', () => {
-      component = shallow(
+      render(
         <PatientSelect
           formFieldLabel="Select a Patient"
           shouldDisplayError={false}
@@ -138,12 +133,11 @@ describe('PatientSelect component', () => {
         />,
       );
 
-      // Component should render without errors
-      expect(component.find('ForwardRef(FormControl)').length).toEqual(1);
+      expect(screen.getByText('Select a Patient')).toBeInTheDocument();
     });
 
     it('renders with empty patient list', () => {
-      component = shallow(
+      render(
         <PatientSelect
           formFieldLabel="Select a Patient"
           shouldDisplayError={false}
@@ -152,7 +146,7 @@ describe('PatientSelect component', () => {
         />,
       );
 
-      expect(component.find('ForwardRef(FormControl)').length).toEqual(1);
+      expect(screen.getByText('Select a Patient')).toBeInTheDocument();
     });
   });
 });

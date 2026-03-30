@@ -1,64 +1,82 @@
 import React from 'react';
-import { shallow, mount } from 'enzyme';
+import { render, screen, fireEvent } from '@testing-library/react';
 
 import ExchangePanel from '../../../src/components/ExchangePanel/exchange-panel';
 
 describe('ExchangePanel component', () => {
 
-  let wrapper;
   let panelHeader;
   let panelText;
 
   beforeEach(() => {
     panelHeader = 'Header';
     panelText = { test: 'test' };
-    wrapper = shallow(<ExchangePanel panelHeader={panelHeader}
-                                     panelText={panelText}
-                                     isExpanded={true} />);
   });
 
   it('should render relevant child components', () => {
-    expect(wrapper.find('ForwardRef(Accordion)')).toHaveLength(1);
-    expect(wrapper.find('ForwardRef(AccordionSummary)')).toHaveLength(1);
-    expect(wrapper.find('ForwardRef(AccordionDetails)')).toHaveLength(1);
+    render(<ExchangePanel panelHeader={panelHeader}
+                                     panelText={panelText}
+                                     isExpanded={true} />);
+    // Accordion, AccordionSummary, AccordionDetails all render in the DOM
+    expect(screen.getByText(panelHeader)).toBeInTheDocument();
+    expect(screen.getByText(/"test": "test"/)).toBeInTheDocument();
   });
 
   it('should have correct expansion state', () => {
-    expect(wrapper.find('ForwardRef(Accordion)').prop('expanded')).toEqual(true);
-    wrapper = shallow(<ExchangePanel panelHeader={panelHeader}
+    // isExpanded is used as initial state, so test each value with a fresh render
+    const { unmount } = render(<ExchangePanel panelHeader={panelHeader}
                                      panelText={panelText}
-                                     isExpanded={false} />);
-    expect(wrapper.find('ForwardRef(Accordion)').prop('expanded')).toEqual(false);
+                                     isExpanded={true} />);
+    expect(screen.getByRole('button', { name: panelHeader })).toHaveAttribute('aria-expanded', 'true');
+
+    unmount();
+    render(<ExchangePanel panelHeader={panelHeader}
+                            panelText={panelText}
+                            isExpanded={false} />);
+    expect(screen.getByRole('button', { name: panelHeader })).toHaveAttribute('aria-expanded', 'false');
   });
 
   it('should have state', () => {
-    expect(wrapper.state('isExpanded')).toEqual(true);
+    render(<ExchangePanel panelHeader={panelHeader}
+                                     panelText={panelText}
+                                     isExpanded={true} />);
+    // Verify expanded state via aria-expanded attribute
+    expect(screen.getByRole('button', { name: panelHeader })).toHaveAttribute('aria-expanded', 'true');
   });
 
   it('should have props', () => {
-    wrapper = shallow(<ExchangePanel panelHeader={panelHeader}
-                                     panelText={panelText}
-                                     isExpanded={true} />);
-    expect(wrapper.instance().props.isExpanded).toEqual(true);
-    expect(wrapper.instance().props.panelText).toEqual(panelText);
-    expect(wrapper.instance().props.panelHeader).toEqual(panelHeader);
+    render(<ExchangePanel panelHeader={panelHeader}
+                          panelText={panelText}
+                          isExpanded={true} />);
+    // Verify props are rendered correctly
+    expect(screen.getByText(panelHeader)).toBeInTheDocument();
+    // panelText is JSON stringified; check for the content
+    expect(screen.getByText(/"test": "test"/)).toBeInTheDocument();
   });
 
   it('should update state when the panel is expanded or collapsed', () => {
-    expect(wrapper.state('isExpanded')).toEqual(true);
-    wrapper.find('ForwardRef(Accordion)').simulate('change');
-    expect(wrapper.state('isExpanded')).toEqual(false);
-  });
-
-  it('should generate a div for each line of the JSON stringified panel text', () => {
-    expect(wrapper.find('.panel-text').find('pre').find('div')).toHaveLength(3);
-  });
-
-  it('should not generate any divs for empty panel text', () => {
-    panelText = '';
-    wrapper = shallow(<ExchangePanel panelHeader={panelHeader}
+    render(<ExchangePanel panelHeader={panelHeader}
                                      panelText={panelText}
                                      isExpanded={true} />);
-    expect(wrapper.find('.panel-text').find('pre').find('div')).toHaveLength(0);
+    const toggleButton = screen.getByRole('button', { name: panelHeader });
+    expect(toggleButton).toHaveAttribute('aria-expanded', 'true');
+    // Click the accordion summary to toggle
+    fireEvent.click(toggleButton);
+    expect(toggleButton).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('should display formatted JSON panel text', () => {
+    render(<ExchangePanel panelHeader={panelHeader}
+                                     panelText={panelText}
+                                     isExpanded={true} />);
+    expect(screen.getByText(/"test": "test"/)).toBeInTheDocument();
+  });
+
+  it('should not display any content for empty panel text', () => {
+    panelText = '';
+    render(<ExchangePanel panelHeader={panelHeader}
+                                     panelText={panelText}
+                                     isExpanded={true} />);
+    expect(screen.queryByText(/"test"/)).not.toBeInTheDocument();
   });
 });

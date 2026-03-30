@@ -4,9 +4,6 @@ import 'core-js/es/array/flat-map';
 
 
 describe('Service Exchange', () => {
-    console.error = jest.fn();
-    console.log = jest.fn();
-
     let mockAxios;
     let axios;
     let actions;
@@ -56,6 +53,8 @@ describe('Service Exchange', () => {
     }
 
     beforeEach(() => {
+        jest.spyOn(console, 'error').mockImplementation(() => {});
+        jest.spyOn(console, 'log').mockImplementation(() => {});
         fhirConfig = require('../../src/config/fhir-config');
         mockPatient = 'patient-1';
         mockFhirServer = 'http://fhir-server-example.com';
@@ -319,7 +318,7 @@ describe('Service Exchange', () => {
             });
 
             it('warns (advisory) on query modifiers outside recommended set', () => {
-                console.warn = jest.fn();
+                jest.spyOn(console, 'warn').mockImplementation(() => {});
                 mockRequest.prefetch = { test: prefetchedData };
                 const serviceResultStatus = 200;
                 mockAxios

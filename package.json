@@ -52,8 +52,8 @@
     "process": "^0.11.10",
     "prop-types": "^15.8.1",
     "query-string": "^5.1.0",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "react-intl": "^2.8.0",
     "react-markdown": "^10.1.0",
     "react-redux": "^5.0.6",
@@ -61,6 +61,8 @@
     "redux": "^3.7.2",
     "redux-immutable-state-invariant": "^2.1.0",
     "redux-logger": "^3.0.6",
+    "rehype-raw": "^7.0.0",
+    "remark-gfm": "^4.0.1",
     "uuid": "^3.3.3"
   },
   "devDependencies": {
@@ -71,6 +73,10 @@
     "@babel/polyfill": "^7.4.4",
     "@babel/preset-env": "^7.5.5",
     "@babel/preset-react": "^7.0.0",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "autoprefixer": "^10.4.23",
     "babel-eslint": "^10.0.3",
     "babel-jest": "^30.2.0",
@@ -78,8 +84,6 @@
     "copy-webpack-plugin": "^13.0.1",
     "core-js": "^3.47.0",
     "css-loader": "^5.0.1",
-    "enzyme": "^3.10.0",
-    "enzyme-adapter-react-16": "^1.14.0",
     "eslint": "^9.39.2",
     "eslint-config-airbnb": "^18.0.1",
     "eslint-plugin-import": "^2.18.2",
@@ -89,40 +93,46 @@
     "file-loader": "^6.0.0",
     "jest": "^30.2.0",
     "jest-environment-jsdom": "^30.2.0",
-    "jest-environment-jsdom-global": "^1.0.3",
     "mini-css-extract-plugin": "^1.6.1",
     "postcss": "^8.1.0",
     "postcss-custom-properties": "^14.0.6",
     "postcss-loader": "^4.2.0",
     "raw-loader": "^4.0.1",
-    "react-test-renderer": "^16.3.1",
     "redux-mock-store": "^1.4.0",
     "sass": "^1.77.0",
     "sass-loader": "^10.5.2",
     "style-loader": "^2.0.0",
     "terser-webpack-plugin": "^5.3.10",
     "webpack": "^5.104.1",
-    "webpack-cli": "^4.10.0",
+    "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^5.2.1",
-    "webpack-merge": "^4.2.2"
+    "webpack-merge": "^5.10.0"
   },
   "jest": {
-    "testURL": "https://cds-client.org",
     "setupFiles": [
       "./tests/jest-setup.js"
     ],
+    "setupFilesAfterEnv": [
+      "./tests/jest-setup-after-env.js"
+    ],
     "moduleNameMapper": {
       "\\.(jpg|jpeg|png|svg|pem)$": "<rootDir>/src/assets/__mocks__/fileMock.js",
-      "\\.(css|scss)$": "identity-obj-proxy"
+      "\\.(css|scss)$": "identity-obj-proxy",
+      "^react-markdown$": "<rootDir>/src/__mocks__/react-markdown.js",
+      "^remark-gfm$": "<rootDir>/src/__mocks__/remark-gfm.js",
+      "^rehype-raw$": "<rootDir>/src/__mocks__/rehype-raw.js"
     },
     "coveragePathIgnorePatterns": [
       "/jest-setup.js",
       "/store.js"
     ],
     "transformIgnorePatterns": [
-      "node_modules/(?!(@mui|@babel|@emotion)/)"
+      "/node_modules/(?!(@mui|@babel|@emotion)/)"
     ],
-    "testEnvironment": "jest-environment-jsdom-global"
+    "testEnvironment": "./tests/jest-environment-jsdom-global.js",
+    "testEnvironmentOptions": {
+      "url": "https://cds-client.org"
+    }
   },
   "browserslist": {
     "production": [

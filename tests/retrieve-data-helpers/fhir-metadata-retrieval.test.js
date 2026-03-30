@@ -11,9 +11,8 @@ describe('FHIR Metadata Retrieval', () => {
   let expectedMetadata;
   let retrieveFhirMetadata;
   let defaultStore = {};
-  console.error = jest.fn();
-
   beforeEach(() => {
+    jest.spyOn(console, 'error').mockImplementation(() => {});
     defaultStore = {
       fhirServerState: {
         defaultFhirServer,

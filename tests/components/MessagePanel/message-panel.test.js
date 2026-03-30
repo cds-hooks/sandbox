@@ -1,57 +1,86 @@
 import React from 'react';
-import { shallow, mount } from 'enzyme';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 
 import MessagePanel from '../../../src/components/MessagePanel/message-panel';
 
 describe('MessagePanel component', () => {
 
-  let wrapper;
   let panelHeader;
 
   beforeEach(() => {
     panelHeader = 'Header';
-    wrapper = shallow(<MessagePanel panelHeader={panelHeader}
-      isExpanded={true} />);
   });
 
   it('should render relevant child components', () => {
-    expect(wrapper.find('ForwardRef(Accordion)')).toHaveLength(1);
-    expect(wrapper.find('ForwardRef(AccordionSummary)')).toHaveLength(1);
-    expect(wrapper.find('ForwardRef(AccordionDetails)')).toHaveLength(1);
+    render(<MessagePanel panelHeader={panelHeader}
+      isExpanded={true} />);
+    expect(screen.getByText(panelHeader)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: panelHeader })).toBeInTheDocument();
   });
 
   it('should have correct expansion state', () => {
-    expect(wrapper.find('ForwardRef(Accordion)').prop('expanded')).toEqual(true);
-    wrapper = shallow(<MessagePanel panelHeader={panelHeader}
+    // isExpanded is used as initial state, so test each value with a fresh render
+    const { unmount } = render(<MessagePanel panelHeader={panelHeader}
+      isExpanded={true} />);
+    expect(screen.getByRole('button', { name: panelHeader })).toHaveAttribute('aria-expanded', 'true');
+
+    unmount();
+    render(<MessagePanel panelHeader={panelHeader}
       isExpanded={false} />);
-    expect(wrapper.find('ForwardRef(Accordion)').prop('expanded')).toEqual(false);
+    expect(screen.getByRole('button', { name: panelHeader })).toHaveAttribute('aria-expanded', 'false');
   });
 
   it('should have state', () => {
-    expect(wrapper.state('isExpanded')).toEqual(true);
+    render(<MessagePanel panelHeader={panelHeader}
+      isExpanded={true} />);
+    expect(screen.getByRole('button', { name: panelHeader })).toHaveAttribute('aria-expanded', 'true');
   });
 
   it('should have props', () => {
-    wrapper = shallow(<MessagePanel panelHeader={panelHeader}
+    render(<MessagePanel panelHeader={panelHeader}
       isExpanded={true} />);
-    expect(wrapper.instance().props.isExpanded).toEqual(true);
-    expect(wrapper.instance().props.panelHeader).toEqual(panelHeader);
+    expect(screen.getByText(panelHeader)).toBeInTheDocument();
   });
 
   it('should update state when the panel is expanded or collapsed', () => {
-    expect(wrapper.state('isExpanded')).toEqual(true);
-    wrapper.find('ForwardRef(Accordion)').simulate('change');
-    expect(wrapper.state('isExpanded')).toEqual(false);
+    render(<MessagePanel panelHeader={panelHeader}
+      isExpanded={true} />);
+    const toggleButton = screen.getByRole('button', { name: panelHeader });
+    expect(toggleButton).toHaveAttribute('aria-expanded', 'true');
+    fireEvent.click(toggleButton);
+    expect(toggleButton).toHaveAttribute('aria-expanded', 'false');
   });
 
-  it('should generate a div for each received message', () => {
-    wrapper.setState({ messages: ['{"messageId": "123", "messageType": "scratchpad.update"}', '{"messageId": "456", "messageType": "scratchpad.create"}'] });
-    expect(wrapper.find('.panel-text').find('pre')).toHaveLength(2);
+  it('should display each received message', () => {
+    render(<MessagePanel panelHeader={panelHeader}
+      isExpanded={true} />);
+
+    // Dispatch valid message events to add messages
+    const source = { postMessage: jest.fn() };
+    const messageData1 = { messageId: '123', messageType: 'scratchpad.update' };
+    const messageData2 = { messageId: '456', messageType: 'scratchpad.create' };
+
+    fireEvent(window, new MessageEvent('message', {
+      data: messageData1,
+      origin: 'https://smart-app.cds-service.net',
+      source: source,
+    }));
+
+    fireEvent(window, new MessageEvent('message', {
+      data: messageData2,
+      origin: 'https://smart-app.cds-service.net',
+      source: source,
+    }));
+
+    expect(screen.getByText(/"messageId": "123"/)).toBeInTheDocument();
+    expect(screen.getByText(/"messageId": "456"/)).toBeInTheDocument();
   });
 
-  it('should not generate any divs for empty messages', () => {
-    wrapper.setState({ messages: [] });
-    expect(wrapper.find('.panel-text').find('pre')).toHaveLength(0);
+  it('should not display any messages initially', () => {
+    render(<MessagePanel panelHeader={panelHeader}
+      isExpanded={true} />);
+    // No messages dispatched, so no message content
+    expect(screen.queryByText(/"messageId"/)).not.toBeInTheDocument();
   });
 
   describe('when receiving and responding to messages,', () => {
@@ -62,14 +91,10 @@ describe('MessagePanel component', () => {
       window.addEventListener = jest.fn((event, listener) => {
         registeredEventListeners[event] = listener;
       });
-
-      // Re-render after mocking addEventListener
-      wrapper = shallow(<MessagePanel panelHeader={panelHeader}
-        isExpanded={true} />);
     });
 
     afterEach(() => {
-      jest.resetModules();
+      jest.restoreAllMocks();
     });
 
     describe('when filtering unsupported messages,', () => {
@@ -77,17 +102,20 @@ describe('MessagePanel component', () => {
 
       beforeEach(() => {
         responseListener = jest.fn();
+        render(<MessagePanel panelHeader={panelHeader}
+          isExpanded={true} />);
       });
 
       afterEach(() => {
-        expect(wrapper.state('messages')).toEqual([]);
+        // No messages should have been added for unsupported messages
+        expect(screen.queryByText(/"messageId"/)).not.toBeInTheDocument();
         expect(responseListener).toHaveBeenCalledTimes(0);
       });
 
       it('should ignore messages that lack messageId', () => {
         sendMessage({ 'messageType': 'scratchpad.update' }, responseListener);
       });
-  
+
       it('should ignore messages that lack messageType', () => {
         sendMessage({ 'messageId': '123' }, responseListener);
       });
@@ -98,16 +126,25 @@ describe('MessagePanel component', () => {
     });
 
     it('should update state for each received message', () => {
+      render(<MessagePanel panelHeader={panelHeader}
+        isExpanded={true} />);
+
       const messageData1 = { 'messageId': '123', 'messageType': 'scratchpad.update' };
       const responseListener1 = jest.fn();
 
       const messageData2 = { 'messageId': '456', 'messageType': 'scratchpad.create' };
       const responseListener2 = jest.fn();
 
-      sendMessage(messageData1, responseListener1);
-      sendMessage(messageData2, responseListener2);
+      act(() => {
+        sendMessage(messageData1, responseListener1);
+      });
+      act(() => {
+        sendMessage(messageData2, responseListener2);
+      });
 
-      expect(wrapper.state('messages')).toEqual([JSON.stringify(messageData1, null, 2), JSON.stringify(messageData2, null, 2)]);
+      // Verify messages are rendered in the DOM
+      expect(screen.getByText(/"messageId": "123"/)).toBeInTheDocument();
+      expect(screen.getByText(/"messageId": "456"/)).toBeInTheDocument();
 
       expect(responseListener1).toHaveBeenCalled();
       expect(responseListener2).toHaveBeenCalled();
@@ -125,6 +162,9 @@ describe('MessagePanel component', () => {
       });
 
       it('should respond to scratchpad messages', () => {
+        render(<MessagePanel panelHeader={panelHeader}
+          isExpanded={true} />);
+
         const messageData = { 'messageId': '123', 'messageType': 'scratchpad.update' };
 
         sendMessage(messageData, responseListener);
@@ -136,6 +176,9 @@ describe('MessagePanel component', () => {
       });
 
       it('should respond to ui messages', () => {
+        render(<MessagePanel panelHeader={panelHeader}
+          isExpanded={true} />);
+
         const messageData = { 'messageId': '456', 'messageType': 'ui.done' };
 
         sendMessage(messageData, responseListener);

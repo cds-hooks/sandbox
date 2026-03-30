@@ -3,7 +3,6 @@ import MockAdapter from 'axios-mock-adapter';
 import retrieveLaunchContext from '../../src/retrieve-data-helpers/launch-context-retrieval';
 
 describe('Launch Context Retrieval', () => {
-  console.error = jest.fn();
   let mockAxios;
   let axios;
 
@@ -13,6 +12,7 @@ describe('Launch Context Retrieval', () => {
   const accessToken = { accessToken: '123' };
 
   beforeEach(() => {
+    jest.spyOn(console, 'error').mockImplementation(() => {});
     axios = require('axios').default;
     mockAxios = new MockAdapter(axios);
     link = {
