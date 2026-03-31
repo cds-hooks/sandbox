@@ -22,19 +22,20 @@ jobs:
           npm run lint
           npm run test
           npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: build/
   deploy:
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     needs: build
     runs-on: ubuntu-latest
     name: Deploy to GitHub Pages
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
+      - uses: actions/download-artifact@v4
         with:
-          node-version: 22
-      - run: |
-          npm ci
-          npm run build
+          name: build-output
+          path: build/
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
