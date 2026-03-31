@@ -32,7 +32,7 @@
     "@mui/material": "^5.18.0",
     "@mui/toolpad-core": "^0.1.51",
     "@mui/x-date-pickers": "^6.20.2",
-    "@uiw/react-codemirror": "4.11.4",
+    "@uiw/react-codemirror": "4.25.4",
     "acorn": "^8.11.3",
     "axios": "^1.13.2",
     "axios-mock-adapter": "^1.17.0",
