@@ -17,8 +17,16 @@ import ButtonGroup from '@mui/material/ButtonGroup';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Box from '@mui/material/Box';
+import CircularProgress from '@mui/material/CircularProgress';
+import LinearProgress from '@mui/material/LinearProgress';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+
+// Experimental CDS Hooks discovery extension key. A service that advertises
+// this in its discovery document is signalling "expect a noticeable wait" -
+// the UI renders a spinner while the request is in flight instead of the
+// usual empty state.
+const LONG_RUNNING_EXTENSION_URL = 'https://cds-hooks.org/experimental/long-running';
 import generateJWT from '../../retrieve-data-helpers/jwt-generator';
 
 import styles from './card-list.css';
@@ -52,6 +60,11 @@ const propTypes = {
    * JSON structure allowing mapping Card links to URLs with SMART launch contexts.
    */
   launchLinks: PropTypes.object,
+  /**
+   * True when a configured service that advertised the long-running
+   * discovery extension is currently awaiting a response.
+   */
+  awaitingLongRunning: PropTypes.bool,
 };
 
 /**
@@ -462,6 +475,35 @@ export class CardList extends Component {
         renderedCards.push(builtCard);
       });
     if (renderedCards.length === 0) {
+      // If a service that advertises the long-running discovery extension is
+      // currently in flight, show a wait indicator instead of the empty state -
+      // otherwise the user can't tell "no cards" from "still computing".
+      if (this.props.awaitingLongRunning) {
+        return (
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '60px 20px',
+              textAlign: 'center',
+            }}
+          >
+            <CircularProgress sx={{ marginBottom: 2 }} />
+            <Typography
+              variant="h6"
+              sx={{ color: '#666', fontWeight: 500, marginBottom: 1 }}
+            >
+              Analyzing patient data&hellip;
+            </Typography>
+            <Typography variant="body2" sx={{ color: '#999', maxWidth: 400 }}>
+              This service advertised that it may take a few seconds to
+              respond. Hold on while it computes.
+            </Typography>
+          </Box>
+        );
+      }
       return (
         <Box
           sx={{
@@ -502,11 +544,25 @@ export class CardList extends Component {
         </Box>
       );
     }
+    // A long-running service is refreshing the data we're already showing.
+    // Surface a thin progress bar above the existing cards so the user knows
+    // fresher results are on the way, without blanking the chart.
+    const refreshIndicator = this.props.awaitingLongRunning ? (
+      <Box sx={{ marginBottom: 1 }}>
+        <LinearProgress />
+        <Typography
+          variant="caption"
+          sx={{ color: '#666', display: 'block', marginTop: 0.5 }}
+        >
+          Re-analyzing patient data&hellip;
+        </Typography>
+      </Box>
+    ) : null;
+
     return (
       <div>
-        {' '}
+        {refreshIndicator}
         {renderedCards}
-        {' '}
       </div>
     );
   }
@@ -514,17 +570,27 @@ export class CardList extends Component {
 
 CardList.propTypes = propTypes;
 
-const mapStateToProps = (state, ownProps) => ({
-  ...ownProps,
-  cardResponses: getCardsFromServices(
-    state,
-    Object.keys(getServicesByHook(
-      state.hookState.currentHook,
-      state.cdsServicesState.configuredServices,
-    )),
-  ),
-  launchLinks: state.serviceExchangeState.launchLinks,
-});
+const mapStateToProps = (state, ownProps) => {
+  const servicesByHook = getServicesByHook(
+    state.hookState.currentHook,
+    state.cdsServicesState.configuredServices,
+  );
+  const pending = state.serviceExchangeState.pending || {};
+  // True iff any currently in-flight service for this hook declared itself
+  // long-running in its discovery document.
+  const awaitingLongRunning = Object.entries(servicesByHook).some(
+    ([url, service]) => pending[url]
+      && service
+      && service.extension
+      && service.extension[LONG_RUNNING_EXTENSION_URL],
+  );
+  return {
+    ...ownProps,
+    cardResponses: getCardsFromServices(state, Object.keys(servicesByHook)),
+    launchLinks: state.serviceExchangeState.launchLinks,
+    awaitingLongRunning,
+  };
+};
 
 export default connect(
   mapStateToProps,

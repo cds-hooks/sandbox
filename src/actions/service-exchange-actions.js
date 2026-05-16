@@ -64,3 +64,11 @@ export function selectService(service) {
     service,
   };
 }
+
+export function markServiceExchangePending(url) {
+  return { type: types.SERVICE_EXCHANGE_PENDING, url };
+}
+
+export function markServiceExchangeDone(url) {
+  return { type: types.SERVICE_EXCHANGE_DONE, url };
+}

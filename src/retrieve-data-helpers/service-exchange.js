@@ -4,6 +4,8 @@ import retrieveLaunchContext from './launch-context-retrieval';
 import {
   storeExchange,
   storeLaunchContext,
+  markServiceExchangePending,
+  markServiceExchangeDone,
 } from '../actions/service-exchange-actions';
 import { productionClientId, allScopes } from '../config/fhir-config';
 import generateJWT from './jwt-generator';
@@ -311,15 +313,20 @@ function callServices(dispatch, state, url, context, exchangeRound = 0) {
 
   const serviceDefinition = state.cdsServicesState.configuredServices[url];
 
-  const sendRequest = () => axios({
-    method: 'post',
-    url,
-    data: request,
-    headers: {
-      Accept: 'application/json',
-      Authorization: `Bearer ${generateJWT(url)}`,
-    },
-  });
+  const sendRequest = () => {
+    // Mark this service as in-flight so the UI can render a wait indicator
+    // for services that advertise the long-running discovery extension.
+    dispatch(markServiceExchangePending(url));
+    return axios({
+      method: 'post',
+      url,
+      data: request,
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${generateJWT(url)}`,
+      },
+    });
+  };
 
   const dispatchResult = (result) => {
     if (result.data && Object.keys(result.data).length) {
@@ -364,7 +371,8 @@ function callServices(dispatch, state, url, context, exchangeRound = 0) {
     }
     return sendRequest()
       .then(dispatchResult)
-      .catch(dispatchErrors);
+      .catch(dispatchErrors)
+      .finally(() => dispatch(markServiceExchangeDone(url)));
   });
 }
 
