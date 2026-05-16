@@ -5,6 +5,8 @@ const initialState = {
   exchanges: {},
   launchLinks: {},
   hiddenCards: {},
+  // Map of url -> true while a CDS POST is in flight. Cleared on completion.
+  pending: {},
 };
 
 const serviceExchangeReducers = (state = initialState, action) => {
@@ -31,6 +33,21 @@ const serviceExchangeReducers = (state = initialState, action) => {
           };
         }
         break;
+      }
+
+      case types.SERVICE_EXCHANGE_PENDING: {
+        if (!action.url) break;
+        return {
+          ...state,
+          pending: { ...state.pending, [action.url]: true },
+        };
+      }
+
+      case types.SERVICE_EXCHANGE_DONE: {
+        if (!action.url || !state.pending[action.url]) break;
+        const nextPending = { ...state.pending };
+        delete nextPending[action.url];
+        return { ...state, pending: nextPending };
       }
 
       case types.STORE_LAUNCH_LINK: {
@@ -75,6 +92,7 @@ const serviceExchangeReducers = (state = initialState, action) => {
           selectedService: '',
           exchanges: {},
           hiddenCards: {},
+          pending: {},
         };
       }
 
@@ -112,6 +130,7 @@ const serviceExchangeReducers = (state = initialState, action) => {
           selectedService: '',
           exchanges: {},
           hiddenCards: {},
+          pending: {},
         };
       }
 
