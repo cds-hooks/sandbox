@@ -21,12 +21,6 @@ import CircularProgress from '@mui/material/CircularProgress';
 import LinearProgress from '@mui/material/LinearProgress';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-
-// Experimental CDS Hooks discovery extension key. A service that advertises
-// this in its discovery document is signalling "expect a noticeable wait" -
-// the UI renders a spinner while the request is in flight instead of the
-// usual empty state.
-const LONG_RUNNING_EXTENSION_URL = 'https://cds-hooks.org/experimental/long-running';
 import generateJWT from '../../retrieve-data-helpers/jwt-generator';
 
 import styles from './card-list.css';
@@ -61,8 +55,9 @@ const propTypes = {
    */
   launchLinks: PropTypes.object,
   /**
-   * True when a configured service that advertised the long-running
-   * discovery extension is currently awaiting a response.
+   * True when a configured service that advertised the OPTIONAL
+   * "potentiallyLongRunning" discovery indicator is currently awaiting a
+   * response.
    */
   awaitingLongRunning: PropTypes.bool,
 };
@@ -475,8 +470,8 @@ export class CardList extends Component {
         renderedCards.push(builtCard);
       });
     if (renderedCards.length === 0) {
-      // If a service that advertises the long-running discovery extension is
-      // currently in flight, show a wait indicator instead of the empty state -
+      // If a service that advertises the "potentiallyLongRunning" discovery
+      // indicator is currently in flight, show a wait indicator instead of the empty state -
       // otherwise the user can't tell "no cards" from "still computing".
       if (this.props.awaitingLongRunning) {
         return (
@@ -576,13 +571,12 @@ const mapStateToProps = (state, ownProps) => {
     state.cdsServicesState.configuredServices,
   );
   const pending = state.serviceExchangeState.pending || {};
-  // True iff any currently in-flight service for this hook declared itself
-  // long-running in its discovery document.
+  // True iff any currently in-flight service for this hook advertised the
+  // OPTIONAL "potentiallyLongRunning" boolean in its discovery document.
   const awaitingLongRunning = Object.entries(servicesByHook).some(
     ([url, service]) => pending[url]
       && service
-      && service.extension
-      && service.extension[LONG_RUNNING_EXTENSION_URL],
+      && service.potentiallyLongRunning === true,
   );
   return {
     ...ownProps,

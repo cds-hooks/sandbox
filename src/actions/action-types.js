@@ -39,7 +39,7 @@ export const SELECT_SERVICE_CONTEXT = 'SELECT_SERVICE_CONTEXT';
 export const STORE_SERVICE_EXCHANGE = 'STORE_SERVICE_EXCHANGE';
 export const STORE_LAUNCH_LINK = 'STORE_LAUNCH_LINK';
 // In-flight tracking so the UI can show a spinner for services that
-// advertise the experimental "long-running" discovery extension.
+// advertise the OPTIONAL "potentiallyLongRunning" discovery indicator.
 export const SERVICE_EXCHANGE_PENDING = 'SERVICE_EXCHANGE_PENDING';
 export const SERVICE_EXCHANGE_DONE = 'SERVICE_EXCHANGE_DONE';
 

@@ -36,7 +36,9 @@ const serviceExchangeReducers = (state = initialState, action) => {
       }
 
       case types.SERVICE_EXCHANGE_PENDING: {
-        if (!action.url) break;
+        if (!action.url) {
+          break;
+        }
         return {
           ...state,
           pending: { ...state.pending, [action.url]: true },
@@ -44,7 +46,9 @@ const serviceExchangeReducers = (state = initialState, action) => {
       }
 
       case types.SERVICE_EXCHANGE_DONE: {
-        if (!action.url || !state.pending[action.url]) break;
+        if (!action.url || !state.pending[action.url]) {
+          break;
+        }
         const nextPending = { ...state.pending };
         delete nextPending[action.url];
         return { ...state, pending: nextPending };

@@ -315,7 +315,7 @@ function callServices(dispatch, state, url, context, exchangeRound = 0) {
 
   const sendRequest = () => {
     // Mark this service as in-flight so the UI can render a wait indicator
-    // for services that advertise the long-running discovery extension.
+    // for services that advertise the "potentiallyLongRunning" discovery indicator.
     dispatch(markServiceExchangePending(url));
     return axios({
       method: 'post',
