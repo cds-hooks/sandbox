@@ -8,7 +8,7 @@ describe('FHIR Server Reducers', () => {
     state = {
       currentFhirServer: '',
       currentMetadata: null,
-      fhirVersion: '1.0.2',
+      fhirVersion: '4.0.1',
       isDefaultFhirServer: true,
       accessToken: null,
       testFhirServer: null,
