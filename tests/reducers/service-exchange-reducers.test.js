@@ -12,6 +12,7 @@ describe('Services Exchange Reducers', () => {
       exchanges: {},
       launchLinks: {},
       hiddenCards: {},
+      pending: {},
     };
     storedExchange = {
       request: 'request',
@@ -181,12 +182,59 @@ describe('Services Exchange Reducers', () => {
     it('should reset the exchanges hash and any selected service', () => {
       state.exchanges[url] = storedExchange;
       state.hiddenCards[url] = ['1', '2']
+      state.pending[url] = true;
       const stateCopy = JSON.parse(JSON.stringify(state));
       stateCopy.exchanges = {};
       stateCopy.selectedService = '';
       stateCopy.hiddenCards = {};
+      stateCopy.pending = {};
       const action = { type: types.RESET_SERVICES };
       expect(reducer(state, action)).toEqual(stateCopy);
+    });
+  });
+
+  describe('SERVICE_EXCHANGE_PENDING', () => {
+    it('should mark a service url as pending', () => {
+      const action = { type: types.SERVICE_EXCHANGE_PENDING, url };
+      expect(reducer(state, action).pending).toEqual({ [url]: true });
+    });
+
+    it('should preserve other pending urls when marking a new one', () => {
+      const otherUrl = 'http://example.com/cds-services/id-2';
+      state.pending[otherUrl] = true;
+      const action = { type: types.SERVICE_EXCHANGE_PENDING, url };
+      expect(reducer(state, action).pending).toEqual({ [otherUrl]: true, [url]: true });
+    });
+
+    it('should not change state if no url is provided', () => {
+      const action = { type: types.SERVICE_EXCHANGE_PENDING };
+      expect(reducer(state, action)).toEqual(state);
+    });
+  });
+
+  describe('SERVICE_EXCHANGE_DONE', () => {
+    it('should clear the pending flag for the given url', () => {
+      state.pending[url] = true;
+      const action = { type: types.SERVICE_EXCHANGE_DONE, url };
+      expect(reducer(state, action).pending).toEqual({});
+    });
+
+    it('should only clear the pending flag for the given url', () => {
+      const otherUrl = 'http://example.com/cds-services/id-2';
+      state.pending[url] = true;
+      state.pending[otherUrl] = true;
+      const action = { type: types.SERVICE_EXCHANGE_DONE, url };
+      expect(reducer(state, action).pending).toEqual({ [otherUrl]: true });
+    });
+
+    it('should not change state if the url was not pending', () => {
+      const action = { type: types.SERVICE_EXCHANGE_DONE, url };
+      expect(reducer(state, action)).toEqual(state);
+    });
+
+    it('should not change state if no url is provided', () => {
+      const action = { type: types.SERVICE_EXCHANGE_DONE };
+      expect(reducer(state, action)).toEqual(state);
     });
   });
 
@@ -347,6 +395,7 @@ describe('Services Exchange Reducers', () => {
       state.exchanges[url] = storedExchange;
       state.selectedService = url;
       state.hiddenCards[url] = ['card-1', 'card-2'];
+      state.pending[url] = true;
 
       const action = {
         type: types.GET_PATIENT_SUCCESS,
@@ -356,6 +405,7 @@ describe('Services Exchange Reducers', () => {
       expect(result.exchanges).toEqual({});
       expect(result.selectedService).toEqual('');
       expect(result.hiddenCards).toEqual({});
+      expect(result.pending).toEqual({});
     });
 
     it('should preserve launchLinks when patient changes', () => {
