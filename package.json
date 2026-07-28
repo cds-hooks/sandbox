@@ -105,7 +105,7 @@
     "terser-webpack-plugin": "^5.4.0",
     "webpack": "^5.104.1",
     "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^5.2.4",
+    "webpack-dev-server": "^5.2.6",
     "webpack-merge": "^5.10.0"
   },
   "jest": {
