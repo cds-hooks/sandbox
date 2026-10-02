@@ -46,7 +46,7 @@ describe('Service Exchange', () => {
         jest.dontMock('query-string');
         axios = require('axios').default;
         mockAxios = new MockAdapter(axios);
-        jest.mock('uuid/v4', () => { return jest.fn(() => { return mockHookInstance })});
+        jest.mock('uuid', () => ({ v4: jest.fn(() => mockHookInstance) }));
         actions = require('../../src/actions/service-exchange-actions');
         jest.setMock('../../src/retrieve-data-helpers/jwt-generator', () => jwtMock);
         callServices = require('../../src/retrieve-data-helpers/service-exchange').default;

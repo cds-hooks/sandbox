@@ -63,7 +63,7 @@
     "redux-logger": "^3.0.6",
     "rehype-raw": "^7.0.0",
     "remark-gfm": "^4.0.1",
-    "uuid": "^3.3.3"
+    "uuid": "^14.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.29.6",
@@ -127,7 +127,7 @@
       "/store.js"
     ],
     "transformIgnorePatterns": [
-      "/node_modules/(?!(@mui|@babel|@emotion)/)"
+      "/node_modules/(?!(@mui|@babel|@emotion|uuid)/)"
     ],
     "testEnvironment": "./tests/jest-environment-jsdom-global.js",
     "testEnvironmentOptions": {
