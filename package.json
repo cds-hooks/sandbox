@@ -105,7 +105,7 @@
     "style-loader": "^2.0.0",
     "terser-webpack-plugin": "^5.6.1",
     "webpack": "^5.111.1",
-    "webpack-cli": "^5.1.4",
+    "webpack-cli": "^7.2.3",
     "webpack-dev-server": "^5.2.6",
     "webpack-merge": "^5.10.0"
   },
