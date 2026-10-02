@@ -23,6 +23,7 @@
     "react/destructuring-assignment": 0,
     "react/button-has-type": 0,
     "react/no-access-state-in-setstate": 0,
-    "import/no-cycle": 0
+    "import/no-cycle": 0,
+    "import/no-unresolved": [2, { "commonjs": true, "caseSensitive": true, "ignore": ["^uuid$"] }]
   }
 }

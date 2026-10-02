@@ -10,7 +10,7 @@ import {
 import { productionClientId, allScopes } from '../config/fhir-config';
 import generateJWT from './jwt-generator';
 
-const uuidv4 = require('uuid/v4');
+const { v4: uuidv4 } = require('uuid');
 
 const remapSmartLinks = ({
   dispatch,

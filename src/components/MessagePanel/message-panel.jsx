@@ -11,7 +11,7 @@ import { IconChevronRight, IconChevronDown } from '../../utils/iconMapping';
 
 import styles from './message-panel.css';
 
-const uuid = require('uuid/v4');
+const { v4: uuid } = require('uuid');
 
 const propTypes = {
   /**
