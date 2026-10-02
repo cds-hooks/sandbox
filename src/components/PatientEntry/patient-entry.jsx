@@ -95,7 +95,7 @@ export class PatientEntry extends Component {
       const patients = [];
       data.forEach((patient) => patients.push({ value: patient.id, label: `${patient.name}, ${patient.dob}` }));
       this.setState({ patients });
-    } catch (error) {
+    } catch {
       this.setState({ shouldDisplayError: true, errorMessage: 'Error fetching patients from FHIR Server' });
     }
   }
@@ -121,7 +121,7 @@ export class PatientEntry extends Component {
         if (this.props.resolve) { this.props.resolve(); }
         this.handleCloseModal();
       });
-    } catch (e) {
+    } catch {
       this.setState({
         shouldDisplayError: true,
         errorMessage: 'Failed to retrieve patient from FHIR server. See console for details.',

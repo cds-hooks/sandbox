@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import cx from 'classnames';
+import { v4 as uuid } from 'uuid';
 
 import CardContent from '@mui/material/CardContent';
 import Accordion from '@mui/material/Accordion';
@@ -10,8 +11,6 @@ import Typography from '@mui/material/Typography';
 import { IconChevronRight, IconChevronDown } from '../../utils/iconMapping';
 
 import styles from './message-panel.css';
-
-const { v4: uuid } = require('uuid');
 
 const propTypes = {
   /**

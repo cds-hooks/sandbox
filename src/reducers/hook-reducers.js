@@ -83,7 +83,6 @@ const hookReducers = (state = initialState, action) => {
 
       case types.CREATE_EXCHANGE_ROUND: {
         return produce(state, (draftState) => {
-          // eslint-disable-next-line no-param-reassign
           draftState.screens[action.screen].triggerPoints[
             action.triggerPoint
           ].lastExchangeRound = action.id;

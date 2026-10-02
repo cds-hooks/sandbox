@@ -19,7 +19,7 @@ export class CardDemo extends Component {
     let errorText = '';
     try {
       JSON.parse(props.tempUserJson);
-    } catch (e) {
+    } catch {
       displayJSONError = true;
       errorText = 'Cannot parse the JSON';
     }
@@ -102,7 +102,7 @@ export class CardDemo extends Component {
 
         this.props.storeTempCardResponse(newJSON);
       }
-    } catch (e) {
+    } catch {
       if (!this.state.displayJSONError) {
         this.setState({
           displayJSONError: true,

@@ -89,7 +89,7 @@ export class ServicesEntry extends Component {
       await retrieveDiscoveryServices(checkUrl).then(() => {
         this.handleCloseModal();
       });
-    } catch (e) {
+    } catch {
       this.setState({
         shouldDisplayError: true,
         errorMessage: 'Failed to connect to the discovery endpoint. See console for details.',

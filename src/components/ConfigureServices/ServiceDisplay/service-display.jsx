@@ -1,5 +1,3 @@
-/* eslint-disable react/forbid-prop-types, react/no-danger */
-
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
