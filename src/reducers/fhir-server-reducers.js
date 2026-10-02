@@ -4,8 +4,8 @@ const initialState = {
   testFhirServer: null,
   currentFhirServer: '',
   currentMetadata: null,
-  defaultFhirServer: 'https://launch.smarthealthit.org/v/r2/fhir',
-  fhirVersion: '1.0.2',
+  defaultFhirServer: 'https://launch.smarthealthit.org/v/r4/fhir',
+  fhirVersion: '4.0.1',
   isDefaultFhirServer: true,
   accessToken: null,
 };
