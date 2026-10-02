@@ -190,7 +190,7 @@ export class Pama extends Component {
           <div>
             <ul>
               {[studyCoding].map((r) => (
-                <li>
+                <li key={`${r.system}|${r.code}`}>
                   <MuiButton
                     title="Remove"
                     onClick={() => this.props.removeStudy(r)}
@@ -220,7 +220,7 @@ export class Pama extends Component {
           <div>
             <ul>
               {reasonCodings.map((r) => (
-                <li>
+                <li key={`${r.system}|${r.code}`}>
                   <MuiButton
                     title="Remove"
                     onClick={() => this.props.removeReason(r)}

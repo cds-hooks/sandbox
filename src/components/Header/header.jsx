@@ -1,5 +1,3 @@
-/* eslint-disable jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions, react/forbid-prop-types */
-
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -235,7 +233,7 @@ export class Header extends Component {
     if (testCurrentPatient) {
       try {
         await retrievePatient(this.props.patientId);
-      } catch (err) {
+      } catch {
         this.setState({ isChangePatientOpen: true });
         if (this.state.settingsOpen) { this.closeSettingsMenu(); }
       }

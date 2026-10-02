@@ -1,7 +1,6 @@
+import JWT from 'jsrsasign';
+import { v4 as uuid } from 'uuid';
 import privKey from '../../keys/ecprivkey.pem';
-
-const JWT = require('jsrsasign');
-const { v4: uuid } = require('uuid');
 
 /**
  * Generates a JWT for a CDS service call, given the audience (the URL endpoint). The JWT is signed using a private key stored on the repository.

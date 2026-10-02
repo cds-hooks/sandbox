@@ -1,5 +1,3 @@
-/* eslint-disable import/prefer-default-export */
-
 import * as types from './action-types';
 
 /**

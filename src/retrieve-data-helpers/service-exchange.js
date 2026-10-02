@@ -1,5 +1,6 @@
 import axios from 'axios';
 import queryString from 'query-string';
+import { v4 as uuidv4 } from 'uuid';
 import retrieveLaunchContext from './launch-context-retrieval';
 import {
   storeExchange,
@@ -9,8 +10,6 @@ import {
 } from '../actions/service-exchange-actions';
 import { productionClientId, allScopes } from '../config/fhir-config';
 import generateJWT from './jwt-generator';
-
-const { v4: uuidv4 } = require('uuid');
 
 const remapSmartLinks = ({
   dispatch,
