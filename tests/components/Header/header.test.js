@@ -57,7 +57,7 @@ describe('Header component', () => {
   // Helper to find the settings gear button (last IconButton in the toolbar)
   function getSettingsButton(container) {
     const buttons = container.querySelectorAll('button');
-    const nonNavButtons = Array.from(buttons).filter(b => !b.classList.contains('nav-links') && !b.classList.contains('active-link'));
+    const nonNavButtons = Array.from(buttons).filter(b => !b.classList.contains('nav-links') && !b.classList.contains('active-link') && !b.closest('.MuiAlert-root'));
     return nonNavButtons[nonNavButtons.length - 1];
   }
 

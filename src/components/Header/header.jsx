@@ -15,6 +15,7 @@ import {
   IconSettings, IconChevronDown, IconLeft, IconEdit,
 } from '../../utils/iconMapping';
 
+import DeprecationBanner from '../DeprecationBanner/deprecation-banner';
 import ConfigureServices from '../ConfigureServices/configure-services';
 import ServicesEntry from '../ServicesEntry/services-entry';
 import PatientEntry from '../PatientEntry/patient-entry';
@@ -324,6 +325,8 @@ export class Header extends Component {
             </IconButton>
           </Toolbar>
         </AppBar>
+
+        <DeprecationBanner />
 
         {gearMenu}
         {this.state.isAddServicesOpen ? (
