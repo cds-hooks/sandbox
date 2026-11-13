@@ -102,12 +102,12 @@
     "redux-mock-store": "^1.5.5",
     "sass": "^1.105.1",
     "sass-loader": "^10.5.2",
-    "style-loader": "^2.0.0",
+    "style-loader": "^4.0.0",
     "terser-webpack-plugin": "^5.6.1",
     "webpack": "^5.111.1",
-    "webpack-cli": "^5.1.4",
+    "webpack-cli": "^7.3.1",
     "webpack-dev-server": "^5.2.6",
-    "webpack-merge": "^5.10.0"
+    "webpack-merge": "^6.0.1"
   },
   "jest": {
     "setupFiles": [
