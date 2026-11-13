@@ -188,4 +188,48 @@ describe('Patient Retrieval', () => {
       });
     });
   });
+
+  describe('When the default patient no longer exists on the FHIR server', () => {
+    beforeEach(() => {
+      localStorage.removeItem('PERSISTED_patientId');
+      jest.spyOn(console, 'warn').mockImplementation(() => {});
+    });
+
+    it('falls back to the first patient on the server', async () => {
+      setMocksAndTestFunction(defaultStore);
+      const fallbackPatient = { resourceType: 'Patient', id: 'fallback-id' };
+      const spy = jest.spyOn(actions, 'signalSuccessPatientRetrieval');
+      mockAxios.onGet(`${fhirServer}/Patient/default-patient-id`).reply(410);
+      mockAxios.onGet(`${fhirServer}/Patient?_count=1`)
+        .reply(200, { resourceType: 'Bundle', entry: [{ resource: fallbackPatient }] });
+      mockAxios.onGet(`${fhirServer}/Patient/fallback-id`).reply(200, fallbackPatient);
+
+      await retrievePatient();
+      expect(spy).toHaveBeenCalledWith(fallbackPatient);
+      spy.mockRestore();
+    });
+
+    it('rejects and dispatches a failure when the server has no patients', async () => {
+      setMocksAndTestFunction(defaultStore);
+      const spy = jest.spyOn(actions, 'signalFailurePatientRetrieval');
+      mockAxios.onGet(`${fhirServer}/Patient/default-patient-id`).reply(410);
+      mockAxios.onGet(`${fhirServer}/Patient?_count=1`).reply(200, { resourceType: 'Bundle' });
+
+      await expect(retrievePatient()).rejects.toBeDefined();
+      expect(spy).toHaveBeenCalled();
+      spy.mockRestore();
+    });
+
+    it('does not fall back for a patient the user picked earlier', async () => {
+      localStorage.setItem('PERSISTED_patientId', 'persisted-id');
+      setMocksAndTestFunction(defaultStore);
+      mockAxios.onGet(`${fhirServer}/Patient/persisted-id`).reply(404);
+      mockAxios.onGet(`${fhirServer}/Patient?_count=1`)
+        .reply(200, { resourceType: 'Bundle', entry: [{ resource: { id: 'fallback-id' } }] });
+
+      await expect(retrievePatient()).rejects.toBeDefined();
+      expect(mockAxios.history.get.map((r) => r.url)).not.toContain(`${fhirServer}/Patient?_count=1`);
+      localStorage.removeItem('PERSISTED_patientId');
+    });
+  });
 });

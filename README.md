@@ -39,7 +39,7 @@ The tool also allows for testing against different patients and FHIR servers (se
 
 While users have the option to configure properties of the Sandbox in-app like the FHIR server, the patient in context, the medication details on Rx View, etc., they also have the option to configure these values on launch via URL query parameters. The Sandbox supports the following query parameters.
   - `fhirServiceUrl` - FHIR server base URL that MUST be URL encoded (i.e. `fhirServiceUrl=https%3A%2F%2Fapi.hspconsortium.org%2Fcdshooksdstu2%2Fopen`)
-  - `patientId` - The ID of the Patient in context as it relates to the associated FHIR server (i.e. `patientId=SMART-1288992`)
+  - `patientId` - The ID of the Patient in context as it relates to the associated FHIR server (i.e. `patientId=f2316789-30c4-4c06-9193-0ca5475bbb1b`)
   - `screen` - The main screen of the Sandbox to display by default (e.g., `screen=rx-view`)
   - `hook` - The default hook for the main screen (e.g., `hook=order-select`)
   - `serviceDiscoveryURL` - A comma-separated list of URL encoded CDS service discovery endpoints (i.e. `serviceDiscoveryURL=http%3A%2F%2Flocalhost%3A3000%2Fcds-services,https%3A%2F%2Fsandbox-services.cds-hooks.org%2Fcds-services`)
