@@ -1,13 +1,14 @@
 import * as types from '../actions/action-types';
+import formatPatientName from '../utils/patient-name';
 
 const initialState = {
-  defaultPatientId: 'smart-1288992',
-  defaultUser: 'Practitioner/COREPRACTITIONER1',
+  defaultPatientId: 'f2316789-30c4-4c06-9193-0ca5475bbb1b',
+  defaultUser: 'Practitioner/6d705d81-8546-43b2-b336-31a282128f2d',
   currentUser: '',
   currentPatient: {
-    id: 'smart-1288992',
-    name: 'Daniel X. Adams',
-    birthDate: '1925-12-23',
+    id: 'f2316789-30c4-4c06-9193-0ca5475bbb1b',
+    name: 'Casimira Nicolas',
+    birthDate: '1987-03-27',
     patientResource: {},
     conditionsResources: [],
   },
@@ -19,14 +20,9 @@ const patientReducers = (state = initialState, action) => {
       // Store Patient resource from successful connection to patient in context from FHIR server
       case types.GET_PATIENT_SUCCESS: {
         const { patient } = action;
-        let fullName = 'Unknown';
-        if (Array.isArray(patient.name)) {
-          const familyName = (Array.isArray(patient.name[0].family)) ? patient.name[0].family.join(' ') : patient.name[0].family;
-          fullName = `${patient.name[0].given.join(' ')} ${familyName}`;
-        }
         const newPatient = {
           id: patient.id,
-          name: fullName,
+          name: formatPatientName(patient.name),
           birthDate: patient.birthDate,
           patientResource: patient,
         };

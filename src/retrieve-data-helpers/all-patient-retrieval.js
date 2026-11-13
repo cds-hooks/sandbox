@@ -1,5 +1,6 @@
 import axios from 'axios';
 import store from '../store/store';
+import formatPatientName from '../utils/patient-name';
 
 function retrieveAllPatientIds() {
   return new Promise((resolve, reject) => {
@@ -22,14 +23,11 @@ function retrieveAllPatientIds() {
       if (result.data && result.data.resourceType === 'Bundle'
         && Array.isArray(result.data.entry) && result.data.entry.length) {
         result.data.entry.forEach((patient) => {
-          const patientInfo = { id: '', name: 'Unknown', dob: '' };
-          patientInfo.id = patient.resource.id;
-          if (Array.isArray(patient.resource.name)) {
-            const familyName = Array.isArray(patient.resource.name[0].family) ? patient.resource.name[0].family.join(' ') : patient.resource.name[0].family;
-            patientInfo.name = `${patient.resource.name[0].given.join(' ')} ${familyName}`;
-          }
-          patientInfo.dob = patient.resource.birthDate;
-          patientInfoList.push(patientInfo);
+          patientInfoList.push({
+            id: patient.resource.id,
+            name: formatPatientName(patient.resource.name),
+            dob: patient.resource.birthDate,
+          });
         });
         return resolve(patientInfoList);
       }
