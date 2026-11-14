@@ -1,6 +1,5 @@
 const webpack = require('webpack');
 const path = require('path');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const Autoprefixer = require('autoprefixer');
 const CustomProperties = require('postcss-custom-properties');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
@@ -110,12 +109,6 @@ const config = {
     ],
   },
   plugins: [
-    /*
-    new MiniCssExtractPlugin({
-      filename: 'styles.css',
-      ignoreOrder: false, // Enable to remove warnings about conflicting order
-    }),
-    */
     new CopyWebpackPlugin({
       patterns: [
         { from: '*.html' },
