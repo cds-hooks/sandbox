@@ -37,3 +37,7 @@ npm-debug.log
 aggregated-translations
 
 build
+
+# Claude Code personal files (may hold secrets)
+**/.claude/settings.local.json
+CLAUDE.local.md
